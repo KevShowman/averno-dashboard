@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String  @id @default(cuid())
+  discordId    String  @unique
+  username     String
+  avatarUrl    String?
+  email        String?
+  role         Role    @default(SOLDADO)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  actions      ActionLog[]
+  moneyTxCreated MoneyTransaction[] @relation("tx_created_by")
+  moneyTxApproved MoneyTransaction[] @relation("tx_approved_by")
+  stockMovements StockMovement[]
+
+  @@map("users")
+}
+
+enum Role { 
+  // Alte Rollen (temporär für Migration)
+  ADMIN
+  QUARTIERMEISTER
+  MITGLIED
+  GAST
+  // Neue Rollen
+  EL_PATRON     // Admin, alle Rechte
+  DON           // Sekundärer Admin, viele Rechte
+  ASESOR        // Alles muss genehmigt werden
+  SOLDADO       // Normales Mitglied, nur lesen
+}
+
+model Module {
+  id        String  @id @default(cuid())
+  key       String  @unique // "lager", "kasse", future modules
+  name      String
+  enabled   Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("modules")
+}
+
+model ItemCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  items Item[]
+  createdAt DateTime @default(now())
+
+  @@map("item_categories")
+}
+
+model Item {
+  id           String @id @default(cuid())
+  name         String
+  sku          String? @unique
+  categoryId   String
+  category     ItemCategory @relation(fields: [categoryId], references: [id])
+  minStock     Int    @default(0)
+  currentStock Int    @default(0)
+  reservedStock Int   @default(0)
+  isLocked     Boolean @default(false)
+  tags         String[] // Prisma text[] in Postgres
+  location     String? // Regal/Standort
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  stockEntries StockMovement[]
+
+  @@map("items")
+}
+
+enum MovementType { 
+  IN 
+  OUT 
+  ADJUST 
+  RESERVE 
+  RELEASE 
+}
+
+model StockMovement {
+  id          String @id @default(cuid())
+  itemId      String
+  item        Item   @relation(fields: [itemId], references: [id])
+  type        MovementType
+  quantity    Int
+  previousStock Int
+  newStock    Int
+  note        String?
+  reference   String? // Auftrag/Person/Event
+  batchNumber String? // für Serien/Batches
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@map("stock_movements")
+}
+
+model MoneyTransaction {
+  id          String @id @default(cuid())
+  kind        MoneyKind
+  amount      Int // in Einheiten (1 = 1$ Schwarz)
+  category    String?
+  note        String?
+  reference   String? // Auftrag/Person
+  status      TransactionStatus @default(PENDING)
+  approvedById String?
+  createdById String
+  createdBy   User   @relation("tx_created_by", fields: [createdById], references: [id])
+  approvedBy  User?  @relation("tx_approved_by", fields: [approvedById], references: [id])
+  approvedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@map("money_transactions")
+}
+
+enum MoneyKind { 
+  EINZAHLUNG 
+  AUSZAHLUNG 
+  TRANSFER 
+  KORREKTUR 
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ActionLog {
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  action    String // e.g. "ITEM_CREATE", "MOVE_OUT", "MONEY_TX"
+  entity    String // "Item", "StockMovement", "MoneyTransaction"
+  entityId  String
+  meta      Json
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("action_logs")
+}
+
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}

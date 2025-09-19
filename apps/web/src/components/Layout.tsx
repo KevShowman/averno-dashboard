@@ -1,0 +1,192 @@
+import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuthStore } from '../stores/auth'
+import { 
+  Skull, 
+  Home, 
+  Package, 
+  DollarSign, 
+  Settings, 
+  FileText, 
+  Menu,
+  X,
+  LogOut,
+  User,
+  Activity
+} from 'lucide-react'
+import { Button } from './ui/button'
+import { cn } from '../lib/utils'
+
+interface LayoutProps {
+  children: React.ReactNode
+}
+
+const navigation = [
+  { name: 'Dashboard', href: '/app', icon: Home },
+  { name: 'Lager', href: '/lager', icon: Package },
+  { name: 'Kasse', href: '/kasse', icon: DollarSign },
+  { name: 'Live-Ticker', href: '/ticker', icon: Activity },
+  { name: 'Audit-Log', href: '/audit', icon: FileText },
+  { name: 'Einstellungen', href: '/settings', icon: Settings },
+]
+
+export default function Layout({ children }: LayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const location = useLocation()
+  const { user, logout } = useAuthStore()
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      {/* Mobile sidebar */}
+      <div className={cn(
+        "fixed inset-0 z-50 lg:hidden",
+        sidebarOpen ? "block" : "hidden"
+      )}>
+        <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed left-0 top-0 h-full w-64 bg-gray-800 shadow-xl">
+          <div className="flex h-16 items-center justify-between px-4">
+            <div className="flex items-center space-x-2">
+              <Skull className="h-8 w-8 text-primary" />
+              <span className="text-lg font-bold text-white">LaSanta Calavera</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X className="h-6 w-6 text-white" />
+            </Button>
+          </div>
+          <nav className="mt-8 px-4">
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={cn(
+                    "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  )}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.name}</span>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-64 lg:bg-gray-800">
+        <div className="flex h-16 items-center px-4">
+          <div className="flex items-center space-x-2">
+            <Skull className="h-8 w-8 text-primary" />
+            <span className="text-lg font-bold text-white">LaSanta Calavera</span>
+          </div>
+        </div>
+        <nav className="mt-8 px-4">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary text-white"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.name}</span>
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* User info at bottom */}
+        {user && (
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <div className="flex items-center space-x-3 rounded-lg bg-gray-700 p-3">
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.username}
+                  className="h-8 w-8 rounded-full"
+                />
+              ) : (
+                <User className="h-8 w-8 text-gray-400" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {user.username}
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  {user.role}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={logout}
+                className="text-gray-400 hover:text-white"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b border-gray-700 bg-gray-800 px-4 shadow-sm lg:gap-x-6 lg:px-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden text-white"
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+
+          <div className="flex flex-1 justify-end">
+            {user && (
+              <div className="flex items-center space-x-4 lg:hidden">
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.username}
+                    className="h-8 w-8 rounded-full"
+                  />
+                ) : (
+                  <User className="h-8 w-8 text-gray-400" />
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={logout}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Page content */}
+        <main className="p-4 lg:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
+}
