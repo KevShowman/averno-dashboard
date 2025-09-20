@@ -72,7 +72,10 @@ export class ItemsService {
     }
 
     if (criticalOnly) {
-      where.currentStock = { lte: this.prisma.item.fields.minStock };
+      where.AND = [
+        { minStock: { gt: 0 } }, // Nur Items mit Mindestbestand > 0
+        { currentStock: { lte: this.prisma.item.fields.minStock } }
+      ];
     }
 
     const [items, total] = await Promise.all([
@@ -94,7 +97,7 @@ export class ItemsService {
     // Add critical status
     const itemsWithStatus = items.map(item => ({
       ...item,
-      isCritical: item.currentStock <= item.minStock,
+      isCritical: item.minStock > 0 && item.currentStock <= item.minStock,
       availableStock: item.currentStock - item.reservedStock,
     }));
 
@@ -132,7 +135,7 @@ export class ItemsService {
 
     return {
       ...item,
-      isCritical: item.currentStock <= item.minStock,
+      isCritical: item.minStock > 0 && item.currentStock <= item.minStock,
       availableStock: item.currentStock - item.reservedStock,
     };
   }
