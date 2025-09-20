@@ -28,6 +28,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: lasanta-api
     restart: unless-stopped
+    command: ["node", "dist/src/main.js"]
     ports:
       - "3000:3000"
     environment:

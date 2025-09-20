@@ -8,7 +8,7 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Kopiere package files
-COPY package*.json ./
+COPY package.json package-lock.json pnpm-lock.yaml ./
 
 # Installiere Dependencies
 RUN pnpm install
@@ -26,8 +26,8 @@ RUN pnpm run build
 # Production Stage
 FROM node:18-alpine AS production
 
-# Installiere pnpm
-RUN npm install -g pnpm
+# Installiere pnpm und wget
+RUN npm install -g pnpm && apk add --no-cache wget
 
 # Erstelle non-root user
 RUN addgroup -g 1001 -S nodejs
@@ -37,7 +37,7 @@ RUN adduser -S nestjs -u 1001
 WORKDIR /app
 
 # Kopiere package files
-COPY package*.json ./
+COPY package.json package-lock.json pnpm-lock.yaml ./
 
 # Installiere nur Production Dependencies
 RUN pnpm install --prod
@@ -58,7 +58,7 @@ EXPOSE 3000
 
 # Health Check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node healthcheck.js
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # Starte Anwendung
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
