@@ -534,6 +534,12 @@ export class ItemsService {
   async rejectMovement(movementId: string, rejectedById: string, reason: string) {
     const movement = await this.prisma.stockMovement.findUnique({
       where: { id: movementId },
+      include: {
+        item: true,
+        createdBy: {
+          select: { id: true, username: true, role: true },
+        },
+      },
     });
 
     if (!movement) {
