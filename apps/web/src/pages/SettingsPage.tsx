@@ -25,6 +25,7 @@ const getRoleDisplayName = (role: string) => {
     case 'DON': return 'Don'
     case 'ASESOR': return 'Asesor'
     case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
+    case 'LOGISTICA': return 'Logistica'
     case 'SICARIO': return 'Sicario'
     case 'SOLDADO': return 'Soldado'
     default: return role
@@ -349,6 +350,7 @@ export default function SettingsPage() {
                             <option value="SOLDADO">Soldado</option>
                             <option value="SICARIO">Sicario</option>
                             <option value="ROUTENVERWALTUNG">Routenverwaltung</option>
+                            <option value="LOGISTICA">Logistica</option>
                             <option value="ASESOR">Asesor</option>
                             <option value="DON">Don</option>
                             <option value="EL_PATRON">El Patrón</option>

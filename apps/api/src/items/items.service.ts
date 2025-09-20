@@ -235,7 +235,7 @@ export class ItemsService {
     }
 
     // Determine if movement needs approval
-    const needsApproval = userRole !== Role.EL_PATRON && userRole !== Role.DON && userRole !== Role.LOGISTICA;
+    const needsApproval = userRole !== Role.EL_PATRON && userRole !== Role.LOGISTICA;
 
     if (needsApproval) {
       // Create pending movement without updating stock

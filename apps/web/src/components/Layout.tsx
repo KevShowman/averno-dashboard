@@ -13,7 +13,8 @@ import {
   LogOut,
   User,
   Activity,
-  FlaskConical
+  FlaskConical,
+  Clock
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName } from '../lib/utils'
@@ -28,6 +29,7 @@ const getRoleDisplayName = (role: string) => {
     case 'DON': return 'Don'
     case 'ASESOR': return 'Asesor'
     case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
+    case 'LOGISTICA': return 'Logistica'
     case 'SOLDADO': return 'Soldado'
     default: return role
   }
@@ -36,6 +38,7 @@ const getRoleDisplayName = (role: string) => {
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: Home },
   { name: 'Lager', href: '/lager', icon: Package },
+  { name: 'Lagerbewegungen', href: '/lager-movements', icon: Clock },
   { name: 'Kasse', href: '/kasse', icon: DollarSign },
   { name: 'Kokain', href: '/kokain', icon: FlaskConical },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },

@@ -8,7 +8,7 @@ export interface User {
   icLastName?: string
   avatarUrl?: string
   email?: string
-  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'SICARIO' | 'SOLDADO'
+  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO'
   createdAt: string
 }
 

@@ -109,7 +109,7 @@ export class KokainController {
   }
 
   @Delete('deposit/:id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ROUTENVERWALTUNG)
   async removeDeposit(
     @Param('id') depositId: string,
     @Body('reason') reason: string,

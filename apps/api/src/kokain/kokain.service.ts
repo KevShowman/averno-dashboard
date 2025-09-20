@@ -431,7 +431,10 @@ export class KokainService {
   async removePendingDeposit(depositId: string, removedById: string, reason: string) {
     const deposit = await this.prisma.kokainDeposit.findUnique({
       where: { id: depositId },
-      include: { user: true },
+      include: { 
+        user: true,
+        uebergabe: true 
+      },
     });
 
     if (!deposit) {
@@ -440,6 +443,11 @@ export class KokainService {
 
     if (deposit.status === DepositStatus.REJECTED) {
       throw new BadRequestException('Abgelehnte Deposits können nicht entfernt werden');
+    }
+
+    // Prüfe ob Deposit zu einer archivierten Übergabe gehört
+    if (deposit.uebergabe && !deposit.uebergabe.isActive) {
+      throw new BadRequestException('Deposits aus archivierten Übergaben können nicht entfernt werden');
     }
 
     // Deposit löschen
@@ -467,6 +475,6 @@ export class KokainService {
   canConfirmDeposit(userRole: Role): boolean {
     return userRole === Role.EL_PATRON || 
            userRole === Role.DON || 
-           userRole === Role.ASESOR;
+           userRole === Role.ROUTENVERWALTUNG;
   }
 }

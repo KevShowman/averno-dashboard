@@ -154,6 +154,8 @@ export default function KokainPage() {
   const canManage = user?.role === 'EL_PATRON' || user?.role === 'DON'
   const canManagePrice = user?.role === 'EL_PATRON' || user?.role === 'DON' || 
                         user?.role === 'ASESOR' || user?.role === 'ROUTENVERWALTUNG'
+  const canRemove = user?.role === 'EL_PATRON' || user?.role === 'DON' ||
+                   user?.role === 'ROUTENVERWALTUNG'
 
   const handleCreateDeposit = () => {
     const packages = parseInt(depositPackages)
@@ -420,16 +422,18 @@ export default function KokainPage() {
                             >
                               <XCircle className="h-3 w-3" />
                             </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
-                              onClick={() => handleRemoveDeposit(deposit.id)}
-                              disabled={removeDepositMutation.isPending}
-                              title="Deposit entfernen"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
+                            {canRemove && (
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
+                                onClick={() => handleRemoveDeposit(deposit.id)}
+                                disabled={removeDepositMutation.isPending}
+                                title="Deposit entfernen"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       )}
@@ -512,7 +516,7 @@ export default function KokainPage() {
                       <TableCell className="text-gray-300">
                         {deposit.confirmedAt ? formatDate(deposit.confirmedAt) : '-'}
                       </TableCell>
-                      {canConfirm && (
+                      {canRemove && (
                         <TableCell>
                           <Button 
                             size="sm" 

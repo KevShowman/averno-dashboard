@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import LagerPage from './pages/LagerPage'
+import LagerMovementsPage from './pages/LagerMovementsPage'
 import KassePage from './pages/KassePage'
 import KokainPage from './pages/KokainPage'
 import AuditPage from './pages/AuditPage'
@@ -51,6 +52,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <LagerPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/lager-movements" element={
+          <ProtectedRoute>
+            <Layout>
+              <LagerMovementsPage />
             </Layout>
           </ProtectedRoute>
         } />

@@ -34,7 +34,7 @@ export default function KassePage() {
     queryFn: () => api.get(`/cash/chart?range=${selectedRange}`).then(res => res.data),
   })
 
-  const canApprove = user?.role === 'EL_PATRON' || user?.role === 'DON'
+  const canApprove = user?.role === 'EL_PATRON'
 
   const approveTransactionMutation = useMutation({
     mutationFn: (transactionId: string) => api.post(`/cash/transactions/${transactionId}/approve`),

@@ -81,7 +81,7 @@ export class ItemsController {
   }
 
   @Post(':id/move')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async moveItem(
     @Param('id') id: string,
@@ -123,14 +123,14 @@ export class ItemsController {
   }
 
   @Get('movements/pending')
-  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async getPendingMovements() {
     return this.itemsService.getPendingMovements();
   }
 
   @Patch('movements/:id/approve')
-  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async approveMovement(
     @Param('id') movementId: string,
@@ -140,7 +140,7 @@ export class ItemsController {
   }
 
   @Patch('movements/:id/reject')
-  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async rejectMovement(
     @Param('id') movementId: string,

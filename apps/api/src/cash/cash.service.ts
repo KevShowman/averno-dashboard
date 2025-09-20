@@ -195,7 +195,7 @@ export class CashService {
   }
 
   async approveTransaction(id: string, userId: string, userRole: Role) {
-    if (userRole !== Role.EL_PATRON && userRole !== Role.DON) {
+    if (userRole !== Role.EL_PATRON) {
       throw new BadRequestException('Insufficient permissions to approve transactions');
     }
 
@@ -253,7 +253,7 @@ export class CashService {
   }
 
   async rejectTransaction(id: string, userId: string, userRole: Role) {
-    if (userRole !== Role.EL_PATRON && userRole !== Role.DON) {
+    if (userRole !== Role.EL_PATRON) {
       throw new BadRequestException('Insufficient permissions to reject transactions');
     }
 
