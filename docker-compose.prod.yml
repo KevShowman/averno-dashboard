@@ -43,9 +43,9 @@ services:
       DISCORD_CLIENT_SECRET: "${DISCORD_CLIENT_SECRET}"
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
       DISCORD_GUILD_ID: "${DISCORD_GUILD_ID}"
-      DISCORD_REDIRECT_URI: "${FRONTEND_URL}/api/auth/discord/callback"
-      FRONTEND_URL: "${FRONTEND_URL}"
-      API_BASE_URL: "${API_BASE_URL}"
+      DISCORD_REDIRECT_URI: "https://lsc-nc.de/api/auth/discord/callback"
+      FRONTEND_URL: "https://lsc-nc.de"
+      API_BASE_URL: "https://lsc-nc.de"
     depends_on:
       db:
         condition: service_healthy
@@ -62,8 +62,8 @@ services:
       dockerfile: Dockerfile.prod
     container_name: lasanta-web
     restart: unless-stopped
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
       NODE_ENV: production
     depends_on:
@@ -71,12 +71,13 @@ services:
     networks:
       - lasanta-network
 
-  # Nginx Reverse Proxy (Optional)
+  # Nginx Reverse Proxy with SSL
   nginx:
     image: nginx:alpine
     container_name: lasanta-nginx
     restart: unless-stopped
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
