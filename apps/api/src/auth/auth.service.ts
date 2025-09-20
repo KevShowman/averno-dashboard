@@ -51,6 +51,7 @@ export class AuthService {
           avatarUrl: avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png` : null,
           email,
           role: validation.highestRole!,
+          allRoles: validation.allRoles || [validation.highestRole!],
           discordRoles: userDiscordRoles,
         },
       });
@@ -63,6 +64,7 @@ export class AuthService {
           avatarUrl: avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png` : user.avatarUrl,
           email: email || user.email,
           role: validation.highestRole!,
+          allRoles: validation.allRoles || [validation.highestRole!],
           discordRoles: userDiscordRoles,
         },
       });

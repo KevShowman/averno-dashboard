@@ -76,7 +76,10 @@ async function main() {
 
     // Ausrüstung
     { name: 'Westen', sku: 'ARMOR-VEST', categoryId: ausruestungCat.id, minStock: 100, tags: ['schutz', 'weste'] },
-    { name: 'Säcke', sku: 'EQUIP-BAGS', categoryId: ausruestungCat.id, minStock: 20, tags: ['säcke', 'entführung'] },
+    { name: 'Säcke', sku: 'EQUIP-BAGS', categoryId: ausruestungCat.id, minStock: 10, tags: ['säcke', 'entführung'] },
+    { name: 'Taucheranzug', sku: 'EQUIP-DIVING', categoryId: ausruestungCat.id, minStock: 5, tags: ['taucher', 'anzug'] },
+    { name: 'Seile', sku: 'EQUIP-ROPES', categoryId: ausruestungCat.id, minStock: 20, tags: ['seile', 'werkzeug'] },
+    { name: 'Folterstuhl', sku: 'EQUIP-TORTURE', categoryId: ausruestungCat.id, minStock: 1, tags: ['folter', 'stuhl'] },
 
     // Zubehör
     { name: 'Schalldämpfer', sku: 'ATT-SUPPRESSOR', categoryId: zubehoerCat.id, minStock: 10, tags: ['aufsatz', 'schalldämpfer'] },

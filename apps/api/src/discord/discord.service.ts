@@ -52,7 +52,7 @@ export class DiscordService {
     }
   }
 
-  async validateUserAccess(discordId: string): Promise<{ hasAccess: boolean; highestRole?: Role; reason?: string }> {
+  async validateUserAccess(discordId: string): Promise<{ hasAccess: boolean; highestRole?: Role; allRoles?: Role[]; reason?: string }> {
     try {
       // Discord-Rollen des Benutzers abrufen
       const userDiscordRoles = await this.getUserRoles(discordId);
@@ -81,10 +81,12 @@ export class DiscordService {
         };
       }
 
-      // Höchste Rolle bestimmen
+      // Alle System-Rollen des Users bestimmen
       const userRoleMappings = roleMappings.filter(mapping => 
         validRoles.includes(mapping.discordRoleId)
       );
+
+      const allUserRoles = userRoleMappings.map(mapping => mapping.systemRole);
 
       // Rollen-Hierarchie definieren (höhere Zahlen = höhere Berechtigung)
       const roleHierarchy = {
@@ -92,8 +94,9 @@ export class DiscordService {
         [Role.SICARIO]: 2,
         [Role.ROUTENVERWALTUNG]: 3,
         [Role.ASESOR]: 4,
-        [Role.DON]: 5,
-        [Role.EL_PATRON]: 6,
+        [Role.LOGISTICA]: 5,
+        [Role.DON]: 6,
+        [Role.EL_PATRON]: 7,
       };
 
       const highestRole = userRoleMappings.reduce((highest, current) => {
@@ -104,7 +107,8 @@ export class DiscordService {
 
       return {
         hasAccess: true,
-        highestRole: highestRole.systemRole
+        highestRole: highestRole.systemRole,
+        allRoles: allUserRoles
       };
 
     } catch (error) {
@@ -123,7 +127,17 @@ export class DiscordService {
       throw new BadRequestException(validation.reason || 'Zugriff verweigert');
     }
 
-    return validation.highestRole!;
+    // User in der Datenbank aktualisieren
+    const user = await this.prisma.user.update({
+      where: { discordId },
+      data: { 
+        role: validation.highestRole,
+        allRoles: validation.allRoles || [validation.highestRole],
+        discordRoles: await this.getUserRoles(discordId)
+      }
+    });
+
+    return user.role;
   }
 
   async updateUserDiscordRoles(userId: string, discordRoles: string[]): Promise<void> {
@@ -131,6 +145,19 @@ export class DiscordService {
       where: { id: userId },
       data: { discordRoles }
     });
+  }
+
+  async userHasRole(userId: string, requiredRole: Role): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { allRoles: true }
+    });
+
+    if (!user) {
+      return false;
+    }
+
+    return user.allRoles.includes(requiredRole);
   }
 
   async getAllServerMembers(): Promise<any[]> {
@@ -186,8 +213,9 @@ export class DiscordService {
           [Role.SICARIO]: 2,
           [Role.ROUTENVERWALTUNG]: 3,
           [Role.ASESOR]: 4,
-          [Role.DON]: 5,
-          [Role.EL_PATRON]: 6,
+          [Role.LOGISTICA]: 5,
+          [Role.DON]: 6,
+          [Role.EL_PATRON]: 7,
         };
 
         const highestRole = memberRoleMappings.reduce((highest, current) => {
@@ -196,6 +224,8 @@ export class DiscordService {
           return currentLevel > highestLevel ? current : highest;
         });
 
+        const allSystemRoles = memberRoleMappings.map(mapping => mapping.systemRole);
+
         return {
           discordId: member.user.id,
           username: member.user.username,
@@ -203,6 +233,7 @@ export class DiscordService {
           avatar: member.user.avatar,
           discordRoles: member.roles,
           highestSystemRole: highestRole.systemRole,
+          allSystemRoles: allSystemRoles,
           highestRoleName: highestRole.name,
           joinedAt: member.joined_at,
           isInDatabase: false // Wird später aktualisiert
@@ -266,6 +297,7 @@ export class DiscordService {
             `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : null,
           email: null, // Discord Bot kann keine E-Mail abrufen
           role: validation.highestRole!,
+          allRoles: validation.allRoles || [validation.highestRole!],
           discordRoles: userDiscordRoles,
         },
       });
@@ -297,6 +329,7 @@ export class DiscordService {
               data: {
                 username: member.username,
                 role: member.highestSystemRole,
+                allRoles: member.allSystemRoles || [member.highestSystemRole],
                 discordRoles: member.discordRoles,
               }
             });
@@ -312,6 +345,7 @@ export class DiscordService {
                   null,
                 email: null,
                 role: member.highestSystemRole,
+                allRoles: member.allSystemRoles || [member.highestSystemRole],
                 discordRoles: member.discordRoles,
               }
             });

@@ -31,7 +31,7 @@ export class AuthController {
       httpOnly: true,
       secure: false, // Set to false for HTTP in production
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {

@@ -19,6 +19,7 @@ model User {
   avatarUrl    String?
   email        String?
   role         Role    @default(SOLDADO)
+  allRoles     Role[]  // Alle System-Rollen des Users
   discordRoles String[] // Discord Rollen-IDs
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
