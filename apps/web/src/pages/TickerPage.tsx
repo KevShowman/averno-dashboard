@@ -34,57 +34,114 @@ export default function TickerPage() {
 
   if (stockMovements?.movements) {
     stockMovements.movements.forEach((movement: any) => {
-      allActivities.push({
-        id: `stock-${movement.id}`,
-        type: 'lager',
-        timestamp: movement.createdAt,
-        user: movement.createdBy,
-        action: movement.type,
-        details: {
-          itemName: movement.item?.name || 'Unbekannter Artikel',
-          quantity: movement.quantity,
-          note: movement.note,
-          reference: movement.reference,
-        }
-      })
+      // Nur APPROVED Bewegungen im Ticker anzeigen
+      if (movement.status === 'APPROVED') {
+        allActivities.push({
+          id: `stock-${movement.id}`,
+          type: 'lager',
+          timestamp: movement.createdAt,
+          user: movement.createdBy,
+          action: movement.type,
+          details: {
+            itemName: movement.item?.name || 'Unbekannter Artikel',
+            quantity: movement.quantity,
+            note: movement.note,
+            reference: movement.reference,
+          }
+        })
+      } else if (movement.status === 'PENDING') {
+        // Pending Bewegungen als "angefragt" anzeigen
+        allActivities.push({
+          id: `stock-pending-${movement.id}`,
+          type: 'lager',
+          timestamp: movement.createdAt,
+          user: movement.createdBy,
+          action: movement.type,
+          isPending: true,
+          details: {
+            itemName: movement.item?.name || 'Unbekannter Artikel',
+            quantity: movement.quantity,
+            note: movement.note,
+            reference: movement.reference,
+          }
+        })
+      }
     })
   }
 
   if (cashTransactions?.transactions) {
     cashTransactions.transactions.forEach((transaction: any) => {
-      allActivities.push({
-        id: `cash-${transaction.id}`,
-        type: 'kasse',
-        timestamp: transaction.createdAt,
-        user: transaction.createdBy,
-        action: transaction.kind,
-        details: {
-          amount: transaction.amount,
-          category: transaction.category,
-          note: transaction.note,
-          status: transaction.status,
-          reference: transaction.reference,
-        }
-      })
+      // Nur APPROVED Transaktionen im Ticker anzeigen
+      if (transaction.status === 'APPROVED') {
+        allActivities.push({
+          id: `cash-${transaction.id}`,
+          type: 'kasse',
+          timestamp: transaction.createdAt,
+          user: transaction.createdBy,
+          action: transaction.kind,
+          details: {
+            amount: transaction.amount,
+            category: transaction.category,
+            note: transaction.note,
+            status: transaction.status,
+            reference: transaction.reference,
+          }
+        })
+      } else if (transaction.status === 'PENDING') {
+        // Pending Transaktionen als "angefragt" anzeigen
+        allActivities.push({
+          id: `cash-pending-${transaction.id}`,
+          type: 'kasse',
+          timestamp: transaction.createdAt,
+          user: transaction.createdBy,
+          action: transaction.kind,
+          isPending: true,
+          details: {
+            amount: transaction.amount,
+            category: transaction.category,
+            note: transaction.note,
+            status: transaction.status,
+            reference: transaction.reference,
+          }
+        })
+      }
     })
   }
 
   if (kokainDeposits?.deposits) {
     kokainDeposits.deposits.forEach((deposit: any) => {
-      allActivities.push({
-        id: `kokain-${deposit.id}`,
-        type: 'kokain',
-        timestamp: deposit.createdAt,
-        user: deposit.user,
-        action: deposit.status,
-        details: {
-          packages: deposit.packages,
-          note: deposit.note,
-          status: deposit.status,
-          confirmedBy: deposit.confirmedBy,
-          confirmedAt: deposit.confirmedAt,
-        }
-      })
+      // Nur CONFIRMED Deposits im Ticker anzeigen
+      if (deposit.status === 'CONFIRMED') {
+        allActivities.push({
+          id: `kokain-${deposit.id}`,
+          type: 'kokain',
+          timestamp: deposit.createdAt,
+          user: deposit.user,
+          action: deposit.status,
+          details: {
+            packages: deposit.packages,
+            note: deposit.note,
+            status: deposit.status,
+            confirmedBy: deposit.confirmedBy,
+            confirmedAt: deposit.confirmedAt,
+          }
+        })
+      } else if (deposit.status === 'PENDING') {
+        // Pending Deposits als "angefragt" anzeigen
+        allActivities.push({
+          id: `kokain-pending-${deposit.id}`,
+          type: 'kokain',
+          timestamp: deposit.createdAt,
+          user: deposit.user,
+          action: deposit.status,
+          isPending: true,
+          details: {
+            packages: deposit.packages,
+            note: deposit.note,
+            status: deposit.status,
+          }
+        })
+      }
     })
   }
 
@@ -293,19 +350,21 @@ export default function TickerPage() {
                         <div className="flex items-center space-x-2">
                           {getActivityIcon(activity.type, activity.action)}
                           <Badge className={
-                            activity.type === 'lager' 
-                              ? getMovementTypeColor(activity.action)
-                              : activity.type === 'kokain'
-                                ? activity.action === 'CONFIRMED' 
-                                  ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                  : activity.action === 'REJECTED'
-                                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                                    : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                              : activity.details.status 
-                                ? getTransactionStatusColor(activity.details.status)
-                                : 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                            activity.isPending
+                              ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
+                              : activity.type === 'lager' 
+                                ? getMovementTypeColor(activity.action)
+                                : activity.type === 'kokain'
+                                  ? activity.action === 'CONFIRMED' 
+                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                    : activity.action === 'REJECTED'
+                                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                                      : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                  : activity.details.status 
+                                    ? getTransactionStatusColor(activity.details.status)
+                                    : 'bg-gray-500/20 text-gray-400 border-gray-500/30'
                           }>
-                            {getActionDisplay(activity.type, activity.action)}
+                            {activity.isPending ? '[ANGEFRAGT] ' : ''}{getActionDisplay(activity.type, activity.action)}
                           </Badge>
                         </div>
                       </TableCell>

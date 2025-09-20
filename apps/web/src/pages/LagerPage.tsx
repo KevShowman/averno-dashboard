@@ -208,7 +208,7 @@ export default function LagerPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          {(user?.role === 'EL_PATRON' || user?.role === 'ASESOR') && (
+                          {(user?.role === 'EL_PATRON' || user?.role === 'ASESOR' || user?.role === 'DON') && (
                             <>
                               <Button 
                                 size="sm" 

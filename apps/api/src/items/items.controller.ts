@@ -81,7 +81,7 @@ export class ItemsController {
   }
 
   @Post(':id/move')
-  @Roles(Role.EL_PATRON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.ASESOR, Role.DON)
   @UseGuards(RolesGuard)
   async moveItem(
     @Param('id') id: string,
@@ -123,8 +123,6 @@ export class ItemsController {
   }
 
   @Get('movements/pending')
-  @Roles(Role.EL_PATRON, Role.LOGISTICA)
-  @UseGuards(RolesGuard)
   async getPendingMovements() {
     return this.itemsService.getPendingMovements();
   }

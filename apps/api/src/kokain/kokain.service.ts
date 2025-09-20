@@ -71,6 +71,7 @@ export class KokainService {
     return this.prisma.kokainDeposit.findMany({
       where: {
         status: DepositStatus.CONFIRMED,
+        uebergabeId: null, // Nur Deposits der aktuellen Übergabe (nicht archiviert)
       },
       include: {
         user: {

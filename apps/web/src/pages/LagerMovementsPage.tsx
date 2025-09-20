@@ -27,6 +27,7 @@ export default function LagerMovementsPage() {
   })
 
   const canApprove = ['EL_PATRON', 'LOGISTICA'].includes(user?.role || '')
+  const canView = true // Alle können ausstehende Bewegungen sehen
 
   const approveMovementMutation = useMutation({
     mutationFn: (movementId: string) => api.patch(`/items/movements/${movementId}/approve`),
