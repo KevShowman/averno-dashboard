@@ -57,6 +57,8 @@ export class KokainService {
           select: {
             id: true,
             username: true,
+            icFirstName: true,
+            icLastName: true,
             avatarUrl: true,
           },
         },
@@ -482,6 +484,7 @@ export class KokainService {
   canConfirmDeposit(userRole: Role): boolean {
     return userRole === Role.EL_PATRON || 
            userRole === Role.DON || 
-           userRole === Role.ROUTENVERWALTUNG;
+           userRole === Role.ROUTENVERWALTUNG ||
+           userRole === Role.LOGISTICA;
   }
 }

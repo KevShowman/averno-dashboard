@@ -61,32 +61,34 @@ async function main() {
   // Create items
   const items = [
     // Waffen
-    { name: '.50 Kaliber', sku: 'WPN-50CAL', categoryId: waffenCat.id, minStock: 5, tags: ['pistole', 'kaliber50'] },
+    { name: '.50 Kaliber', sku: 'WPN-50CAL', categoryId: waffenCat.id, minStock: 0, tags: ['pistole', 'kaliber50'] },
     { name: 'Pistole', sku: 'WPN-PISTOL', categoryId: waffenCat.id, minStock: 10, tags: ['pistole', 'standard'] },
-    { name: 'Schwere Pistole', sku: 'WPN-HEAVY-PISTOL', categoryId: waffenCat.id, minStock: 5, tags: ['pistole', 'combat'] },
-    { name: 'Advanced Gewehr', sku: 'WPN-ADV-RIFLE', categoryId: waffenCat.id, minStock: 3, tags: ['gewehr', 'sturm'] },
-    { name: 'Spezialkarabiner', sku: 'WPN-SPEC-CARBINE', categoryId: waffenCat.id, minStock: 3, tags: ['karabiner', 'spezial'] },
-    { name: 'Tommy Gun', sku: 'WPN-GUSENBERG', categoryId: waffenCat.id, minStock: 2, tags: ['tommy', 'automatik'] },
-    { name: 'Karabiner', sku: 'WPN-CARBINE', categoryId: waffenCat.id, minStock: 5, tags: ['karabiner', 'standard'] },
+    { name: 'Schwere Pistole', sku: 'WPN-HEAVY-PISTOL', categoryId: waffenCat.id, minStock: 0, tags: ['pistole', 'combat'] },
+    { name: 'Advanced Gewehr', sku: 'WPN-ADV-RIFLE', categoryId: waffenCat.id, minStock: 0, tags: ['gewehr', 'sturm'] },
+    { name: 'Spezialkarabiner', sku: 'WPN-SPEC-CARBINE', categoryId: waffenCat.id, minStock: 0, tags: ['karabiner', 'spezial'] },
+    { name: 'Tommy Gun', sku: 'WPN-GUSENBERG', categoryId: waffenCat.id, minStock: 0, tags: ['tommy', 'automatik'] },
+    { name: 'Karabiner', sku: 'WPN-CARBINE', categoryId: waffenCat.id, minStock: 0, tags: ['karabiner', 'standard'] },
+    { name: 'SMG', sku: 'WPN-SMG', categoryId: waffenCat.id, minStock: 10, tags: ['smg', 'automatik'] },
+    { name: 'PDW', sku: 'WPN-PDW', categoryId: waffenCat.id, minStock: 10, tags: ['pdw', 'automatik'] },
 
     // Munition
     { name: 'Munition', sku: 'AMMO-UNIVERSAL', categoryId: munitionCat.id, minStock: 500, tags: ['munition', 'universal'] },
 
     // Ausrüstung
-    { name: 'Westen', sku: 'ARMOR-VEST', categoryId: ausruestungCat.id, minStock: 15, tags: ['schutz', 'weste'] },
+    { name: 'Westen', sku: 'ARMOR-VEST', categoryId: ausruestungCat.id, minStock: 100, tags: ['schutz', 'weste'] },
     { name: 'Säcke', sku: 'EQUIP-BAGS', categoryId: ausruestungCat.id, minStock: 20, tags: ['säcke', 'entführung'] },
 
     // Zubehör
     { name: 'Schalldämpfer', sku: 'ATT-SUPPRESSOR', categoryId: zubehoerCat.id, minStock: 10, tags: ['aufsatz', 'schalldämpfer'] },
-    { name: 'Zielfernrohr', sku: 'ATT-SCOPE', categoryId: zubehoerCat.id, minStock: 8, tags: ['aufsatz', 'zielfernrohr'] },
-    { name: 'Erweitertes Magazin', sku: 'ATT-EXT-MAG', categoryId: zubehoerCat.id, minStock: 15, tags: ['aufsatz', 'magazin'] },
-    { name: 'Taschenlampe', sku: 'ATT-FLASHLIGHT', categoryId: zubehoerCat.id, minStock: 12, tags: ['aufsatz', 'licht'] },
+    { name: 'Zielfernrohr', sku: 'ATT-SCOPE', categoryId: zubehoerCat.id, minStock: 10, tags: ['aufsatz', 'zielfernrohr'] },
+    { name: 'Erweitertes Magazin', sku: 'ATT-EXT-MAG', categoryId: zubehoerCat.id, minStock: 10, tags: ['aufsatz', 'magazin'] },
+    { name: 'Taschenlampe', sku: 'ATT-FLASHLIGHT', categoryId: zubehoerCat.id, minStock: 10, tags: ['aufsatz', 'licht'] },
 
     // Medizin
-    { name: 'Medkits', sku: 'MED-MEDKIT', categoryId: medizinCat.id, minStock: 25, tags: ['medizin', 'heilung'] },
+    { name: 'Medkits', sku: 'MED-MEDKIT', categoryId: medizinCat.id, minStock: 300, tags: ['medizin', 'heilung'] },
 
     // Werkzeug
-    { name: 'Repairkits', sku: 'TOOL-REPAIR', categoryId: werkzeugCat.id, minStock: 15, tags: ['reparatur', 'werkzeug'] },
+    { name: 'Repairkits', sku: 'TOOL-REPAIR', categoryId: werkzeugCat.id, minStock: 300, tags: ['reparatur', 'werkzeug'] },
   ];
 
   const createdItems = [];

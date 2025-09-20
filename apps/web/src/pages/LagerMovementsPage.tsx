@@ -167,7 +167,7 @@ export default function LagerMovementsPage() {
                           : movement.type === 'OUT'
                           ? movement.item.currentStock - movement.quantity
                           : movement.type === 'ADJUST'
-                          ? movement.item.currentStock + movement.quantity
+                          ? movement.quantity  // ADJUST sets to absolute value
                           : movement.item.currentStock
                         }
                       </TableCell>

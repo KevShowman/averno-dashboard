@@ -513,7 +513,7 @@ export class ItemsService {
           newStock = currentItem.currentStock - movement.quantity;
           break;
         case MovementType.ADJUST:
-          newStock = currentItem.currentStock + movement.quantity; // quantity is the adjustment amount
+          newStock = movement.quantity; // quantity is the new desired stock level
           break;
         case MovementType.RESERVE:
           newStock = currentItem.currentStock;

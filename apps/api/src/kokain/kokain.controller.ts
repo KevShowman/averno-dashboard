@@ -34,7 +34,7 @@ export class KokainController {
   }
 
   @Patch('deposit/:id/confirm')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.LOGISTICA)
   async confirmDeposit(
     @Param('id') depositId: string,
     @CurrentUser() user: User,
@@ -47,7 +47,7 @@ export class KokainController {
   }
 
   @Patch('deposit/:id/reject')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.LOGISTICA)
   async rejectDeposit(
     @Param('id') depositId: string,
     @Body('reason') reason: string,
