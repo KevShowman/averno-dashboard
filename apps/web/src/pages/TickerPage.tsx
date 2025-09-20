@@ -30,7 +30,7 @@ export default function TickerPage() {
   })
 
   // Combine and sort activities
-  const allActivities = []
+  const allActivities: any[] = []
 
   if (stockMovements?.movements) {
     stockMovements.movements.forEach((movement: any) => {

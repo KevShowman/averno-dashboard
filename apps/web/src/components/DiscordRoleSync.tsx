@@ -27,7 +27,7 @@ export default function DiscordRoleSync() {
 
   const syncRoleMutation = useMutation({
     mutationFn: () => api.patch('/discord/sync-user-role'),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('Rolle erfolgreich synchronisiert!')
       queryClient.invalidateQueries({ queryKey: ['auth-me'] })
       queryClient.invalidateQueries({ queryKey: ['discord-user-roles'] })

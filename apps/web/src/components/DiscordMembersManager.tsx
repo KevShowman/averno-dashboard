@@ -44,7 +44,7 @@ export default function DiscordMembersManager() {
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Importieren des Benutzers')
+        toast.error((error.response?.data as any)?.message || 'Fehler beim Importieren des Benutzers')
     },
   })
 
@@ -127,7 +127,7 @@ export default function DiscordMembersManager() {
           <div className="flex items-center gap-2 text-red-400">
             <AlertCircle className="h-4 w-4" />
             <span className="text-sm">
-              {error.message || 'Unbekannter Fehler beim Abrufen der Mitglieder'}
+              {(error as any).message || 'Unbekannter Fehler beim Abrufen der Mitglieder'}
             </span>
           </div>
         </CardContent>

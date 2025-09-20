@@ -1,21 +1,27 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '../lib/api'
-import { useAuthStore } from '../stores/auth'
+import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Settings, Users, DollarSign, Package, Shield, Save, FlaskConical } from 'lucide-react'
+import { 
+  Shield, 
+  Save, 
+  Users, 
+  Settings, 
+  Package, 
+  FlaskConical
+} from 'lucide-react'
+import { useAuthStore } from '../stores/auth'
+import { api } from '../lib/api'
 import { formatCurrency, getRoleColor, getDisplayName } from '../lib/utils'
-import { toast } from 'sonner'
 import DiscordRoleSync from '../components/DiscordRoleSync'
 import DiscordMembersManager from '../components/DiscordMembersManager'
 
 const getRoleDisplayName = (role: string) => {
   switch (role) {
-    case 'EL_PATRON': return 'El Patron'
+    case 'EL_PATRON': return 'El Patrón'
     case 'DON': return 'Don'
     case 'ASESOR': return 'Asesor'
     case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
@@ -28,72 +34,76 @@ const getRoleDisplayName = (role: string) => {
 export default function SettingsPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
-  const [approvalThreshold, setApprovalThreshold] = useState(100000)
+  
+  // IC Name states
+  const [icFirstName, setIcFirstName] = useState('')
+  const [icLastName, setIcLastName] = useState('')
+  
+  // Admin creation states
   const [newAdminDiscordId, setNewAdminDiscordId] = useState('')
+  
+  // Kokain price state
   const [kokainPrice, setKokainPrice] = useState(1000)
 
-  // Berechtigungen basierend auf Rollen
+  // Permission checks
   const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
   const canManageSettings = user?.role && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role)
   const canManageKokainPrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
   const canChangeIcName = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'SICARIO', 'SOLDADO'].includes(user.role)
 
+  // Queries
   const { data: users } = useQuery({
     queryKey: ['users'],
     queryFn: () => api.get('/users').then(res => res.data),
-    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
+    enabled: canManageUsers,
   })
 
   const { data: kokainPriceData } = useQuery({
     queryKey: ['kokain-price'],
     queryFn: () => api.get('/kokain/price').then(res => res.data),
-    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
+    enabled: canManageKokainPrice,
   })
 
-  const { data: settings } = useQuery({
-    queryKey: ['settings'],
-    queryFn: () => api.get('/settings').then(res => res.data),
-    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
-  })
-
-  const updateThresholdMutation = useMutation({
-    mutationFn: (threshold: number) => 
-      api.patch('/settings/approval_threshold', { amount: threshold }),
+  // Mutations
+  const updateIcNameMutation = useMutation({
+    mutationFn: (data: { icFirstName: string; icLastName: string }) =>
+      api.patch('/users/ic-name', data),
     onSuccess: () => {
-      toast.success('Genehmigungsschwellwert aktualisiert')
-      queryClient.invalidateQueries({ queryKey: ['settings'] })
+      toast.success('IC-Name aktualisiert')
+      queryClient.invalidateQueries({ queryKey: ['auth'] })
     },
-    onError: () => {
-      toast.error('Fehler beim Aktualisieren der Einstellungen')
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des IC-Namens')
+    },
+  })
+
+  const makeAdminByIdMutation = useMutation({
+    mutationFn: (discordId: string) =>
+      api.post('/users/make-admin', { discordId }),
+    onSuccess: () => {
+      toast.success('Benutzer wurde zum El Patrón ernannt')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      setNewAdminDiscordId('')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Ernennen des El Patrón')
     },
   })
 
   const updateUserRoleMutation = useMutation({
-    mutationFn: ({ userId, role }: { userId: string, role: string }) => 
+    mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       api.patch(`/users/${userId}/role`, { role }),
     onSuccess: () => {
       toast.success('Benutzerrolle aktualisiert')
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
-    onError: () => {
-      toast.error('Fehler beim Aktualisieren der Benutzerrolle')
-    },
-  })
-
-  const makeAdminByIdMutation = useMutation({
-    mutationFn: (discordId: string) => 
-      api.post('/users/make-admin', { discordId }),
-    onSuccess: () => {
-      toast.success('Benutzer wurde zum Admin gemacht')
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Admins')
+      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren der Benutzerrolle')
     },
   })
 
   const updateKokainPriceMutation = useMutation({
-    mutationFn: (price: number) => 
+    mutationFn: (price: number) =>
       api.post('/kokain/price', { price }),
     onSuccess: () => {
       toast.success('Kokain-Preis aktualisiert')
@@ -104,54 +114,29 @@ export default function SettingsPage() {
     },
   })
 
-  // Set initial kokain price when data is loaded
+  // Set initial values
+  useEffect(() => {
+    if (user?.icFirstName) setIcFirstName(user.icFirstName)
+    if (user?.icLastName) setIcLastName(user.icLastName)
+  }, [user])
+
   useEffect(() => {
     if (kokainPriceData?.price) {
       setKokainPrice(kokainPriceData.price)
     }
   }, [kokainPriceData])
 
-  if (user?.role !== 'EL_PATRON' && user?.role !== 'DON') {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white flex items-center">
-            <Settings className="mr-3 h-8 w-8 text-accent" />
-            Einstellungen
-          </h1>
-          <p className="text-gray-400 mt-2">
-            Systemkonfiguration und Benutzerverwaltung
-          </p>
-        </div>
-
-        <Card className="lasanta-card">
-          <CardContent className="pt-6">
-            <div className="text-center py-8">
-              <Shield className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Zugriff verweigert</h3>
-              <p className="text-gray-400">
-                Nur El Patrón und Don haben Zugriff auf die Systemeinstellungen.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
+  const handleUpdateIcName = () => {
+    if (icFirstName.trim() && icLastName.trim()) {
+      updateIcNameMutation.mutate({
+        icFirstName: icFirstName.trim(),
+        icLastName: icLastName.trim(),
+      })
+    }
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white flex items-center">
-          <Settings className="mr-3 h-8 w-8 text-accent" />
-          Einstellungen
-        </h1>
-        <p className="text-gray-400 mt-2">
-          Systemkonfiguration und Benutzerverwaltung
-        </p>
-      </div>
-
       {/* IC-Name-Änderung für alle Benutzer */}
       {canChangeIcName && (
         <Card className="lasanta-card">
@@ -161,39 +146,40 @@ export default function SettingsPage() {
               IC-Name ändern
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Ändere deinen In-Character Vor- und Nachnamen
+              Ändere deinen In-Character Namen
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
-                    IC Vorname
-                  </label>
-                  <Input
-                    value={user?.icFirstName || ''}
-                    placeholder="Max"
-                    className="bg-background border-input"
-                    disabled
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
-                    IC Nachname
-                  </label>
-                  <Input
-                    value={user?.icLastName || ''}
-                    placeholder="Mustermann"
-                    className="bg-background border-input"
-                    disabled
-                  />
-                </div>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">
+                  IC Vorname
+                </label>
+                <Input
+                  value={icFirstName}
+                  onChange={(e) => setIcFirstName(e.target.value)}
+                  placeholder="Vorname"
+                />
               </div>
-              <div className="text-sm text-gray-500">
-                Um deinen IC-Namen zu ändern, kontaktiere einen Administrator.
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">
+                  IC Nachname
+                </label>
+                <Input
+                  value={icLastName}
+                  onChange={(e) => setIcLastName(e.target.value)}
+                  placeholder="Nachname"
+                />
               </div>
             </div>
+            <Button
+              onClick={handleUpdateIcName}
+              disabled={updateIcNameMutation.isPending || !icFirstName.trim() || !icLastName.trim()}
+              variant="lasanta"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              IC-Name speichern
+            </Button>
           </CardContent>
         </Card>
       )}
@@ -201,84 +187,61 @@ export default function SettingsPage() {
       {/* System Settings - nur für El Patron, Don, Asesor */}
       {canManageSettings && (
         <Card className="lasanta-card">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <DollarSign className="mr-2 h-5 w-5" />
-            Kassensystem-Einstellungen
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            Konfiguriere Genehmigungsprozesse und Schwellwerte
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-2 block">
-              Genehmigungsschwellwert (Schwarzgeld)
-            </label>
-            <div className="flex space-x-2">
-              <Input
-                type="number"
-                value={approvalThreshold}
-                onChange={(e) => setApprovalThreshold(Number(e.target.value))}
-                className="flex-1"
-                placeholder="100000"
-              />
-              <Button
-                onClick={() => updateThresholdMutation.mutate(approvalThreshold)}
-                disabled={updateThresholdMutation.isPending}
-                variant="lasanta"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Speichern
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Transaktionen ab diesem Betrag erfordern eine Genehmigung durch El Patrón oder Don
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Settings className="mr-2 h-5 w-5" />
+              System-Einstellungen
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Konfiguriere allgemeine System-Einstellungen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-400">System-Einstellungen werden hier konfiguriert...</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Kokain-System-Einstellungen - für El Patron, Don, Asesor, Routenverwaltung */}
       {canManageKokainPrice && (
         <Card className="lasanta-card">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <FlaskConical className="mr-2 h-5 w-5" />
-            Kokain-System-Einstellungen
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            Konfiguriere Preise und Einstellungen für das Kokain-Deposit-System
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-2 block">
-              Preis pro Kokain-Paket (Schwarzgeld)
-            </label>
-            <div className="flex space-x-2">
-              <Input
-                type="number"
-                value={kokainPrice}
-                onChange={(e) => setKokainPrice(Number(e.target.value))}
-                className="flex-1"
-                placeholder="1000"
-              />
-              <Button
-                onClick={() => updateKokainPriceMutation.mutate(kokainPrice)}
-                disabled={updateKokainPriceMutation.isPending}
-                variant="lasanta"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Speichern
-              </Button>
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <FlaskConical className="mr-2 h-5 w-5" />
+              Kokain-System-Einstellungen
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Konfiguriere Preise und Einstellungen für das Kokain-Deposit-System
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">
+                Preis pro Kokain-Paket (Schwarzgeld)
+              </label>
+              <div className="flex space-x-2">
+                <Input
+                  type="number"
+                  value={kokainPrice}
+                  onChange={(e) => setKokainPrice(Number(e.target.value))}
+                  className="flex-1"
+                  placeholder="1000"
+                />
+                <Button
+                  onClick={() => updateKokainPriceMutation.mutate(kokainPrice)}
+                  disabled={updateKokainPriceMutation.isPending}
+                  variant="lasanta"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  Speichern
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Aktueller Preis: {formatCurrency(kokainPriceData?.price || 1000)} pro Paket
+              </p>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Aktueller Preis: {formatCurrency(kokainPriceData?.price || 1000)} pro Paket
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       )}
 
       {/* Admin Creation - Only for El Patron */}
@@ -293,39 +256,39 @@ export default function SettingsPage() {
               Mache einen Benutzer zum El Patrón über seine Discord ID
             </CardDescription>
           </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-2 block">
-              Discord ID des neuen El Patrón
-            </label>
-            <div className="flex space-x-2">
-              <Input
-                type="text"
-                value={newAdminDiscordId}
-                onChange={(e) => setNewAdminDiscordId(e.target.value)}
-                className="flex-1"
-                placeholder="123456789012345678"
-              />
-              <Button
-                onClick={() => {
-                  if (newAdminDiscordId.trim()) {
-                    makeAdminByIdMutation.mutate(newAdminDiscordId.trim())
-                    setNewAdminDiscordId('')
-                  }
-                }}
-                disabled={makeAdminByIdMutation.isPending || !newAdminDiscordId.trim()}
-                variant="lasanta"
-              >
-                <Users className="mr-2 h-4 w-4" />
-                El Patrón machen
-              </Button>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">
+                Discord ID des neuen El Patrón
+              </label>
+              <div className="flex space-x-2">
+                <Input
+                  type="text"
+                  value={newAdminDiscordId}
+                  onChange={(e) => setNewAdminDiscordId(e.target.value)}
+                  className="flex-1"
+                  placeholder="123456789012345678"
+                />
+                <Button
+                  onClick={() => {
+                    if (newAdminDiscordId.trim()) {
+                      makeAdminByIdMutation.mutate(newAdminDiscordId.trim())
+                      setNewAdminDiscordId('')
+                    }
+                  }}
+                  disabled={makeAdminByIdMutation.isPending || !newAdminDiscordId.trim()}
+                  variant="lasanta"
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  El Patrón machen
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Der Benutzer muss sich mindestens einmal angemeldet haben, bevor er El Patrón werden kann.
+              </p>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Der Benutzer muss sich mindestens einmal angemeldet haben, bevor er El Patrón werden kann.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       )}
 
       {/* Discord Management - nur für El Patron, Don */}
@@ -338,104 +301,84 @@ export default function SettingsPage() {
 
       {/* User Management - für El Patron, Don, Asesor, Routenverwaltung */}
       {canManageUsers && (
-      <Card className="lasanta-card">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <Users className="mr-2 h-5 w-5" />
-            Benutzerverwaltung
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            Verwalte Benutzerrollen und Berechtigungen
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-gray-400">Benutzer</TableHead>
-                  <TableHead className="text-gray-400">Discord ID</TableHead>
-                  <TableHead className="text-gray-400">Aktuelle Rolle</TableHead>
-                  <TableHead className="text-gray-400">Registriert</TableHead>
-                  <TableHead className="text-gray-400">Aktionen</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users?.map((u: any) => (
-                  <TableRow key={u.id} className="hover:bg-gray-800/50">
-                    <TableCell>
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Users className="mr-2 h-5 w-5" />
+              Benutzerverwaltung
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Verwalte Benutzerrollen und Berechtigungen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {users && users.length > 0 ? (
+                <div className="space-y-3">
+                  {users.map((u: any) => (
+                    <div key={u.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                       <div className="flex items-center space-x-3">
-                        {u.avatarUrl ? (
-                          <img
-                            src={u.avatarUrl}
-                            alt={u.username}
-                            className="h-8 w-8 rounded-full"
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
-                            <span className="text-sm font-medium text-white">
-                              {u.username.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
+                        <img
+                          src={u.avatarUrl || '/default-avatar.png'}
+                          alt={u.username}
+                          className="w-8 h-8 rounded-full"
+                        />
                         <div>
                           <div className="font-medium text-white">{getDisplayName(u)}</div>
+                          <div className="text-sm text-gray-400">{u.username}</div>
                           {u.email && (
-                            <div className="text-sm text-gray-400">{u.email}</div>
-                          )}
-                          {!u.icFirstName && !u.icLastName && (
-                            <div className="text-xs text-yellow-400">IC-Name fehlt</div>
+                            <div className="text-xs text-gray-500">{u.email}</div>
                           )}
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-gray-300 font-mono text-sm">
-                      {u.discordId}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getRoleColor(u.role)}>
-                        {getRoleDisplayName(u.role)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-300">
-                      {new Date(u.createdAt).toLocaleDateString('de-DE')}
-                    </TableCell>
-                    <TableCell>
-                      {u.id !== user?.id && (
-                        <select
-                          value={u.role}
-                          onChange={(e) => updateUserRoleMutation.mutate({
-                            userId: u.id,
-                            role: e.target.value
-                          })}
-                          className="px-2 py-1 bg-background border border-input rounded text-foreground text-sm"
-                          disabled={updateUserRoleMutation.isPending}
-                        >
-                          <option value="SOLDADO">Soldado</option>
-                          <option value="SICARIO">Sicario</option>
-                          <option value="ROUTENVERWALTUNG">Routenverwaltung</option>
-                          <option value="ASESOR">Asesor</option>
-                          <option value="DON">Don</option>
-                          <option value="EL_PATRON">El Patrón</option>
-                        </select>
-                      )}
-                      {u.id === user?.id && (
-                        <span className="text-sm text-gray-400">Eigenes Konto</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            {(!users || users.length === 0) && (
-              <div className="text-center py-8 text-gray-400">
-                Keine Benutzer gefunden
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+                      <div className="flex items-center space-x-2">
+                        <Badge className={getRoleColor(u.role)}>
+                          {getRoleDisplayName(u.role)}
+                        </Badge>
+                        {!u.icFirstName && !u.icLastName && (
+                          <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+                            Kein IC-Name
+                          </Badge>
+                        )}
+                        {u.id !== user?.id && (
+                          <select
+                            value={u.role}
+                            onChange={(e) => updateUserRoleMutation.mutate({ userId: u.id, role: e.target.value })}
+                            className="bg-gray-700 text-white px-2 py-1 rounded text-sm"
+                          >
+                            <option value="SOLDADO">Soldado</option>
+                            <option value="SICARIO">Sicario</option>
+                            <option value="ROUTENVERWALTUNG">Routenverwaltung</option>
+                            <option value="ASESOR">Asesor</option>
+                            <option value="DON">Don</option>
+                            <option value="EL_PATRON">El Patrón</option>
+                          </select>
+                        )}
+                        {u.id === user?.id && (
+                          <Badge variant="outline" className="text-blue-400 border-blue-400">
+                            Du
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <Users className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                  <p>Keine Benutzer gefunden</p>
+                </div>
+              )}
+              {(!users || users.length === 0) && (
+                <div className="text-center py-8 text-gray-400">
+                  <Users className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                  <p>Keine Benutzer gefunden</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* System Information */}
       <Card className="lasanta-card">
