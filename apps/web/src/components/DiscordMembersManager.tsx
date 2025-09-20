@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
-import { Users, RefreshCw, Download, CheckCircle, XCircle, AlertCircle, Sync } from 'lucide-react'
+import { Users, RefreshCw, Download, CheckCircle, XCircle, AlertCircle, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface DiscordMember {
@@ -183,7 +183,7 @@ export default function DiscordMembersManager() {
               size="sm"
               className="bg-green-600 hover:bg-green-700 text-white"
             >
-              <Sync className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+              <RotateCcw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
               Sync Now
             </Button>
             <Button
