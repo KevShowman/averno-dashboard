@@ -367,6 +367,67 @@ export class KokainService {
     });
   }
 
+  async getArchiveDetails(archiveId: string) {
+    const archive = await this.prisma.kokainUebergabe.findUnique({
+      where: { id: archiveId },
+      include: {
+        deposits: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+                avatarUrl: true,
+              },
+            },
+            confirmedBy: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!archive) {
+      throw new BadRequestException('Archiv nicht gefunden');
+    }
+
+    // Calculate user summaries
+    const userSummary = archive.deposits.reduce((acc: any, deposit: any) => {
+      const userId = deposit.userId;
+      if (!acc[userId]) {
+        acc[userId] = {
+          user: deposit.user,
+          totalPackages: 0,
+          totalValue: 0,
+          deposits: [],
+        };
+      }
+      acc[userId].totalPackages += deposit.packages;
+      acc[userId].deposits.push(deposit);
+      return acc;
+    }, {});
+
+    // Calculate total value per user
+    const kokainPrice = await this.getKokainPrice();
+    Object.values(userSummary).forEach((userData: any) => {
+      userData.totalValue = userData.totalPackages * kokainPrice;
+    });
+
+    return {
+      ...archive,
+      userSummary: Object.values(userSummary),
+      kokainPrice,
+    };
+  }
+
   async removePendingDeposit(depositId: string, removedById: string, reason: string) {
     const deposit = await this.prisma.kokainDeposit.findUnique({
       where: { id: depositId },
@@ -377,8 +438,8 @@ export class KokainService {
       throw new BadRequestException('Deposit nicht gefunden');
     }
 
-    if (deposit.status !== DepositStatus.PENDING) {
-      throw new BadRequestException('Nur Pending Deposits können entfernt werden');
+    if (deposit.status === DepositStatus.REJECTED) {
+      throw new BadRequestException('Abgelehnte Deposits können nicht entfernt werden');
     }
 
     // Deposit löschen
@@ -396,6 +457,7 @@ export class KokainService {
         depositUser: deposit.user.username,
         reason,
         depositNote: deposit.note,
+        originalStatus: deposit.status,
       },
     });
 

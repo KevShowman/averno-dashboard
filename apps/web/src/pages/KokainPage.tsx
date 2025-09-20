@@ -19,7 +19,8 @@ import {
   Settings,
   AlertTriangle,
   User,
-  Trash2
+  Trash2,
+  Eye
 } from 'lucide-react'
 import { formatDate, formatCurrency, getDisplayName } from '../lib/utils'
 import { toast } from 'sonner'
@@ -32,6 +33,8 @@ export default function KokainPage() {
   const [depositPackages, setDepositPackages] = useState('')
   const [depositNote, setDepositNote] = useState('')
   const [newPrice, setNewPrice] = useState('')
+  const [showArchiveDetails, setShowArchiveDetails] = useState(false)
+  const [selectedArchive, setSelectedArchive] = useState<any>(null)
 
   const { data: pendingDeposits, isLoading: pendingLoading } = useQuery({
     queryKey: ['kokain-pending-deposits'],
@@ -56,6 +59,12 @@ export default function KokainPage() {
   const { data: archives } = useQuery({
     queryKey: ['kokain-archives'],
     queryFn: () => api.get('/kokain/archives').then(res => res.data),
+  })
+
+  const { data: archiveDetails } = useQuery({
+    queryKey: ['kokain-archive-details', selectedArchive?.id],
+    queryFn: () => api.get(`/kokain/archives/${selectedArchive.id}`).then(res => res.data),
+    enabled: !!selectedArchive?.id,
   })
 
   const confirmDepositMutation = useMutation({
@@ -131,6 +140,7 @@ export default function KokainPage() {
       api.delete(`/kokain/deposit/${depositId}`, { data: { reason } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['kokain-confirmed-deposits'] })
       queryClient.invalidateQueries({ queryKey: ['kokain-summary'] })
       toast.success('Deposit wurde entfernt!')
     },
@@ -175,6 +185,11 @@ export default function KokainPage() {
     if (reason && reason.trim()) {
       removeDepositMutation.mutate({ depositId, reason: reason.trim() })
     }
+  }
+
+  const handleViewArchive = (archive: any) => {
+    setSelectedArchive(archive)
+    setShowArchiveDetails(true)
   }
 
   return (
@@ -433,6 +448,99 @@ export default function KokainPage() {
         </CardContent>
       </Card>
 
+      {/* Confirmed Deposits */}
+      <Card className="lasanta-card">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <CheckCircle className="mr-2 h-5 w-5 text-green-400" />
+            Bestätigte Deposits
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Übersicht aller bestätigten Kokain-Deposits
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {confirmedLoading ? (
+            <div className="text-center py-8 text-gray-400">
+              Lade bestätigte Deposits...
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-gray-400">Benutzer</TableHead>
+                    <TableHead className="text-gray-400">Pakete</TableHead>
+                    <TableHead className="text-gray-400">Notiz</TableHead>
+                    <TableHead className="text-gray-400">Erstellt</TableHead>
+                    <TableHead className="text-gray-400">Bestätigt von</TableHead>
+                    <TableHead className="text-gray-400">Bestätigt am</TableHead>
+                    {canConfirm && (
+                      <TableHead className="text-gray-400">Aktionen</TableHead>
+                    )}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {confirmedDeposits?.map((deposit: any) => (
+                    <TableRow key={deposit.id} className="hover:bg-gray-800/50">
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          {deposit.user.avatarUrl ? (
+                            <img 
+                              src={deposit.user.avatarUrl} 
+                              alt={getDisplayName(deposit.user)}
+                              className="w-6 h-6 rounded-full"
+                            />
+                          ) : (
+                            <User className="w-6 h-6 text-gray-400" />
+                          )}
+                          <span className="text-white">{getDisplayName(deposit.user)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-white font-medium">
+                        {deposit.packages}
+                      </TableCell>
+                      <TableCell className="text-gray-300 max-w-xs truncate">
+                        {deposit.note || '-'}
+                      </TableCell>
+                      <TableCell className="text-gray-300">
+                        {formatDate(deposit.createdAt)}
+                      </TableCell>
+                      <TableCell className="text-gray-300">
+                        {deposit.confirmedBy ? getDisplayName(deposit.confirmedBy) : '-'}
+                      </TableCell>
+                      <TableCell className="text-gray-300">
+                        {deposit.confirmedAt ? formatDate(deposit.confirmedAt) : '-'}
+                      </TableCell>
+                      {canConfirm && (
+                        <TableCell>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
+                            onClick={() => handleRemoveDeposit(deposit.id)}
+                            disabled={removeDepositMutation.isPending}
+                            title="Deposit entfernen"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              
+              {(!confirmedDeposits || confirmedDeposits.length === 0) && (
+                <div className="text-center py-8 text-gray-400">
+                  Keine bestätigten Deposits
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Archives */}
       {archives && archives.length > 0 && (
         <Card className="lasanta-card">
@@ -451,6 +559,7 @@ export default function KokainPage() {
                     <TableHead className="text-gray-400">Pakete</TableHead>
                     <TableHead className="text-gray-400">Wert</TableHead>
                     <TableHead className="text-gray-400">Datum</TableHead>
+                    <TableHead className="text-gray-400">Aktionen</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -460,6 +569,17 @@ export default function KokainPage() {
                       <TableCell className="text-white">{archive.totalPackages}</TableCell>
                       <TableCell className="text-green-400">{formatCurrency(archive.totalValue)}</TableCell>
                       <TableCell className="text-gray-300">{formatDate(archive.archivedAt)}</TableCell>
+                      <TableCell>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+                          onClick={() => handleViewArchive(archive)}
+                          title="Details anzeigen"
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -556,6 +676,166 @@ export default function KokainPage() {
                 >
                   Abbrechen
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Archive Details Modal */}
+      {showArchiveDetails && selectedArchive && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-4xl max-h-[80vh] lasanta-card overflow-y-auto">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-white flex items-center">
+                    <Archive className="mr-2 h-5 w-5 text-gray-400" />
+                    {selectedArchive.name}
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Archiviert am {formatDate(selectedArchive.archivedAt)}
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowArchiveDetails(false)
+                    setSelectedArchive(null)
+                  }}
+                  className="text-gray-400 border-gray-400 hover:bg-gray-400/10"
+                >
+                  Schließen
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Summary Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="lasanta-card">
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-white">
+                      {archiveDetails?.totalPackages || 0}
+                    </div>
+                    <div className="text-sm text-gray-400">Gesamt Pakete</div>
+                  </CardContent>
+                </Card>
+                <Card className="lasanta-card">
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-green-400">
+                      {formatCurrency(archiveDetails?.totalValue || 0)}
+                    </div>
+                    <div className="text-sm text-gray-400">Gesamtwert</div>
+                  </CardContent>
+                </Card>
+                <Card className="lasanta-card">
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-blue-400">
+                      {archiveDetails?.userSummary?.length || 0}
+                    </div>
+                    <div className="text-sm text-gray-400">Teilnehmer</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* User Summary */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4">Teilnehmer Übersicht</h3>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-gray-400">Benutzer</TableHead>
+                        <TableHead className="text-gray-400">Pakete</TableHead>
+                        <TableHead className="text-gray-400">Wert</TableHead>
+                        <TableHead className="text-gray-400">Einzelne Deposits</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {archiveDetails?.userSummary?.map((userData: any) => (
+                        <TableRow key={userData.user.id} className="hover:bg-gray-800/50">
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              {userData.user.avatarUrl ? (
+                                <img 
+                                  src={userData.user.avatarUrl} 
+                                  alt={getDisplayName(userData.user)}
+                                  className="w-6 h-6 rounded-full"
+                                />
+                              ) : (
+                                <User className="w-6 h-6 text-gray-400" />
+                              )}
+                              <span className="text-white">{getDisplayName(userData.user)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-white font-medium">
+                            {userData.totalPackages}
+                          </TableCell>
+                          <TableCell className="text-green-400 font-medium">
+                            {formatCurrency(userData.totalValue)}
+                          </TableCell>
+                          <TableCell className="text-gray-300">
+                            {userData.deposits.length} Deposit{userData.deposits.length !== 1 ? 's' : ''}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              {/* Individual Deposits */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4">Einzelne Deposits</h3>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-gray-400">Benutzer</TableHead>
+                        <TableHead className="text-gray-400">Pakete</TableHead>
+                        <TableHead className="text-gray-400">Wert</TableHead>
+                        <TableHead className="text-gray-400">Notiz</TableHead>
+                        <TableHead className="text-gray-400">Erstellt</TableHead>
+                        <TableHead className="text-gray-400">Bestätigt von</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {archiveDetails?.deposits?.map((deposit: any) => (
+                        <TableRow key={deposit.id} className="hover:bg-gray-800/50">
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              {deposit.user.avatarUrl ? (
+                                <img 
+                                  src={deposit.user.avatarUrl} 
+                                  alt={getDisplayName(deposit.user)}
+                                  className="w-5 h-5 rounded-full"
+                                />
+                              ) : (
+                                <User className="w-5 h-5 text-gray-400" />
+                              )}
+                              <span className="text-white text-sm">{getDisplayName(deposit.user)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-white font-medium">
+                            {deposit.packages}
+                          </TableCell>
+                          <TableCell className="text-green-400 font-medium">
+                            {formatCurrency(deposit.packages * archiveDetails.kokainPrice)}
+                          </TableCell>
+                          <TableCell className="text-gray-300 max-w-xs truncate">
+                            {deposit.note || '-'}
+                          </TableCell>
+                          <TableCell className="text-gray-300 text-sm">
+                            {formatDate(deposit.createdAt)}
+                          </TableCell>
+                          <TableCell className="text-gray-300 text-sm">
+                            {deposit.confirmedBy ? getDisplayName(deposit.confirmedBy) : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -70,7 +70,7 @@ export class ItemsController {
   }
 
   @Patch(':id')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async updateItem(
     @Param('id') id: string,
@@ -81,7 +81,7 @@ export class ItemsController {
   }
 
   @Post(':id/move')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async moveItem(
     @Param('id') id: string,
@@ -120,5 +120,33 @@ export class ItemsController {
   @Get('movements/recent')
   async getRecentMovements() {
     return this.itemsService.getRecentMovements();
+  }
+
+  @Get('movements/pending')
+  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @UseGuards(RolesGuard)
+  async getPendingMovements() {
+    return this.itemsService.getPendingMovements();
+  }
+
+  @Patch('movements/:id/approve')
+  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @UseGuards(RolesGuard)
+  async approveMovement(
+    @Param('id') movementId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.itemsService.approveMovement(movementId, user.id);
+  }
+
+  @Patch('movements/:id/reject')
+  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @UseGuards(RolesGuard)
+  async rejectMovement(
+    @Param('id') movementId: string,
+    @Body('reason') reason: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.itemsService.rejectMovement(movementId, user.id, reason);
   }
 }

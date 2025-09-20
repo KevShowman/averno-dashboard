@@ -102,9 +102,15 @@ export class KokainController {
     return this.kokainService.getArchivedUebergaben();
   }
 
+  @Get('archives/:id')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async getArchiveDetails(@Param('id') archiveId: string) {
+    return this.kokainService.getArchiveDetails(archiveId);
+  }
+
   @Delete('deposit/:id')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  async removePendingDeposit(
+  async removeDeposit(
     @Param('id') depositId: string,
     @Body('reason') reason: string,
     @CurrentUser() user: User,

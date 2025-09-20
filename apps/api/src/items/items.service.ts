@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { MovementType, Role } from '@prisma/client';
+import { MovementType, MovementStatus, Role } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
 
 export interface CreateItemDto {
@@ -234,19 +234,12 @@ export class ItemsService {
         break;
     }
 
-    // Use transaction to ensure consistency
-    const result = await this.prisma.$transaction(async (prisma) => {
-      // Update item stock
-      const updatedItem = await prisma.item.update({
-        where: { id },
-        data: {
-          currentStock: newStock,
-          reservedStock: newReservedStock,
-        },
-      });
+    // Determine if movement needs approval
+    const needsApproval = userRole !== Role.EL_PATRON && userRole !== Role.DON && userRole !== Role.LOGISTICA;
 
-      // Create movement record
-      const movement = await prisma.stockMovement.create({
+    if (needsApproval) {
+      // Create pending movement without updating stock
+      const movement = await this.prisma.stockMovement.create({
         data: {
           itemId: id,
           type,
@@ -257,6 +250,7 @@ export class ItemsService {
           reference,
           batchNumber,
           createdById: userId,
+          status: MovementStatus.PENDING,
         },
         include: {
           item: { include: { category: true } },
@@ -266,24 +260,78 @@ export class ItemsService {
         },
       });
 
-      return { item: updatedItem, movement };
-    });
+      await this.auditService.log({
+        userId,
+        action: `STOCK_${type}_PENDING`,
+        entity: 'StockMovement',
+        entityId: movement.id,
+        meta: {
+          itemName: item.name,
+          quantity,
+          previousStock: item.currentStock,
+          newStock,
+          type,
+          needsApproval: true,
+        },
+      });
 
-    await this.auditService.log({
-      userId,
-      action: `STOCK_${type}`,
-      entity: 'StockMovement',
-      entityId: result.movement.id,
-      meta: {
-        itemName: item.name,
-        quantity,
-        previousStock: item.currentStock,
-        newStock,
-        type,
-      },
-    });
+      return { item, movement, needsApproval: true };
+    } else {
+      // Execute movement immediately
+      const result = await this.prisma.$transaction(async (prisma) => {
+        // Update item stock
+        const updatedItem = await prisma.item.update({
+          where: { id },
+          data: {
+            currentStock: newStock,
+            reservedStock: newReservedStock,
+          },
+        });
 
-    return result;
+        // Create movement record
+        const movement = await prisma.stockMovement.create({
+          data: {
+            itemId: id,
+            type,
+            quantity,
+            previousStock: item.currentStock,
+            newStock,
+            note,
+            reference,
+            batchNumber,
+            createdById: userId,
+            status: MovementStatus.APPROVED,
+            approvedById: userId,
+            approvedAt: new Date(),
+          },
+          include: {
+            item: { include: { category: true } },
+            createdBy: {
+              select: { id: true, username: true, role: true },
+            },
+          },
+        });
+
+        return { item: updatedItem, movement };
+      });
+
+      await this.auditService.log({
+        userId,
+        action: `STOCK_${type}`,
+        entity: 'StockMovement',
+        entityId: result.movement.id,
+        meta: {
+          itemName: item.name,
+          quantity,
+          previousStock: item.currentStock,
+          newStock,
+          type,
+          needsApproval: false,
+        },
+      });
+
+      return result;
+    }
   }
 
   async getItemMovements(id: string, params: { from?: Date; to?: Date; page?: number; limit?: number }) {
@@ -401,5 +449,134 @@ export class ItemsService {
     });
 
     return { movements };
+  }
+
+  async getPendingMovements() {
+    return this.prisma.stockMovement.findMany({
+      where: { status: MovementStatus.PENDING },
+      include: {
+        item: { include: { category: true } },
+        createdBy: {
+          select: { id: true, username: true, role: true },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async approveMovement(movementId: string, approvedById: string) {
+    const movement = await this.prisma.stockMovement.findUnique({
+      where: { id: movementId },
+      include: { item: true, createdBy: true },
+    });
+
+    if (!movement) {
+      throw new NotFoundException('Movement not found');
+    }
+
+    if (movement.status !== MovementStatus.PENDING) {
+      throw new BadRequestException('Movement is not pending approval');
+    }
+
+    // Execute the movement
+    const result = await this.prisma.$transaction(async (prisma) => {
+      // Update item stock
+      const updatedItem = await prisma.item.update({
+        where: { id: movement.itemId },
+        data: {
+          currentStock: movement.newStock,
+          reservedStock: movement.type === MovementType.RESERVE ? 
+            movement.item.reservedStock + movement.quantity :
+            movement.type === MovementType.RELEASE ?
+            movement.item.reservedStock - movement.quantity :
+            movement.item.reservedStock,
+        },
+      });
+
+      // Update movement status
+      const approvedMovement = await prisma.stockMovement.update({
+        where: { id: movementId },
+        data: {
+          status: MovementStatus.APPROVED,
+          approvedById,
+          approvedAt: new Date(),
+        },
+        include: {
+          item: { include: { category: true } },
+          createdBy: {
+            select: { id: true, username: true, role: true },
+          },
+          approvedBy: {
+            select: { id: true, username: true, role: true },
+          },
+        },
+      });
+
+      return { item: updatedItem, movement: approvedMovement };
+    });
+
+    await this.auditService.log({
+      userId: approvedById,
+      action: 'STOCK_MOVEMENT_APPROVED',
+      entity: 'StockMovement',
+      entityId: movementId,
+      meta: {
+        itemName: movement.item.name,
+        type: movement.type,
+        quantity: movement.quantity,
+        createdBy: movement.createdBy.username,
+      },
+    });
+
+    return result;
+  }
+
+  async rejectMovement(movementId: string, rejectedById: string, reason: string) {
+    const movement = await this.prisma.stockMovement.findUnique({
+      where: { id: movementId },
+    });
+
+    if (!movement) {
+      throw new NotFoundException('Movement not found');
+    }
+
+    if (movement.status !== MovementStatus.PENDING) {
+      throw new BadRequestException('Movement is not pending approval');
+    }
+
+    const rejectedMovement = await this.prisma.stockMovement.update({
+      where: { id: movementId },
+      data: {
+        status: MovementStatus.REJECTED,
+        approvedById: rejectedById,
+        approvedAt: new Date(),
+        rejectionReason: reason,
+      },
+      include: {
+        item: { include: { category: true } },
+        createdBy: {
+          select: { id: true, username: true, role: true },
+        },
+        approvedBy: {
+          select: { id: true, username: true, role: true },
+        },
+      },
+    });
+
+    await this.auditService.log({
+      userId: rejectedById,
+      action: 'STOCK_MOVEMENT_REJECTED',
+      entity: 'StockMovement',
+      entityId: movementId,
+      meta: {
+        itemName: movement.item.name,
+        type: movement.type,
+        quantity: movement.quantity,
+        reason,
+        createdBy: movement.createdBy.username,
+      },
+    });
+
+    return rejectedMovement;
   }
 }

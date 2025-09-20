@@ -27,7 +27,8 @@ model User {
   actions      ActionLog[]
   moneyTxCreated MoneyTransaction[] @relation("tx_created_by")
   moneyTxApproved MoneyTransaction[] @relation("tx_approved_by")
-  stockMovements StockMovement[]
+  stockMovements StockMovement[] @relation("movement_created_by")
+  stockMovementsApproved StockMovement[] @relation("movement_approved_by")
   kokainDeposits KokainDeposit[] @relation("deposit_created_by")
   kokainConfirmations KokainDeposit[] @relation("deposit_confirmed_by")
 
@@ -45,6 +46,7 @@ enum Role {
   DON              // Sub-Admin
   ASESOR           // Alles muss genehmigt werden
   ROUTENVERWALTUNG // Kann Kokain-Deposits bestätigen
+  LOGISTICA        // Kann Lagerbewegungen bestätigen
   SICARIO          // Erweiterte Berechtigungen
   SOLDADO          // Normales Mitglied, nur lesen
 }
@@ -98,6 +100,12 @@ enum MovementType {
   RELEASE 
 }
 
+enum MovementStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model StockMovement {
   id          String @id @default(cuid())
   itemId      String
@@ -109,8 +117,13 @@ model StockMovement {
   note        String?
   reference   String? // Auftrag/Person/Event
   batchNumber String? // für Serien/Batches
+  status      MovementStatus @default(PENDING)
+  approvedById String?
+  approvedBy  User?  @relation("movement_approved_by", fields: [approvedById], references: [id])
+  approvedAt  DateTime?
+  rejectionReason String?
   createdById String
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdBy   User   @relation("movement_created_by", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 
   @@map("stock_movements")
