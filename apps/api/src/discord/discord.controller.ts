@@ -92,6 +92,22 @@ export class DiscordController {
     }
   }
 
+  @Post('sync-all-members')
+  @Roles(Role.EL_PATRON, Role.DON)
+  async syncAllMembers() {
+    try {
+      const result = await this.discordService.syncAllMembersWithAllowedRoles();
+      return {
+        message: 'Alle Discord-Mitglieder erfolgreich synchronisiert',
+        imported: result.imported,
+        updated: result.updated,
+        total: result.total
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('role-mappings')
   @Roles(Role.EL_PATRON, Role.DON)
   async getRoleMappings() {

@@ -276,4 +276,62 @@ export class DiscordService {
       throw error;
     }
   }
+
+  async syncAllMembersWithAllowedRoles() {
+    try {
+      const members = await this.getMembersWithAllowedRoles();
+      let imported = 0;
+      let updated = 0;
+      const errors = [];
+
+      for (const member of members) {
+        try {
+          const existingUser = await this.prisma.user.findUnique({
+            where: { discordId: member.discordId }
+          });
+
+          if (existingUser) {
+            // Aktualisiere bestehenden Benutzer
+            await this.prisma.user.update({
+              where: { discordId: member.discordId },
+              data: {
+                username: member.username,
+                role: member.highestSystemRole,
+                discordRoles: member.discordRoles,
+              }
+            });
+            updated++;
+          } else {
+            // Erstelle neuen Benutzer
+            await this.prisma.user.create({
+              data: {
+                discordId: member.discordId,
+                username: member.username,
+                avatarUrl: member.avatar ? 
+                  `https://cdn.discordapp.com/avatars/${member.discordId}/${member.avatar}.png` : 
+                  null,
+                email: null,
+                role: member.highestSystemRole,
+                discordRoles: member.discordRoles,
+              }
+            });
+            imported++;
+          }
+        } catch (error) {
+          console.error(`Fehler beim Synchronisieren von ${member.username}:`, error);
+          errors.push({ username: member.username, error: error.message });
+        }
+      }
+
+      return {
+        imported,
+        updated,
+        total: members.length,
+        errors
+      };
+    } catch (error) {
+      console.error('Fehler beim Synchronisieren aller Mitglieder:', error);
+      throw error;
+    }
+  }
 }

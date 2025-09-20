@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
-import { Users, RefreshCw, Download, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
+import { Users, RefreshCw, Download, CheckCircle, XCircle, AlertCircle, Sync } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface DiscordMember {
@@ -28,6 +28,7 @@ interface DiscordMembersResponse {
 
 export default function DiscordMembersManager() {
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   const queryClient = useQueryClient()
 
   const { data: membersData, isLoading, error } = useQuery({
@@ -48,6 +49,19 @@ export default function DiscordMembersManager() {
     },
   })
 
+  const syncAllMembersMutation = useMutation({
+    mutationFn: () => api.post('/discord/sync-all-members'),
+    onSuccess: (data) => {
+      const { imported, updated, total } = data.data
+      toast.success(`Synchronisation abgeschlossen! ${imported} neue Benutzer importiert, ${updated} aktualisiert von ${total} insgesamt.`)
+      queryClient.invalidateQueries({ queryKey: ['discord-server-members'] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+    onError: (error: any) => {
+      toast.error((error.response?.data as any)?.message || 'Fehler beim Synchronisieren aller Mitglieder')
+    },
+  })
+
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
@@ -59,6 +73,15 @@ export default function DiscordMembersManager() {
 
   const handleImportMember = async (discordId: string) => {
     await importMemberMutation.mutateAsync(discordId)
+  }
+
+  const handleSyncAll = async () => {
+    setIsSyncing(true)
+    try {
+      await syncAllMembersMutation.mutateAsync()
+    } finally {
+      setIsSyncing(false)
+    }
   }
 
   const getRoleColor = (role: string) => {
@@ -152,15 +175,27 @@ export default function DiscordMembersManager() {
               Mitglieder mit erlaubten Discord-Rollen ({members.length} gefunden)
             </CardDescription>
           </div>
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            variant="outline"
-            size="sm"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Aktualisieren
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleSyncAll}
+              disabled={isSyncing || syncAllMembersMutation.isPending}
+              variant="default"
+              size="sm"
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Sync className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+              Sync Now
+            </Button>
+            <Button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Aktualisieren
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
