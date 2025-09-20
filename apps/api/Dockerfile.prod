@@ -8,10 +8,10 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Kopiere package files
-COPY package.json package-lock.json pnpm-lock.yaml ./
+COPY package.json ./
 
 # Installiere Dependencies
-RUN pnpm install
+RUN pnpm install --no-frozen-lockfile
 
 # Kopiere Source Code
 COPY . .
@@ -37,10 +37,10 @@ RUN adduser -S nestjs -u 1001
 WORKDIR /app
 
 # Kopiere package files
-COPY package.json package-lock.json pnpm-lock.yaml ./
+COPY package.json ./
 
 # Installiere nur Production Dependencies
-RUN pnpm install --prod
+RUN pnpm install --prod --no-frozen-lockfile
 
 # Kopiere built application
 COPY --from=build /app/dist ./dist
