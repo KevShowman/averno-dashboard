@@ -128,7 +128,7 @@ export class ItemsController {
   }
 
   @Patch('movements/:id/approve')
-  @Roles(Role.EL_PATRON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.LOGISTICA, Role.DON) // Temporär: Don kann auch genehmigen
   @UseGuards(RolesGuard)
   async approveMovement(
     @Param('id') movementId: string,
@@ -138,7 +138,7 @@ export class ItemsController {
   }
 
   @Patch('movements/:id/reject')
-  @Roles(Role.EL_PATRON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.LOGISTICA, Role.DON) // Temporär: Don kann auch ablehnen
   @UseGuards(RolesGuard)
   async rejectMovement(
     @Param('id') movementId: string,

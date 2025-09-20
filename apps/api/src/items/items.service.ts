@@ -238,7 +238,8 @@ export class ItemsService {
     }
 
     // Determine if movement needs approval
-    const needsApproval = userRole !== Role.EL_PATRON && userRole !== Role.LOGISTICA;
+    // Temporär: Don kann auch direkt ausführen (wie Logistica)
+    const needsApproval = userRole !== Role.EL_PATRON && userRole !== Role.LOGISTICA && userRole !== Role.DON;
 
     if (needsApproval) {
       // Create pending movement without updating stock

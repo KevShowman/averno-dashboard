@@ -27,6 +27,13 @@ export class RolesGuard implements CanActivate {
     const hasRole = requiredRoles.some((role) => 
       user.role === role || (user.allRoles && user.allRoles.includes(role))
     );
+
+    // Fallback: Wenn allRoles nicht existiert, prüfe nur die Hauptrolle
+    // TODO: Entfernen nach Datenbank-Migration
+    if (!hasRole && !user.allRoles) {
+      const fallbackHasRole = requiredRoles.some((role) => user.role === role);
+      return fallbackHasRole;
+    }
     
     if (!hasRole) {
       throw new ForbiddenException(`Access denied. Required roles: ${requiredRoles.join(', ')}`);
