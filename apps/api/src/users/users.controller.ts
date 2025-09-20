@@ -37,7 +37,7 @@ export class UsersController {
   }
 
   @Patch('ic-name')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async updateIcName(
     @Body('icFirstName') icFirstName: string,
     @Body('icLastName') icLastName: string,

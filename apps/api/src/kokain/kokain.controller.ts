@@ -12,7 +12,7 @@ export class KokainController {
   constructor(private kokainService: KokainService) {}
 
   @Post('deposit')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async createDeposit(
     @Body('packages') packages: number,
     @Body('note') note: string,
@@ -22,13 +22,13 @@ export class KokainController {
   }
 
   @Get('deposits/pending')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getPendingDeposits() {
     return this.kokainService.getPendingDeposits();
   }
 
   @Get('deposits/confirmed')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getConfirmedDeposits() {
     return this.kokainService.getConfirmedDeposits();
   }
@@ -61,13 +61,13 @@ export class KokainController {
   }
 
   @Get('summary')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getCurrentDepositSummary() {
     return this.kokainService.getCurrentDepositSummary();
   }
 
   @Get('price')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getKokainPrice() {
     return { price: await this.kokainService.getKokainPrice() };
   }
