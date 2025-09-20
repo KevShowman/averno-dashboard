@@ -29,14 +29,14 @@ export class AuthController {
     // Set HTTP-only cookies
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false for HTTP in production
       sameSite: 'lax',
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false for HTTP in production
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -69,14 +69,14 @@ export class AuthController {
       // Set new cookies
       res.cookie('access_token', tokens.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Set to false for HTTP in production
         sameSite: 'lax',
         maxAge: 15 * 60 * 1000, // 15 minutes
       });
 
       res.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Set to false for HTTP in production
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
