@@ -26,7 +26,7 @@ export default function LagerMovementsPage() {
     queryFn: () => api.get('/items/movements/pending').then(res => res.data),
   })
 
-  const canApprove = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'LOGISTICA'
+  const canApprove = ['EL_PATRON', 'DON', 'LOGISTICA'].includes(user?.role || '')
 
   const approveMovementMutation = useMutation({
     mutationFn: (movementId: string) => api.patch(`/items/movements/${movementId}/approve`),
