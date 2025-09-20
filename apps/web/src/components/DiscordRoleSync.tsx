@@ -12,6 +12,7 @@ interface DiscordRoleInfo {
   discordRoles: string[]
   hasAccess: boolean
   currentRole: string
+  allRoles?: string[]
   reason?: string
 }
 
@@ -123,6 +124,22 @@ export default function DiscordRoleSync() {
           </Badge>
         </div>
 
+        {/* Alle System-Rollen */}
+        {roleInfo.allRoles && roleInfo.allRoles.length > 0 && (
+          <div>
+            <h4 className="text-white font-medium mb-2">
+              Alle System-Rollen ({roleInfo.allRoles.length})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {roleInfo.allRoles.map((role) => (
+                <Badge key={role} variant="outline" className="bg-green-900/20 text-green-400 border-green-400">
+                  {role}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Discord-Rollen */}
         <div>
           <h4 className="text-white font-medium mb-2">
@@ -156,7 +173,7 @@ export default function DiscordRoleSync() {
               Rolle synchronisieren
             </Button>
             <p className="text-xs text-gray-500 mt-2">
-              Synchronisiert deine Discord-Rollen mit deiner System-Rolle
+              Synchronisiert deine Discord-Rollen mit deinen System-Rollen (alle Rollen werden berücksichtigt)
             </p>
           </div>
         )}

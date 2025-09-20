@@ -12,7 +12,7 @@ export class DiscordController {
   constructor(private discordService: DiscordService) {}
 
   @Patch('sync-user-role')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO, Role.LOGISTICA)
   async syncUserRole(@CurrentUser() user: User) {
     try {
       const newRole = await this.discordService.syncUserRole(user.discordId);
@@ -21,9 +21,16 @@ export class DiscordController {
       const userDiscordRoles = await this.discordService.getUserRoles(user.discordId);
       await this.discordService.updateUserDiscordRoles(user.id, userDiscordRoles);
 
+      // Aktualisierten User mit allen Rollen abrufen
+      const updatedUser = await this.discordService.prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: true, allRoles: true, discordRoles: true }
+      });
+
       return {
         message: 'Rolle erfolgreich synchronisiert',
         newRole,
+        allRoles: updatedUser?.allRoles || [],
         discordRoles: userDiscordRoles
       };
     } catch (error) {
@@ -32,7 +39,7 @@ export class DiscordController {
   }
 
   @Get('user-roles')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO, Role.LOGISTICA)
   async getUserRoles(@CurrentUser() user: User) {
     try {
       const discordRoles = await this.discordService.getUserRoles(user.discordId);
@@ -43,6 +50,7 @@ export class DiscordController {
         discordRoles,
         hasAccess: validation.hasAccess,
         currentRole: user.role,
+        allRoles: user.allRoles || [],
         reason: validation.reason
       };
     } catch (error) {
@@ -118,6 +126,7 @@ export class DiscordController {
         { discordRoleId: '1402760679613661224', systemRole: 'EL_PATRON', name: 'El Patron' },
         { discordRoleId: '1402760800216551494', systemRole: 'DON', name: 'Don' },
         { discordRoleId: '1402760888561438862', systemRole: 'ASESOR', name: 'Asesor' },
+        { discordRoleId: '1402761109013925909', systemRole: 'LOGISTICA', name: 'Logistica' },
         { discordRoleId: '1402760961097470025', systemRole: 'ROUTENVERWALTUNG', name: 'Inspector' },
         { discordRoleId: '1402761049568051331', systemRole: 'ROUTENVERWALTUNG', name: 'Routenverwaltung' },
         { discordRoleId: '1402761676851511356', systemRole: 'SICARIO', name: 'Sicario' },
