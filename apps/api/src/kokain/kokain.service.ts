@@ -332,6 +332,12 @@ export class KokainService {
   async getRecentDeposits() {
     return this.prisma.kokainDeposit.findMany({
       take: 50, // Letzte 50 Deposits
+      where: {
+        status: {
+          in: [DepositStatus.CONFIRMED, DepositStatus.PENDING], // Nur bestätigte und angefragte
+        },
+        uebergabeId: null, // Nur Deposits der aktuellen Übergabe (nicht archiviert)
+      },
       include: {
         user: {
           select: {

@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3 } from 'lucide-react'
+import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock } from 'lucide-react'
 import { formatCurrency } from '../lib/utils'
 
 interface DashboardStats {
@@ -266,6 +266,33 @@ export default function DashboardPage() {
                 <Link to="/audit">
                   <Button variant="lasanta" size="sm">
                     Öffnen
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Clock className="h-6 w-6 text-cyan-400" />
+                  <CardTitle className="text-white">Lagerbewegungen</CardTitle>
+                </div>
+                <Badge variant="outline">Pending</Badge>
+              </div>
+              <CardDescription className="text-gray-400">
+                Ausstehende Lagerbewegungen genehmigen oder ablehnen.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Wartende Genehmigungen
+                </div>
+                <Link to="/lager-movements">
+                  <Button variant="lasanta" size="sm">
+                    Verwalten
                   </Button>
                 </Link>
               </div>

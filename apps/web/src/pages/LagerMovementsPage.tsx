@@ -159,10 +159,17 @@ export default function LagerMovementsPage() {
                         {movement.quantity}
                       </TableCell>
                       <TableCell className="text-gray-300">
-                        {movement.previousStock}
+                        {movement.item.currentStock}
                       </TableCell>
                       <TableCell className="text-gray-300">
-                        {movement.newStock}
+                        {movement.type === 'IN' 
+                          ? movement.item.currentStock + movement.quantity
+                          : movement.type === 'OUT'
+                          ? movement.item.currentStock - movement.quantity
+                          : movement.type === 'ADJUST'
+                          ? movement.item.currentStock + movement.quantity
+                          : movement.item.currentStock
+                        }
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">

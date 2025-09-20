@@ -441,7 +441,14 @@ export class ItemsService {
           },
         },
         createdBy: {
-          select: { id: true, username: true, role: true },
+          select: { 
+            id: true, 
+            username: true, 
+            role: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true
+          },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -457,7 +464,14 @@ export class ItemsService {
       include: {
         item: { include: { category: true } },
         createdBy: {
-          select: { id: true, username: true, role: true },
+          select: { 
+            id: true, 
+            username: true, 
+            role: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true
+          },
         },
       },
       orderBy: { createdAt: 'asc' },
@@ -480,16 +494,47 @@ export class ItemsService {
 
     // Execute the movement
     const result = await this.prisma.$transaction(async (prisma) => {
+      // Get current item stock (not the old value from when movement was created)
+      const currentItem = await prisma.item.findUnique({
+        where: { id: movement.itemId }
+      });
+      
+      if (!currentItem) {
+        throw new BadRequestException('Item not found');
+      }
+      
+      // Calculate new stock based on current stock, not the old stock
+      let newStock: number;
+      switch (movement.type) {
+        case MovementType.IN:
+          newStock = currentItem.currentStock + movement.quantity;
+          break;
+        case MovementType.OUT:
+          newStock = currentItem.currentStock - movement.quantity;
+          break;
+        case MovementType.ADJUST:
+          newStock = currentItem.currentStock + movement.quantity; // quantity is the adjustment amount
+          break;
+        case MovementType.RESERVE:
+          newStock = currentItem.currentStock;
+          break;
+        case MovementType.RELEASE:
+          newStock = currentItem.currentStock;
+          break;
+        default:
+          throw new BadRequestException('Invalid movement type');
+      }
+      
       // Update item stock
       const updatedItem = await prisma.item.update({
         where: { id: movement.itemId },
         data: {
-          currentStock: movement.newStock,
+          currentStock: newStock,
           reservedStock: movement.type === MovementType.RESERVE ? 
-            movement.item.reservedStock + movement.quantity :
+            currentItem.reservedStock + movement.quantity :
             movement.type === MovementType.RELEASE ?
-            movement.item.reservedStock - movement.quantity :
-            movement.item.reservedStock,
+            currentItem.reservedStock - movement.quantity :
+            currentItem.reservedStock,
         },
       });
 
@@ -537,7 +582,14 @@ export class ItemsService {
       include: {
         item: true,
         createdBy: {
-          select: { id: true, username: true, role: true },
+          select: { 
+            id: true, 
+            username: true, 
+            role: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true
+          },
         },
       },
     });
@@ -561,7 +613,14 @@ export class ItemsService {
       include: {
         item: { include: { category: true } },
         createdBy: {
-          select: { id: true, username: true, role: true },
+          select: { 
+            id: true, 
+            username: true, 
+            role: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true
+          },
         },
         approvedBy: {
           select: { id: true, username: true, role: true },

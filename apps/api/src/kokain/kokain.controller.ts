@@ -22,13 +22,13 @@ export class KokainController {
   }
 
   @Get('deposits/pending')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getPendingDeposits() {
     return this.kokainService.getPendingDeposits();
   }
 
   @Get('deposits/confirmed')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getConfirmedDeposits() {
     return this.kokainService.getConfirmedDeposits();
   }
@@ -91,19 +91,19 @@ export class KokainController {
   }
 
   @Get('deposits/recent')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SOLDADO)
   async getRecentDeposits() {
     return this.kokainService.getRecentDeposits();
   }
 
   @Get('archives')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
   async getArchivedUebergaben() {
     return this.kokainService.getArchivedUebergaben();
   }
 
   @Get('archives/:id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
   async getArchiveDetails(@Param('id') archiveId: string) {
     return this.kokainService.getArchiveDetails(archiveId);
   }
