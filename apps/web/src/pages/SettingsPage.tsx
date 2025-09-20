@@ -279,6 +279,7 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Admin Creation - Only for El Patron */}
       {user?.role === 'EL_PATRON' && (
@@ -465,7 +466,6 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
-      )}
     </div>
   )
 }
