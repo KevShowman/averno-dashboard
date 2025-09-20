@@ -22,6 +22,12 @@ export class UsersService {
       throw new Error('User not found');
     }
 
+    // Don darf nicht El Patrón Rolle zuweisen
+    const updater = await this.prisma.user.findUnique({ where: { id: updatedById } });
+    if (updater?.role === Role.DON && role === Role.EL_PATRON) {
+      throw new Error('Don kann keine El Patrón Rolle zuweisen');
+    }
+
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: { role },

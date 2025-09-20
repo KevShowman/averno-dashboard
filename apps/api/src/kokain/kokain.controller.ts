@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -34,7 +34,7 @@ export class KokainController {
   }
 
   @Patch('deposit/:id/confirm')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   async confirmDeposit(
     @Param('id') depositId: string,
     @CurrentUser() user: User,
@@ -47,7 +47,7 @@ export class KokainController {
   }
 
   @Patch('deposit/:id/reject')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   async rejectDeposit(
     @Param('id') depositId: string,
     @Body('reason') reason: string,
@@ -73,7 +73,7 @@ export class KokainController {
   }
 
   @Post('price')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
   async setKokainPrice(
     @Body('price') price: number,
     @CurrentUser() user: User,
@@ -100,5 +100,19 @@ export class KokainController {
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
   async getArchivedUebergaben() {
     return this.kokainService.getArchivedUebergaben();
+  }
+
+  @Delete('deposit/:id')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async removePendingDeposit(
+    @Param('id') depositId: string,
+    @Body('reason') reason: string,
+    @CurrentUser() user: User,
+  ) {
+    if (!this.kokainService.canConfirmDeposit(user.role)) {
+      throw new BadRequestException('Keine Berechtigung zum Entfernen von Deposits');
+    }
+    
+    return this.kokainService.removePendingDeposit(depositId, user.id, reason);
   }
 }

@@ -367,10 +367,44 @@ export class KokainService {
     });
   }
 
+  async removePendingDeposit(depositId: string, removedById: string, reason: string) {
+    const deposit = await this.prisma.kokainDeposit.findUnique({
+      where: { id: depositId },
+      include: { user: true },
+    });
+
+    if (!deposit) {
+      throw new BadRequestException('Deposit nicht gefunden');
+    }
+
+    if (deposit.status !== DepositStatus.PENDING) {
+      throw new BadRequestException('Nur Pending Deposits können entfernt werden');
+    }
+
+    // Deposit löschen
+    await this.prisma.kokainDeposit.delete({
+      where: { id: depositId },
+    });
+
+    await this.auditService.log({
+      userId: removedById,
+      action: 'KOKAIN_DEPOSIT_REMOVED',
+      entity: 'KokainDeposit',
+      entityId: depositId,
+      meta: {
+        packages: deposit.packages,
+        depositUser: deposit.user.username,
+        reason,
+        depositNote: deposit.note,
+      },
+    });
+
+    return { success: true, message: 'Deposit wurde entfernt' };
+  }
+
   canConfirmDeposit(userRole: Role): boolean {
     return userRole === Role.EL_PATRON || 
            userRole === Role.DON || 
-           userRole === Role.ASESOR || 
-           userRole === Role.ROUTENVERWALTUNG;
+           userRole === Role.ASESOR;
   }
 }

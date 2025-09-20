@@ -157,14 +157,8 @@ export class CashService {
   }
 
   async createTransaction(data: CreateTransactionDto, userId: string, userRole: Role) {
-    // Get approval threshold from settings
-    const thresholdSetting = await this.prisma.settings.findUnique({
-      where: { key: 'approval_threshold' },
-    });
-
-    const threshold = (thresholdSetting?.value as any)?.amount || 100000;
-    // El Patron kann alles ohne Genehmigung, alle anderen brauchen Genehmigung ab Schwellwert
-    const needsApproval = Math.abs(data.amount) >= threshold && userRole !== Role.EL_PATRON;
+    // Alle Transaktionen benötigen Bestätigung, außer El Patrón
+    const needsApproval = userRole !== Role.EL_PATRON;
 
     const transaction = await this.prisma.moneyTransaction.create({
       data: {

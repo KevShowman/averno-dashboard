@@ -18,7 +18,8 @@ import {
   Archive,
   Settings,
   AlertTriangle,
-  User
+  User,
+  Trash2
 } from 'lucide-react'
 import { formatDate, formatCurrency, getDisplayName } from '../lib/utils'
 import { toast } from 'sonner'
@@ -125,9 +126,24 @@ export default function KokainPage() {
     },
   })
 
+  const removeDepositMutation = useMutation({
+    mutationFn: ({ depositId, reason }: { depositId: string; reason: string }) => 
+      api.delete(`/kokain/deposit/${depositId}`, { data: { reason } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['kokain-summary'] })
+      toast.success('Deposit wurde entfernt!')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Entfernen')
+    },
+  })
+
   const canConfirm = user?.role === 'EL_PATRON' || user?.role === 'DON' || 
-                    user?.role === 'ASESOR' || user?.role === 'ROUTENVERWALTUNG'
+                    user?.role === 'ASESOR'
   const canManage = user?.role === 'EL_PATRON' || user?.role === 'DON'
+  const canManagePrice = user?.role === 'EL_PATRON' || user?.role === 'DON' || 
+                        user?.role === 'ASESOR' || user?.role === 'ROUTENVERWALTUNG'
 
   const handleCreateDeposit = () => {
     const packages = parseInt(depositPackages)
@@ -154,6 +170,13 @@ export default function KokainPage() {
     }
   }
 
+  const handleRemoveDeposit = (depositId: string) => {
+    const reason = prompt('Begründung für das Entfernen eingeben:')
+    if (reason && reason.trim()) {
+      removeDepositMutation.mutate({ depositId, reason: reason.trim() })
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -176,16 +199,18 @@ export default function KokainPage() {
             <Plus className="mr-2 h-4 w-4" />
             Deposit anfragen
           </Button>
+          {canManagePrice && (
+            <Button
+              onClick={() => setShowPriceModal(true)}
+              variant="outline"
+              className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Preis ändern
+            </Button>
+          )}
           {canManage && (
             <>
-              <Button
-                onClick={() => setShowPriceModal(true)}
-                variant="outline"
-                className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Preis ändern
-              </Button>
               <Button
                 onClick={handleArchive}
                 variant="outline"
@@ -379,6 +404,16 @@ export default function KokainPage() {
                               disabled={rejectDepositMutation.isPending}
                             >
                               <XCircle className="h-3 w-3" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
+                              onClick={() => handleRemoveDeposit(deposit.id)}
+                              disabled={removeDepositMutation.isPending}
+                              title="Deposit entfernen"
+                            >
+                              <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
                         </TableCell>
