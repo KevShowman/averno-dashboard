@@ -160,6 +160,13 @@ export class DiscordService {
     return user.allRoles.includes(requiredRole);
   }
 
+  async getUserById(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true, allRoles: true, discordRoles: true }
+    });
+  }
+
   async getAllServerMembers(): Promise<any[]> {
     try {
       const response = await fetch(

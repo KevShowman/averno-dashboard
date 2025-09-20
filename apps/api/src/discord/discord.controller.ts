@@ -22,10 +22,7 @@ export class DiscordController {
       await this.discordService.updateUserDiscordRoles(user.id, userDiscordRoles);
 
       // Aktualisierten User mit allen Rollen abrufen
-      const updatedUser = await this.discordService.prisma.user.findUnique({
-        where: { id: user.id },
-        select: { role: true, allRoles: true, discordRoles: true }
-      });
+      const updatedUser = await this.discordService.getUserById(user.id);
 
       return {
         message: 'Rolle erfolgreich synchronisiert',
