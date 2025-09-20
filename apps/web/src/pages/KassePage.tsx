@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
@@ -10,9 +10,11 @@ import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Plus
 import { formatCurrency, formatDate, getTransactionStatusColor, getDisplayName } from '../lib/utils'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import MoneyTransactionModal from '../components/MoneyTransactionModal'
+import { toast } from 'sonner'
 
 export default function KassePage() {
   const user = useAuthStore((state) => state.user)
+  const queryClient = useQueryClient()
   const [selectedRange, setSelectedRange] = useState('month')
   const [showTransactionModal, setShowTransactionModal] = useState(false)
   const [transactionType, setTransactionType] = useState<'EINZAHLUNG' | 'AUSZAHLUNG'>('EINZAHLUNG')
@@ -31,6 +33,45 @@ export default function KassePage() {
     queryKey: ['cash-chart', selectedRange],
     queryFn: () => api.get(`/cash/chart?range=${selectedRange}`).then(res => res.data),
   })
+
+  const canApprove = user?.role === 'EL_PATRON' || user?.role === 'DON'
+
+  const approveTransactionMutation = useMutation({
+    mutationFn: (transactionId: string) => api.post(`/cash/transactions/${transactionId}/approve`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cash-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['cash-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['cash-chart'] })
+      toast.success('Transaktion genehmigt!')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Genehmigen')
+    },
+  })
+
+  const rejectTransactionMutation = useMutation({
+    mutationFn: ({ transactionId, reason }: { transactionId: string; reason: string }) => 
+      api.post(`/cash/transactions/${transactionId}/reject`, { reason }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cash-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['cash-summary'] })
+      toast.success('Transaktion abgelehnt!')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Ablehnen')
+    },
+  })
+
+  const handleApprove = (transactionId: string) => {
+    approveTransactionMutation.mutate(transactionId)
+  }
+
+  const handleReject = (transactionId: string) => {
+    const reason = prompt('Begründung für die Ablehnung:')
+    if (reason && reason.trim()) {
+      rejectTransactionMutation.mutate({ transactionId, reason: reason.trim() })
+    }
+  }
 
   const getKindDisplay = (kind: string) => {
     switch (kind) {
@@ -293,15 +334,35 @@ export default function KassePage() {
                         {formatDate(tx.createdAt)}
                       </TableCell>
                       <TableCell>
-                        {tx.status === 'PENDING' && (
+                        {tx.status === 'PENDING' && canApprove && (
                           <div className="flex space-x-2">
-                            <Button size="sm" variant="outline" className="text-green-400 border-green-400 hover:bg-green-400/10">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-green-400 border-green-400 hover:bg-green-400/10"
+                              onClick={() => handleApprove(tx.id)}
+                              disabled={approveTransactionMutation.isPending}
+                              title="Genehmigen"
+                            >
                               <CheckCircle className="h-3 w-3" />
                             </Button>
-                            <Button size="sm" variant="outline" className="text-red-400 border-red-400 hover:bg-red-400/10">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-red-400 border-red-400 hover:bg-red-400/10"
+                              onClick={() => handleReject(tx.id)}
+                              disabled={rejectTransactionMutation.isPending}
+                              title="Ablehnen"
+                            >
                               <XCircle className="h-3 w-3" />
                             </Button>
                           </div>
+                        )}
+                        {tx.status === 'PENDING' && !canApprove && (
+                          <Badge className="text-yellow-400 bg-yellow-400/10">
+                            <Clock className="mr-1 h-3 w-3" />
+                            Ausstehend
+                          </Badge>
                         )}
                       </TableCell>
                     </TableRow>
