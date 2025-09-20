@@ -25,7 +25,7 @@ list_volumes() {
     echo ""
     docker volume ls | grep lasanta || echo "Keine LaSanta Volumes gefunden."
     echo ""
-    docker-compose config --volumes
+    docker compose config --volumes
 }
 
 show_info() {
@@ -93,14 +93,14 @@ reset_volumes() {
     fi
     
     echo "🛑 Stoppe Container..."
-    docker-compose down
+    docker compose down
     
     echo "🗑️  Lösche Volumes..."
     docker volume rm lasanta_postgres_data lasanta_api_uploads lasanta_api_logs 2>/dev/null || true
     
     echo "✅ Alle Daten wurden gelöscht."
     echo "🚀 Starte System neu..."
-    docker-compose up -d
+    docker compose up -d
 }
 
 # Hauptlogik

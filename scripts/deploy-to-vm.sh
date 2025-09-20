@@ -9,8 +9,8 @@ echo "🚀 LaSanta Calavera VM Deployment"
 echo "================================"
 
 # Prüfe ob wir im richtigen Verzeichnis sind
-if [ ! -f "docker-compose.yml" ]; then
-    echo "❌ docker-compose.yml nicht gefunden. Bitte im Projekt-Root ausführen."
+if [ ! -f "docker compose.yml" ]; then
+    echo "❌ docker compose.yml nicht gefunden. Bitte im Projekt-Root ausführen."
     exit 1
 fi
 
@@ -63,15 +63,15 @@ fi
 
 # Docker Compose Build
 echo "🔨 Baue Docker Images..."
-docker-compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml build
 
 # Stoppe alte Container
 echo "🛑 Stoppe alte Container..."
-docker-compose down 2>/dev/null || true
+docker compose down 2>/dev/null || true
 
 # Starte neue Container
 echo "🚀 Starte neue Container..."
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 
 # Warte auf Services
 echo "⏳ Warte auf Services..."
@@ -79,11 +79,11 @@ sleep 30
 
 # Prüfe Health
 echo "🏥 Prüfe Service Health..."
-if docker-compose -f docker-compose.prod.yml ps | grep -q "Up"; then
+if docker compose -f docker-compose.prod.yml ps | grep -q "Up"; then
     echo "✅ Services sind gestartet!"
 else
     echo "❌ Einige Services sind nicht gestartet!"
-    docker-compose -f docker-compose.prod.yml ps
+    docker compose -f docker-compose.prod.yml ps
     exit 1
 fi
 
@@ -93,7 +93,7 @@ echo "💾 Erstelle ersten Backup..."
 
 # Setup Discord Rollen
 echo "🔧 Richte Discord-Rollen ein..."
-docker-compose exec api pnpm setup-discord-roles
+docker compose exec api pnpm setup-discord-roles
 
 # Zeige Status
 echo ""
@@ -104,8 +104,8 @@ echo "🔧 API: http://localhost:3000"
 echo "🗄️  Datenbank: localhost:5432"
 echo ""
 echo "📋 Nützliche Befehle:"
-echo "  docker-compose -f docker-compose.prod.yml ps          # Status anzeigen"
-echo "  docker-compose -f docker-compose.prod.yml logs -f     # Logs anzeigen"
+echo "  docker compose -f docker-compose.prod.yml ps          # Status anzeigen"
+echo "  docker compose -f docker-compose.prod.yml logs -f     # Logs anzeigen"
 echo "  ./scripts/backup-database.sh                          # Backup erstellen"
 echo "  ./scripts/manage-volumes.sh info                      # Volume-Info"
 echo ""

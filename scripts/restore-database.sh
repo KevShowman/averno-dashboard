@@ -44,7 +44,7 @@ fi
 if ! docker ps | grep -q $CONTAINER_NAME; then
     echo "❌ Container $CONTAINER_NAME ist nicht gestartet!"
     echo "🚀 Starte Container..."
-    docker-compose up -d db
+    docker compose up -d db
     sleep 10
 fi
 
@@ -56,7 +56,7 @@ docker exec -i $CONTAINER_NAME psql -U $DB_USER -d $DB_NAME < "$BACKUP_FILE"
 if [ $? -eq 0 ]; then
     echo "✅ Datenbank erfolgreich wiederhergestellt!"
     echo "🔄 Starte API neu für Schema-Updates..."
-    docker-compose restart api
+    docker compose restart api
     echo "🎉 Restore-Prozess abgeschlossen!"
 else
     echo "❌ Fehler beim Wiederherstellen der Datenbank!"

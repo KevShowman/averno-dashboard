@@ -8,19 +8,25 @@
    cd crc-ws
    ```
 
-2. **Deployment-Script ausführen:**
+2. **Docker Compose V2 prüfen:**
+   ```bash
+   docker compose version
+   # Sollte Version 2.0+ anzeigen
+   ```
+
+3. **Deployment-Script ausführen:**
    ```bash
    chmod +x scripts/*.sh
    ./scripts/deploy-to-vm.sh
    ```
 
-3. **Umgebungsvariablen konfigurieren:**
+4. **Umgebungsvariablen konfigurieren:**
    - Bearbeite `.env` mit deinen Werten
    - Führe erneut aus: `./scripts/deploy-to-vm.sh --continue`
 
 ## 📋 Voraussetzungen
 
-- Docker & Docker Compose
+- Docker & Docker Compose V2 (mindestens Version 2.0)
 - Mindestens 2GB RAM
 - 10GB freier Speicherplatz
 - Port 80, 443, 3000, 5432 verfügbar
@@ -122,17 +128,17 @@ sudo ufw enable
 ### Logs anzeigen
 ```bash
 # Alle Services
-docker-compose -f docker-compose.prod.yml logs -f
+docker compose -f docker compose.prod.yml logs -f
 
 # Einzelner Service
-docker-compose -f docker-compose.prod.yml logs -f api
-docker-compose -f docker-compose.prod.yml logs -f web
-docker-compose -f docker-compose.prod.yml logs -f db
+docker compose -f docker compose.prod.yml logs -f api
+docker compose -f docker compose.prod.yml logs -f web
+docker compose -f docker compose.prod.yml logs -f db
 ```
 
 ### Status prüfen
 ```bash
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker compose.prod.yml ps
 ```
 
 ### Ressourcenverbrauch
@@ -145,25 +151,25 @@ docker stats
 ### Anwendung aktualisieren
 ```bash
 git pull
-docker-compose -f docker-compose.prod.yml build
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker compose.prod.yml build
+docker compose -f docker compose.prod.yml up -d
 ```
 
 ### Datenbank-Migration
 ```bash
-docker-compose exec api pnpm exec prisma migrate deploy
+docker compose exec api pnpm exec prisma migrate deploy
 ```
 
 ## 🆘 Troubleshooting
 
 ### Container startet nicht
 ```bash
-docker-compose -f docker-compose.prod.yml logs [service-name]
+docker compose -f docker compose.prod.yml logs [service-name]
 ```
 
 ### Datenbank-Verbindung
 ```bash
-docker-compose exec db psql -U lasanta -d lasanta_db
+docker compose exec db psql -U lasanta -d lasanta_db
 ```
 
 ### Volumes zurücksetzen
@@ -173,8 +179,8 @@ docker-compose exec db psql -U lasanta -d lasanta_db
 
 ### Vollständiger Neustart
 ```bash
-docker-compose -f docker-compose.prod.yml down
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker compose.prod.yml down
+docker compose -f docker compose.prod.yml up -d
 ```
 
 ## 📞 Support

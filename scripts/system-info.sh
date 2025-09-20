@@ -11,7 +11,7 @@ echo ""
 echo "🐳 Docker Status:"
 if command -v docker &> /dev/null; then
     docker --version
-    docker-compose --version
+    docker compose --version
     echo "✅ Docker ist installiert"
 else
     echo "❌ Docker ist nicht installiert"
@@ -20,8 +20,8 @@ echo ""
 
 # Container Status
 echo "📦 Container Status:"
-if docker-compose ps 2>/dev/null | grep -q "Up"; then
-    docker-compose ps
+if docker compose ps 2>/dev/null | grep -q "Up"; then
+    docker compose ps
 else
     echo "❌ Keine Container laufen"
 fi
@@ -93,8 +93,8 @@ echo ""
 echo "📋 Nützliche Befehle:"
 echo "  ./scripts/backup-database.sh                    # Backup erstellen"
 echo "  ./scripts/manage-volumes.sh info                # Volume-Info"
-echo "  docker-compose -f docker-compose.prod.yml ps    # Status anzeigen"
-echo "  docker-compose -f docker-compose.prod.yml logs  # Logs anzeigen"
+echo "  docker compose -f docker-compose.prod.yml ps    # Status anzeigen"
+echo "  docker compose -f docker-compose.prod.yml logs  # Logs anzeigen"
 echo ""
 
 echo "🎉 System-Check abgeschlossen!"
