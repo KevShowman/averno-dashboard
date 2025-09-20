@@ -1,4 +1,3 @@
-// Healthcheck für Docker Container
 const http = require('http');
 
 const options = {
