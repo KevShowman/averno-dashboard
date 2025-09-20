@@ -9,16 +9,28 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    preserveSymlinks: false,
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: 5173,
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.NODE_ENV === 'development' && process.env.DOCKER ? 'http://api:3000' : 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       },
     },
   },
+  optimizeDeps: {
+    force: true,
+    include: ['react', 'react-dom'],
+    exclude: []
+  },
+  build: {
+    rollupOptions: {
+      external: []
+    }
+  }
 })

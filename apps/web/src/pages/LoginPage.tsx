@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth'
 import { Button } from '../components/ui/button'
@@ -8,13 +7,8 @@ import { Skull } from 'lucide-react'
 export default function LoginPage() {
   const { isAuthenticated, login, isLoading } = useAuthStore()
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
+  // Don't show loading here - App.tsx already handles it
+  // This prevents double loading screens and potential redirect loops
 
   if (isAuthenticated) {
     return <Navigate to="/app" replace />

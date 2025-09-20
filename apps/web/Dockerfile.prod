@@ -1,0 +1,57 @@
+# Production Dockerfile für Frontend
+FROM node:18-alpine AS base
+
+# Installiere pnpm
+RUN npm install -g pnpm
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere package files
+COPY package*.json pnpm-lock.yaml ./
+
+# Installiere Dependencies
+RUN pnpm install --frozen-lockfile
+
+# Kopiere Source Code
+COPY . .
+
+# Build Stage
+FROM base AS build
+
+# Build für Production
+RUN pnpm run build
+
+# Production Stage mit Nginx
+FROM nginx:alpine AS production
+
+# Kopiere custom nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Kopiere built files
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Erstelle non-root user
+RUN addgroup -g 1001 -S nginx-user
+RUN adduser -S nginx-user -u 1001 -G nginx-user
+
+# Setze Berechtigungen
+RUN chown -R nginx-user:nginx-user /usr/share/nginx/html
+RUN chown -R nginx-user:nginx-user /var/cache/nginx
+RUN chown -R nginx-user:nginx-user /var/log/nginx
+RUN chown -R nginx-user:nginx-user /etc/nginx/conf.d
+RUN touch /var/run/nginx.pid
+RUN chown -R nginx-user:nginx-user /var/run/nginx.pid
+
+# Wechsle zu non-root user
+USER nginx-user
+
+# Exponiere Port
+EXPOSE 80
+
+# Health Check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+# Starte Nginx
+CMD ["nginx", "-g", "daemon off;"]

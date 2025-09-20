@@ -14,6 +14,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups  # Für Datenbank-Backups
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U lasanta -d lasanta_db"]
       interval: 10s
@@ -32,6 +33,8 @@ services:
     environment:
       DATABASE_URL: "postgresql://lasanta:password@db:5432/lasanta_db?schema=public"
       NODE_ENV: development
+      HOST: "0.0.0.0"
+      PORT: 3000
       JWT_SECRET: "your-super-secret-jwt-key-here-change-in-production"
       JWT_REFRESH_SECRET: "your-super-secret-refresh-key-here-change-in-production"
       JWT_EXPIRES_IN: "15m"
@@ -47,6 +50,8 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
+      - api_uploads:/app/uploads  # Für persistente Uploads/Dateien
+      - api_logs:/app/logs  # Für Log-Dateien
 
   # React Frontend
   web:
@@ -59,8 +64,15 @@ services:
       - "5173:5173"
     environment:
       VITE_API_URL: "http://localhost:3000/api"
+      NODE_ENV: development
+      DOCKER: "true"
     depends_on:
       - api
 
 volumes:
   postgres_data:
+    driver: local
+  api_uploads:
+    driver: local
+  api_logs:
+    driver: local

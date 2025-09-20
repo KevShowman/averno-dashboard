@@ -72,4 +72,27 @@ export class UsersService {
 
     return updatedUser;
   }
+
+  async updateIcName(userId: string, icFirstName: string, icLastName: string) {
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        icFirstName,
+        icLastName,
+      },
+    });
+
+    await this.auditService.log({
+      userId,
+      action: 'IC_NAME_UPDATED',
+      entity: 'User',
+      entityId: userId,
+      meta: {
+        icFirstName,
+        icLastName,
+      },
+    });
+
+    return updatedUser;
+  }
 }

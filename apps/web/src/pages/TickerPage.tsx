@@ -5,11 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Activity, Package, DollarSign, TrendingUp, TrendingDown, RotateCcw, Plus, Minus, Filter } from 'lucide-react'
-import { formatDate, formatCurrency, getRoleColor, getRoleDisplayName, getMovementTypeColor, getTransactionStatusColor } from '../lib/utils'
+import { Activity, Package, DollarSign, TrendingUp, TrendingDown, RotateCcw, Plus, Minus, Filter, FlaskConical, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { formatDate, formatCurrency, getRoleColor, getRoleDisplayName, getMovementTypeColor, getTransactionStatusColor, getDisplayName } from '../lib/utils'
 
 export default function TickerPage() {
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'lager' | 'kasse'>('all')
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'lager' | 'kasse' | 'kokain'>('all')
 
   const { data: stockMovements, isLoading: stockLoading } = useQuery({
     queryKey: ['recent-stock-movements'],
@@ -21,6 +21,12 @@ export default function TickerPage() {
     queryKey: ['recent-cash-transactions'],
     queryFn: () => api.get('/cash/transactions?limit=50').then(res => res.data),
     enabled: selectedFilter === 'all' || selectedFilter === 'kasse',
+  })
+
+  const { data: kokainDeposits, isLoading: kokainLoading } = useQuery({
+    queryKey: ['recent-kokain-deposits'],
+    queryFn: () => api.get('/kokain/deposits/recent').then(res => res.data),
+    enabled: selectedFilter === 'all' || selectedFilter === 'kokain',
   })
 
   // Combine and sort activities
@@ -63,6 +69,25 @@ export default function TickerPage() {
     })
   }
 
+  if (kokainDeposits?.deposits) {
+    kokainDeposits.deposits.forEach((deposit: any) => {
+      allActivities.push({
+        id: `kokain-${deposit.id}`,
+        type: 'kokain',
+        timestamp: deposit.createdAt,
+        user: deposit.user,
+        action: deposit.status,
+        details: {
+          packages: deposit.packages,
+          note: deposit.note,
+          status: deposit.status,
+          confirmedBy: deposit.confirmedBy,
+          confirmedAt: deposit.confirmedAt,
+        }
+      })
+    })
+  }
+
   // Sort by timestamp (newest first)
   allActivities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
@@ -76,13 +101,20 @@ export default function TickerPage() {
         case 'RELEASE': return <Package className="h-4 w-4 text-purple-400" />
         default: return <Package className="h-4 w-4" />
       }
-    } else {
+    } else if (type === 'kasse') {
       switch (action) {
         case 'EINZAHLUNG': return <TrendingUp className="h-4 w-4 text-green-400" />
         case 'AUSZAHLUNG': return <TrendingDown className="h-4 w-4 text-red-400" />
         case 'TRANSFER': return <DollarSign className="h-4 w-4 text-blue-400" />
         case 'KORREKTUR': return <RotateCcw className="h-4 w-4 text-yellow-400" />
         default: return <DollarSign className="h-4 w-4" />
+      }
+    } else {
+      switch (action) {
+        case 'PENDING': return <Clock className="h-4 w-4 text-yellow-400" />
+        case 'CONFIRMED': return <CheckCircle className="h-4 w-4 text-green-400" />
+        case 'REJECTED': return <XCircle className="h-4 w-4 text-red-400" />
+        default: return <FlaskConical className="h-4 w-4" />
       }
     }
   }
@@ -97,7 +129,7 @@ export default function TickerPage() {
         'RELEASE': 'Reservierung aufgehoben',
       }
       return actionMap[action] || action
-    } else {
+    } else if (type === 'kasse') {
       const actionMap: Record<string, string> = {
         'EINZAHLUNG': 'Einzahlung',
         'AUSZAHLUNG': 'Auszahlung',
@@ -105,10 +137,17 @@ export default function TickerPage() {
         'KORREKTUR': 'Korrektur',
       }
       return actionMap[action] || action
+    } else {
+      const actionMap: Record<string, string> = {
+        'PENDING': 'Deposit angefragt',
+        'CONFIRMED': 'Deposit bestätigt',
+        'REJECTED': 'Deposit abgelehnt',
+      }
+      return actionMap[action] || action
     }
   }
 
-  const isLoading = stockLoading || cashLoading
+  const isLoading = stockLoading || cashLoading || kokainLoading
 
   return (
     <div className="space-y-6">
@@ -148,11 +187,19 @@ export default function TickerPage() {
             <DollarSign className="mr-2 h-4 w-4" />
             Kasse
           </Button>
+          <Button
+            variant={selectedFilter === 'kokain' ? "default" : "outline"}
+            onClick={() => setSelectedFilter('kokain')}
+            size="sm"
+          >
+            <FlaskConical className="mr-2 h-4 w-4" />
+            Kokain
+          </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="lasanta-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-400">Aktivitäten heute</CardTitle>
@@ -185,6 +232,17 @@ export default function TickerPage() {
           <CardContent>
             <div className="text-2xl font-bold text-green-400">
               {allActivities.filter(activity => activity.type === 'kasse').length}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="lasanta-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-gray-400">Kokain-Deposits</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-400">
+              {allActivities.filter(activity => activity.type === 'kokain').length}
             </div>
           </CardContent>
         </Card>
@@ -223,8 +281,12 @@ export default function TickerPage() {
                         {formatDate(activity.timestamp)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={activity.type === 'lager' ? 'outline' : 'secondary'}>
-                          {activity.type === 'lager' ? 'Lager' : 'Kasse'}
+                        <Badge variant={
+                          activity.type === 'lager' ? 'outline' : 
+                          activity.type === 'kokain' ? 'destructive' : 'secondary'
+                        }>
+                          {activity.type === 'lager' ? 'Lager' : 
+                           activity.type === 'kokain' ? 'Kokain' : 'Kasse'}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -233,6 +295,12 @@ export default function TickerPage() {
                           <Badge className={
                             activity.type === 'lager' 
                               ? getMovementTypeColor(activity.action)
+                              : activity.type === 'kokain'
+                                ? activity.action === 'CONFIRMED' 
+                                  ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                  : activity.action === 'REJECTED'
+                                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                                    : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
                               : activity.details.status 
                                 ? getTransactionStatusColor(activity.details.status)
                                 : 'bg-gray-500/20 text-gray-400 border-gray-500/30'
@@ -243,7 +311,7 @@ export default function TickerPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <span className="text-white">{activity.user.username}</span>
+                          <span className="text-white">{getDisplayName(activity.user)}</span>
                           <Badge className={getRoleColor(activity.user.role)}>
                             {getRoleDisplayName(activity.user.role)}
                           </Badge>
@@ -256,6 +324,17 @@ export default function TickerPage() {
                             <div className="text-sm text-gray-400">
                               Menge: {activity.details.quantity}
                             </div>
+                          </div>
+                        ) : activity.type === 'kokain' ? (
+                          <div>
+                            <div className="font-medium">
+                              {activity.details.packages} Pakete
+                            </div>
+                            {activity.details.confirmedBy && (
+                              <div className="text-sm text-gray-400">
+                                Bestätigt von: {getDisplayName(activity.details.confirmedBy)}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div>

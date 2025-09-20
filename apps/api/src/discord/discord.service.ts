@@ -1,0 +1,279 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../common/prisma/prisma.service';
+import { Role } from '@prisma/client';
+
+@Injectable()
+export class DiscordService {
+  private readonly discordApiUrl = 'https://discord.com/api/v10';
+  private readonly botToken: string;
+  private readonly guildId: string;
+
+  constructor(
+    private configService: ConfigService,
+    private prisma: PrismaService,
+  ) {
+    this.botToken = this.configService.get<string>('DISCORD_BOT_TOKEN');
+    this.guildId = this.configService.get<string>('DISCORD_GUILD_ID');
+    
+    if (!this.botToken) {
+      throw new Error('DISCORD_BOT_TOKEN ist nicht konfiguriert');
+    }
+    if (!this.guildId) {
+      throw new Error('DISCORD_GUILD_ID ist nicht konfiguriert');
+    }
+  }
+
+  async getUserRoles(discordId: string): Promise<string[]> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Benutzer ist nicht im Server
+          return [];
+        }
+        throw new Error(`Discord API Fehler: ${response.status}`);
+      }
+
+      const member = await response.json();
+      return member.roles || [];
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Discord-Rollen:', error);
+      return [];
+    }
+  }
+
+  async validateUserAccess(discordId: string): Promise<{ hasAccess: boolean; highestRole?: Role; reason?: string }> {
+    try {
+      // Discord-Rollen des Benutzers abrufen
+      const userDiscordRoles = await this.getUserRoles(discordId);
+      
+      if (userDiscordRoles.length === 0) {
+        return {
+          hasAccess: false,
+          reason: 'Benutzer ist nicht im Discord-Server oder hat keine Rollen'
+        };
+      }
+
+      // Discord-Rollen-Mappings abrufen
+      const roleMappings = await this.prisma.discordRoleMapping.findMany({
+        where: { isActive: true }
+      });
+
+      // Prüfen ob der Benutzer mindestens eine erlaubte Rolle hat
+      const validRoles = userDiscordRoles.filter(roleId => 
+        roleMappings.some(mapping => mapping.discordRoleId === roleId)
+      );
+
+      if (validRoles.length === 0) {
+        return {
+          hasAccess: false,
+          reason: 'Benutzer hat keine der erlaubten Discord-Rollen'
+        };
+      }
+
+      // Höchste Rolle bestimmen
+      const userRoleMappings = roleMappings.filter(mapping => 
+        validRoles.includes(mapping.discordRoleId)
+      );
+
+      // Rollen-Hierarchie definieren (höhere Zahlen = höhere Berechtigung)
+      const roleHierarchy = {
+        [Role.SOLDADO]: 1,
+        [Role.SICARIO]: 2,
+        [Role.ROUTENVERWALTUNG]: 3,
+        [Role.ASESOR]: 4,
+        [Role.DON]: 5,
+        [Role.EL_PATRON]: 6,
+      };
+
+      const highestRole = userRoleMappings.reduce((highest, current) => {
+        const currentLevel = roleHierarchy[current.systemRole];
+        const highestLevel = roleHierarchy[highest.systemRole];
+        return currentLevel > highestLevel ? current : highest;
+      });
+
+      return {
+        hasAccess: true,
+        highestRole: highestRole.systemRole
+      };
+
+    } catch (error) {
+      console.error('Fehler bei der Benutzer-Zugriffsvalidierung:', error);
+      return {
+        hasAccess: false,
+        reason: 'Fehler bei der Discord-Rollen-Überprüfung'
+      };
+    }
+  }
+
+  async syncUserRole(discordId: string): Promise<Role> {
+    const validation = await this.validateUserAccess(discordId);
+    
+    if (!validation.hasAccess) {
+      throw new BadRequestException(validation.reason || 'Zugriff verweigert');
+    }
+
+    return validation.highestRole!;
+  }
+
+  async updateUserDiscordRoles(userId: string, discordRoles: string[]): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { discordRoles }
+    });
+  }
+
+  async getAllServerMembers(): Promise<any[]> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members?limit=1000`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Discord API Fehler: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Server-Mitglieder:', error);
+      return [];
+    }
+  }
+
+  async getMembersWithAllowedRoles(): Promise<any[]> {
+    try {
+      const allMembers = await this.getAllServerMembers();
+      
+      // Discord-Rollen-Mappings abrufen
+      const roleMappings = await this.prisma.discordRoleMapping.findMany({
+        where: { isActive: true }
+      });
+
+      const allowedRoleIds = roleMappings.map(mapping => mapping.discordRoleId);
+
+      // Mitglieder filtern, die mindestens eine erlaubte Rolle haben
+      const membersWithAllowedRoles = allMembers.filter(member => {
+        return member.roles && member.roles.some((roleId: string) => 
+          allowedRoleIds.includes(roleId)
+        );
+      });
+
+      // Für jeden Mitglied die höchste Rolle bestimmen
+      const membersWithRoles = membersWithAllowedRoles.map(member => {
+        const memberRoleMappings = roleMappings.filter(mapping => 
+          member.roles.includes(mapping.discordRoleId)
+        );
+
+        // Rollen-Hierarchie definieren
+        const roleHierarchy = {
+          [Role.SOLDADO]: 1,
+          [Role.SICARIO]: 2,
+          [Role.ROUTENVERWALTUNG]: 3,
+          [Role.ASESOR]: 4,
+          [Role.DON]: 5,
+          [Role.EL_PATRON]: 6,
+        };
+
+        const highestRole = memberRoleMappings.reduce((highest, current) => {
+          const currentLevel = roleHierarchy[current.systemRole];
+          const highestLevel = roleHierarchy[highest.systemRole];
+          return currentLevel > highestLevel ? current : highest;
+        });
+
+        return {
+          discordId: member.user.id,
+          username: member.user.username,
+          discriminator: member.user.discriminator,
+          avatar: member.user.avatar,
+          discordRoles: member.roles,
+          highestSystemRole: highestRole.systemRole,
+          highestRoleName: highestRole.name,
+          joinedAt: member.joined_at,
+          isInDatabase: false // Wird später aktualisiert
+        };
+      });
+
+      // Prüfen welche Mitglieder bereits in der Datenbank sind
+      const discordIds = membersWithRoles.map(member => member.discordId);
+      const existingUsers = await this.prisma.user.findMany({
+        where: { discordId: { in: discordIds } }
+      });
+
+      const existingDiscordIds = new Set(existingUsers.map(user => user.discordId));
+
+      return membersWithRoles.map(member => ({
+        ...member,
+        isInDatabase: existingDiscordIds.has(member.discordId)
+      }));
+
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Mitglieder mit erlaubten Rollen:', error);
+      return [];
+    }
+  }
+
+  async importMemberToDatabase(discordId: string): Promise<any> {
+    try {
+      // Discord-Benutzer-Informationen abrufen
+      const userResponse = await fetch(
+        `${this.discordApiUrl}/users/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!userResponse.ok) {
+        throw new Error(`Discord API Fehler: ${userResponse.status}`);
+      }
+
+      const discordUser = await userResponse.json();
+      
+      // Discord-Rollen des Benutzers abrufen
+      const userDiscordRoles = await this.getUserRoles(discordId);
+      
+      // Zugriff validieren
+      const validation = await this.validateUserAccess(discordId);
+      
+      if (!validation.hasAccess) {
+        throw new BadRequestException('Benutzer hat keine erlaubten Discord-Rollen');
+      }
+
+      // Benutzer in Datenbank erstellen
+      const user = await this.prisma.user.create({
+        data: {
+          discordId,
+          username: discordUser.username,
+          avatarUrl: discordUser.avatar ? 
+            `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : null,
+          email: null, // Discord Bot kann keine E-Mail abrufen
+          role: validation.highestRole!,
+          discordRoles: userDiscordRoles,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      console.error('Fehler beim Importieren des Benutzers:', error);
+      throw error;
+    }
+  }
+}

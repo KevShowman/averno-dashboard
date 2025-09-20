@@ -30,9 +30,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const port = configService.get('PORT', 3000);
-  await app.listen(port);
+  const host = configService.get('HOST', '0.0.0.0');
+  await app.listen(port, host);
   
-  console.log(`🚀 LaSanta Calavera API running on: http://localhost:${port}/api`);
+  console.log(`🚀 LaSanta Calavera API running on: http://${host}:${port}/api`);
 }
 
 bootstrap();

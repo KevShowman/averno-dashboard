@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -11,6 +12,7 @@ import { formatDate, getRoleColor } from '../lib/utils'
 import StockMovementModal from '../components/StockMovementModal'
 
 export default function LagerPage() {
+  const user = useAuthStore((state) => state.user)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showCriticalOnly, setShowCriticalOnly] = useState(false)
@@ -175,18 +177,7 @@ export default function LagerPage() {
                   {itemsData?.items?.map((item: any) => (
                     <TableRow key={item.id} className="hover:bg-gray-800/50">
                       <TableCell>
-                        <div>
-                          <div className="font-medium text-white">{item.name}</div>
-                          {item.tags.length > 0 && (
-                            <div className="flex gap-1 mt-1">
-                              {item.tags.slice(0, 2).map((tag: string) => (
-                                <Badge key={tag} variant="outline" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                        <div className="font-medium text-white">{item.name}</div>
                       </TableCell>
                       <TableCell className="text-gray-300">
                         {item.category.name}

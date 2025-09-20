@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
@@ -7,26 +7,53 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Settings, Users, DollarSign, Package, Shield, Save } from 'lucide-react'
-import { formatCurrency, getRoleColor, getRoleDisplayName } from '../lib/utils'
+import { Settings, Users, DollarSign, Package, Shield, Save, FlaskConical } from 'lucide-react'
+import { formatCurrency, getRoleColor, getDisplayName } from '../lib/utils'
 import { toast } from 'sonner'
+import DiscordRoleSync from '../components/DiscordRoleSync'
+import DiscordMembersManager from '../components/DiscordMembersManager'
+
+const getRoleDisplayName = (role: string) => {
+  switch (role) {
+    case 'EL_PATRON': return 'El Patron'
+    case 'DON': return 'Don'
+    case 'ASESOR': return 'Asesor'
+    case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
+    case 'SICARIO': return 'Sicario'
+    case 'SOLDADO': return 'Soldado'
+    default: return role
+  }
+}
 
 export default function SettingsPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
   const [approvalThreshold, setApprovalThreshold] = useState(100000)
   const [newAdminDiscordId, setNewAdminDiscordId] = useState('')
+  const [kokainPrice, setKokainPrice] = useState(1000)
+
+  // Berechtigungen basierend auf Rollen
+  const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
+  const canManageSettings = user?.role && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role)
+  const canManageKokainPrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
+  const canChangeIcName = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'SICARIO', 'SOLDADO'].includes(user.role)
 
   const { data: users } = useQuery({
     queryKey: ['users'],
     queryFn: () => api.get('/users').then(res => res.data),
-    enabled: user?.role === 'ADMIN',
+    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
+  })
+
+  const { data: kokainPriceData } = useQuery({
+    queryKey: ['kokain-price'],
+    queryFn: () => api.get('/kokain/price').then(res => res.data),
+    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
   })
 
   const { data: settings } = useQuery({
     queryKey: ['settings'],
     queryFn: () => api.get('/settings').then(res => res.data),
-    enabled: user?.role === 'ADMIN',
+    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
   })
 
   const updateThresholdMutation = useMutation({
@@ -64,6 +91,25 @@ export default function SettingsPage() {
       toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Admins')
     },
   })
+
+  const updateKokainPriceMutation = useMutation({
+    mutationFn: (price: number) => 
+      api.post('/kokain/price', { price }),
+    onSuccess: () => {
+      toast.success('Kokain-Preis aktualisiert')
+      queryClient.invalidateQueries({ queryKey: ['kokain-price'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Kokain-Preises')
+    },
+  })
+
+  // Set initial kokain price when data is loaded
+  useEffect(() => {
+    if (kokainPriceData?.price) {
+      setKokainPrice(kokainPriceData.price)
+    }
+  }, [kokainPriceData])
 
   if (user?.role !== 'EL_PATRON' && user?.role !== 'DON') {
     return (
@@ -106,8 +152,55 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* System Settings */}
-      <Card className="lasanta-card">
+      {/* IC-Name-Änderung für alle Benutzer */}
+      {canChangeIcName && (
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Users className="mr-2 h-5 w-5" />
+              IC-Name ändern
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Ändere deinen In-Character Vor- und Nachnamen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    IC Vorname
+                  </label>
+                  <Input
+                    value={user?.icFirstName || ''}
+                    placeholder="Max"
+                    className="bg-background border-input"
+                    disabled
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    IC Nachname
+                  </label>
+                  <Input
+                    value={user?.icLastName || ''}
+                    placeholder="Mustermann"
+                    className="bg-background border-input"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="text-sm text-gray-500">
+                Um deinen IC-Namen zu ändern, kontaktiere einen Administrator.
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* System Settings - nur für El Patron, Don, Asesor */}
+      {canManageSettings && (
+        <Card className="lasanta-card">
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <DollarSign className="mr-2 h-5 w-5" />
@@ -141,6 +234,47 @@ export default function SettingsPage() {
             </div>
             <p className="text-xs text-gray-500 mt-1">
               Transaktionen ab diesem Betrag erfordern eine Genehmigung durch El Patrón oder Don
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Kokain-System-Einstellungen - für El Patron, Don, Asesor, Routenverwaltung */}
+      {canManageKokainPrice && (
+        <Card className="lasanta-card">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <FlaskConical className="mr-2 h-5 w-5" />
+            Kokain-System-Einstellungen
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Konfiguriere Preise und Einstellungen für das Kokain-Deposit-System
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm text-gray-400 mb-2 block">
+              Preis pro Kokain-Paket (Schwarzgeld)
+            </label>
+            <div className="flex space-x-2">
+              <Input
+                type="number"
+                value={kokainPrice}
+                onChange={(e) => setKokainPrice(Number(e.target.value))}
+                className="flex-1"
+                placeholder="1000"
+              />
+              <Button
+                onClick={() => updateKokainPriceMutation.mutate(kokainPrice)}
+                disabled={updateKokainPriceMutation.isPending}
+                variant="lasanta"
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Speichern
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Aktueller Preis: {formatCurrency(kokainPriceData?.price || 1000)} pro Paket
             </p>
           </div>
         </CardContent>
@@ -193,7 +327,16 @@ export default function SettingsPage() {
       </Card>
       )}
 
-      {/* User Management */}
+      {/* Discord Management - nur für El Patron, Don */}
+      {(user?.role === 'EL_PATRON' || user?.role === 'DON') && (
+        <>
+          <DiscordRoleSync />
+          <DiscordMembersManager />
+        </>
+      )}
+
+      {/* User Management - für El Patron, Don, Asesor, Routenverwaltung */}
+      {canManageUsers && (
       <Card className="lasanta-card">
         <CardHeader>
           <CardTitle className="text-white flex items-center">
@@ -235,9 +378,12 @@ export default function SettingsPage() {
                           </div>
                         )}
                         <div>
-                          <div className="font-medium text-white">{u.username}</div>
+                          <div className="font-medium text-white">{getDisplayName(u)}</div>
                           {u.email && (
                             <div className="text-sm text-gray-400">{u.email}</div>
+                          )}
+                          {!u.icFirstName && !u.icLastName && (
+                            <div className="text-xs text-yellow-400">IC-Name fehlt</div>
                           )}
                         </div>
                       </div>
@@ -265,6 +411,8 @@ export default function SettingsPage() {
                           disabled={updateUserRoleMutation.isPending}
                         >
                           <option value="SOLDADO">Soldado</option>
+                          <option value="SICARIO">Sicario</option>
+                          <option value="ROUTENVERWALTUNG">Routenverwaltung</option>
                           <option value="ASESOR">Asesor</option>
                           <option value="DON">Don</option>
                           <option value="EL_PATRON">El Patrón</option>
@@ -317,6 +465,7 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   )
 }

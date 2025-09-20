@@ -1,0 +1,64 @@
+# Production Dockerfile für API
+FROM node:18-alpine AS base
+
+# Installiere pnpm
+RUN npm install -g pnpm
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere package files
+COPY package*.json pnpm-lock.yaml ./
+
+# Installiere Dependencies
+RUN pnpm install --frozen-lockfile
+
+# Kopiere Source Code
+COPY . .
+
+# Generiere Prisma Client
+RUN pnpm exec prisma generate
+
+# Build Stage
+FROM base AS build
+RUN pnpm run build
+
+# Production Stage
+FROM node:18-alpine AS production
+
+# Installiere pnpm
+RUN npm install -g pnpm
+
+# Erstelle non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere package files
+COPY package*.json pnpm-lock.yaml ./
+
+# Installiere nur Production Dependencies
+RUN pnpm install --frozen-lockfile --prod
+
+# Kopiere built application
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+
+# Erstelle Verzeichnisse für Uploads und Logs
+RUN mkdir -p uploads logs
+RUN chown -R nestjs:nodejs uploads logs
+
+# Wechsle zu non-root user
+USER nestjs
+
+# Exponiere Port
+EXPOSE 3000
+
+# Health Check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node healthcheck.js
+
+# Starte Anwendung
+CMD ["node", "dist/main.js"]

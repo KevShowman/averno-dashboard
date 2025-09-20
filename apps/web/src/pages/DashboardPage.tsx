@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity } from 'lucide-react'
+import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3 } from 'lucide-react'
 import { formatCurrency } from '../lib/utils'
 
 interface DashboardStats {
@@ -14,6 +14,9 @@ interface DashboardStats {
   pendingTransactions: number
   todayChange: number
   weekChange: number
+  pendingDeposits: number
+  confirmedDeposits: number
+  kokainPrice: number
 }
 
 export default function DashboardPage() {
@@ -35,6 +38,16 @@ export default function DashboardPage() {
     queryFn: () => api.get('/cash/summary').then(res => res.data),
   })
 
+  const { data: kokainStats } = useQuery({
+    queryKey: ['kokain-stats'],
+    queryFn: () => api.get('/kokain/summary').then(res => res.data),
+  })
+
+  const { data: kokainPrice } = useQuery({
+    queryKey: ['kokain-price'],
+    queryFn: () => api.get('/kokain/price').then(res => res.data),
+  })
+
   const stats: DashboardStats = {
     criticalItems: lagerStats?.criticalItems || 0,
     totalItems: lagerStats?.totalItems || 0,
@@ -42,6 +55,9 @@ export default function DashboardPage() {
     pendingTransactions: cashStats?.pendingTransactions || 0,
     todayChange: cashStats?.todayChange || 0,
     weekChange: cashStats?.weekChange || 0,
+    pendingDeposits: kokainStats?.pendingDeposits || 0,
+    confirmedDeposits: kokainStats?.confirmedDeposits || 0,
+    kokainPrice: kokainPrice?.price || 0,
   }
 
   return (
@@ -55,7 +71,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="lasanta-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
@@ -123,6 +139,23 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
+
+        <Card className="lasanta-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-400">
+              Kokain-Deposits
+            </CardTitle>
+            <FlaskConical className="h-4 w-4 text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {stats.confirmedDeposits}
+            </div>
+            <p className="text-xs text-gray-400">
+              {stats.pendingDeposits} ausstehend
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Module Cards */}
@@ -178,6 +211,93 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           ))}
+
+          {/* Zusätzliche System-Module */}
+          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <FlaskConical className="h-6 w-6 text-green-400" />
+                  <CardTitle className="text-white">Kokain-System</CardTitle>
+                </div>
+                <Badge variant="success">Aktiv</Badge>
+              </div>
+              <CardDescription className="text-gray-400">
+                Deposit-Verwaltung und Übergabe-System.
+                {stats.pendingDeposits > 0 && (
+                  <span className="text-yellow-400 font-medium">
+                    {' '}⏳ {stats.pendingDeposits} ausstehend
+                  </span>
+                )}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  {formatCurrency(stats.kokainPrice)} pro Paket
+                </div>
+                <Link to="/kokain">
+                  <Button variant="lasanta" size="sm">
+                    Öffnen
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Shield className="h-6 w-6 text-blue-400" />
+                  <CardTitle className="text-white">Audit-Logs</CardTitle>
+                </div>
+                <Badge variant="success">Aktiv</Badge>
+              </div>
+              <CardDescription className="text-gray-400">
+                Vollständige Aktivitäts-Protokollierung und Nachverfolgung aller System-Aktionen.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Alle Aktivitäten
+                </div>
+                <Link to="/audit">
+                  <Button variant="lasanta" size="sm">
+                    Öffnen
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <BarChart3 className="h-6 w-6 text-purple-400" />
+                  <CardTitle className="text-white">Live Ticker</CardTitle>
+                </div>
+                <Badge variant="success">Aktiv</Badge>
+              </div>
+              <CardDescription className="text-gray-400">
+                Echtzeit-Aktivitäts-Feed mit Filtern und Statistiken.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Live Updates
+                </div>
+                <Link to="/ticker">
+                  <Button variant="lasanta" size="sm">
+                    Öffnen
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

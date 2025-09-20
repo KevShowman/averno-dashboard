@@ -35,4 +35,14 @@ export class UsersController {
   ) {
     return this.usersService.makeAdminByDiscordId(discordId, user.id);
   }
+
+  @Patch('ic-name')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  async updateIcName(
+    @Body('icFirstName') icFirstName: string,
+    @Body('icLastName') icLastName: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.usersService.updateIcName(user.id, icFirstName, icLastName);
+  }
 }

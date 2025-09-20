@@ -12,19 +12,32 @@ import {
   X,
   LogOut,
   User,
-  Activity
+  Activity,
+  FlaskConical
 } from 'lucide-react'
 import { Button } from './ui/button'
-import { cn } from '../lib/utils'
+import { cn, getDisplayName } from '../lib/utils'
 
 interface LayoutProps {
   children: React.ReactNode
+}
+
+const getRoleDisplayName = (role: string) => {
+  switch (role) {
+    case 'EL_PATRON': return 'El Patron'
+    case 'DON': return 'Don'
+    case 'ASESOR': return 'Asesor'
+    case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
+    case 'SOLDADO': return 'Soldado'
+    default: return role
+  }
 }
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: Home },
   { name: 'Lager', href: '/lager', icon: Package },
   { name: 'Kasse', href: '/kasse', icon: DollarSign },
+  { name: 'Kokain', href: '/kokain', icon: FlaskConical },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
   { name: 'Audit-Log', href: '/audit', icon: FileText },
   { name: 'Einstellungen', href: '/settings', icon: Settings },
@@ -125,10 +138,10 @@ export default function Layout({ children }: LayoutProps) {
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  {user.username}
+                  {getDisplayName(user)}
                 </p>
                 <p className="text-xs text-gray-400 truncate">
-                  {user.role}
+                  {getRoleDisplayName(user.role)}
                 </p>
               </div>
               <Button

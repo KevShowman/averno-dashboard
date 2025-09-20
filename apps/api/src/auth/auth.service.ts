@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { User, Role } from '@prisma/client';
+import { DiscordService } from '../discord/discord.service';
 
 export interface JwtPayload {
   sub: string;
@@ -21,34 +22,48 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private discordService: DiscordService,
   ) {}
 
   async validateDiscordUser(profile: any): Promise<User> {
     const { id: discordId, username, avatar, email } = profile;
     
+    // Discord-Rollen des Benutzers abrufen
+    const userDiscordRoles = await this.discordService.getUserRoles(discordId);
+    
+    // Zugriff validieren
+    const validation = await this.discordService.validateUserAccess(discordId);
+    
+    if (!validation.hasAccess) {
+      throw new BadRequestException(validation.reason || 'Zugriff verweigert - Du hast keine der erlaubten Discord-Rollen');
+    }
+
     let user = await this.prisma.user.findUnique({
       where: { discordId },
     });
 
     if (!user) {
-      // Create new user with default role
+      // Create new user with Discord-synced role
       user = await this.prisma.user.create({
         data: {
           discordId,
           username,
           avatarUrl: avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png` : null,
           email,
-          role: Role.MITGLIED,
+          role: validation.highestRole!,
+          discordRoles: userDiscordRoles,
         },
       });
     } else {
-      // Update user info
+      // Update user info and sync role
       user = await this.prisma.user.update({
         where: { id: user.id },
         data: {
           username,
           avatarUrl: avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png` : user.avatarUrl,
           email: email || user.email,
+          role: validation.highestRole!,
+          discordRoles: userDiscordRoles,
         },
       });
     }

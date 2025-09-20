@@ -14,9 +14,12 @@ model User {
   id           String  @id @default(cuid())
   discordId    String  @unique
   username     String
+  icFirstName  String? // IC Vorname
+  icLastName   String? // IC Nachname
   avatarUrl    String?
   email        String?
   role         Role    @default(SOLDADO)
+  discordRoles String[] // Discord Rollen-IDs
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
@@ -25,6 +28,8 @@ model User {
   moneyTxCreated MoneyTransaction[] @relation("tx_created_by")
   moneyTxApproved MoneyTransaction[] @relation("tx_approved_by")
   stockMovements StockMovement[]
+  kokainDeposits KokainDeposit[] @relation("deposit_created_by")
+  kokainConfirmations KokainDeposit[] @relation("deposit_confirmed_by")
 
   @@map("users")
 }
@@ -36,10 +41,12 @@ enum Role {
   MITGLIED
   GAST
   // Neue Rollen
-  EL_PATRON     // Admin, alle Rechte
-  DON           // Sekundärer Admin, viele Rechte
-  ASESOR        // Alles muss genehmigt werden
-  SOLDADO       // Normales Mitglied, nur lesen
+  EL_PATRON        // Admin, höchste Rolle
+  DON              // Sub-Admin
+  ASESOR           // Alles muss genehmigt werden
+  ROUTENVERWALTUNG // Kann Kokain-Deposits bestätigen
+  SICARIO          // Erweiterte Berechtigungen
+  SOLDADO          // Normales Mitglied, nur lesen
 }
 
 model Module {
@@ -163,4 +170,58 @@ model Settings {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+// Kokain-Deposit System
+model KokainDeposit {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation("deposit_created_by", fields: [userId], references: [id])
+  packages    Int    // Anzahl Kokain-Pakete
+  status      DepositStatus @default(PENDING)
+  confirmedById String?
+  confirmedBy User?  @relation("deposit_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt DateTime?
+  note        String?
+  uebergabeId String? // Referenz zur Übergabe-Session
+  uebergabe   KokainUebergabe? @relation(fields: [uebergabeId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("kokain_deposits")
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+// Übergabe-Sessions für Archivierung
+model KokainUebergabe {
+  id          String @id @default(cuid())
+  name        String // z.B. "Übergabe Dezember 2024"
+  totalPackages Int
+  totalValue  Int // Gesamtwert in Schwarzgeld
+  isActive    Boolean @default(true)
+  archivedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  deposits    KokainDeposit[]
+
+  @@map("kokain_uebergaben")
+}
+
+model DiscordRoleMapping {
+  id          String @id @default(cuid())
+  discordRoleId String @unique // Discord Rollen-ID
+  systemRole  Role   // System-Rolle
+  name        String // Name der Discord-Rolle
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("discord_role_mappings")
 }

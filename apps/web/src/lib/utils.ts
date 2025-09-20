@@ -35,6 +35,10 @@ export function getRoleColor(role: string) {
       return 'bg-amber-500/20 text-amber-400 border-amber-500/30'
     case 'ASESOR':
       return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+    case 'ROUTENVERWALTUNG':
+      return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+    case 'SICARIO':
+      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
     case 'SOLDADO':
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
     default:
@@ -50,11 +54,22 @@ export function getRoleDisplayName(role: string) {
       return 'Don'
     case 'ASESOR':
       return 'Asesor'
+    case 'ROUTENVERWALTUNG':
+      return 'Routenverwaltung'
+    case 'SICARIO':
+      return 'Sicario'
     case 'SOLDADO':
       return 'Soldado'
     default:
       return role
   }
+}
+
+export function getDisplayName(user: { icFirstName?: string; icLastName?: string; username: string }): string {
+  if (user.icFirstName && user.icLastName) {
+    return `${user.icFirstName} ${user.icLastName}`
+  }
+  return user.username
 }
 
 export function getMovementTypeColor(type: string) {

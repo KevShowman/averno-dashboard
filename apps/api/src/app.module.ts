@@ -9,6 +9,8 @@ import { AuditModule } from './audit/audit.module';
 import { ModulesModule } from './modules/modules.module';
 import { UsersModule } from './users/users.module';
 import { SettingsModule } from './settings/settings.module';
+import { KokainModule } from './kokain/kokain.module';
+import { DiscordModule } from './discord/discord.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -31,6 +33,8 @@ import { AppService } from './app.service';
     ModulesModule,
     UsersModule,
     SettingsModule,
+    KokainModule,
+    DiscordModule,
   ],
   controllers: [AppController],
   providers: [AppService],

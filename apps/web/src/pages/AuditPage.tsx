@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
 import { FileText, Search, Filter, Calendar } from 'lucide-react'
-import { formatDate, getRoleColor, getRoleDisplayName } from '../lib/utils'
+import { formatDate, getRoleColor, getRoleDisplayName, getDisplayName } from '../lib/utils'
 
 export default function AuditPage() {
   const [selectedEntity, setSelectedEntity] = useState('')
@@ -165,7 +165,7 @@ export default function AuditPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <span className="text-white">{log.user.username}</span>
+                          <span className="text-white">{getDisplayName(log.user)}</span>
                           <Badge className={getRoleColor(log.user.role)}>
                             {getRoleDisplayName(log.user.role)}
                           </Badge>
@@ -192,6 +192,33 @@ export default function AuditPage() {
                           )}
                           {log.meta?.method && (
                             <span> | Methode: {log.meta.method}</span>
+                          )}
+                          {log.meta?.packages && (
+                            <span> | Pakete: {log.meta.packages}</span>
+                          )}
+                          {log.meta?.reason && (
+                            <span> | Grund: {log.meta.reason}</span>
+                          )}
+                          {log.meta?.price && (
+                            <span> | Preis: {log.meta.price}</span>
+                          )}
+                          {log.meta?.totalPackages && (
+                            <span> | Gesamt: {log.meta.totalPackages} Pakete</span>
+                          )}
+                          {log.meta?.totalValue && (
+                            <span> | Wert: {log.meta.totalValue}</span>
+                          )}
+                          {log.meta?.name && (
+                            <span> | Name: {log.meta.name}</span>
+                          )}
+                          {log.meta?.newPrice && (
+                            <span> | Neuer Preis: {log.meta.newPrice}</span>
+                          )}
+                          {log.meta?.depositCount && (
+                            <span> | Deposits: {log.meta.depositCount}</span>
+                          )}
+                          {log.meta?.note && (
+                            <span> | Notiz: {log.meta.note}</span>
                           )}
                         </div>
                       </TableCell>

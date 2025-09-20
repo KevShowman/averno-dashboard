@@ -113,6 +113,8 @@ export class AuthController {
     return {
       id: user.id,
       username: user.username,
+      icFirstName: user.icFirstName,
+      icLastName: user.icLastName,
       avatarUrl: user.avatarUrl,
       email: user.email,
       role: user.role,

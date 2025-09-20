@@ -24,6 +24,8 @@
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "make-admin": "ts-node --transpile-only src/scripts/make-admin.ts",
+    "set-default-admin": "ts-node --transpile-only src/scripts/set-default-admin.ts",
+    "setup-discord-roles": "ts-node --transpile-only src/scripts/setup-discord-roles.ts",
     "cleanup-ammo": "ts-node --transpile-only src/scripts/cleanup-ammo.ts",
     "update-names": "ts-node --transpile-only src/scripts/update-names.ts",
     "migrate-roles": "ts-node --transpile-only src/scripts/migrate-roles.ts",

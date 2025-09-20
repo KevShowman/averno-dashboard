@@ -1,6 +1,6 @@
 FROM node:18-alpine
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 5173
 
 # Start the application
-CMD ["pnpm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+CMD ["pnpm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173", "--clearScreen", "false"]

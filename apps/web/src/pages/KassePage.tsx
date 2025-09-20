@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
 import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Plus, Minus } from 'lucide-react'
-import { formatCurrency, formatDate, getTransactionStatusColor } from '../lib/utils'
+import { formatCurrency, formatDate, getTransactionStatusColor, getDisplayName } from '../lib/utils'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import MoneyTransactionModal from '../components/MoneyTransactionModal'
 
 export default function KassePage() {
+  const user = useAuthStore((state) => state.user)
   const [selectedRange, setSelectedRange] = useState('month')
   const [showTransactionModal, setShowTransactionModal] = useState(false)
   const [transactionType, setTransactionType] = useState<'EINZAHLUNG' | 'AUSZAHLUNG'>('EINZAHLUNG')
@@ -285,7 +287,7 @@ export default function KassePage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-gray-300">
-                        {tx.createdBy.username}
+                        {getDisplayName(tx.createdBy)}
                       </TableCell>
                       <TableCell className="text-gray-300">
                         {formatDate(tx.createdAt)}

@@ -1,0 +1,104 @@
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, BadRequestException } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Role, User } from '@prisma/client';
+import { KokainService } from './kokain.service';
+
+@Controller('kokain')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class KokainController {
+  constructor(private kokainService: KokainService) {}
+
+  @Post('deposit')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  async createDeposit(
+    @Body('packages') packages: number,
+    @Body('note') note: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.kokainService.createDeposit(user.id, packages, note);
+  }
+
+  @Get('deposits/pending')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async getPendingDeposits() {
+    return this.kokainService.getPendingDeposits();
+  }
+
+  @Get('deposits/confirmed')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async getConfirmedDeposits() {
+    return this.kokainService.getConfirmedDeposits();
+  }
+
+  @Patch('deposit/:id/confirm')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async confirmDeposit(
+    @Param('id') depositId: string,
+    @CurrentUser() user: User,
+  ) {
+    if (!this.kokainService.canConfirmDeposit(user.role)) {
+      throw new BadRequestException('Keine Berechtigung zum Bestätigen von Deposits');
+    }
+    
+    return this.kokainService.confirmDeposit(depositId, user.id);
+  }
+
+  @Patch('deposit/:id/reject')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async rejectDeposit(
+    @Param('id') depositId: string,
+    @Body('reason') reason: string,
+    @CurrentUser() user: User,
+  ) {
+    if (!this.kokainService.canConfirmDeposit(user.role)) {
+      throw new BadRequestException('Keine Berechtigung zum Ablehnen von Deposits');
+    }
+    
+    return this.kokainService.rejectDeposit(depositId, user.id, reason);
+  }
+
+  @Get('summary')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async getCurrentDepositSummary() {
+    return this.kokainService.getCurrentDepositSummary();
+  }
+
+  @Get('price')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  async getKokainPrice() {
+    return { price: await this.kokainService.getKokainPrice() };
+  }
+
+  @Post('price')
+  @Roles(Role.EL_PATRON, Role.DON)
+  async setKokainPrice(
+    @Body('price') price: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.kokainService.setKokainPrice(price, user.id);
+  }
+
+  @Post('archive')
+  @Roles(Role.EL_PATRON, Role.DON)
+  async archiveCurrentDeposits(
+    @Body('name') archiveName: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.kokainService.archiveCurrentDeposits(user.id, archiveName);
+  }
+
+  @Get('deposits/recent')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SOLDADO)
+  async getRecentDeposits() {
+    return this.kokainService.getRecentDeposits();
+  }
+
+  @Get('archives')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  async getArchivedUebergaben() {
+    return this.kokainService.getArchivedUebergaben();
+  }
+}
