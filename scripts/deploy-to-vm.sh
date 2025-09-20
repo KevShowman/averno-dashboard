@@ -9,8 +9,8 @@ echo "🚀 LaSanta Calavera VM Deployment"
 echo "================================"
 
 # Prüfe ob wir im richtigen Verzeichnis sind
-if [ ! -f "docker compose.yml" ]; then
-    echo "❌ docker compose.yml nicht gefunden. Bitte im Projekt-Root ausführen."
+if [ ! -f "docker-compose.yml" ]; then
+    echo "❌ docker-compose.yml nicht gefunden. Bitte im Projekt-Root ausführen."
     exit 1
 fi
 
