@@ -109,8 +109,8 @@ export class WeeklyDeliveryController {
       exclusionDto.userId,
       exclusionDto.reason,
       startDate,
-      endDate,
-      req.user.id
+      req.user.id,
+      endDate
     );
   }
 

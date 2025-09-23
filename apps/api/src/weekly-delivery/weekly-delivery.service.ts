@@ -220,7 +220,7 @@ export class WeeklyDeliveryService {
   }
 
   // Ausschluss erstellen
-  async createExclusion(userId: string, reason: string, startDate: Date, endDate?: Date, createdById: string) {
+  async createExclusion(userId: string, reason: string, startDate: Date, createdById: string, endDate?: Date) {
     return this.prisma.weeklyDeliveryExclusion.create({
       data: {
         userId,
