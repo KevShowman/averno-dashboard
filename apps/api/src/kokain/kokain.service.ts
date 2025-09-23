@@ -110,7 +110,7 @@ export class KokainService {
       payoutPackages = packages - weeklyDeliveryPackages;
 
       // Wochenabgabe Status basierend auf Paketen setzen
-      let newStatus = WeeklyDeliveryStatus.PENDING;
+      let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
       if (weeklyDeliveryPackages >= 300) {
         newStatus = WeeklyDeliveryStatus.PAID;
       } else if (weeklyDeliveryPackages > 0) {
@@ -278,7 +278,7 @@ export class KokainService {
         0
       ) + (deposit.weeklyDeliveryPackages || 0);
       
-      let newStatus = WeeklyDeliveryStatus.PENDING;
+      let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
       if (totalConfirmedPackages >= weeklyDelivery.packages) {
         newStatus = WeeklyDeliveryStatus.PAID;
       } else if (totalConfirmedPackages > 0) {
@@ -368,7 +368,7 @@ export class KokainService {
       const weeklyDelivery = deposit.weeklyDelivery;
       
       // Berechne neue Status basierend auf verbleibenden Paketen
-      let newStatus = WeeklyDeliveryStatus.PENDING;
+      let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
       let newPaidAmount = 0;
       
       // Finde alle anderen bestätigten Deposits für diese Wochenabgabe
@@ -735,7 +735,7 @@ export class KokainService {
         0
       );
       
-      let newStatus = WeeklyDeliveryStatus.PENDING;
+      let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
       if (totalRemainingPackages >= weeklyDelivery.packages) {
         newStatus = WeeklyDeliveryStatus.PAID;
       } else if (totalRemainingPackages > 0) {
