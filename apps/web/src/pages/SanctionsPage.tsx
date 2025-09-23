@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Scale, AlertTriangle, CheckCircle, Clock, X, DollarSign, User } from 'lucide-react'
+import { Scale, AlertTriangle, CheckCircle, Clock, X, DollarSign, User, Plus } from 'lucide-react'
 import { toast } from 'sonner'
+import { useAuthStore } from '../stores/auth'
 
 interface Sanction {
   id: string
@@ -57,6 +58,10 @@ export default function SanctionsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [showMySanctions, setShowMySanctions] = useState(false)
   const queryClient = useQueryClient()
+  const { user } = useAuthStore()
+  
+  // Check if user has leadership role
+  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR'
 
   // Queries
   const { data: sanctions = [], isLoading: loadingSanctions } = useQuery({
@@ -191,15 +196,28 @@ export default function SanctionsPage() {
             <User className="h-4 w-4" />
             {showMySanctions ? 'Alle Sanktionen' : 'Meine Sanktionen'}
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => cleanupMutation.mutate()}
-            disabled={cleanupMutation.isPending}
-            className="flex items-center gap-2"
-          >
-            <X className="h-4 w-4" />
-            Bereinigen
-          </Button>
+          
+          {isLeadership && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => cleanupMutation.mutate()}
+                disabled={cleanupMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <X className="h-4 w-4" />
+                Bereinigen
+              </Button>
+              
+              <Button
+                variant="default"
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Sanktion erstellen
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -373,7 +391,7 @@ export default function SanctionsPage() {
                   <TableHead>Erstellt von</TableHead>
                   <TableHead>Erstellt</TableHead>
                   <TableHead>Ablauf</TableHead>
-                  {!showMySanctions && <TableHead>Aktionen</TableHead>}
+                  {!showMySanctions && isLeadership && <TableHead>Aktionen</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -405,7 +423,7 @@ export default function SanctionsPage() {
                     <TableCell>
                       {sanction.expiresAt ? formatDate(sanction.expiresAt) : '-'}
                     </TableCell>
-                    {!showMySanctions && (
+                    {!showMySanctions && isLeadership && (
                       <TableCell>
                         <div className="flex gap-2">
                           {sanction.status === 'ACTIVE' && (

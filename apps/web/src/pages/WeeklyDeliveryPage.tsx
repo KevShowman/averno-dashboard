@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, X } from 'lucide-react'
+import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, X, UserPlus, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
+import { useAuthStore } from '../stores/auth'
 
 interface WeeklyDelivery {
   id: string
@@ -62,6 +63,10 @@ export default function WeeklyDeliveryPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [showExclusions, setShowExclusions] = useState(false)
   const queryClient = useQueryClient()
+  const { user } = useAuthStore()
+  
+  // Check if user has leadership role
+  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR'
 
   // Queries
   const { data: currentWeekDeliveries = [], isLoading: loadingCurrentWeek } = useQuery({
@@ -116,6 +121,40 @@ export default function WeeklyDeliveryPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Deaktivieren')
+    },
+  })
+
+  // Admin mutations
+  const indexUsersMutation = useMutation({
+    mutationFn: () => weeklyDeliveryApi.indexAllUsers(),
+    onSuccess: () => {
+      toast.success('Alle User wurden indexiert')
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Indexieren')
+    },
+  })
+
+  const autoSanctionMutation = useMutation({
+    mutationFn: () => weeklyDeliveryApi.autoSanctionOverdue(),
+    onSuccess: () => {
+      toast.success('Überfällige Abgaben wurden sanktioniert')
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Sanktionieren')
+    },
+  })
+
+  const weeklyResetMutation = useMutation({
+    mutationFn: () => weeklyDeliveryApi.weeklyReset(),
+    onSuccess: () => {
+      toast.success('Wochenreset wurde durchgeführt')
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Wochenreset')
     },
   })
 
@@ -174,6 +213,40 @@ export default function WeeklyDeliveryPage() {
             <Users className="h-4 w-4" />
             {showExclusions ? 'Abgaben anzeigen' : 'Ausschlüsse anzeigen'}
           </Button>
+          
+          {isLeadership && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => indexUsersMutation.mutate()}
+                disabled={indexUsersMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <UserPlus className="h-4 w-4" />
+                Alle User indexieren
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => autoSanctionMutation.mutate()}
+                disabled={autoSanctionMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <AlertCircle className="h-4 w-4" />
+                Sanktionieren
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => weeklyResetMutation.mutate()}
+                disabled={weeklyResetMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Wochenreset
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
