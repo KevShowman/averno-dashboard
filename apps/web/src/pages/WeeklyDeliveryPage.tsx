@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, X, UserPlus, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
+import WeeklyDeliveryPayModal from '../components/WeeklyDeliveryPayModal'
 
 interface WeeklyDelivery {
   id: string
@@ -62,6 +63,8 @@ interface WeeklyDeliveryStats {
 export default function WeeklyDeliveryPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [showExclusions, setShowExclusions] = useState(false)
+  const [showPayModal, setShowPayModal] = useState(false)
+  const [selectedDelivery, setSelectedDelivery] = useState<WeeklyDelivery | null>(null)
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
@@ -157,6 +160,27 @@ export default function WeeklyDeliveryPage() {
       toast.error(error.response?.data?.message || 'Fehler beim Wochenreset')
     },
   })
+
+  // Handler für Pay Modal
+  const handleOpenPayModal = (delivery: WeeklyDelivery) => {
+    setSelectedDelivery(delivery)
+    setShowPayModal(true)
+  }
+
+  const handleClosePayModal = () => {
+    setShowPayModal(false)
+    setSelectedDelivery(null)
+  }
+
+  const handlePayDelivery = (data: { paidAmount?: number; paidMoney?: number }) => {
+    if (selectedDelivery) {
+      payDeliveryMutation.mutate({
+        id: selectedDelivery.id,
+        data,
+      })
+      handleClosePayModal()
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -422,20 +446,17 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            {delivery.status === 'PENDING' && (
+                            {(delivery.status === 'PENDING' || (delivery.status === 'PAID' && (delivery.paidAmount || 0) < delivery.packages)) && (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => payDeliveryMutation.mutate({
-                                  id: delivery.id,
-                                  data: { paidAmount: 300 }
-                                })}
+                                onClick={() => handleOpenPayModal(delivery)}
                                 disabled={payDeliveryMutation.isPending}
                               >
                                 Bezahlen
                               </Button>
                             )}
-                            {delivery.status === 'PAID' && (
+                            {delivery.status === 'PAID' && (delivery.paidAmount || 0) >= delivery.packages && (
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -541,6 +562,17 @@ export default function WeeklyDeliveryPage() {
           </Card>
         </>
       )}
+
+      {/* Pay Modal */}
+      <WeeklyDeliveryPayModal
+        isOpen={showPayModal}
+        onClose={handleClosePayModal}
+        onConfirm={handlePayDelivery}
+        requiredPackages={selectedDelivery?.packages || 300}
+        currentPaidAmount={selectedDelivery?.paidAmount || 0}
+        currentPaidMoney={selectedDelivery?.paidMoney || 0}
+        isLoading={payDeliveryMutation.isPending}
+      />
     </div>
   )
 }

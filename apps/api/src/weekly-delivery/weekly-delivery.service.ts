@@ -1,10 +1,14 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion, SanctionCategory } from '@prisma/client';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class WeeklyDeliveryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private discordService: DiscordService,
+  ) {}
 
   // Wochenabgabe erstellen
   async createWeeklyDelivery(userId: string, weekStart: Date, weekEnd: Date) {
@@ -81,12 +85,23 @@ export class WeeklyDeliveryService {
       throw new BadRequestException('Mindestens eine Zahlungsmethode muss angegeben werden');
     }
 
+    // Prüfe ob vollständig bezahlt
+    const totalPaidPackages = (delivery.paidAmount || 0) + (paidAmount || 0);
+    const totalPaidMoney = (delivery.paidMoney || 0) + (paidMoney || 0);
+    const requiredPackages = delivery.packages;
+    
+    // Status basierend auf vollständiger Zahlung setzen
+    let newStatus = WeeklyDeliveryStatus.PENDING;
+    if (totalPaidPackages >= requiredPackages || totalPaidMoney >= requiredPackages * 1000) {
+      newStatus = WeeklyDeliveryStatus.PAID;
+    }
+
     return this.prisma.weeklyDelivery.update({
       where: { id: deliveryId },
       data: {
-        paidAmount,
-        paidMoney,
-        status: WeeklyDeliveryStatus.PAID,
+        paidAmount: totalPaidPackages,
+        paidMoney: totalPaidMoney,
+        status: newStatus,
       },
       include: {
         user: {
@@ -372,6 +387,9 @@ export class WeeklyDeliveryService {
 
   // Alle aktiven User für Wochenabgabe indexieren
   async indexAllUsers() {
+    // Erst alle Discord-Mitglieder importieren, die noch nicht in der users Tabelle sind
+    await this.discordService.importDiscordMembers();
+    
     const users = await this.prisma.user.findMany({
       where: {
         role: {
@@ -501,7 +519,20 @@ export class WeeklyDeliveryService {
   async weeklyReset() {
     const currentWeek = this.getCurrentWeek();
     
-    // Alle User für die neue Woche indexieren
+    // Alle ausstehenden Abgaben der vorherigen Woche als überfällig markieren
+    await this.prisma.weeklyDelivery.updateMany({
+      where: {
+        status: WeeklyDeliveryStatus.PENDING,
+        weekEnd: {
+          lt: currentWeek.start,
+        },
+      },
+      data: {
+        status: WeeklyDeliveryStatus.OVERDUE,
+      },
+    });
+    
+    // Alle User für die neue Woche indexieren (nur wenn noch nicht vorhanden)
     const indexResult = await this.indexAllUsers();
     
     // Automatische Sanktionierung für überfällige Abgaben

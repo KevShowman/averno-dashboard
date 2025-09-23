@@ -266,6 +266,40 @@ export class DiscordService {
     }
   }
 
+  async importDiscordMembers(): Promise<any> {
+    try {
+      // Alle Mitglieder mit erlaubten Rollen abrufen
+      const members = await this.getMembersWithAllowedRoles();
+      const importedUsers = [];
+      
+      for (const member of members) {
+        try {
+          // Prüfen ob User bereits in Datenbank existiert
+          const existingUser = await this.prisma.user.findUnique({
+            where: { discordId: member.discordId }
+          });
+          
+          if (!existingUser) {
+            // User importieren
+            const importedUser = await this.importMemberToDatabase(member.discordId);
+            importedUsers.push(importedUser);
+          }
+        } catch (error) {
+          console.error(`Fehler beim Importieren von ${member.discordId}:`, error);
+        }
+      }
+      
+      return {
+        message: `${importedUsers.length} neue Benutzer importiert`,
+        imported: importedUsers.length,
+        total: members.length
+      };
+    } catch (error) {
+      console.error('Fehler beim Importieren aller Discord-Mitglieder:', error);
+      throw error;
+    }
+  }
+
   async importMemberToDatabase(discordId: string): Promise<any> {
     try {
       // Discord-Benutzer-Informationen abrufen
