@@ -27,9 +27,9 @@ interface CreateSanctionDto {
 export class SanctionsController {
   constructor(private sanctionsService: SanctionsService) {}
 
-  // Sanktion erstellen (Admin/Don)
+  // Sanktion erstellen (Leaderschaft: EL_PATRON, DON, ASESOR)
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async createSanction(@Body() createDto: CreateSanctionDto, @Request() req) {
     return this.sanctionsService.createSanction(
@@ -41,17 +41,17 @@ export class SanctionsController {
     );
   }
 
-  // Sanktion als bezahlt markieren
+  // Sanktion als bezahlt markieren (Leaderschaft)
   @Patch(':id/pay')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async paySanction(@Param('id') id: string) {
     return this.sanctionsService.paySanction(id);
   }
 
-  // Sanktion entfernen (Admin/Don)
+  // Sanktion entfernen (Leaderschaft)
   @Patch(':id/remove')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async removeSanction(@Param('id') id: string) {
     return this.sanctionsService.removeSanction(id);
@@ -148,6 +148,28 @@ export class SanctionsController {
           penalties: [
             { level: 1, amount: null, penalty: 'Joker' },
             { level: 2, amount: 250000, penalty: null },
+            { level: 3, amount: 500000, penalty: null },
+            { level: 4, amount: 500000, penalty: 'Blood Out' },
+          ],
+        },
+        {
+          key: SanctionCategory.NICHT_BEZAHLT,
+          name: 'Nicht bezahlt',
+          description: 'Wochenabgabe nicht bezahlt',
+          penalties: [
+            { level: 1, amount: 100000, penalty: null },
+            { level: 2, amount: 250000, penalty: null },
+            { level: 3, amount: 500000, penalty: null },
+            { level: 4, amount: 500000, penalty: 'Blood Out' },
+          ],
+        },
+        {
+          key: SanctionCategory.NICHT_BEZAHLT_48H,
+          name: 'Nicht bezahlt (48h)',
+          description: 'Wochenabgabe nicht innerhalb von 48 Stunden bezahlt',
+          penalties: [
+            { level: 1, amount: 200000, penalty: null },
+            { level: 2, amount: 400000, penalty: null },
             { level: 3, amount: 500000, penalty: null },
             { level: 4, amount: 500000, penalty: 'Blood Out' },
           ],

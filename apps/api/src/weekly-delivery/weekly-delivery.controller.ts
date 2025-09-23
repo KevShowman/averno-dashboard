@@ -32,6 +32,13 @@ interface CreateExclusionDto {
   endDate?: string;
 }
 
+interface PrepayWeeksDto {
+  userId: string;
+  weeks: number;
+  paidAmount?: number;
+  paidMoney?: number;
+}
+
 @Controller('weekly-delivery')
 @UseGuards(JwtAuthGuard)
 export class WeeklyDeliveryController {
@@ -66,9 +73,9 @@ export class WeeklyDeliveryController {
     );
   }
 
-  // Wochenabgabe bestätigen (Admin/Don/ROUTENVERWALTUNG)
+  // Wochenabgabe bestätigen (Leaderschaft: EL_PATRON, DON, ASESOR)
   @Patch(':id/confirm')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async confirmWeeklyDelivery(@Param('id') id: string, @Request() req) {
     return this.weeklyDeliveryService.confirmWeeklyDelivery(id, req.user.id);
@@ -97,9 +104,47 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.getWeeklyDeliveryStats();
   }
 
-  // Ausschluss erstellen (Admin/Don)
+  // Vorauszahlung für mehrere Wochen (Leaderschaft)
+  @Post('prepay')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async prepayWeeks(@Body() prepayDto: PrepayWeeksDto, @Request() req) {
+    return this.weeklyDeliveryService.prepayWeeks(
+      prepayDto.userId,
+      prepayDto.weeks,
+      prepayDto.paidAmount,
+      prepayDto.paidMoney,
+      req.user.id
+    );
+  }
+
+  // Alle User für Wochenabgabe indexieren (Leaderschaft)
+  @Post('index-users')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async indexAllUsers() {
+    return this.weeklyDeliveryService.indexAllUsers();
+  }
+
+  // Automatische Sanktionierung (Leaderschaft)
+  @Post('auto-sanction')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async autoSanctionOverdue() {
+    return this.weeklyDeliveryService.autoSanctionOverdue();
+  }
+
+  // Wöchentlicher Reset (Leaderschaft)
+  @Post('weekly-reset')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async weeklyReset() {
+    return this.weeklyDeliveryService.weeklyReset();
+  }
+
+  // Ausschluss erstellen (Leaderschaft)
   @Post('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async createExclusion(@Body() exclusionDto: CreateExclusionDto, @Request() req) {
     const startDate = new Date(exclusionDto.startDate);
@@ -121,9 +166,9 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.getExclusions(active);
   }
 
-  // Ausschluss deaktivieren (Admin/Don)
+  // Ausschluss deaktivieren (Leaderschaft)
   @Patch('exclusions/:id/deactivate')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async deactivateExclusion(@Param('id') id: string) {
     return this.weeklyDeliveryService.deactivateExclusion(id);

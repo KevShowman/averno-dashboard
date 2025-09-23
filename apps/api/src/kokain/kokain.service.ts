@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { Role, DepositStatus } from '@prisma/client';
+import { Role, DepositStatus, WeeklyDeliveryStatus } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
 
 @Injectable()
@@ -45,6 +45,145 @@ export class KokainService {
     });
 
     return deposit;
+  }
+
+  // Prüfen ob User eine ausstehende Wochenabgabe hat
+  async checkPendingWeeklyDelivery(userId: string) {
+    const currentWeek = this.getCurrentWeek();
+    
+    const pendingDelivery = await this.prisma.weeklyDelivery.findFirst({
+      where: {
+        userId,
+        status: WeeklyDeliveryStatus.PENDING,
+        weekStart: {
+          gte: currentWeek.start,
+        },
+        weekEnd: {
+          lte: currentWeek.end,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+
+    return pendingDelivery;
+  }
+
+  // Kokain-Deposit mit Wochenabgabe-Integration erstellen
+  async createDepositWithWeeklyDelivery(
+    userId: string, 
+    packages: number, 
+    note?: string,
+    useForWeeklyDelivery: boolean = false,
+    weeklyDeliveryId?: string
+  ) {
+    if (packages <= 0) {
+      throw new BadRequestException('Anzahl der Pakete muss größer als 0 sein');
+    }
+
+    let weeklyDeliveryPackages = 0;
+    let payoutPackages = packages;
+
+    if (useForWeeklyDelivery && weeklyDeliveryId) {
+      const weeklyDelivery = await this.prisma.weeklyDelivery.findUnique({
+        where: { id: weeklyDeliveryId },
+      });
+
+      if (!weeklyDelivery || weeklyDelivery.userId !== userId) {
+        throw new BadRequestException('Wochenabgabe nicht gefunden oder nicht berechtigt');
+      }
+
+      if (weeklyDelivery.status !== WeeklyDeliveryStatus.PENDING) {
+        throw new BadRequestException('Wochenabgabe wurde bereits bezahlt');
+      }
+
+      // 300 Pakete für Wochenabgabe verwenden
+      weeklyDeliveryPackages = Math.min(packages, 300);
+      payoutPackages = packages - weeklyDeliveryPackages;
+
+      // Wochenabgabe als bezahlt markieren
+      await this.prisma.weeklyDelivery.update({
+        where: { id: weeklyDeliveryId },
+        data: {
+          status: WeeklyDeliveryStatus.PAID,
+          paidAmount: weeklyDeliveryPackages,
+        },
+      });
+    }
+
+    const deposit = await this.prisma.kokainDeposit.create({
+      data: {
+        userId,
+        packages,
+        note,
+        status: DepositStatus.PENDING,
+        weeklyDeliveryId: useForWeeklyDelivery ? weeklyDeliveryId : null,
+        weeklyDeliveryPackages: weeklyDeliveryPackages > 0 ? weeklyDeliveryPackages : null,
+        payoutPackages: payoutPackages > 0 ? payoutPackages : null,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+        weeklyDelivery: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    await this.auditService.log({
+      userId,
+      action: 'KOKAIN_DEPOSIT_CREATED',
+      entity: 'KokainDeposit',
+      entityId: deposit.id,
+      meta: {
+        packages,
+        note,
+        weeklyDeliveryPackages,
+        payoutPackages,
+        useForWeeklyDelivery,
+      },
+    });
+
+    return deposit;
+  }
+
+  // Hilfsmethode: Aktuelle Woche berechnen
+  private getCurrentWeek() {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Montag
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sonntag
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    return {
+      start: startOfWeek,
+      end: endOfWeek,
+    };
   }
 
   async getPendingDeposits() {

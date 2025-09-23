@@ -21,6 +21,32 @@ export class KokainController {
     return this.kokainService.createDeposit(user.id, packages, note);
   }
 
+  // Prüfen ob User eine ausstehende Wochenabgabe hat
+  @Get('check-weekly-delivery')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  async checkPendingWeeklyDelivery(@CurrentUser() user: User) {
+    return this.kokainService.checkPendingWeeklyDelivery(user.id);
+  }
+
+  // Kokain-Deposit mit Wochenabgabe-Integration erstellen
+  @Post('deposit-with-weekly-delivery')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  async createDepositWithWeeklyDelivery(
+    @Body('packages') packages: number,
+    @Body('note') note: string,
+    @Body('useForWeeklyDelivery') useForWeeklyDelivery: boolean,
+    @Body('weeklyDeliveryId') weeklyDeliveryId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.kokainService.createDepositWithWeeklyDelivery(
+      user.id,
+      packages,
+      note,
+      useForWeeklyDelivery,
+      weeklyDeliveryId
+    );
+  }
+
   @Get('deposits/pending')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getPendingDeposits() {

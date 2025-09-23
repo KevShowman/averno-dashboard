@@ -205,6 +205,11 @@ model KokainDeposit {
   note        String?
   uebergabeId String? // Referenz zur Übergabe-Session
   uebergabe   KokainUebergabe? @relation(fields: [uebergabeId], references: [id])
+  // Wochenabgabe Integration
+  weeklyDeliveryId String? // Referenz zur Wochenabgabe
+  weeklyDelivery   WeeklyDelivery? @relation(fields: [weeklyDeliveryId], references: [id])
+  weeklyDeliveryPackages Int? // Pakete die für Wochenabgabe verwendet wurden
+  payoutPackages Int? // Pakete die als Auszahlung verwendet wurden
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -261,8 +266,13 @@ model WeeklyDelivery {
   confirmedBy User?  @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
   confirmedAt DateTime?
   note        String?
+  isPrepaid   Boolean @default(false) // Vorauszahlung für mehrere Wochen
+  prepaidWeeks Int?   // Anzahl der vorausbezahlten Wochen
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Relations
+  kokainDeposits KokainDeposit[]
 
   @@map("weekly_deliveries")
 }
@@ -317,6 +327,8 @@ enum SanctionCategory {
   RESPEKTVERHALTEN
   FUNKCHECK
   REAKTIONSPFLICHT
+  NICHT_BEZAHLT
+  NICHT_BEZAHLT_48H
 }
 
 enum SanctionStatus {

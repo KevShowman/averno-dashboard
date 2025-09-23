@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '../lib/api'
+import { api, kokainApi } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { formatDate, formatCurrency, getDisplayName } from '../lib/utils'
 import { toast } from 'sonner'
+import WeeklyDeliveryPaymentModal from '../components/WeeklyDeliveryPaymentModal'
 
 export default function KokainPage() {
   const user = useAuthStore((state) => state.user)
@@ -35,6 +36,8 @@ export default function KokainPage() {
   const [newPrice, setNewPrice] = useState('')
   const [showArchiveDetails, setShowArchiveDetails] = useState(false)
   const [selectedArchive, setSelectedArchive] = useState<any>(null)
+  const [showWeeklyDeliveryModal, setShowWeeklyDeliveryModal] = useState(false)
+  const [pendingWeeklyDelivery, setPendingWeeklyDelivery] = useState<any>(null)
 
   const { data: pendingDeposits, isLoading: pendingLoading } = useQuery({
     queryKey: ['kokain-pending-deposits'],
@@ -49,6 +52,12 @@ export default function KokainPage() {
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['kokain-summary'],
     queryFn: () => api.get('/kokain/summary').then(res => res.data),
+  })
+
+  // Prüfen ob User eine ausstehende Wochenabgabe hat
+  const { data: weeklyDeliveryCheck } = useQuery({
+    queryKey: ['kokain-weekly-delivery-check'],
+    queryFn: () => kokainApi.checkPendingWeeklyDelivery().then(res => res.data),
   })
 
   const { data: priceData } = useQuery({
@@ -108,6 +117,28 @@ export default function KokainPage() {
     },
   })
 
+  // Mutation für Kokain-Deposit mit Wochenabgabe-Integration
+  const createDepositWithWeeklyDeliveryMutation = useMutation({
+    mutationFn: (data: { 
+      packages: number; 
+      note?: string; 
+      useForWeeklyDelivery: boolean; 
+      weeklyDeliveryId: string 
+    }) => kokainApi.createDepositWithWeeklyDelivery(data),
+    onSuccess: () => {
+      toast.success('Kokain-Deposit mit Wochenabgabe-Integration erstellt')
+      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+      setShowDepositModal(false)
+      setShowWeeklyDeliveryModal(false)
+      setDepositPackages('')
+      setDepositNote('')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Deposits')
+    },
+  })
+
   const updatePriceMutation = useMutation({
     mutationFn: (price: number) => api.post('/kokain/price', { price }),
     onSuccess: () => {
@@ -163,7 +194,29 @@ export default function KokainPage() {
       toast.error('Anzahl der Pakete muss größer als 0 sein')
       return
     }
-    createDepositMutation.mutate({ packages, note: depositNote })
+
+    // Prüfen ob User eine ausstehende Wochenabgabe hat
+    if (weeklyDeliveryCheck) {
+      setPendingWeeklyDelivery(weeklyDeliveryCheck)
+      setShowWeeklyDeliveryModal(true)
+    } else {
+      createDepositMutation.mutate({ packages, note: depositNote })
+    }
+  }
+
+  const handleWeeklyDeliveryConfirm = (useForWeeklyDelivery: boolean, weeklyDeliveryId: string) => {
+    const packages = parseInt(depositPackages)
+    
+    if (useForWeeklyDelivery) {
+      createDepositWithWeeklyDeliveryMutation.mutate({
+        packages,
+        note: depositNote,
+        useForWeeklyDelivery: true,
+        weeklyDeliveryId
+      })
+    } else {
+      createDepositMutation.mutate({ packages, note: depositNote })
+    }
   }
 
   const handleUpdatePrice = () => {
@@ -844,6 +897,20 @@ export default function KokainPage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Weekly Delivery Payment Modal */}
+      {pendingWeeklyDelivery && (
+        <WeeklyDeliveryPaymentModal
+          isOpen={showWeeklyDeliveryModal}
+          onClose={() => {
+            setShowWeeklyDeliveryModal(false)
+            setPendingWeeklyDelivery(null)
+          }}
+          onConfirm={handleWeeklyDeliveryConfirm}
+          pendingDelivery={pendingWeeklyDelivery}
+          depositPackages={parseInt(depositPackages) || 0}
+        />
       )}
     </div>
   )

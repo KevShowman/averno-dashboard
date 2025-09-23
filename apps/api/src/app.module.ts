@@ -13,6 +13,7 @@ import { KokainModule } from './kokain/kokain.module';
 import { DiscordModule } from './discord/discord.module';
 import { WeeklyDeliveryModule } from './weekly-delivery/weekly-delivery.module';
 import { SanctionsModule } from './sanctions/sanctions.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -39,6 +40,7 @@ import { AppService } from './app.service';
     DiscordModule,
     WeeklyDeliveryModule,
     SanctionsModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

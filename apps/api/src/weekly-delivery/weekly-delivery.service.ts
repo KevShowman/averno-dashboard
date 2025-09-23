@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion } from '@prisma/client';
+import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion, SanctionCategory } from '@prisma/client';
 
 @Injectable()
 export class WeeklyDeliveryService {
@@ -289,6 +289,246 @@ export class WeeklyDeliveryService {
         endDate: new Date(),
       },
     });
+  }
+
+  // Vorauszahlung für mehrere Wochen
+  async prepayWeeks(userId: string, weeks: number, paidAmount?: number, paidMoney?: number, createdById: string) {
+    if (weeks < 1 || weeks > 12) {
+      throw new BadRequestException('Vorauszahlung kann nur für 1-12 Wochen erfolgen');
+    }
+
+    // Prüfen ob User von der Wochenabgabe ausgeschlossen ist
+    const exclusion = await this.prisma.weeklyDeliveryExclusion.findFirst({
+      where: {
+        userId,
+        isActive: true,
+        startDate: { lte: new Date() },
+        OR: [
+          { endDate: null },
+          { endDate: { gte: new Date() } },
+        ],
+      },
+    });
+
+    if (exclusion) {
+      throw new BadRequestException('User ist von der Wochenabgabe ausgeschlossen');
+    }
+
+    const deliveries = [];
+    const now = new Date();
+    
+    for (let i = 0; i < weeks; i++) {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay() + 1 + (i * 7)); // Montag der Woche
+      weekStart.setHours(0, 0, 0, 0);
+
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6); // Sonntag der Woche
+      weekEnd.setHours(23, 59, 59, 999);
+
+      // Prüfen ob bereits eine Abgabe für diese Woche existiert
+      const existingDelivery = await this.prisma.weeklyDelivery.findFirst({
+        where: {
+          userId,
+          weekStart: {
+            gte: weekStart,
+          },
+          weekEnd: {
+            lte: weekEnd,
+          },
+        },
+      });
+
+      if (!existingDelivery) {
+        const delivery = await this.prisma.weeklyDelivery.create({
+          data: {
+            userId,
+            weekStart,
+            weekEnd,
+            packages: 300,
+            paidAmount,
+            paidMoney,
+            status: WeeklyDeliveryStatus.PAID,
+            isPrepaid: true,
+            prepaidWeeks: weeks,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+              },
+            },
+          },
+        });
+        deliveries.push(delivery);
+      }
+    }
+
+    return deliveries;
+  }
+
+  // Alle aktiven User für Wochenabgabe indexieren
+  async indexAllUsers() {
+    const users = await this.prisma.user.findMany({
+      where: {
+        role: {
+          not: 'GAST', // Gäste sind ausgeschlossen
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        role: true,
+      },
+    });
+
+    const currentWeek = this.getCurrentWeek();
+    const indexedDeliveries = [];
+
+    for (const user of users) {
+      // Prüfen ob bereits eine Abgabe für diese Woche existiert
+      const existingDelivery = await this.prisma.weeklyDelivery.findFirst({
+        where: {
+          userId: user.id,
+          weekStart: {
+            gte: currentWeek.start,
+          },
+          weekEnd: {
+            lte: currentWeek.end,
+          },
+        },
+      });
+
+      if (!existingDelivery) {
+        // Prüfen ob User von der Wochenabgabe ausgeschlossen ist
+        const exclusion = await this.prisma.weeklyDeliveryExclusion.findFirst({
+          where: {
+            userId: user.id,
+            isActive: true,
+            startDate: { lte: currentWeek.end },
+            OR: [
+              { endDate: null },
+              { endDate: { gte: currentWeek.start } },
+            ],
+          },
+        });
+
+        if (!exclusion) {
+          const delivery = await this.prisma.weeklyDelivery.create({
+            data: {
+              userId: user.id,
+              weekStart: currentWeek.start,
+              weekEnd: currentWeek.end,
+              packages: 300,
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  icFirstName: true,
+                  icLastName: true,
+                },
+              },
+            },
+          });
+          indexedDeliveries.push(delivery);
+        }
+      }
+    }
+
+    return {
+      message: `${indexedDeliveries.length} neue Wochenabgaben erstellt`,
+      deliveries: indexedDeliveries,
+    };
+  }
+
+  // Automatische Sanktionierung bei nicht bezahlten Abgaben
+  async autoSanctionOverdue() {
+    const now = new Date();
+    const threeDaysAgo = new Date(now.getTime() - (3 * 24 * 60 * 60 * 1000)); // 3 Tage zurück
+    
+    // Überfällige Abgaben finden (älter als 3 Tage, nicht bezahlt)
+    const overdueDeliveries = await this.prisma.weeklyDelivery.findMany({
+      where: {
+        status: WeeklyDeliveryStatus.PENDING,
+        createdAt: {
+          lt: threeDaysAgo,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    const sanctions = [];
+
+    for (const delivery of overdueDeliveries) {
+      // Status auf OVERDUE setzen
+      await this.prisma.weeklyDelivery.update({
+        where: { id: delivery.id },
+        data: { status: WeeklyDeliveryStatus.OVERDUE },
+      });
+
+      // Sanktion erstellen
+      const sanction = await this.prisma.sanction.create({
+        data: {
+          userId: delivery.userId,
+          category: SanctionCategory.NICHT_BEZAHLT,
+          level: 1,
+          description: `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
+          amount: 100000, // 100k Schwarzgeld
+          createdById: 'system', // System-Sanktion
+          expiresAt: new Date(Date.now() + (28 * 24 * 60 * 60 * 1000)), // 4 Wochen
+        },
+      });
+
+      sanctions.push(sanction);
+    }
+
+    return {
+      message: `${sanctions.length} Sanktionen für überfällige Abgaben erstellt`,
+      sanctions,
+    };
+  }
+
+  // Automatischer Wochenreset (Montag 03:00 AM)
+  async weeklyReset() {
+    const currentWeek = this.getCurrentWeek();
+    
+    // Alle User für die neue Woche indexieren
+    const indexResult = await this.indexAllUsers();
+    
+    // Automatische Sanktionierung für überfällige Abgaben
+    const sanctionResult = await this.autoSanctionOverdue();
+
+    return {
+      message: 'Wöchentlicher Reset durchgeführt',
+      indexed: indexResult,
+      sanctions: sanctionResult,
+    };
+  }
+
+  // Hilfsmethode: Aktuelle Woche berechnen
+  private getCurrentWeek() {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Montag
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sonntag
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    return {
+      start: startOfWeek,
+      end: endOfWeek,
+    };
   }
 
   // Statistiken

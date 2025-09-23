@@ -39,6 +39,11 @@ export const weeklyDeliveryApi = {
   createExclusion: (data: { userId: string; reason: string; startDate: string; endDate?: string }) => 
     api.post('/weekly-delivery/exclusions', data),
   deactivateExclusion: (id: string) => api.patch(`/weekly-delivery/exclusions/${id}/deactivate`),
+  prepayWeeks: (data: { userId: string; weeks: number; paidAmount?: number; paidMoney?: number }) => 
+    api.post('/weekly-delivery/prepay', data),
+  indexAllUsers: () => api.post('/weekly-delivery/index-users'),
+  autoSanctionOverdue: () => api.post('/weekly-delivery/auto-sanction'),
+  weeklyReset: () => api.post('/weekly-delivery/weekly-reset'),
 }
 
 // Sanctions API
@@ -54,5 +59,28 @@ export const sanctionsApi = {
   paySanction: (id: string) => api.patch(`/sanctions/${id}/pay`),
   removeSanction: (id: string) => api.patch(`/sanctions/${id}/remove`),
   cleanupExpired: () => api.post('/sanctions/cleanup'),
+}
+
+// Kokain API (erweitert um Wochenabgabe-Integration)
+export const kokainApi = {
+  createDeposit: (data: { packages: number; note?: string }) => 
+    api.post('/kokain/deposit', data),
+  checkPendingWeeklyDelivery: () => api.get('/kokain/check-weekly-delivery'),
+  createDepositWithWeeklyDelivery: (data: { 
+    packages: number; 
+    note?: string; 
+    useForWeeklyDelivery: boolean; 
+    weeklyDeliveryId: string 
+  }) => api.post('/kokain/deposit-with-weekly-delivery', data),
+  getPendingDeposits: () => api.get('/kokain/deposits/pending'),
+  getConfirmedDeposits: () => api.get('/kokain/deposits/confirmed'),
+  confirmDeposit: (id: string) => api.patch(`/kokain/deposit/${id}/confirm`),
+  rejectDeposit: (id: string, reason: string) => api.patch(`/kokain/deposit/${id}/reject`, { reason }),
+  deleteDeposit: (id: string) => api.delete(`/kokain/deposit/${id}`),
+  getUebergaben: () => api.get('/kokain/uebergaben'),
+  createUebergabe: (data: { name: string }) => api.post('/kokain/uebergabe', data),
+  archiveUebergabe: (id: string) => api.patch(`/kokain/uebergabe/${id}/archive`),
+  getDepositsByUebergabe: (uebergabeId: string) => api.get(`/kokain/uebergabe/${uebergabeId}/deposits`),
+  getStats: () => api.get('/kokain/stats'),
 }
 

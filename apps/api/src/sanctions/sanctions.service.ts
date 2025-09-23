@@ -333,6 +333,24 @@ export class SanctionsService {
           case 4: return { amount: 500000, penalty: 'Blood Out' };
         }
         break;
+
+      case SanctionCategory.NICHT_BEZAHLT:
+        switch (level) {
+          case 1: return { amount: 100000 };
+          case 2: return { amount: 250000 };
+          case 3: return { amount: 500000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.NICHT_BEZAHLT_48H:
+        switch (level) {
+          case 1: return { amount: 200000 };
+          case 2: return { amount: 400000 };
+          case 3: return { amount: 500000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
     }
 
     return {};
