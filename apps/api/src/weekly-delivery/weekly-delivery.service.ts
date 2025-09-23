@@ -91,7 +91,7 @@ export class WeeklyDeliveryService {
     const requiredPackages = delivery.packages;
     
     // Status basierend auf vollständiger Zahlung setzen
-    let newStatus = WeeklyDeliveryStatus.PENDING;
+    let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
     if (totalPaidPackages >= requiredPackages || totalPaidMoney >= requiredPackages * 1000) {
       newStatus = WeeklyDeliveryStatus.PAID;
     }
