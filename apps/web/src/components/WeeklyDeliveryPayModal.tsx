@@ -75,13 +75,13 @@ export default function WeeklyDeliveryPayModal({
               <div>
                 <div className="text-gray-400">Bereits bezahlt:</div>
                 <div className="text-white">
-                  {currentPaidAmount} Pakete + {currentPaidMoney.toLocaleString()} €
+                  {currentPaidAmount} Pakete
                 </div>
               </div>
               <div>
                 <div className="text-gray-400">Noch benötigt:</div>
                 <div className="text-white">
-                  {remainingPackages} Pakete oder {remainingMoney.toLocaleString()} €
+                  {remainingPackages} Pakete
                 </div>
               </div>
             </div>
