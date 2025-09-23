@@ -112,9 +112,9 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.prepayWeeks(
       prepayDto.userId,
       prepayDto.weeks,
+      req.user.id,
       prepayDto.paidAmount,
-      prepayDto.paidMoney,
-      req.user.id
+      prepayDto.paidMoney
     );
   }
 

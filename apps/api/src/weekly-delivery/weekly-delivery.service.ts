@@ -292,7 +292,7 @@ export class WeeklyDeliveryService {
   }
 
   // Vorauszahlung für mehrere Wochen
-  async prepayWeeks(userId: string, weeks: number, paidAmount?: number, paidMoney?: number, createdById: string) {
+  async prepayWeeks(userId: string, weeks: number, createdById: string, paidAmount?: number, paidMoney?: number) {
     if (weeks < 1 || weeks > 12) {
       throw new BadRequestException('Vorauszahlung kann nur für 1-12 Wochen erfolgen');
     }
