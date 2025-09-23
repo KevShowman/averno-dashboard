@@ -32,6 +32,12 @@ model User {
   stockMovementsApproved StockMovement[] @relation("movement_approved_by")
   kokainDeposits KokainDeposit[] @relation("deposit_created_by")
   kokainConfirmations KokainDeposit[] @relation("deposit_confirmed_by")
+  weeklyDeliveries WeeklyDelivery[] @relation("delivery_created_by")
+  weeklyDeliveryConfirmations WeeklyDelivery[] @relation("delivery_confirmed_by")
+  sanctionsCreated Sanction[] @relation("sanction_created_by")
+  sanctionsReceived Sanction[] @relation("sanction_received_by")
+  exclusionsReceived WeeklyDeliveryExclusion[] @relation("exclusion_user")
+  exclusionsCreated WeeklyDeliveryExclusion[] @relation("exclusion_created_by")
 
   @@map("users")
 }
@@ -238,4 +244,84 @@ model DiscordRoleMapping {
   updatedAt   DateTime @updatedAt
 
   @@map("discord_role_mappings")
+}
+
+// Wochenabgabe System
+model WeeklyDelivery {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation("delivery_created_by", fields: [userId], references: [id])
+  weekStart   DateTime // Start der Woche (Montag)
+  weekEnd     DateTime // Ende der Woche (Sonntag)
+  packages    Int    @default(300) // Standard: 300 Kokain-Pakete
+  paidAmount  Int?   // Bezahlte Menge in Kokain-Paketen
+  paidMoney   Int?   // Bezahlte Menge in Schwarzgeld
+  status      WeeklyDeliveryStatus @default(PENDING)
+  confirmedById String?
+  confirmedBy User?  @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt DateTime?
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("weekly_deliveries")
+}
+
+enum WeeklyDeliveryStatus {
+  PENDING
+  PAID
+  CONFIRMED
+  OVERDUE
+}
+
+// Wochenabgabe Ausschlüsse
+model WeeklyDeliveryExclusion {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation("exclusion_user", fields: [userId], references: [id])
+  reason      String
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean @default(true)
+  createdById String
+  createdBy   User   @relation("exclusion_created_by", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("weekly_delivery_exclusions")
+}
+
+// Sanktionssystem
+model Sanction {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation("sanction_received_by", fields: [userId], references: [id])
+  category    SanctionCategory
+  level       Int    @default(1) // 1-4, Level bestimmt Strafe
+  description String
+  amount      Int?   // Geldstrafe in Schwarzgeld
+  penalty     String? // Spezielle Strafe (z.B. "LaSanta Calavera Brücke 1x")
+  status      SanctionStatus @default(ACTIVE)
+  createdById String
+  createdBy   User   @relation("sanction_created_by", fields: [createdById], references: [id])
+  paidAt      DateTime?
+  expiresAt   DateTime? // Für automatische Bereinigung nach 4 Wochen
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("sanctions")
+}
+
+enum SanctionCategory {
+  ABMELDUNG
+  RESPEKTVERHALTEN
+  FUNKCHECK
+  REAKTIONSPFLICHT
+}
+
+enum SanctionStatus {
+  ACTIVE
+  PAID
+  EXPIRED
+  CANCELLED
 }

@@ -10,6 +10,8 @@ import KokainPage from './pages/KokainPage'
 import AuditPage from './pages/AuditPage'
 import SettingsPage from './pages/SettingsPage'
 import TickerPage from './pages/TickerPage'
+import WeeklyDeliveryPage from './pages/WeeklyDeliveryPage'
+import SanctionsPage from './pages/SanctionsPage'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
@@ -94,6 +96,20 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <TickerPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/weekly-delivery" element={
+          <ProtectedRoute>
+            <Layout>
+              <WeeklyDeliveryPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/sanctions" element={
+          <ProtectedRoute>
+            <Layout>
+              <SanctionsPage />
             </Layout>
           </ProtectedRoute>
         } />

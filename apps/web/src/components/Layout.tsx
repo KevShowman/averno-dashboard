@@ -14,7 +14,9 @@ import {
   User,
   Activity,
   FlaskConical,
-  Clock
+  Clock,
+  Calendar,
+  Scale
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName } from '../lib/utils'
@@ -41,6 +43,8 @@ const navigation = [
   { name: 'Lagerbewegungen', href: '/lager-movements', icon: Clock },
   { name: 'Kasse', href: '/kasse', icon: DollarSign },
   { name: 'Kokain', href: '/kokain', icon: FlaskConical },
+  { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
+  { name: 'Sanktionen', href: '/sanctions', icon: Scale },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
   { name: 'Audit-Log', href: '/audit', icon: FileText },
   { name: 'Einstellungen', href: '/settings', icon: Settings },

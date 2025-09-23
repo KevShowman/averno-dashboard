@@ -26,7 +26,37 @@ async function main() {
     },
   });
 
-  console.log('✅ Modules created:', { lagerModule, kasseModule });
+  const kokainModule = await prisma.module.upsert({
+    where: { key: 'kokain' },
+    update: {},
+    create: {
+      key: 'kokain',
+      name: 'Kokain-System',
+      enabled: true,
+    },
+  });
+
+  const weeklyDeliveryModule = await prisma.module.upsert({
+    where: { key: 'weekly-delivery' },
+    update: {},
+    create: {
+      key: 'weekly-delivery',
+      name: 'Wochenabgabe-System',
+      enabled: true,
+    },
+  });
+
+  const sanctionsModule = await prisma.module.upsert({
+    where: { key: 'sanctions' },
+    update: {},
+    create: {
+      key: 'sanctions',
+      name: 'Sanktionssystem',
+      enabled: true,
+    },
+  });
+
+  console.log('✅ Modules created:', { lagerModule, kasseModule, kokainModule, weeklyDeliveryModule, sanctionsModule });
 
   // Create item categories
   const categories = [
