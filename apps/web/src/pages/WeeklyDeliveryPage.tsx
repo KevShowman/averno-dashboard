@@ -454,9 +454,9 @@ export default function WeeklyDeliveryPage() {
                         </TableCell>
                         <TableCell>{delivery.packages}</TableCell>
                         <TableCell>
-                          {delivery.paidAmount && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && `${delivery.paidMoney} €`}
-                          {!delivery.paidAmount && !delivery.paidMoney && '-'}
+                          {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${delivery.paidMoney} €`}
+                          {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
                         <TableCell>
@@ -557,9 +557,9 @@ export default function WeeklyDeliveryPage() {
                         </TableCell>
                         <TableCell>{delivery.packages}</TableCell>
                         <TableCell>
-                          {delivery.paidAmount && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && `${delivery.paidMoney} €`}
-                          {!delivery.paidAmount && !delivery.paidMoney && '-'}
+                          {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${delivery.paidMoney} €`}
+                          {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
                         <TableCell>

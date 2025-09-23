@@ -54,7 +54,9 @@ export class KokainService {
     const pendingDelivery = await this.prisma.weeklyDelivery.findFirst({
       where: {
         userId,
-        status: WeeklyDeliveryStatus.PENDING,
+        status: {
+          in: [WeeklyDeliveryStatus.PENDING, WeeklyDeliveryStatus.PARTIALLY_PAID],
+        },
         weekStart: {
           gte: currentWeek.start,
         },
@@ -69,6 +71,14 @@ export class KokainService {
             username: true,
             icFirstName: true,
             icLastName: true,
+          },
+        },
+        kokainDeposits: {
+          where: {
+            status: DepositStatus.CONFIRMED,
+          },
+          select: {
+            weeklyDeliveryPackages: true,
           },
         },
       },
@@ -122,14 +132,8 @@ export class KokainService {
         newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
       }
 
-      // Wochenabgabe aktualisieren (aber noch nicht als bezahlt markieren - das passiert erst bei Bestätigung)
-      await this.prisma.weeklyDelivery.update({
-        where: { id: weeklyDeliveryId },
-        data: {
-          status: newStatus,
-          paidAmount: totalPaid,
-        },
-      });
+      // Wochenabgabe wird erst bei Bestätigung des Deposits aktualisiert
+      // Hier nur die Berechnung für den Deposit speichern
     }
 
     const deposit = await this.prisma.kokainDeposit.create({
@@ -735,7 +739,7 @@ export class KokainService {
     if (deposit.weeklyDeliveryId && deposit.weeklyDelivery) {
       const weeklyDelivery = deposit.weeklyDelivery;
       
-      // Berechne neue Status basierend auf verbleibenden bestätigten Deposits
+      // Berechne neuen Status basierend auf verbleibenden bestätigten Deposits
       const remainingConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
         where: {
           weeklyDeliveryId: deposit.weeklyDeliveryId,
