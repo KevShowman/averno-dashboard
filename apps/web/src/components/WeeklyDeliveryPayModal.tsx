@@ -24,23 +24,19 @@ export default function WeeklyDeliveryPayModal({
   isLoading = false,
 }: WeeklyDeliveryPayModalProps) {
   const [paidAmount, setPaidAmount] = useState<number>(0)
-  const [paidMoney, setPaidMoney] = useState<number>(0)
 
   const totalPaidPackages = currentPaidAmount + paidAmount
-  const totalPaidMoney = currentPaidMoney + paidMoney
   const remainingPackages = requiredPackages - totalPaidPackages
-  const remainingMoney = (remainingPackages * 1000) - totalPaidMoney
-  const isFullyPaid = totalPaidPackages >= requiredPackages || totalPaidMoney >= (requiredPackages * 1000)
+  const isFullyPaid = totalPaidPackages >= requiredPackages
 
   const handleConfirm = () => {
-    if (paidAmount > 0 || paidMoney > 0) {
+    if (paidAmount > 0) {
       onConfirm({
-        paidAmount: paidAmount > 0 ? paidAmount : undefined,
-        paidMoney: paidMoney > 0 ? paidMoney : undefined,
+        paidAmount: paidAmount,
+        paidMoney: undefined,
       })
       // Reset form
       setPaidAmount(0)
-      setPaidMoney(0)
     }
   }
 

@@ -18,7 +18,7 @@ interface WeeklyDelivery {
   packages: number
   paidAmount?: number
   paidMoney?: number
-  status: 'PENDING' | 'PAID' | 'CONFIRMED' | 'OVERDUE'
+  status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'CONFIRMED' | 'OVERDUE'
   confirmedAt?: string
   note?: string
   user: {
