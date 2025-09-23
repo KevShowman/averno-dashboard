@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Scale, AlertTriangle, CheckCircle, Clock, X, DollarSign, User, Plus } from 'lucide-react'
+import { Scale, AlertTriangle, CheckCircle, Clock, X, DollarSign, User, Plus, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
+import CreateSanctionModal from '../components/CreateSanctionModal'
+import ResetSanctionLevelsModal from '../components/ResetSanctionLevelsModal'
 
 interface Sanction {
   id: string
@@ -57,11 +59,15 @@ export default function SanctionsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [showMySanctions, setShowMySanctions] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<{ id: string; name: string } | null>(null)
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
   // Check if user has leadership role
   const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR'
+  const isElPatron = user?.role === 'EL_PATRON'
 
   // Queries
   const { data: sanctions = [], isLoading: loadingSanctions } = useQuery({
@@ -119,6 +125,33 @@ export default function SanctionsPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Bereinigen')
+    },
+  })
+
+  const createSanctionMutation = useMutation({
+    mutationFn: (data: { userId: string; category: string; level: number; description: string }) =>
+      sanctionsApi.createSanction(data),
+    onSuccess: () => {
+      toast.success('Sanktion wurde erstellt')
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] })
+      setShowCreateModal(false)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Erstellen der Sanktion')
+    },
+  })
+
+  const resetUserLevelsMutation = useMutation({
+    mutationFn: (data: { userId: string; category: string }) =>
+      sanctionsApi.resetUserLevels(data),
+    onSuccess: (response) => {
+      toast.success(response.data.message)
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] })
+      setShowResetModal(false)
+      setSelectedUser(null)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Zurücksetzen der Sanktionen')
     },
   })
 
@@ -211,11 +244,23 @@ export default function SanctionsPage() {
               
               <Button
                 variant="default"
+                onClick={() => setShowCreateModal(true)}
                 className="flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
                 Sanktion erstellen
               </Button>
+              
+              {isElPatron && (
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowResetModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Level zurücksetzen
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -477,8 +522,11 @@ export default function SanctionsPage() {
                       <div key={penalty.level} className="text-center p-2 bg-gray-800 rounded">
                         <div className="text-sm font-medium text-white">Level {penalty.level}</div>
                         <div className="text-xs text-gray-400">
-                          {penalty.amount && `${penalty.amount.toLocaleString()} €`}
-                          {penalty.penalty && penalty.penalty}
+                          {penalty.amount && penalty.penalty 
+                            ? `${penalty.amount.toLocaleString()} € / ${penalty.penalty}`
+                            : penalty.amount && `${penalty.amount.toLocaleString()} €`
+                          }
+                          {penalty.penalty && !penalty.amount && penalty.penalty}
                           {!penalty.amount && !penalty.penalty && 'Verwarnung'}
                         </div>
                       </div>
@@ -490,6 +538,24 @@ export default function SanctionsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Create Sanction Modal */}
+      <CreateSanctionModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={createSanctionMutation.mutate}
+        isLoading={createSanctionMutation.isPending}
+      />
+
+      {/* Reset Sanction Levels Modal */}
+      <ResetSanctionLevelsModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onReset={resetUserLevelsMutation.mutate}
+        userId={selectedUser?.id}
+        userName={selectedUser?.name}
+        isLoading={resetUserLevelsMutation.isPending}
+      />
     </div>
   )
 }

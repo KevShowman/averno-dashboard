@@ -59,6 +59,7 @@ export const sanctionsApi = {
   paySanction: (id: string) => api.patch(`/sanctions/${id}/pay`),
   removeSanction: (id: string) => api.patch(`/sanctions/${id}/remove`),
   cleanupExpired: () => api.post('/sanctions/cleanup'),
+  resetUserLevels: (data: { userId: string; category: string }) => api.post('/sanctions/reset-user-levels', data),
 }
 
 // Kokain API (erweitert um Wochenabgabe-Integration)

@@ -124,8 +124,8 @@ export class SanctionsController {
           name: 'Respektverhalten',
           description: 'Beleidigungen, Ignorieren von Anweisungen',
           penalties: [
-            { level: 1, amount: null, penalty: 'LaSanta Calavera Brücke 1x' },
-            { level: 2, amount: null, penalty: 'LaSanta Calavera Brücke 2x' },
+            { level: 1, amount: 75000, penalty: null },
+            { level: 2, amount: 150000, penalty: null },
             { level: 3, amount: 300000, penalty: null },
             { level: 4, amount: 500000, penalty: 'Blood Out' },
           ],
@@ -176,5 +176,20 @@ export class SanctionsController {
         },
       ],
     };
+  }
+
+  // El Patron: Sanktions-Level für User und Kategorie zurücksetzen
+  @Post('reset-user-levels')
+  @Roles(Role.EL_PATRON)
+  @UseGuards(RolesGuard)
+  async resetUserSanctionLevels(
+    @Body() data: { userId: string; category: SanctionCategory },
+    @Request() req,
+  ) {
+    return this.sanctionsService.resetUserSanctionLevels(
+      data.userId,
+      data.category,
+      req.user.id,
+    );
   }
 }

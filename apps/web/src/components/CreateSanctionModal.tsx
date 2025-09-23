@@ -1,0 +1,317 @@
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Scale, X, AlertTriangle } from 'lucide-react'
+
+interface CreateSanctionModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onCreate: (data: {
+    userId: string
+    category: string
+    level: number
+    description: string
+  }) => void
+  isLoading?: boolean
+}
+
+interface User {
+  id: string
+  username: string
+  icFirstName?: string
+  icLastName?: string
+}
+
+interface SanctionCategory {
+  key: string
+  name: string
+  description: string
+  penalties: Array<{
+    level: number
+    amount?: number
+    penalty?: string
+  }>
+}
+
+const SANCTION_CATEGORIES: SanctionCategory[] = [
+  {
+    key: 'ABMELDUNG',
+    name: 'Abmeldung',
+    description: 'Unentschuldigte Abwesenheit',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 150000 },
+      { level: 3, amount: 300000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'RESPEKTVERHALTEN',
+    name: 'Respektverhalten',
+    description: 'Beleidigungen, Ignorieren von Anweisungen',
+    penalties: [
+      { level: 1, amount: 75000 },
+      { level: 2, amount: 150000 },
+      { level: 3, amount: 300000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'FUNKCHECK',
+    name: 'Funkcheck',
+    description: 'Mehrfaches Ignorieren von Funkchecks',
+    penalties: [
+      { level: 1, amount: 100000 },
+      { level: 2, amount: 250000 },
+      { level: 3, amount: 500000, penalty: 'Blood Out' },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'REAKTIONSPFLICHT',
+    name: 'Reaktionspflicht',
+    description: 'Nicht reagieren / Nicht anwesend trotz Zusage',
+    penalties: [
+      { level: 1, penalty: 'Joker' },
+      { level: 2, amount: 250000 },
+      { level: 3, amount: 500000, penalty: 'Blood Out' },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'NICHT_BEZAHLT',
+    name: 'Nicht bezahlt',
+    description: 'Wochenabgabe nicht bezahlt',
+    penalties: [
+      { level: 1, amount: 100000 },
+      { level: 2, amount: 250000 },
+      { level: 3, amount: 500000, penalty: 'Blood Out' },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'NICHT_BEZAHLT_48H',
+    name: 'Nicht bezahlt (48h)',
+    description: 'Wochenabgabe nicht innerhalb von 48 Stunden bezahlt',
+    penalties: [
+      { level: 1, amount: 200000 },
+      { level: 2, amount: 400000 },
+      { level: 3, amount: 500000, penalty: 'Blood Out' },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+]
+
+export default function CreateSanctionModal({
+  isOpen,
+  onClose,
+  onCreate,
+  isLoading = false,
+}: CreateSanctionModalProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [selectedLevel, setSelectedLevel] = useState<number>(1)
+  const [description, setDescription] = useState<string>('')
+  const [searchUser, setSearchUser] = useState<string>('')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+
+  const category = SANCTION_CATEGORIES.find(c => c.key === selectedCategory)
+  const selectedPenalty = category?.penalties.find(p => p.level === selectedLevel)
+
+  const handleCreate = () => {
+    if (selectedUser && selectedCategory && description.trim()) {
+      onCreate({
+        userId: selectedUser.id,
+        category: selectedCategory,
+        level: selectedLevel,
+        description: description.trim(),
+      })
+      // Reset form
+      setSelectedCategory('')
+      setSelectedLevel(1)
+      setDescription('')
+      setSearchUser('')
+      setSelectedUser(null)
+    }
+  }
+
+  const handleClose = () => {
+    onClose()
+    // Reset form
+    setSelectedCategory('')
+    setSelectedLevel(1)
+    setDescription('')
+    setSearchUser('')
+    setSelectedUser(null)
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <Card className="w-full max-w-2xl lasanta-card max-h-[90vh] overflow-y-auto">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Scale className="h-5 w-5" />
+                Neue Sanktion erstellen
+              </CardTitle>
+              <CardDescription>
+                Erstelle eine neue Sanktion für einen Regelverstoß
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {/* User Selection */}
+          <div>
+            <label className="text-white block text-sm font-medium mb-2">
+              Benutzer auswählen
+            </label>
+            <div className="space-y-2">
+              <Input
+                placeholder="Benutzername suchen..."
+                value={searchUser}
+                onChange={(e) => setSearchUser(e.target.value)}
+                disabled={isLoading}
+              />
+              {selectedUser && (
+                <div className="bg-green-900/20 border border-green-500/20 p-3 rounded-lg">
+                  <div className="text-green-300 font-medium">Ausgewählt:</div>
+                  <div className="text-white">{selectedUser.username}</div>
+                  <div className="text-sm text-gray-400">
+                    {selectedUser.icFirstName && selectedUser.icLastName 
+                      ? `${selectedUser.icFirstName} ${selectedUser.icLastName}`
+                      : 'Kein IC-Name verfügbar'
+                    }
+                  </div>
+                </div>
+              )}
+              <div className="text-sm text-gray-400">
+                Hinweis: Benutzer-Auswahl wird über die API implementiert
+              </div>
+            </div>
+          </div>
+
+          {/* Category Selection */}
+          <div>
+            <label className="text-white block text-sm font-medium mb-2">
+              Sanktionskategorie
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {SANCTION_CATEGORIES.map((cat) => (
+                <Button
+                  key={cat.key}
+                  variant={selectedCategory === cat.key ? 'default' : 'outline'}
+                  onClick={() => {
+                    setSelectedCategory(cat.key)
+                    setSelectedLevel(1) // Reset level when category changes
+                  }}
+                  disabled={isLoading}
+                  className="text-left justify-start h-auto p-3"
+                >
+                  <div>
+                    <div className="font-medium">{cat.name}</div>
+                    <div className="text-xs opacity-75">{cat.description}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Level Selection */}
+          {category && (
+            <div>
+              <label className="text-white block text-sm font-medium mb-2">
+                Level (1-4)
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {category.penalties.map((penalty) => (
+                  <Button
+                    key={penalty.level}
+                    variant={selectedLevel === penalty.level ? 'default' : 'outline'}
+                    onClick={() => setSelectedLevel(penalty.level)}
+                    disabled={isLoading}
+                    className="flex flex-col h-auto p-3"
+                  >
+                    <div className="font-medium">Level {penalty.level}</div>
+                    <div className="text-xs opacity-75">
+                      {penalty.amount && penalty.penalty 
+                        ? `${penalty.amount.toLocaleString()} € / ${penalty.penalty}`
+                        : penalty.amount && `${penalty.amount.toLocaleString()} €`
+                      }
+                      {penalty.penalty && !penalty.amount && penalty.penalty}
+                      {!penalty.amount && !penalty.penalty && 'Verwarnung'}
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Selected Penalty Preview */}
+          {selectedPenalty && (
+            <div className="bg-yellow-900/20 border border-yellow-500/20 p-4 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                <span className="font-semibold text-yellow-300">Ausgewählte Strafe:</span>
+              </div>
+              <div className="text-white">
+                {selectedPenalty.amount && selectedPenalty.penalty 
+                  ? `${selectedPenalty.amount.toLocaleString()} € / ${selectedPenalty.penalty}`
+                  : selectedPenalty.amount && `${selectedPenalty.amount.toLocaleString()} €`
+                }
+                {selectedPenalty.penalty && !selectedPenalty.amount && selectedPenalty.penalty}
+                {!selectedPenalty.amount && !selectedPenalty.penalty && 'Verwarnung'}
+              </div>
+            </div>
+          )}
+
+          {/* Description */}
+          <div>
+            <label className="text-white block text-sm font-medium mb-2">
+              Beschreibung des Verstoßes
+            </label>
+            <textarea
+              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              placeholder="Beschreibe den Regelverstoß..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={isLoading}
+              className="flex-1"
+            >
+              Abbrechen
+            </Button>
+            <Button
+              onClick={handleCreate}
+              disabled={isLoading || !selectedUser || !selectedCategory || !description.trim()}
+              className="flex-1"
+            >
+              {isLoading ? 'Erstelle...' : 'Sanktion erstellen'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

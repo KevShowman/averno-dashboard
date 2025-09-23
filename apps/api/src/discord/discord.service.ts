@@ -271,6 +271,7 @@ export class DiscordService {
       // Alle Mitglieder mit erlaubten Rollen abrufen
       const members = await this.getMembersWithAllowedRoles();
       const importedUsers = [];
+      const updatedUsers = [];
       
       for (const member of members) {
         try {
@@ -283,20 +284,63 @@ export class DiscordService {
             // User importieren
             const importedUser = await this.importMemberToDatabase(member.discordId);
             importedUsers.push(importedUser);
+          } else {
+            // Bestehenden User mit aktuellen Nickname aktualisieren
+            const updatedUser = await this.updateUserNickname(member.discordId, existingUser);
+            if (updatedUser) {
+              updatedUsers.push(updatedUser);
+            }
           }
         } catch (error) {
-          console.error(`Fehler beim Importieren von ${member.discordId}:`, error);
+          console.error(`Fehler beim Importieren/Aktualisieren von ${member.discordId}:`, error);
         }
       }
       
       return {
-        message: `${importedUsers.length} neue Benutzer importiert`,
+        message: `${importedUsers.length} neue Benutzer importiert, ${updatedUsers.length} aktualisiert`,
         imported: importedUsers.length,
+        updated: updatedUsers.length,
         total: members.length
       };
     } catch (error) {
       console.error('Fehler beim Importieren aller Discord-Mitglieder:', error);
       throw error;
+    }
+  }
+
+  async updateUserNickname(discordId: string, existingUser: any): Promise<any> {
+    try {
+      // Server-spezifische Mitgliedsdaten abrufen (für Nickname)
+      const memberResponse = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      if (!memberResponse.ok) {
+        return null; // User nicht mehr im Server
+      }
+      
+      const memberData = await memberResponse.json();
+      const serverNickname = memberData.nick || memberData.user?.display_name || memberData.user?.username;
+      
+      // Nur aktualisieren wenn sich der Name geändert hat
+      if (serverNickname !== existingUser.username) {
+        const updatedUser = await this.prisma.user.update({
+          where: { discordId },
+          data: { username: serverNickname },
+        });
+        return updatedUser;
+      }
+      
+      return null; // Keine Änderung nötig
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren des Nicknames:', error);
+      return null;
     }
   }
 
@@ -322,6 +366,23 @@ export class DiscordService {
       // Discord-Rollen des Benutzers abrufen
       const userDiscordRoles = await this.getUserRoles(discordId);
       
+      // Server-spezifische Mitgliedsdaten abrufen (für Nickname)
+      const memberResponse = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      let serverNickname = discordUser.username; // Fallback
+      if (memberResponse.ok) {
+        const memberData = await memberResponse.json();
+        serverNickname = memberData.nick || memberData.user?.display_name || discordUser.username;
+      }
+      
       // Zugriff validieren
       const validation = await this.validateUserAccess(discordId);
       
@@ -333,7 +394,7 @@ export class DiscordService {
       const user = await this.prisma.user.create({
         data: {
           discordId,
-          username: discordUser.username,
+          username: serverNickname, // Verwende Server-Nickname anstatt Discord-Username
           avatarUrl: discordUser.avatar ? 
             `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : null,
           email: null, // Discord Bot kann keine E-Mail abrufen

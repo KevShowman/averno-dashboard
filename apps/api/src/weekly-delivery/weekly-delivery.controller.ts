@@ -173,4 +173,12 @@ export class WeeklyDeliveryController {
   async deactivateExclusion(@Param('id') id: string) {
     return this.weeklyDeliveryService.deactivateExclusion(id);
   }
+
+  // Development: Alle Wochenabgaben löschen
+  @Post('clear-all')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async clearAllWeeklyDeliveries() {
+    return this.weeklyDeliveryService.clearAllWeeklyDeliveries();
+  }
 }

@@ -309,8 +309,8 @@ export class SanctionsService {
 
       case SanctionCategory.RESPEKTVERHALTEN:
         switch (level) {
-          case 1: return { penalty: 'LaSanta Calavera Brücke 1x' };
-          case 2: return { penalty: 'LaSanta Calavera Brücke 2x' };
+          case 1: return { amount: 75000 };
+          case 2: return { amount: 150000 };
           case 3: return { amount: 300000 };
           case 4: return { amount: 500000, penalty: 'Blood Out' };
         }
@@ -354,5 +354,44 @@ export class SanctionsService {
     }
 
     return {};
+  }
+
+  // El Patron: Sanktions-Level für User und Kategorie zurücksetzen
+  async resetUserSanctionLevels(userId: string, category: SanctionCategory, createdById: string) {
+    // Alle aktiven Sanktionen für diesen User und diese Kategorie finden
+    const activeSanctions = await this.prisma.sanction.findMany({
+      where: {
+        userId,
+        category,
+        status: SanctionStatus.ACTIVE,
+      },
+    });
+
+    if (activeSanctions.length === 0) {
+      return {
+        message: 'Keine aktiven Sanktionen für diesen User und diese Kategorie gefunden',
+        resetCount: 0,
+      };
+    }
+
+    // Alle aktiven Sanktionen als CANCELLED markieren
+    const resetResult = await this.prisma.sanction.updateMany({
+      where: {
+        userId,
+        category,
+        status: SanctionStatus.ACTIVE,
+      },
+      data: {
+        status: SanctionStatus.CANCELLED,
+        updatedAt: new Date(),
+      },
+    });
+
+    return {
+      message: `${resetResult.count} Sanktionen wurden zurückgesetzt`,
+      resetCount: resetResult.count,
+      userId,
+      category,
+    };
   }
 }

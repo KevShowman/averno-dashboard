@@ -545,6 +545,16 @@ export class WeeklyDeliveryService {
     };
   }
 
+  // Development: Alle Wochenabgaben löschen
+  async clearAllWeeklyDeliveries() {
+    const deletedCount = await this.prisma.weeklyDelivery.deleteMany({});
+    
+    return {
+      message: `${deletedCount.count} Wochenabgaben wurden gelöscht`,
+      deletedCount: deletedCount.count,
+    };
+  }
+
   // Hilfsmethode: Aktuelle Woche berechnen
   private getCurrentWeek() {
     const now = new Date();
