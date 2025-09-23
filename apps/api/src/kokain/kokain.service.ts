@@ -109,11 +109,19 @@ export class KokainService {
       weeklyDeliveryPackages = Math.min(packages, 300);
       payoutPackages = packages - weeklyDeliveryPackages;
 
-      // Wochenabgabe als bezahlt markieren
+      // Wochenabgabe Status basierend auf Paketen setzen
+      let newStatus = WeeklyDeliveryStatus.PENDING;
+      if (weeklyDeliveryPackages >= 300) {
+        newStatus = WeeklyDeliveryStatus.PAID;
+      } else if (weeklyDeliveryPackages > 0) {
+        newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
+      }
+
+      // Wochenabgabe aktualisieren (aber noch nicht als bezahlt markieren - das passiert erst bei Bestätigung)
       await this.prisma.weeklyDelivery.update({
         where: { id: weeklyDeliveryId },
         data: {
-          status: WeeklyDeliveryStatus.PAID,
+          status: newStatus,
           paidAmount: weeklyDeliveryPackages,
         },
       });
@@ -238,7 +246,10 @@ export class KokainService {
   async confirmDeposit(depositId: string, confirmedById: string) {
     const deposit = await this.prisma.kokainDeposit.findUnique({
       where: { id: depositId },
-      include: { user: true },
+      include: { 
+        user: true,
+        weeklyDelivery: true,
+      },
     });
 
     if (!deposit) {
@@ -247,6 +258,41 @@ export class KokainService {
 
     if (deposit.status !== DepositStatus.PENDING) {
       throw new BadRequestException('Deposit wurde bereits bearbeitet');
+    }
+
+    // Wenn der Deposit mit einer Wochenabgabe verknüpft ist, aktualisiere diese
+    if (deposit.weeklyDeliveryId && deposit.weeklyDelivery) {
+      const weeklyDelivery = deposit.weeklyDelivery;
+      
+      // Berechne neue Status basierend auf allen bestätigten Deposits für diese Wochenabgabe
+      const allConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
+        where: {
+          weeklyDeliveryId: deposit.weeklyDeliveryId,
+          status: DepositStatus.CONFIRMED,
+        },
+      });
+      
+      // Füge die Pakete des aktuell bestätigten Deposits hinzu
+      const totalConfirmedPackages = allConfirmedDeposits.reduce(
+        (sum, d) => sum + (d.weeklyDeliveryPackages || 0), 
+        0
+      ) + (deposit.weeklyDeliveryPackages || 0);
+      
+      let newStatus = WeeklyDeliveryStatus.PENDING;
+      if (totalConfirmedPackages >= weeklyDelivery.packages) {
+        newStatus = WeeklyDeliveryStatus.PAID;
+      } else if (totalConfirmedPackages > 0) {
+        newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
+      }
+      
+      // Aktualisiere Wochenabgabe
+      await this.prisma.weeklyDelivery.update({
+        where: { id: deposit.weeklyDeliveryId },
+        data: {
+          status: newStatus,
+          paidAmount: totalConfirmedPackages,
+        },
+      });
     }
 
     const confirmedDeposit = await this.prisma.kokainDeposit.update({
@@ -270,6 +316,18 @@ export class KokainService {
             username: true,
           },
         },
+        weeklyDelivery: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -281,6 +339,8 @@ export class KokainService {
       meta: {
         packages: deposit.packages,
         depositUser: deposit.user.username,
+        weeklyDeliveryId: deposit.weeklyDeliveryId,
+        weeklyDeliveryPackages: deposit.weeklyDeliveryPackages,
       },
     });
 
@@ -290,6 +350,9 @@ export class KokainService {
   async rejectDeposit(depositId: string, rejectedById: string, reason?: string) {
     const deposit = await this.prisma.kokainDeposit.findUnique({
       where: { id: depositId },
+      include: {
+        weeklyDelivery: true,
+      },
     });
 
     if (!deposit) {
@@ -298,6 +361,47 @@ export class KokainService {
 
     if (deposit.status !== DepositStatus.PENDING) {
       throw new BadRequestException('Deposit wurde bereits bearbeitet');
+    }
+
+    // Wenn der Deposit mit einer Wochenabgabe verknüpft ist, muss diese zurückgesetzt werden
+    if (deposit.weeklyDeliveryId && deposit.weeklyDelivery) {
+      const weeklyDelivery = deposit.weeklyDelivery;
+      
+      // Berechne neue Status basierend auf verbleibenden Paketen
+      let newStatus = WeeklyDeliveryStatus.PENDING;
+      let newPaidAmount = 0;
+      
+      // Finde alle anderen bestätigten Deposits für diese Wochenabgabe
+      const otherConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
+        where: {
+          weeklyDeliveryId: deposit.weeklyDeliveryId,
+          status: DepositStatus.CONFIRMED,
+          id: { not: depositId }, // Ausschließen des aktuell abgelehnten Deposits
+        },
+      });
+      
+      // Berechne Gesamtmenge aus anderen bestätigten Deposits
+      const totalConfirmedPackages = otherConfirmedDeposits.reduce(
+        (sum, d) => sum + (d.weeklyDeliveryPackages || 0), 
+        0
+      );
+      
+      newPaidAmount = totalConfirmedPackages;
+      
+      if (newPaidAmount >= weeklyDelivery.packages) {
+        newStatus = WeeklyDeliveryStatus.PAID;
+      } else if (newPaidAmount > 0) {
+        newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
+      }
+      
+      // Aktualisiere Wochenabgabe
+      await this.prisma.weeklyDelivery.update({
+        where: { id: deposit.weeklyDeliveryId },
+        data: {
+          status: newStatus,
+          paidAmount: newPaidAmount,
+        },
+      });
     }
 
     const rejectedDeposit = await this.prisma.kokainDeposit.update({
@@ -322,6 +426,18 @@ export class KokainService {
             username: true,
           },
         },
+        weeklyDelivery: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -333,6 +449,8 @@ export class KokainService {
       meta: {
         packages: deposit.packages,
         reason,
+        weeklyDeliveryId: deposit.weeklyDeliveryId,
+        weeklyDeliveryPackages: deposit.weeklyDeliveryPackages,
       },
     });
 
@@ -581,7 +699,8 @@ export class KokainService {
       where: { id: depositId },
       include: { 
         user: true,
-        uebergabe: true 
+        uebergabe: true,
+        weeklyDelivery: true,
       },
     });
 
@@ -596,6 +715,41 @@ export class KokainService {
     // Prüfe ob Deposit zu einer archivierten Übergabe gehört
     if (deposit.uebergabe && !deposit.uebergabe.isActive) {
       throw new BadRequestException('Deposits aus archivierten Übergaben können nicht entfernt werden');
+    }
+
+    // Wenn der Deposit mit einer Wochenabgabe verknüpft ist, muss diese zurückgesetzt werden
+    if (deposit.weeklyDeliveryId && deposit.weeklyDelivery) {
+      const weeklyDelivery = deposit.weeklyDelivery;
+      
+      // Berechne neue Status basierend auf verbleibenden bestätigten Deposits
+      const remainingConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
+        where: {
+          weeklyDeliveryId: deposit.weeklyDeliveryId,
+          status: DepositStatus.CONFIRMED,
+          id: { not: depositId }, // Ausschließen des aktuell gelöschten Deposits
+        },
+      });
+      
+      const totalRemainingPackages = remainingConfirmedDeposits.reduce(
+        (sum, d) => sum + (d.weeklyDeliveryPackages || 0), 
+        0
+      );
+      
+      let newStatus = WeeklyDeliveryStatus.PENDING;
+      if (totalRemainingPackages >= weeklyDelivery.packages) {
+        newStatus = WeeklyDeliveryStatus.PAID;
+      } else if (totalRemainingPackages > 0) {
+        newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
+      }
+      
+      // Aktualisiere Wochenabgabe
+      await this.prisma.weeklyDelivery.update({
+        where: { id: deposit.weeklyDeliveryId },
+        data: {
+          status: newStatus,
+          paidAmount: totalRemainingPackages,
+        },
+      });
     }
 
     // Deposit löschen
@@ -614,6 +768,8 @@ export class KokainService {
         reason,
         depositNote: deposit.note,
         originalStatus: deposit.status,
+        weeklyDeliveryId: deposit.weeklyDeliveryId,
+        weeklyDeliveryPackages: deposit.weeklyDeliveryPackages,
       },
     });
 

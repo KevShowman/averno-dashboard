@@ -29,6 +29,13 @@ warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
+# Check for development mode
+if [ "$1" = "dev" ] || [ "$1" = "development" ]; then
+    log "Starting development mode..."
+    exec ./dev-restart.sh
+    exit 0
+fi
+
 # Check if we're in the right directory
 if [ ! -f "docker-compose.prod.yml" ]; then
     error "docker-compose.prod.yml not found. Are you in the correct directory?"

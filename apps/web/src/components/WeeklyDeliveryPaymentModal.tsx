@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from './ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
-import { AlertTriangle, Package, DollarSign, Calendar } from 'lucide-react'
+import { AlertTriangle, Package, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface WeeklyDeliveryPaymentModalProps {
@@ -31,13 +31,11 @@ export default function WeeklyDeliveryPaymentModal({
   depositPackages
 }: WeeklyDeliveryPaymentModalProps) {
   const [useForWeeklyDelivery, setUseForWeeklyDelivery] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<'packages' | 'money'>('packages')
 
   if (!isOpen) return null
 
   const weeklyDeliveryPackages = Math.min(depositPackages, 300)
   const payoutPackages = depositPackages - weeklyDeliveryPackages
-  const weeklyDeliveryMoney = 300 * 1000 // 300k Schwarzgeld (angenommen 1 Paket = 1k)
 
   const handleConfirm = () => {
     onConfirm(useForWeeklyDelivery, pendingDelivery.id)
@@ -167,44 +165,16 @@ export default function WeeklyDeliveryPaymentModal({
             </div>
           </div>
 
-          {/* Payment Method Selection (nur wenn für Wochenabgabe verwendet wird) */}
+          {/* Payment Method Info (nur wenn für Wochenabgabe verwendet wird) */}
           {useForWeeklyDelivery && (
             <div className="space-y-3">
-              <h4 className="font-semibold text-white">Zahlungsmethode für Wochenabgabe:</h4>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div 
-                  className={`border rounded-lg p-3 cursor-pointer transition-colors ${
-                    paymentMethod === 'packages' 
-                      ? 'border-primary bg-primary/10' 
-                      : 'border-gray-600 hover:border-gray-500'
-                  }`}
-                  onClick={() => setPaymentMethod('packages')}
-                >
-                  <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium text-white">Kokain-Pakete</div>
-                      <div className="text-xs text-gray-400">{weeklyDeliveryPackages} Pakete</div>
-                    </div>
-                  </div>
+              <div className="bg-blue-900/20 border border-blue-500/20 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Package className="h-4 w-4 text-blue-400" />
+                  <span className="font-semibold text-blue-300">Zahlungsmethode: Kokain-Pakete</span>
                 </div>
-
-                <div 
-                  className={`border rounded-lg p-3 cursor-pointer transition-colors ${
-                    paymentMethod === 'money' 
-                      ? 'border-primary bg-primary/10' 
-                      : 'border-gray-600 hover:border-gray-500'
-                  }`}
-                  onClick={() => setPaymentMethod('money')}
-                >
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium text-white">Schwarzgeld</div>
-                      <div className="text-xs text-gray-400">{weeklyDeliveryMoney.toLocaleString()} €</div>
-                    </div>
-                  </div>
+                <div className="text-blue-200 text-sm">
+                  {weeklyDeliveryPackages} Pakete werden für die Wochenabgabe verwendet
                 </div>
               </div>
             </div>
@@ -216,13 +186,8 @@ export default function WeeklyDeliveryPaymentModal({
               <h4 className="font-semibold text-white mb-3">Zusammenfassung:</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Wochenabgabe ({paymentMethod === 'packages' ? 'Pakete' : 'Schwarzgeld'}):</span>
-                  <span className="text-white font-medium">
-                    {paymentMethod === 'packages' 
-                      ? `${weeklyDeliveryPackages} Pakete`
-                      : `${weeklyDeliveryMoney.toLocaleString()} €`
-                    }
-                  </span>
+                  <span className="text-gray-400">Wochenabgabe (Pakete):</span>
+                  <span className="text-white font-medium">{weeklyDeliveryPackages} Pakete</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Auszahlung (Pakete):</span>

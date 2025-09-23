@@ -416,6 +416,7 @@ export default function KokainPage() {
                   <TableRow>
                     <TableHead className="text-gray-400">Benutzer</TableHead>
                     <TableHead className="text-gray-400">Pakete</TableHead>
+                    <TableHead className="text-gray-400">Wochenabgabe</TableHead>
                     <TableHead className="text-gray-400">Notiz</TableHead>
                     <TableHead className="text-gray-400">Datum</TableHead>
                     {canConfirm && (
@@ -442,6 +443,27 @@ export default function KokainPage() {
                       </TableCell>
                       <TableCell className="text-white font-medium">
                         {deposit.packages}
+                      </TableCell>
+                      <TableCell className="text-gray-300">
+                        {deposit.weeklyDeliveryId ? (
+                          <div className="flex flex-col gap-1">
+                            <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs">
+                              Wochenabgabe
+                            </Badge>
+                            <div className="text-xs text-gray-400">
+                              {deposit.weeklyDeliveryPackages || 0} Pakete
+                            </div>
+                            {deposit.payoutPackages && deposit.payoutPackages > 0 && (
+                              <div className="text-xs text-green-400">
+                                +{deposit.payoutPackages} Auszahlung
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs">
+                            Normale Auszahlung
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-gray-300 max-w-xs truncate">
                         {deposit.note || '-'}
