@@ -101,19 +101,24 @@ export class KokainService {
         throw new BadRequestException('Wochenabgabe nicht gefunden oder nicht berechtigt');
       }
 
-      if (weeklyDelivery.status !== WeeklyDeliveryStatus.PENDING) {
-        throw new BadRequestException('Wochenabgabe wurde bereits bezahlt');
+      if (weeklyDelivery.status === WeeklyDeliveryStatus.PAID || weeklyDelivery.status === WeeklyDeliveryStatus.CONFIRMED) {
+        throw new BadRequestException('Wochenabgabe wurde bereits vollständig bezahlt');
       }
 
-      // 300 Pakete für Wochenabgabe verwenden
-      weeklyDeliveryPackages = Math.min(packages, 300);
+      // Berechne noch benötigte Pakete für Wochenabgabe
+      const alreadyPaid = weeklyDelivery.paidAmount || 0;
+      const remainingRequired = Math.max(0, 300 - alreadyPaid);
+      
+      // Verwende nur die benötigten Pakete für Wochenabgabe
+      weeklyDeliveryPackages = Math.min(packages, remainingRequired);
       payoutPackages = packages - weeklyDeliveryPackages;
 
-      // Wochenabgabe Status basierend auf Paketen setzen
+      // Wochenabgabe Status basierend auf Gesamtpaketen setzen
       let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
-      if (weeklyDeliveryPackages >= 300) {
+      const totalPaid = alreadyPaid + weeklyDeliveryPackages;
+      if (totalPaid >= 300) {
         newStatus = WeeklyDeliveryStatus.PAID;
-      } else if (weeklyDeliveryPackages > 0) {
+      } else if (totalPaid > 0) {
         newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
       }
 
@@ -122,7 +127,7 @@ export class KokainService {
         where: { id: weeklyDeliveryId },
         data: {
           status: newStatus,
-          paidAmount: weeklyDeliveryPackages,
+          paidAmount: totalPaid,
         },
       });
     }
@@ -475,23 +480,32 @@ export class KokainService {
     });
 
     const totalPackages = confirmedDeposits.reduce((sum, deposit) => sum + deposit.packages, 0);
+    const totalWeeklyDeliveryPackages = confirmedDeposits.reduce((sum, deposit) => sum + (deposit.weeklyDeliveryPackages || 0), 0);
+    const totalPayoutPackages = confirmedDeposits.reduce((sum, deposit) => sum + (deposit.payoutPackages || 0), 0);
+    
     const userCounts = confirmedDeposits.reduce((acc, deposit) => {
       const userId = deposit.userId;
       if (!acc[userId]) {
         acc[userId] = {
           user: deposit.user,
           packages: 0,
+          weeklyDeliveryPackages: 0,
+          payoutPackages: 0,
         };
       }
       acc[userId].packages += deposit.packages;
+      acc[userId].weeklyDeliveryPackages += (deposit.weeklyDeliveryPackages || 0);
+      acc[userId].payoutPackages += (deposit.payoutPackages || 0);
       return acc;
-    }, {} as Record<string, { user: any; packages: number }>);
+    }, {} as Record<string, { user: any; packages: number; weeklyDeliveryPackages: number; payoutPackages: number }>);
 
     // Kokain-Preis aus Settings holen
     const kokainPrice = await this.getKokainPrice();
 
     return {
       totalPackages,
+      totalWeeklyDeliveryPackages,
+      totalPayoutPackages,
       totalUsers: Object.keys(userCounts).length,
       userDeposits: Object.values(userCounts).map(item => ({
         ...item,

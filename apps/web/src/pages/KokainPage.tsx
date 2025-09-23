@@ -305,6 +305,9 @@ export default function KokainPage() {
             <div className="text-2xl font-bold text-white">
               {summary?.totalPackages || 0}
             </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {summary?.totalWeeklyDeliveryPackages || 0} Wochenabgabe, {summary?.totalPayoutPackages || 0} Auszahlung
+            </div>
           </CardContent>
         </Card>
         
@@ -357,7 +360,9 @@ export default function KokainPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-gray-400">Benutzer</TableHead>
-                    <TableHead className="text-gray-400">Pakete</TableHead>
+                    <TableHead className="text-gray-400">Gesamt Pakete</TableHead>
+                    <TableHead className="text-gray-400">Wochenabgabe</TableHead>
+                    <TableHead className="text-gray-400">Auszahlung</TableHead>
                     <TableHead className="text-gray-400">Wert</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -380,6 +385,12 @@ export default function KokainPage() {
                       </TableCell>
                       <TableCell className="text-white font-medium">
                         {item.packages}
+                      </TableCell>
+                      <TableCell className="text-blue-400 font-medium">
+                        {item.weeklyDeliveryPackages || 0}
+                      </TableCell>
+                      <TableCell className="text-gray-300 font-medium">
+                        {item.payoutPackages || 0}
                       </TableCell>
                       <TableCell className="text-green-400 font-medium">
                         {formatCurrency(item.value)}
@@ -446,8 +457,8 @@ export default function KokainPage() {
                       </TableCell>
                       <TableCell className="text-gray-300">
                         {deposit.weeklyDeliveryId ? (
-                          <div className="flex flex-col gap-1">
-                            <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs">
+                          <div className="flex flex-col gap-1 w-fit">
+                            <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs w-fit">
                               Wochenabgabe
                             </Badge>
                             <div className="text-xs text-gray-400">
@@ -460,7 +471,7 @@ export default function KokainPage() {
                             )}
                           </div>
                         ) : (
-                          <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs">
+                          <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs w-fit">
                             Normale Auszahlung
                           </Badge>
                         )}
