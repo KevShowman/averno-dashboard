@@ -1,14 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
-import { Scale, X, AlertTriangle, RotateCcw } from 'lucide-react'
+import { Input } from './ui/input'
+import { Scale, X, AlertTriangle, RotateCcw, Search, User } from 'lucide-react'
+import { weeklyDeliveryApi } from '../lib/api'
+
+interface User {
+  id: string
+  username: string
+  icFirstName?: string
+  icLastName?: string
+}
 
 interface ResetSanctionLevelsModalProps {
   isOpen: boolean
   onClose: () => void
   onReset: (data: { userId: string; category: string }) => void
-  userId?: string
-  userName?: string
   isLoading?: boolean
 }
 
@@ -25,20 +32,72 @@ export default function ResetSanctionLevelsModal({
   isOpen,
   onClose,
   onReset,
-  userId,
-  userName,
   isLoading = false,
 }: ResetSanctionLevelsModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [searchUser, setSearchUser] = useState<string>('')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [searchResults, setSearchResults] = useState<User[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+
+  // User suchen
+  const searchUsers = async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      // Hier verwenden wir die Weekly Delivery API, da sie alle User zurückgibt
+      const response = await weeklyDeliveryApi.getDeliveries()
+      const allUsers = response.data.map((delivery: any) => delivery.user)
+      
+      // Deduplizieren und filtern
+      const uniqueUsers = allUsers.filter((user: User, index: number, self: User[]) => 
+        index === self.findIndex(u => u.id === user.id)
+      )
+      
+      const filtered = uniqueUsers.filter((user: User) =>
+        user.username.toLowerCase().includes(query.toLowerCase()) ||
+        (user.icFirstName && user.icFirstName.toLowerCase().includes(query.toLowerCase())) ||
+        (user.icLastName && user.icLastName.toLowerCase().includes(query.toLowerCase()))
+      )
+      
+      setSearchResults(filtered.slice(0, 10)) // Max 10 Ergebnisse
+    } catch (error) {
+      console.error('Fehler beim Suchen von Usern:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchUsers(searchUser)
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchUser])
+
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user)
+    setSearchUser('')
+    setSearchResults([])
+  }
 
   const handleReset = () => {
-    if (userId && selectedCategory) {
+    if (selectedUser && selectedCategory) {
       onReset({
-        userId,
+        userId: selectedUser.id,
         category: selectedCategory,
       })
       // Reset form
       setSelectedCategory('')
+      setSelectedUser(null)
+      setSearchUser('')
     }
   }
 
@@ -46,6 +105,9 @@ export default function ResetSanctionLevelsModal({
     onClose()
     // Reset form
     setSelectedCategory('')
+    setSelectedUser(null)
+    setSearchUser('')
+    setSearchResults([])
   }
 
   if (!isOpen) return null
@@ -76,11 +138,70 @@ export default function ResetSanctionLevelsModal({
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* User Info */}
-          {userName && (
-            <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-lg">
-              <div className="text-blue-300 font-medium">Benutzer:</div>
-              <div className="text-white text-lg">{userName}</div>
+          {/* User Search */}
+          <div>
+            <label className="text-white block text-sm font-medium mb-2">
+              Benutzer suchen
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Benutzername oder IC-Name eingeben..."
+                value={searchUser}
+                onChange={(e) => setSearchUser(e.target.value)}
+                className="pl-10"
+                disabled={isLoading}
+              />
+            </div>
+            
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="mt-2 max-h-40 overflow-y-auto border border-gray-600 rounded-lg bg-gray-800">
+                {searchResults.map((user) => (
+                  <button
+                    key={user.id}
+                    onClick={() => handleUserSelect(user)}
+                    className="w-full text-left p-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0"
+                  >
+                    <div className="text-white font-medium">{user.username}</div>
+                    <div className="text-gray-400 text-sm">
+                      {user.icFirstName && user.icLastName 
+                        ? `${user.icFirstName} ${user.icLastName}`
+                        : 'Kein IC-Name verfügbar'
+                      }
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {isSearching && (
+              <div className="mt-2 text-gray-400 text-sm">Suche...</div>
+            )}
+          </div>
+
+          {/* Selected User */}
+          {selectedUser && (
+            <div className="bg-green-900/20 border border-green-500/20 p-4 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="h-4 w-4 text-green-400" />
+                <span className="text-green-300 font-medium">Ausgewählter Benutzer:</span>
+              </div>
+              <div className="text-white text-lg">{selectedUser.username}</div>
+              <div className="text-green-200 text-sm">
+                {selectedUser.icFirstName && selectedUser.icLastName 
+                  ? `${selectedUser.icFirstName} ${selectedUser.icLastName}`
+                  : 'Kein IC-Name verfügbar'
+                }
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedUser(null)}
+                className="mt-2 text-red-400 hover:text-red-300"
+              >
+                Auswahl entfernen
+              </Button>
             </div>
           )}
 
@@ -145,7 +266,7 @@ export default function ResetSanctionLevelsModal({
             </Button>
             <Button
               onClick={handleReset}
-              disabled={isLoading || !selectedCategory}
+              disabled={isLoading || !selectedCategory || !selectedUser}
               variant="destructive"
               className="flex-1"
             >

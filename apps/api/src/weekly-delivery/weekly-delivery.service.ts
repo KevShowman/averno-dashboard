@@ -90,10 +90,12 @@ export class WeeklyDeliveryService {
     const totalPaidMoney = (delivery.paidMoney || 0) + (paidMoney || 0);
     const requiredPackages = delivery.packages;
     
-    // Status basierend auf vollständiger Zahlung setzen
+    // Status basierend auf Zahlung setzen
     let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
     if (totalPaidPackages >= requiredPackages || totalPaidMoney >= requiredPackages * 1000) {
       newStatus = WeeklyDeliveryStatus.PAID;
+    } else if (totalPaidPackages > 0 || totalPaidMoney > 0) {
+      newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
     }
 
     return this.prisma.weeklyDelivery.update({
@@ -578,6 +580,9 @@ export class WeeklyDeliveryService {
     const pendingDeliveries = await this.prisma.weeklyDelivery.count({
       where: { status: WeeklyDeliveryStatus.PENDING },
     });
+    const partiallyPaidDeliveries = await this.prisma.weeklyDelivery.count({
+      where: { status: WeeklyDeliveryStatus.PARTIALLY_PAID },
+    });
     const paidDeliveries = await this.prisma.weeklyDelivery.count({
       where: { status: WeeklyDeliveryStatus.PAID },
     });
@@ -591,6 +596,7 @@ export class WeeklyDeliveryService {
     return {
       total: totalDeliveries,
       pending: pendingDeliveries,
+      partiallyPaid: partiallyPaidDeliveries,
       paid: paidDeliveries,
       confirmed: confirmedDeliveries,
       overdue: overdueDeliveries,

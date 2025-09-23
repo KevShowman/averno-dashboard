@@ -279,6 +279,7 @@ model WeeklyDelivery {
 
 enum WeeklyDeliveryStatus {
   PENDING
+  PARTIALLY_PAID
   PAID
   CONFIRMED
   OVERDUE

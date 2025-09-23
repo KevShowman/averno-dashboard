@@ -61,7 +61,6 @@ export default function SanctionsPage() {
   const [showMySanctions, setShowMySanctions] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<{ id: string; name: string } | null>(null)
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
@@ -148,7 +147,6 @@ export default function SanctionsPage() {
       toast.success(response.data.message)
       queryClient.invalidateQueries({ queryKey: ['sanctions'] })
       setShowResetModal(false)
-      setSelectedUser(null)
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Zurücksetzen der Sanktionen')
@@ -552,8 +550,6 @@ export default function SanctionsPage() {
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}
         onReset={resetUserLevelsMutation.mutate}
-        userId={selectedUser?.id}
-        userName={selectedUser?.name}
         isLoading={resetUserLevelsMutation.isPending}
       />
     </div>

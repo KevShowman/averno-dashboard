@@ -111,53 +111,34 @@ export default function WeeklyDeliveryPayModal({
                   disabled={isLoading}
                 />
               </div>
-            </div>
-
-            <div>
-              <label htmlFor="paidMoney" className="text-white block text-sm font-medium mb-1">
-                Schwarzgeld hinzufügen
-              </label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  id="paidMoney"
-                  type="number"
-                  min="0"
-                  max={remainingMoney}
-                  value={paidMoney || ''}
-                  onChange={(e) => setPaidMoney(parseInt(e.target.value) || 0)}
-                  className="pl-10"
-                  placeholder="Betrag in €"
-                  disabled={isLoading}
-                />
+              <div className="text-sm text-gray-400 mt-1">
+                Noch benötigt: {remainingPackages} Pakete
               </div>
             </div>
           </div>
 
           {/* Payment Summary */}
-          {(paidAmount > 0 || paidMoney > 0) && (
+          {paidAmount > 0 && (
             <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-lg">
               <h4 className="font-semibold text-blue-300 mb-2">Zahlungszusammenfassung</h4>
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Neue Zahlung:</span>
                   <span className="text-white">
-                    {paidAmount > 0 && `${paidAmount} Pakete`}
-                    {paidAmount > 0 && paidMoney > 0 && ' + '}
-                    {paidMoney > 0 && `${paidMoney.toLocaleString()} €`}
+                    {paidAmount} Pakete
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Gesamt nach Zahlung:</span>
                   <span className="text-white">
-                    {totalPaidPackages} Pakete + {totalPaidMoney.toLocaleString()} €
+                    {totalPaidPackages} Pakete
                   </span>
                 </div>
                 <div className="flex justify-between font-semibold">
-                  <span className={isFullyPaid ? 'text-green-400' : 'text-yellow-400'}>
+                  <span className={isFullyPaid ? 'text-green-400' : 'text-orange-400'}>
                     Status:
                   </span>
-                  <span className={isFullyPaid ? 'text-green-400' : 'text-yellow-400'}>
+                  <span className={isFullyPaid ? 'text-green-400' : 'text-orange-400'}>
                     {isFullyPaid ? 'Vollständig bezahlt' : 'Teilweise bezahlt'}
                   </span>
                 </div>
@@ -177,7 +158,7 @@ export default function WeeklyDeliveryPayModal({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={isLoading || (paidAmount === 0 && paidMoney === 0)}
+              disabled={isLoading || paidAmount === 0}
               className="flex-1"
             >
               {isLoading ? 'Bezahlt...' : 'Bezahlen'}

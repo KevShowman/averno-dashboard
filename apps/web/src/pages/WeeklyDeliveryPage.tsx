@@ -55,6 +55,7 @@ interface WeeklyDeliveryExclusion {
 interface WeeklyDeliveryStats {
   total: number
   pending: number
+  partiallyPaid: number
   paid: number
   confirmed: number
   overdue: number
@@ -186,6 +187,8 @@ export default function WeeklyDeliveryPage() {
     switch (status) {
       case 'PENDING':
         return <Badge variant="outline" className="text-yellow-600 border-yellow-600">Ausstehend</Badge>
+      case 'PARTIALLY_PAID':
+        return <Badge variant="outline" className="text-orange-600 border-orange-600">Teilbezahlt</Badge>
       case 'PAID':
         return <Badge variant="outline" className="text-blue-600 border-blue-600">Bezahlt</Badge>
       case 'CONFIRMED':
@@ -276,7 +279,7 @@ export default function WeeklyDeliveryPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           <Card className="lasanta-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
@@ -296,6 +299,18 @@ export default function WeeklyDeliveryPage() {
                 <div>
                   <div className="text-2xl font-bold text-white">{stats.pending}</div>
                   <div className="text-sm text-gray-400">Ausstehend</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lasanta-card">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-orange-500" />
+                <div>
+                  <div className="text-2xl font-bold text-white">{stats.partiallyPaid}</div>
+                  <div className="text-sm text-gray-400">Teilbezahlt</div>
                 </div>
               </div>
             </CardContent>
@@ -446,17 +461,17 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            {(delivery.status === 'PENDING' || (delivery.status === 'PAID' && (delivery.paidAmount || 0) < delivery.packages)) && (
+                            {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && (
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleOpenPayModal(delivery)}
                                 disabled={payDeliveryMutation.isPending}
                               >
-                                Bezahlen
+                                {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
                               </Button>
                             )}
-                            {delivery.status === 'PAID' && (delivery.paidAmount || 0) >= delivery.packages && (
+                            {delivery.status === 'PAID' && (
                               <Button
                                 variant="outline"
                                 size="sm"
