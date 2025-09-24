@@ -492,9 +492,11 @@ export default function KokainPage() {
                             <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs w-fit">
                               Wochenabgabe
                             </Badge>
-                            <div className="text-xs text-gray-400">
-                              {deposit.weeklyDeliveryPackages || 0} Pakete
-                            </div>
+                            {(deposit.weeklyDeliveryPackages || 0) > 0 && (
+                              <div className="text-xs text-gray-400">
+                                {deposit.weeklyDeliveryPackages} Pakete
+                              </div>
+                            )}
                             {deposit.payoutPackages && deposit.payoutPackages > 0 && (
                               <div className="text-xs text-green-400">
                                 +{deposit.payoutPackages} Auszahlung

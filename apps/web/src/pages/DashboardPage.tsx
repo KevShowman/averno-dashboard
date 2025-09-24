@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock } from 'lucide-react'
+import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock, Calendar, Scale } from 'lucide-react'
 import { formatCurrency } from '../lib/utils'
 
 interface DashboardStats {
@@ -217,26 +217,48 @@ export default function DashboardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <FlaskConical className="h-6 w-6 text-green-400" />
-                  <CardTitle className="text-white">Kokain-System</CardTitle>
+                  <Calendar className="h-6 w-6 text-blue-400" />
+                  <CardTitle className="text-white">Wochenabgabe-System</CardTitle>
                 </div>
                 <Badge variant="success">Aktiv</Badge>
               </div>
               <CardDescription className="text-gray-400">
-                Deposit-Verwaltung und Übergabe-System.
-                {stats.pendingDeposits > 0 && (
-                  <span className="text-yellow-400 font-medium">
-                    {' '}⏳ {stats.pendingDeposits} ausstehend
-                  </span>
-                )}
+                Verwaltung der wöchentlichen Kokain-Abgaben (300 Stück pro Woche).
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex justify-between items-center">
                 <div className="text-sm text-gray-400">
-                  {formatCurrency(stats.kokainPrice)} pro Paket
+                  Wöchentliche Abgaben
                 </div>
-                <Link to="/kokain">
+                <Link to="/weekly-delivery">
+                  <Button variant="lasanta" size="sm">
+                    Öffnen
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Scale className="h-6 w-6 text-red-400" />
+                  <CardTitle className="text-white">Sanktionssystem</CardTitle>
+                </div>
+                <Badge variant="success">Aktiv</Badge>
+              </div>
+              <CardDescription className="text-gray-400">
+                LaFamilia se cuida, Compadres! Verwaltung von Verstößen und Strafen.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Regelverstöße & Strafen
+                </div>
+                <Link to="/sanctions">
                   <Button variant="lasanta" size="sm">
                     Öffnen
                   </Button>

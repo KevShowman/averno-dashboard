@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, X, UserPlus, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
+import { hasRole } from '../lib/utils'
 import WeeklyDeliveryPayModal from '../components/WeeklyDeliveryPayModal'
 import CreateExclusionModal from '../components/CreateExclusionModal'
 
@@ -72,9 +73,9 @@ export default function WeeklyDeliveryPage() {
   const { user } = useAuthStore()
   
   // Check if user has leadership role
-  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR'
-  const isElPatron = user?.role === 'EL_PATRON'
-  const canPayForOthers = user?.role === 'EL_PATRON' || user?.role === 'DON'
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR'])
+  const isElPatron = hasRole(user, 'EL_PATRON')
+  const canPayForOthers = hasRole(user, ['EL_PATRON', 'DON'])
 
   // Queries
   const { data: currentWeekDeliveries = [], isLoading: loadingCurrentWeek } = useQuery({
@@ -146,9 +147,10 @@ export default function WeeklyDeliveryPage() {
 
   const autoSanctionMutation = useMutation({
     mutationFn: () => weeklyDeliveryApi.autoSanctionOverdue(),
-    onSuccess: () => {
-      toast.success('Überfällige Abgaben wurden sanktioniert')
+    onSuccess: (response) => {
+      toast.success(response.data.message || 'Überfällige Abgaben wurden sanktioniert')
       queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] }) // Auch Sanktionen aktualisieren
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Sanktionieren')
@@ -269,7 +271,7 @@ export default function WeeklyDeliveryPage() {
             </Button>
           )}
           
-          {isLeadership && (
+          {canPayForOthers && (
             <>
               <Button
                 variant="outline"
@@ -483,7 +485,7 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{delivery.packages}</TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${delivery.paidMoney} €`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} €`}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
@@ -566,17 +568,18 @@ export default function WeeklyDeliveryPage() {
                 </div>
               ) : (
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Benutzer</TableHead>
-                      <TableHead>Woche</TableHead>
-                      <TableHead>Pakete</TableHead>
-                      <TableHead>Bezahlt</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Bestätigt von</TableHead>
-                      <TableHead>Erstellt</TableHead>
-                    </TableRow>
-                  </TableHeader>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Benutzer</TableHead>
+                        <TableHead>Woche</TableHead>
+                        <TableHead>Pakete</TableHead>
+                        <TableHead>Bezahlt</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Bestätigt von</TableHead>
+                        <TableHead>Erstellt</TableHead>
+                        <TableHead>Aktionen</TableHead>
+                      </TableRow>
+                    </TableHeader>
                   <TableBody>
                     {allDeliveries.map((delivery: WeeklyDelivery) => (
                       <TableRow key={delivery.id}>
@@ -589,7 +592,7 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{delivery.packages}</TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${delivery.paidMoney} €`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} €`}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
@@ -598,6 +601,32 @@ export default function WeeklyDeliveryPage() {
                         </TableCell>
                         <TableCell>
                           {formatDate(delivery.weekStart)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            {/* Pay Button - nur für El Patron/Don für alle, oder für eigene */}
+                            {canPayForOthers || delivery.userId === user?.id ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePayDelivery(delivery)}
+                                disabled={delivery.status === 'CONFIRMED' || delivery.status === 'OVERDUE'}
+                              >
+                                {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
+                              </Button>
+                            ) : null}
+                            
+                            {/* Confirm Button - nur für Leadership */}
+                            {isLeadership && delivery.status === 'PAID' && (
+                              <Button
+                                variant="lasanta"
+                                size="sm"
+                                onClick={() => handleConfirmDelivery(delivery.id)}
+                              >
+                                Bestätigen
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

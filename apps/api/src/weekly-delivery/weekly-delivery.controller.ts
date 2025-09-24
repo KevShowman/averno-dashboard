@@ -96,10 +96,8 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.getCurrentWeekDeliveries();
   }
 
-  // Statistiken (Admin/Don)
+  // Statistiken (alle authentifizierten User)
   @Get('stats')
-  @Roles(Role.EL_PATRON, Role.DON)
-  @UseGuards(RolesGuard)
   async getStats() {
     return this.weeklyDeliveryService.getWeeklyDeliveryStats();
   }
@@ -142,9 +140,9 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.weeklyReset();
   }
 
-  // Ausschluss erstellen (Leaderschaft)
+  // Ausschluss erstellen (El Patron)
   @Post('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON)
   @UseGuards(RolesGuard)
   async createExclusion(@Body() exclusionDto: CreateExclusionDto, @Request() req) {
     const startDate = new Date(exclusionDto.startDate);
@@ -154,8 +152,8 @@ export class WeeklyDeliveryController {
       exclusionDto.userId,
       exclusionDto.reason,
       startDate,
-      req.user.id,
-      endDate
+      endDate,
+      req.user.id
     );
   }
 

@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage'
 import TickerPage from './pages/TickerPage'
 import WeeklyDeliveryPage from './pages/WeeklyDeliveryPage'
 import SanctionsPage from './pages/SanctionsPage'
+import UserManagementPage from './pages/UserManagementPage'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
@@ -110,6 +111,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <SanctionsPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/user-management" element={
+          <ProtectedRoute>
+            <Layout>
+              <UserManagementPage />
             </Layout>
           </ProtectedRoute>
         } />

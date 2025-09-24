@@ -76,10 +76,8 @@ export class SanctionsController {
     return this.sanctionsService.removeSanction(id);
   }
 
-  // Alle Sanktionen abrufen
+  // Alle Sanktionen abrufen (alle authentifizierten User)
   @Get()
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  @UseGuards(RolesGuard)
   async getSanctions(
     @Query('userId') userId?: string,
     @Query('status') status?: string,
@@ -114,10 +112,8 @@ export class SanctionsController {
     return this.sanctionsService.cleanupExpiredSanctions();
   }
 
-  // Statistiken (Admin/Don)
+  // Statistiken (alle authentifizierten User)
   @Get('stats')
-  @Roles(Role.EL_PATRON, Role.DON)
-  @UseGuards(RolesGuard)
   async getStats() {
     return this.sanctionsService.getSanctionStats();
   }
@@ -185,7 +181,7 @@ export class SanctionsController {
         {
           key: SanctionCategory.NICHT_BEZAHLT_48H,
           name: 'Nicht bezahlt (48h)',
-          description: 'Wochenabgabe nicht innerhalb von 48 Stunden bezahlt',
+          description: 'Sanktion nicht innerhalb von 48 Stunden bezahlt',
           penalties: [
             { level: 1, amount: 200000, penalty: null },
             { level: 2, amount: 400000, penalty: null },

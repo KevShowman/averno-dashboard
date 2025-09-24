@@ -16,10 +16,11 @@ import {
   FlaskConical,
   Clock,
   Calendar,
-  Scale
+  Scale,
+  Users
 } from 'lucide-react'
 import { Button } from './ui/button'
-import { cn, getDisplayName } from '../lib/utils'
+import { cn, getDisplayName, hasRole } from '../lib/utils'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -45,6 +46,7 @@ const navigation = [
   { name: 'Kokain', href: '/kokain', icon: FlaskConical },
   { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
   { name: 'Sanktionen', href: '/sanctions', icon: Scale },
+  { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
   { name: 'Audit-Log', href: '/audit', icon: FileText },
   { name: 'Einstellungen', href: '/settings', icon: Settings },
@@ -79,6 +81,11 @@ export default function Layout({ children }: LayoutProps) {
           </div>
           <nav className="mt-8 px-4">
             {navigation.map((item) => {
+              // Benutzerverwaltung nur für El Patron
+              if (item.name === 'Benutzerverwaltung' && !hasRole(user, 'EL_PATRON')) {
+                return null
+              }
+
               const isActive = location.pathname === item.href
               return (
                 <Link
@@ -111,6 +118,11 @@ export default function Layout({ children }: LayoutProps) {
         </div>
         <nav className="mt-8 px-4">
           {navigation.map((item) => {
+            // Benutzerverwaltung nur für El Patron
+            if (item.name === 'Benutzerverwaltung' && !hasRole(user, 'EL_PATRON')) {
+              return null
+            }
+
             const isActive = location.pathname === item.href
             return (
               <Link
@@ -147,9 +159,19 @@ export default function Layout({ children }: LayoutProps) {
                 <p className="text-sm font-medium text-white truncate">
                   {getDisplayName(user)}
                 </p>
-                <p className="text-xs text-gray-400 truncate">
-                  {getRoleDisplayName(user.role)}
-                </p>
+                <div className="text-xs text-gray-400 truncate">
+                  {user.allRoles && user.allRoles.length > 1 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {user.allRoles.map((role, index) => (
+                        <span key={index} className="inline-block bg-gray-700 px-1 rounded text-xs">
+                          {getRoleDisplayName(role)}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span>{getRoleDisplayName(user.role)}</span>
+                  )}
+                </div>
               </div>
               <Button
                 variant="ghost"

@@ -1,104 +1,191 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Role } from '@prisma/client';
-import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private prisma: PrismaService,
-    private auditService: AuditService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
+  // Alle User abrufen
   async getAllUsers() {
     return this.prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        avatarUrl: true,
+        role: true,
+        allRoles: true,
+        discordRoles: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { username: 'asc' },
     });
   }
 
-  async updateUserRole(userId: string, role: Role, updatedById: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    // Don darf nicht El Patrón Rolle zuweisen
-    const updater = await this.prisma.user.findUnique({ where: { id: updatedById } });
-    if (updater?.role === Role.DON && role === Role.EL_PATRON) {
-      throw new Error('Don kann keine El Patrón Rolle zuweisen');
-    }
-
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: { role },
-    });
-
-    await this.auditService.log({
-      userId: updatedById,
-      action: 'USER_ROLE_UPDATE',
-      entity: 'User',
-      entityId: userId,
-      meta: {
-        oldRole: user.role,
-        newRole: role,
-        targetUser: user.username,
+  // User nach ID abrufen
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        avatarUrl: true,
+        role: true,
+        allRoles: true,
+        discordRoles: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    return updatedUser;
+    if (!user) {
+      throw new NotFoundException('User nicht gefunden');
+    }
+
+    return user;
   }
 
-  async makeAdminByDiscordId(discordId: string, adminId: string) {
-    const user = await this.prisma.user.findUnique({ where: { discordId } });
-    if (!user) {
-      throw new Error('Benutzer mit dieser Discord ID nicht gefunden. Der Benutzer muss sich mindestens einmal angemeldet haben.');
-    }
-
-    if (user.role === Role.EL_PATRON) {
-      throw new Error('Benutzer ist bereits El Patron');
-    }
-
-    const updatedUser = await this.prisma.user.update({
+  // User nach Discord ID abrufen
+  async getUserByDiscordId(discordId: string) {
+    return this.prisma.user.findUnique({
       where: { discordId },
-      data: { role: Role.EL_PATRON },
-    });
-
-    await this.auditService.log({
-      userId: adminId,
-      action: 'ADMIN_CREATED',
-      entity: 'User',
-      entityId: user.id,
-      meta: {
-        oldRole: user.role,
-        newRole: Role.EL_PATRON,
-        targetUser: user.username,
-        discordId,
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        avatarUrl: true,
+        role: true,
+        allRoles: true,
+        discordRoles: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
-
-    return updatedUser;
   }
 
-  async updateIcName(userId: string, icFirstName: string, icLastName: string) {
-    const updatedUser = await this.prisma.user.update({
+  // User-Rollen aktualisieren
+  async updateUserRoles(userId: string, allRoles: Role[], updatedById: string) {
+    // Prüfen ob User existiert
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User nicht gefunden');
+    }
+
+    // Validierung der Rollen
+    if (allRoles.length === 0) {
+      throw new BadRequestException('User muss mindestens eine Rolle haben');
+    }
+
+    // Hauptrolle bestimmen (höchste Rolle)
+    const roleHierarchy = {
+      [Role.SOLDADO]: 1,
+      [Role.SICARIO]: 2,
+      [Role.ROUTENVERWALTUNG]: 3,
+      [Role.ASESOR]: 4,
+      [Role.LOGISTICA]: 5,
+      [Role.DON]: 6,
+      [Role.EL_PATRON]: 7,
+    };
+
+    const highestRole = allRoles.reduce((highest, current) => {
+      const currentLevel = roleHierarchy[current] || 0;
+      const highestLevel = roleHierarchy[highest] || 0;
+      return currentLevel > highestLevel ? current : highest;
+    });
+
+    // User aktualisieren
+    return this.prisma.user.update({
       where: { id: userId },
       data: {
-        icFirstName,
-        icLastName,
+        role: highestRole,
+        allRoles: allRoles,
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        avatarUrl: true,
+        role: true,
+        allRoles: true,
+        discordRoles: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
+  }
 
-    await this.auditService.log({
-      userId,
-      action: 'IC_NAME_UPDATED',
-      entity: 'User',
-      entityId: userId,
-      meta: {
-        icFirstName,
-        icLastName,
+  // User nach Name/Username suchen
+  async searchUsers(query: string) {
+    if (!query || query.trim().length < 2) {
+      return [];
+    }
+
+    const searchTerm = query.trim().toLowerCase();
+
+    return this.prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: searchTerm, mode: 'insensitive' } },
+          { icFirstName: { contains: searchTerm, mode: 'insensitive' } },
+          { icLastName: { contains: searchTerm, mode: 'insensitive' } },
+        ],
       },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        avatarUrl: true,
+        role: true,
+        allRoles: true,
+        discordRoles: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { username: 'asc' },
+      take: 20, // Limit auf 20 Ergebnisse
+    });
+  }
+
+  // Alle verfügbaren Rollen abrufen
+  async getAvailableRoles() {
+    return [
+      { key: Role.EL_PATRON, name: 'El Patrón', description: 'Höchste Autorität' },
+      { key: Role.DON, name: 'Don', description: 'Zweithöchste Autorität' },
+      { key: Role.ASESOR, name: 'Asesor', description: 'Berater und Führung' },
+      { key: Role.LOGISTICA, name: 'Logistica', description: 'Lagerverwaltung' },
+      { key: Role.ROUTENVERWALTUNG, name: 'Routenverwaltung', description: 'Route Management' },
+      { key: Role.SICARIO, name: 'Sicario', description: 'Erweiterte Berechtigungen' },
+      { key: Role.SOLDADO, name: 'Soldado', description: 'Standard Mitglied' },
+    ];
+  }
+
+  // User-Statistiken
+  async getUserStats() {
+    const totalUsers = await this.prisma.user.count();
+    
+    const roleStats = await this.prisma.user.groupBy({
+      by: ['role'],
+      _count: { role: true },
     });
 
-    return updatedUser;
+    return {
+      totalUsers,
+      roleDistribution: roleStats.map(stat => ({
+        role: stat.role,
+        count: stat._count.role,
+      })),
+    };
   }
 }

@@ -14,7 +14,7 @@ import {
   User,
   AlertTriangle
 } from 'lucide-react'
-import { formatDate, getDisplayName, getMovementTypeColor } from '../lib/utils'
+import { formatDate, getDisplayName, getMovementTypeColor, hasRole } from '../lib/utils'
 import { toast } from 'sonner'
 
 export default function LagerMovementsPage() {
@@ -26,7 +26,7 @@ export default function LagerMovementsPage() {
     queryFn: () => api.get('/items/movements/pending').then(res => res.data),
   })
 
-  const canApprove = ['EL_PATRON', 'LOGISTICA', 'DON'].includes(user?.role || '') // Temporär: Don kann auch genehmigen
+  const canApprove = hasRole(user, ['EL_PATRON', 'LOGISTICA', 'DON']) // Temporär: Don kann auch genehmigen
   const canView = true // Alle können ausstehende Bewegungen sehen
 
   const approveMovementMutation = useMutation({

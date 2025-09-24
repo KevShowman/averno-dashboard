@@ -65,6 +65,26 @@ export const sanctionsApi = {
   autoSanction48h: () => api.post('/sanctions/auto-sanction-48h'),
 }
 
+// Settings API
+export const settingsApi = {
+  getAllSettings: () => api.get('/settings'),
+  getSetting: (key: string) => api.get(`/settings/${key}`),
+  setSetting: (data: { key: string; value: any; type?: string }) => api.put('/settings', data),
+  deleteSetting: (key: string) => api.delete(`/settings/${key}`),
+  getWeeklyDeliverySettings: () => api.get('/settings/weekly-delivery/values'),
+  setWeeklyDeliverySettings: (data: { packages: number; moneyPerPackage: number }) => api.put('/settings/weekly-delivery', data),
+}
+
+// Users API
+export const usersApi = {
+  getAllUsers: () => api.get('/users'),
+  getUserById: (id: string) => api.get(`/users/${id}`),
+  searchUsers: (query: string) => api.get(`/users/search/${query}`),
+  getAvailableRoles: () => api.get('/users/roles/available'),
+  getUserStats: () => api.get('/users/stats/overview'),
+  updateUserRoles: (id: string, data: { allRoles: string[] }) => api.put(`/users/${id}/roles`, data),
+}
+
 // Kokain API (erweitert um Wochenabgabe-Integration)
 export const kokainApi = {
   createDeposit: (data: { packages: number; note?: string }) => 

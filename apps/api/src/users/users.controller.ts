@@ -1,48 +1,71 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Put,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Role, User } from '@prisma/client';
-import { UsersService } from './users.service';
+import { Role } from '@prisma/client';
+
+interface UpdateUserRolesDto {
+  allRoles: Role[];
+}
 
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  // Alle User abrufen (alle authentifizierten User)
   @Get()
-  @Roles(Role.EL_PATRON, Role.DON)
   async getAllUsers() {
     return this.usersService.getAllUsers();
   }
 
-  @Patch(':id/role')
-  @Roles(Role.EL_PATRON, Role.DON)
-  async updateUserRole(
-    @Param('id') userId: string,
-    @Body('role') role: Role,
-    @CurrentUser() user: User,
-  ) {
-    return this.usersService.updateUserRole(userId, role, user.id);
+  // User nach ID abrufen (alle authentifizierten User)
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    return this.usersService.getUserById(id);
   }
 
-  @Post('make-admin')
+  // User suchen (alle authentifizierten User)
+  @Get('search/:query')
+  async searchUsers(@Param('query') query: string) {
+    return this.usersService.searchUsers(query);
+  }
+
+  // Verfügbare Rollen abrufen (alle authentifizierten User)
+  @Get('roles/available')
+  async getAvailableRoles() {
+    return this.usersService.getAvailableRoles();
+  }
+
+  // User-Statistiken abrufen (alle authentifizierten User)
+  @Get('stats/overview')
+  async getUserStats() {
+    return this.usersService.getUserStats();
+  }
+
+  // User-Rollen aktualisieren (nur El Patron)
+  @Put(':id/roles')
   @Roles(Role.EL_PATRON)
-  async makeAdminByDiscordId(
-    @Body('discordId') discordId: string,
-    @CurrentUser() user: User,
+  @UseGuards(RolesGuard)
+  async updateUserRoles(
+    @Param('id') userId: string,
+    @Body() updateDto: UpdateUserRolesDto,
+    @Request() req
   ) {
-    return this.usersService.makeAdminByDiscordId(discordId, user.id);
-  }
-
-  @Patch('ic-name')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
-  async updateIcName(
-    @Body('icFirstName') icFirstName: string,
-    @Body('icLastName') icLastName: string,
-    @CurrentUser() user: User,
-  ) {
-    return this.usersService.updateIcName(user.id, icFirstName, icLastName);
+    return this.usersService.updateUserRoles(
+      userId,
+      updateDto.allRoles,
+      req.user.id
+    );
   }
 }

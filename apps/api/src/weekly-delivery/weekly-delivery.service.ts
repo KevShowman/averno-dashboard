@@ -2,12 +2,14 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../common/prisma/prisma.service';
 import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion, SanctionCategory } from '@prisma/client';
 import { DiscordService } from '../discord/discord.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class WeeklyDeliveryService {
   constructor(
     private prisma: PrismaService,
     private discordService: DiscordService,
+    private settingsService: SettingsService,
   ) {}
 
   // Wochenabgabe erstellen
@@ -46,12 +48,15 @@ export class WeeklyDeliveryService {
       throw new BadRequestException('User ist von der Wochenabgabe ausgeschlossen');
     }
 
+    // Hole Wochenabgabe-Settings
+    const settings = await this.settingsService.getWeeklyDeliverySettings();
+
     return this.prisma.weeklyDelivery.create({
       data: {
         userId,
         weekStart,
         weekEnd,
-        packages: 300, // Standard: 300 Kokain-Pakete
+        packages: settings.packages, // Aus Settings
       },
       include: {
         user: {
@@ -158,8 +163,61 @@ export class WeeklyDeliveryService {
     });
   }
 
+  // Aktuelle Woche abrufen
+  async getCurrentWeekDeliveries() {
+    const currentWeek = this.getCurrentWeek();
+    
+    return this.getWeeklyDeliveries(undefined, undefined, currentWeek.start, currentWeek.end);
+  }
+
+  // Ausschluss erstellen
+  async createExclusion(userId: string, reason: string, startDate: Date, endDate?: Date, createdById: string) {
+    const exclusion = await this.prisma.weeklyDeliveryExclusion.create({
+      data: {
+        userId,
+        reason,
+        startDate,
+        endDate,
+        isActive: true,
+        createdById,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    // Retrigger Index: Entferne alle aktiven Wochenabgaben für diesen User
+    const currentWeek = this.getCurrentWeek();
+    await this.prisma.weeklyDelivery.deleteMany({
+      where: {
+        userId,
+        weekStart: {
+          gte: startDate,
+        },
+        status: {
+          in: [WeeklyDeliveryStatus.PENDING, WeeklyDeliveryStatus.PARTIALLY_PAID],
+        },
+      },
+    });
+
+    return exclusion;
+  }
+
   // Alle Wochenabgaben abrufen
-  async getWeeklyDeliveries(status?: WeeklyDeliveryStatus, userId?: string) {
+  async getWeeklyDeliveries(status?: WeeklyDeliveryStatus, userId?: string, weekStart?: Date, weekEnd?: Date) {
     const where: any = {};
     
     if (status) {
@@ -168,6 +226,37 @@ export class WeeklyDeliveryService {
     
     if (userId) {
       where.userId = userId;
+    }
+    
+    if (weekStart && weekEnd) {
+      where.weekStart = {
+        gte: weekStart,
+        lte: weekEnd,
+      };
+    }
+
+    // Hole alle aktiven Exclusions
+    const activeExclusions = await this.prisma.weeklyDeliveryExclusion.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { endDate: null }, // Permanente Exclusions
+          { endDate: { gte: new Date() } }, // Temporäre Exclusions, die noch aktiv sind
+        ],
+      },
+      select: { userId: true },
+    });
+
+    const excludedUserIds = activeExclusions.map(ex => ex.userId);
+    
+    // Filtere excluded Users aus (nur wenn keine spezifische userId gesucht wird)
+    if (excludedUserIds.length > 0 && !userId) {
+      where.userId = {
+        notIn: excludedUserIds,
+      };
+    } else if (userId && excludedUserIds.includes(userId)) {
+      // Wenn die gesuchte userId excluded ist, leere Liste zurückgeben
+      return [];
     }
 
     return this.prisma.weeklyDelivery.findMany({

@@ -76,6 +76,38 @@ export function getDisplayName(user: { icFirstName?: string; icLastName?: string
   return user.username
 }
 
+export function hasRole(user: any, requiredRoles: string | string[]) {
+  if (!user) return false
+  
+  const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
+  
+  // Prüfe Hauptrolle
+  if (roles.includes(user.role)) return true
+  
+  // Prüfe alle Rollen
+  if (user.allRoles && user.allRoles.some((role: string) => roles.includes(role))) return true
+  
+  return false
+}
+
+export function hasAnyRole(user: any, requiredRoles: string[]) {
+  return hasRole(user, requiredRoles)
+}
+
+export function hasAllRoles(user: any, requiredRoles: string[]) {
+  if (!user) return false
+  
+  // Prüfe Hauptrolle
+  const hasMainRole = requiredRoles.includes(user.role)
+  
+  // Prüfe alle Rollen
+  const hasAllUserRoles = user.allRoles ? 
+    requiredRoles.every(role => user.allRoles.includes(role)) : 
+    hasMainRole
+  
+  return hasAllUserRoles
+}
+
 export function getMovementTypeColor(type: string) {
   switch (type) {
     case 'IN':
