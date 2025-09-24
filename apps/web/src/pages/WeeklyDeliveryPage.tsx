@@ -583,9 +583,13 @@ export default function WeeklyDeliveryPage() {
             {loadingArchives ? (
               <div className="text-center py-8 text-gray-400">Lade Archive...</div>
             ) : (
-              <div className="space-y-4">
-                {archives.map((archive: any) => (
-                  <div key={archive.id} className="bg-gray-800/50 rounded-lg p-4">
+            <div className="space-y-6">
+              {archives.map((archive: any, index: number) => (
+                <div key={archive.id}>
+                  {index > 0 && (
+                    <div className="border-t border-gray-700 my-6"></div>
+                  )}
+                  <div className="bg-gray-800/50 rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h3 className="font-semibold text-white">{archive.archiveName}</h3>
@@ -634,7 +638,8 @@ export default function WeeklyDeliveryPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
               </div>
             )}
           </CardContent>

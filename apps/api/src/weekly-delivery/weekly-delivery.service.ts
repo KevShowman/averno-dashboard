@@ -591,6 +591,20 @@ export class WeeklyDeliveryService {
 
     const sanctions = [];
 
+    // Finde den ersten El Patron als System-User für Sanktionen
+    const systemUser = await this.prisma.user.findFirst({
+      where: { role: 'EL_PATRON' },
+      select: { id: true }
+    });
+
+    if (!systemUser) {
+      console.warn('Kein El Patron gefunden für System-Sanktionen');
+      return {
+        message: 'Kein El Patron gefunden für System-Sanktionen',
+        sanctions: [],
+      };
+    }
+
     for (const delivery of unpaidDeliveries) {
       // Hole Wochenabgabe-Settings für Sanktions-Betrag
       const settings = await this.settingsService.getWeeklyDeliverySettings();
@@ -604,7 +618,7 @@ export class WeeklyDeliveryService {
           level: 1,
           description: `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
           amount: sanctionAmount, // Dynamischer Betrag basierend auf Settings
-          createdById: 'system', // System-Sanktion
+          createdById: systemUser.id, // Verwende ersten El Patron als System-User
           expiresAt: new Date(Date.now() + (28 * 24 * 60 * 60 * 1000)), // 4 Wochen
         },
       });
@@ -638,6 +652,20 @@ export class WeeklyDeliveryService {
 
     const sanctions = [];
 
+    // Finde den ersten El Patron als System-User für Sanktionen
+    const systemUser = await this.prisma.user.findFirst({
+      where: { role: 'EL_PATRON' },
+      select: { id: true }
+    });
+
+    if (!systemUser) {
+      console.warn('Kein El Patron gefunden für System-Sanktionen');
+      return {
+        message: 'Kein El Patron gefunden für System-Sanktionen',
+        sanctions: [],
+      };
+    }
+
     for (const delivery of overdueDeliveries) {
       // Status auf OVERDUE setzen
       await this.prisma.weeklyDelivery.update({
@@ -657,7 +685,7 @@ export class WeeklyDeliveryService {
           level: 1,
           description: `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
           amount: sanctionAmount, // Dynamischer Betrag basierend auf Settings
-          createdById: 'system', // System-Sanktion
+          createdById: systemUser.id, // Verwende ersten El Patron als System-User
           expiresAt: new Date(Date.now() + (28 * 24 * 60 * 60 * 1000)), // 4 Wochen
         },
       });
