@@ -18,4 +18,13 @@ export class AppController {
       service: 'LaSanta Calavera API',
     };
   }
+
+  @Get('version')
+  getVersion() {
+    return {
+      version: process.env.APP_VERSION || process.env.npm_package_version || '1.0.0',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+    };
+  }
 }

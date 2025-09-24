@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": fileURLToPath(new URL('./src', import.meta.url)),
     },
     preserveSymlinks: false,
     dedupe: ['react', 'react-dom'],
@@ -30,7 +30,24 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: []
+      external: [],
+      output: {
+        // Use content hash for cache busting
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
+        // Split chunks for better caching
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['lucide-react', 'sonner'],
+          query: ['@tanstack/react-query'],
+        }
+      }
+    },
+    // Ensure deterministic module IDs for better caching
+    modulePreload: {
+      polyfill: false
     }
   }
 })

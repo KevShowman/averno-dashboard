@@ -13,7 +13,9 @@ async function bootstrap() {
     origin: [
       configService.get('FRONTEND_URL', 'http://localhost:5173'),
       'http://185.237.14.61',
-      'http://185.237.14.61:3000'
+      'http://185.237.14.61:3000',
+      'https://lsc-nc.de',
+      'https://lsc-nc.de:3000'
     ],
     credentials: true,
   });
