@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const versionJsonPath = path.join(__dirname, '../apps/web/public/version.json');
+const versionJsonPath = path.join(__dirname, '../public/version.json');
 
 // Get current timestamp
 const now = new Date();

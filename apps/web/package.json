@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node ../../scripts/update-version.js && tsc && vite build",
-    "build:prod": "node ../../scripts/update-version.js && tsc && vite build --mode production",
+    "build": "node scripts/update-version.js && tsc && vite build",
+    "build:prod": "node scripts/update-version.js && tsc && vite build --mode production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "update-version": "node ../../scripts/update-version.js"
+    "update-version": "node scripts/update-version.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
