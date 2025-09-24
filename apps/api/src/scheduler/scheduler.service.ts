@@ -62,6 +62,26 @@ export class SchedulerService {
     }
   }
 
+  // Automatische 48h-Sanktionierung alle 6 Stunden
+  @Cron('0 */6 * * *', {
+    name: 'auto-sanction-48h',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleAutoSanction48h() {
+    this.logger.log('⏰ Starte automatische 48h-Sanktionierung...');
+    
+    try {
+      const result = await this.sanctionsService.autoSanctionUnpaidAfter48h();
+      this.logger.log(`✅ 48h-Sanktionierung abgeschlossen: ${result.processed} Sanktionen verarbeitet`);
+      
+      if (result.sanctions.length > 0) {
+        this.logger.log(`⚖️ Neue 48h-Sanktionen erstellt für: ${result.sanctions.map(s => s.new48hSanction.user.username).join(', ')}`);
+      }
+    } catch (error) {
+      this.logger.error('❌ Fehler bei der 48h-Sanktionierung:', error);
+    }
+  }
+
   // Manueller Test des Wochenresets (für Entwicklung)
   async manualWeeklyReset() {
     this.logger.log('🔧 Manueller Wochenreset gestartet...');
@@ -78,5 +98,11 @@ export class SchedulerService {
   async manualAutoSanctionOverdue() {
     this.logger.log('🔧 Manuelle automatische Sanktionierung gestartet...');
     return this.handleAutoSanctionOverdue();
+  }
+
+  // Manueller Test der 48h-Sanktionierung (für Entwicklung)
+  async manualAutoSanction48h() {
+    this.logger.log('🔧 Manuelle 48h-Sanktionierung gestartet...');
+    return this.handleAutoSanction48h();
   }
 }

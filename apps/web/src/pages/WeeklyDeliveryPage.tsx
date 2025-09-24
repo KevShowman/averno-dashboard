@@ -9,6 +9,7 @@ import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, 
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
 import WeeklyDeliveryPayModal from '../components/WeeklyDeliveryPayModal'
+import CreateExclusionModal from '../components/CreateExclusionModal'
 
 interface WeeklyDelivery {
   id: string
@@ -65,12 +66,15 @@ export default function WeeklyDeliveryPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [showExclusions, setShowExclusions] = useState(false)
   const [showPayModal, setShowPayModal] = useState(false)
+  const [showCreateExclusionModal, setShowCreateExclusionModal] = useState(false)
   const [selectedDelivery, setSelectedDelivery] = useState<WeeklyDelivery | null>(null)
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
   // Check if user has leadership role
   const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR'
+  const isElPatron = user?.role === 'EL_PATRON'
+  const canPayForOthers = user?.role === 'EL_PATRON' || user?.role === 'DON'
 
   // Queries
   const { data: currentWeekDeliveries = [], isLoading: loadingCurrentWeek } = useQuery({
@@ -162,6 +166,19 @@ export default function WeeklyDeliveryPage() {
     },
   })
 
+  const createExclusionMutation = useMutation({
+    mutationFn: (data: { userId: string; reason: string; startDate: string; endDate?: string }) =>
+      weeklyDeliveryApi.createExclusion(data),
+    onSuccess: () => {
+      toast.success('Ausschluss wurde erstellt')
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+      setShowCreateExclusionModal(false)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Ausschlusses')
+    },
+  })
+
   // Handler für Pay Modal
   const handleOpenPayModal = (delivery: WeeklyDelivery) => {
     setSelectedDelivery(delivery)
@@ -240,6 +257,17 @@ export default function WeeklyDeliveryPage() {
             <Users className="h-4 w-4" />
             {showExclusions ? 'Abgaben anzeigen' : 'Ausschlüsse anzeigen'}
           </Button>
+          
+          {isElPatron && (
+            <Button
+              variant="default"
+              onClick={() => setShowCreateExclusionModal(true)}
+              className="flex items-center gap-2"
+            >
+              <UserPlus className="h-4 w-4" />
+              Ausschluss erstellen
+            </Button>
+          )}
           
           {isLeadership && (
             <>
@@ -462,14 +490,17 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>
                           <div className="flex gap-2">
                             {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenPayModal(delivery)}
-                                disabled={payDeliveryMutation.isPending}
-                              >
-                                {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
-                              </Button>
+                              // Nur El Patron und Don können für andere bezahlen, andere nur für sich selbst
+                              (canPayForOthers || delivery.userId === user?.id) && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleOpenPayModal(delivery)}
+                                  disabled={payDeliveryMutation.isPending}
+                                >
+                                  {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
+                                </Button>
+                              )
                             )}
                             {delivery.status === 'PAID' && (
                               <Button
@@ -584,9 +615,16 @@ export default function WeeklyDeliveryPage() {
         onClose={handleClosePayModal}
         onConfirm={handlePayDelivery}
         requiredPackages={selectedDelivery?.packages || 300}
-        currentPaidAmount={selectedDelivery?.paidAmount || 0}
         currentPaidMoney={selectedDelivery?.paidMoney || 0}
         isLoading={payDeliveryMutation.isPending}
+      />
+
+      {/* Create Exclusion Modal */}
+      <CreateExclusionModal
+        isOpen={showCreateExclusionModal}
+        onClose={() => setShowCreateExclusionModal(false)}
+        onCreate={createExclusionMutation.mutate}
+        isLoading={createExclusionMutation.isPending}
       />
     </div>
   )

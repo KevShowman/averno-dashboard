@@ -6,6 +6,80 @@ import { Sanction, SanctionCategory, SanctionStatus } from '@prisma/client';
 export class SanctionsService {
   constructor(private prisma: PrismaService) {}
 
+  // Automatische 48h-Sanktionierung für unbezahlte Sanktionen
+  async autoSanctionUnpaidAfter48h() {
+    const fortyEightHoursAgo = new Date();
+    fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
+
+    // Finde alle aktiven Sanktionen, die älter als 48 Stunden sind
+    const unpaidSanctions = await this.prisma.sanction.findMany({
+      where: {
+        status: SanctionStatus.ACTIVE,
+        createdAt: {
+          lt: fortyEightHoursAgo,
+        },
+        category: {
+          notIn: [SanctionCategory.NICHT_BEZAHLT_48H, SanctionCategory.NICHT_BEZAHLT], // Ausschließen von bereits 48h-Sanktionen und Wochenabgabe-Sanktionen
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    const results = [];
+
+    for (const sanction of unpaidSanctions) {
+      // Prüfe, ob bereits eine aktive 48h-Sanktion für diesen User existiert
+      const existing48hSanction = await this.prisma.sanction.findFirst({
+        where: {
+          userId: sanction.userId,
+          category: SanctionCategory.NICHT_BEZAHLT_48H,
+          status: SanctionStatus.ACTIVE,
+        },
+      });
+
+      if (!existing48hSanction) {
+        // Berechne Level für 48h-Sanktion basierend auf vorherigen 48h-Sanktionen
+        const level = await this.calculateNextLevel(sanction.userId, SanctionCategory.NICHT_BEZAHLT_48H);
+        
+        // Erstelle 48h-Sanktion
+        const penalty = this.calculatePenalty(SanctionCategory.NICHT_BEZAHLT_48H, level);
+        
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 28);
+
+        const newSanction = await this.prisma.sanction.create({
+          data: {
+            userId: sanction.userId,
+            category: SanctionCategory.NICHT_BEZAHLT_48H,
+            level,
+            description: `Automatische Sanktion: Ursprüngliche Sanktion (${sanction.category}, Level ${sanction.level}) nicht innerhalb von 48 Stunden bezahlt`,
+            penaltyAmount: penalty.amount,
+            penaltyType: penalty.type,
+            expiresAt,
+            status: SanctionStatus.ACTIVE,
+            createdById: sanction.createdById, // Verwende den Ersteller der ursprünglichen Sanktion
+          },
+          include: {
+            user: true,
+            createdBy: true,
+          },
+        });
+
+        results.push({
+          originalSanction: sanction,
+          new48hSanction: newSanction,
+        });
+      }
+    }
+
+    return {
+      processed: results.length,
+      sanctions: results,
+    };
+  }
+
   // Automatisches Level berechnen basierend auf vorherigen Sanktionen
   async calculateNextLevel(userId: string, category: SanctionCategory): Promise<number> {
     const fourWeeksAgo = new Date();
@@ -15,7 +89,9 @@ export class SanctionsService {
       where: {
         userId,
         category,
-        status: SanctionStatus.ACTIVE,
+        status: {
+          in: [SanctionStatus.ACTIVE, SanctionStatus.PAID], // Berücksichtige sowohl aktive als auch bezahlte Sanktionen
+        },
         createdAt: {
           gte: fourWeeksAgo,
         },
@@ -29,7 +105,7 @@ export class SanctionsService {
       return 1; // Erste Sanktion dieser Kategorie
     }
 
-    // Höchstes Level der letzten 4 Wochen finden
+    // Höchstes Level der letzten 4 Wochen finden (auch bezahlte Sanktionen)
     const highestLevel = Math.max(...recentSanctions.map(s => s.level));
     
     // Nächstes Level (max. 4)

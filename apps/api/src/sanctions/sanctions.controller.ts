@@ -211,4 +211,12 @@ export class SanctionsController {
       req.user.id,
     );
   }
+
+  // Automatische 48h-Sanktionierung
+  @Post('auto-sanction-48h')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async autoSanctionUnpaidAfter48h() {
+    return this.sanctionsService.autoSanctionUnpaidAfter48h();
+  }
 }

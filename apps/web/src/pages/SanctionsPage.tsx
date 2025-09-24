@@ -153,6 +153,17 @@ export default function SanctionsPage() {
     },
   })
 
+  const autoSanction48hMutation = useMutation({
+    mutationFn: () => sanctionsApi.autoSanction48h(),
+    onSuccess: (response) => {
+      toast.success(`48h-Sanktionierung abgeschlossen: ${response.data.processed} Sanktionen verarbeitet`)
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler bei der 48h-Sanktionierung')
+    },
+  })
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -238,6 +249,16 @@ export default function SanctionsPage() {
               >
                 <X className="h-4 w-4" />
                 Bereinigen
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => autoSanction48hMutation.mutate()}
+                disabled={autoSanction48hMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <Clock className="h-4 w-4" />
+                48h Sanktionierung
               </Button>
               
               <Button

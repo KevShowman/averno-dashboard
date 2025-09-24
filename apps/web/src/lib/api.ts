@@ -62,6 +62,7 @@ export const sanctionsApi = {
   removeSanction: (id: string) => api.patch(`/sanctions/${id}/remove`),
   cleanupExpired: () => api.post('/sanctions/cleanup'),
   resetUserLevels: (data: { userId: string; category: string }) => api.post('/sanctions/reset-user-levels', data),
+  autoSanction48h: () => api.post('/sanctions/auto-sanction-48h'),
 }
 
 // Kokain API (erweitert um Wochenabgabe-Integration)
