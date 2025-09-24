@@ -250,7 +250,7 @@ export default function WeeklyDeliveryPage() {
     return user.username
   }
 
-  if (loadingCurrentWeek || loadingDeliveries || loadingStats) {
+  if (loadingCurrentWeek || loadingStats) {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">

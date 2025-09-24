@@ -328,26 +328,24 @@ export default function KassePage() {
                     x: {
                       grid: {
                         color: 'rgba(106, 31, 43, 0.2)',
-                        drawBorder: false,
                       },
                       ticks: {
                         color: 'rgb(156, 163, 175)',
                         font: {
                           size: 12,
-                          weight: '500'
+                          weight: 'normal'
                         }
                       }
                     },
                     y: {
                       grid: {
                         color: 'rgba(106, 31, 43, 0.2)',
-                        drawBorder: false,
                       },
                       ticks: {
                         color: 'rgb(156, 163, 175)',
                         font: {
                           size: 12,
-                          weight: '500'
+                          weight: 'normal'
                         },
                         callback: function(value) {
                           return formatCurrency(value as number);
