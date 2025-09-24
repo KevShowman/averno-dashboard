@@ -1,10 +1,14 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Sanction, SanctionCategory, SanctionStatus } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class SanctionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   // Automatische 48h-Sanktionierung für unbezahlte Sanktionen
   async autoSanctionUnpaidAfter48h() {
@@ -187,7 +191,7 @@ export class SanctionsService {
       throw new BadRequestException('Sanktion ist nicht aktiv');
     }
 
-    return this.prisma.sanction.update({
+    const paidSanction = await this.prisma.sanction.update({
       where: { id: sanctionId },
       data: {
         status: SanctionStatus.PAID,
@@ -209,6 +213,56 @@ export class SanctionsService {
           },
         },
       },
+    });
+
+    // Audit-Log
+    await this.auditService.log({
+      userId: sanction.userId,
+      action: 'SANCTION_PAY',
+      entity: 'Sanction',
+      entityId: sanctionId,
+      meta: {
+        category: sanction.category,
+        level: sanction.level,
+        amount: sanction.amount,
+        penalty: sanction.penalty,
+      },
+    });
+
+    return paidSanction;
+  }
+
+  // Recent sanctions für Live-Ticker
+  async getRecentSanctions() {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return this.prisma.sanction.findMany({
+      where: {
+        createdAt: {
+          gte: oneWeekAgo,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 50,
     });
   }
 

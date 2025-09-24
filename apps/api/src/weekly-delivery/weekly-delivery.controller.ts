@@ -102,6 +102,11 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.getWeeklyDeliveryStats();
   }
 
+  @Get('recent')
+  async getRecentDeliveries() {
+    return this.weeklyDeliveryService.getRecentDeliveries();
+  }
+
   // Vorauszahlung für mehrere Wochen (Leaderschaft)
   @Post('prepay')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)

@@ -4,9 +4,10 @@ import { WeeklyDeliveryService } from './weekly-delivery.service';
 import { PrismaModule } from '../common/prisma/prisma.module';
 import { DiscordModule } from '../discord/discord.module';
 import { SettingsModule } from '../settings/settings.module';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [PrismaModule, DiscordModule, SettingsModule],
+  imports: [PrismaModule, DiscordModule, SettingsModule, AuditModule],
   controllers: [WeeklyDeliveryController],
   providers: [WeeklyDeliveryService],
   exports: [WeeklyDeliveryService],

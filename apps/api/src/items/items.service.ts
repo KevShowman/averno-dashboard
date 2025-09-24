@@ -196,7 +196,21 @@ export class ItemsService {
       throw new NotFoundException('Item not found');
     }
 
-    if (item.isLocked && userRole !== Role.EL_PATRON && userRole !== Role.DON) {
+    // Hole User mit allRoles für korrekte Berechtigungsprüfung
+    const user = await this.prisma.user.findUnique({ 
+      where: { id: userId },
+      select: { role: true, allRoles: true }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Prüfe ob User El Patron oder Don ist (für gesperrte Items)
+    const isElPatronOrDon = user.role === Role.EL_PATRON || user.role === Role.DON ||
+                           (user.allRoles && (user.allRoles.includes(Role.EL_PATRON) || user.allRoles.includes(Role.DON)));
+
+    if (item.isLocked && !isElPatronOrDon) {
       throw new BadRequestException('Item is locked');
     }
 
@@ -238,8 +252,11 @@ export class ItemsService {
     }
 
     // Determine if movement needs approval
-    // Temporär: Don kann auch direkt ausführen (wie Logistica)
-    const needsApproval = userRole !== Role.EL_PATRON && userRole !== Role.LOGISTICA && userRole !== Role.DON;
+    // El Patron, Don und Logistica können direkt ausführen
+    const isLeadership = user.role === Role.EL_PATRON || user.role === Role.DON || user.role === Role.LOGISTICA ||
+                        (user.allRoles && (user.allRoles.includes(Role.EL_PATRON) || user.allRoles.includes(Role.DON) || user.allRoles.includes(Role.LOGISTICA)));
+    
+    const needsApproval = !isLeadership;
 
     if (needsApproval) {
       // Create pending movement without updating stock

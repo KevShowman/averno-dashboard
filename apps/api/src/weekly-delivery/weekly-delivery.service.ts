@@ -3,6 +3,7 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion, SanctionCategory } from '@prisma/client';
 import { DiscordService } from '../discord/discord.service';
 import { SettingsService } from '../settings/settings.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class WeeklyDeliveryService {
@@ -10,6 +11,7 @@ export class WeeklyDeliveryService {
     private prisma: PrismaService,
     private discordService: DiscordService,
     private settingsService: SettingsService,
+    private auditService: AuditService,
   ) {}
 
   // Wochenabgabe erstellen
@@ -107,7 +109,7 @@ export class WeeklyDeliveryService {
       newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
     }
 
-    return this.prisma.weeklyDelivery.update({
+    const updatedDelivery = await this.prisma.weeklyDelivery.update({
       where: { id: deliveryId },
       data: {
         paidAmount: totalPaidPackages,
@@ -125,6 +127,25 @@ export class WeeklyDeliveryService {
         },
       },
     });
+
+    // Audit-Log
+    await this.auditService.log({
+      userId: delivery.userId,
+      action: 'WEEKLY_DELIVERY_PAY',
+      entity: 'WeeklyDelivery',
+      entityId: deliveryId,
+      meta: {
+        paidAmount,
+        paidMoney,
+        totalPaidPackages,
+        totalPaidMoney,
+        newStatus,
+        weekStart: delivery.weekStart,
+        weekEnd: delivery.weekEnd,
+      },
+    });
+
+    return updatedDelivery;
   }
 
   // Wochenabgabe bestätigen
@@ -141,7 +162,7 @@ export class WeeklyDeliveryService {
       throw new BadRequestException('Wochenabgabe muss zuerst bezahlt werden');
     }
 
-    return this.prisma.weeklyDelivery.update({
+    const confirmedDelivery = await this.prisma.weeklyDelivery.update({
       where: { id: deliveryId },
       data: {
         status: WeeklyDeliveryStatus.CONFIRMED,
@@ -165,8 +186,59 @@ export class WeeklyDeliveryService {
         },
       },
     });
+
+    // Audit-Log
+    await this.auditService.log({
+      userId: confirmedById,
+      action: 'WEEKLY_DELIVERY_CONFIRM',
+      entity: 'WeeklyDelivery',
+      entityId: deliveryId,
+      meta: {
+        targetUserId: delivery.userId,
+        weekStart: delivery.weekStart,
+        weekEnd: delivery.weekEnd,
+        packages: delivery.packages,
+        paidAmount: delivery.paidAmount,
+        paidMoney: delivery.paidMoney,
+      },
+    });
+
+    return confirmedDelivery;
   }
 
+  // Recent deliveries für Live-Ticker
+  async getRecentDeliveries() {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return this.prisma.weeklyDelivery.findMany({
+      where: {
+        createdAt: {
+          gte: oneWeekAgo,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        confirmedBy: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 50,
+    });
+  }
 
   // Alle Wochenabgaben abrufen
   async getWeeklyDeliveries(status?: WeeklyDeliveryStatus, userId?: string, weekStart?: Date, weekEnd?: Date) {
@@ -281,6 +353,20 @@ export class WeeklyDeliveryService {
         status: {
           in: [WeeklyDeliveryStatus.PENDING, WeeklyDeliveryStatus.PARTIALLY_PAID],
         },
+      },
+    });
+
+    // Audit-Log
+    await this.auditService.log({
+      userId: createdById,
+      action: 'WEEKLY_DELIVERY_EXCLUSION_CREATE',
+      entity: 'WeeklyDeliveryExclusion',
+      entityId: exclusion.id,
+      meta: {
+        targetUserId: userId,
+        reason,
+        startDate,
+        endDate,
       },
     });
 

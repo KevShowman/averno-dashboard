@@ -542,8 +542,8 @@ export default function SanctionsPage() {
                         <div className="text-sm font-medium text-white">Level {penalty.level}</div>
                         <div className="text-xs text-gray-400">
                           {penalty.amount && penalty.penalty 
-                            ? `${penalty.amount.toLocaleString()} € / ${penalty.penalty}`
-                            : penalty.amount && `${penalty.amount.toLocaleString()} €`
+                            ? `${penalty.amount.toLocaleString('de-DE')} Schwarzgeld / ${penalty.penalty}`
+                            : penalty.amount && `${penalty.amount.toLocaleString('de-DE')} Schwarzgeld`
                           }
                           {penalty.penalty && !penalty.amount && penalty.penalty}
                           {!penalty.amount && !penalty.penalty && 'Verwarnung'}

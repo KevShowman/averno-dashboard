@@ -60,7 +60,7 @@ export class ItemsController {
   }
 
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async createItem(
     @Body() createItemDto: CreateItemDto,
@@ -70,7 +70,7 @@ export class ItemsController {
   }
 
   @Patch(':id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async updateItem(
     @Param('id') id: string,
@@ -81,7 +81,7 @@ export class ItemsController {
   }
 
   @Post(':id/move')
-  @Roles(Role.EL_PATRON, Role.ASESOR, Role.DON)
+  @Roles(Role.EL_PATRON, Role.ASESOR, Role.DON, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async moveItem(
     @Param('id') id: string,

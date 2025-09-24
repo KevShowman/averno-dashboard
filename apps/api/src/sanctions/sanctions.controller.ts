@@ -118,6 +118,11 @@ export class SanctionsController {
     return this.sanctionsService.getSanctionStats();
   }
 
+  @Get('recent')
+  async getRecentSanctions() {
+    return this.sanctionsService.getRecentSanctions();
+  }
+
   // Sanktionskategorien abrufen
   @Get('categories')
   async getCategories() {
