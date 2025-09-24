@@ -608,26 +608,28 @@ export default function WeeklyDeliveryPage() {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-white">{archive.totalDeliveries}</div>
-                        <div className="text-xs text-gray-400">Gesamt</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400">{archive.paidDeliveries}</div>
-                        <div className="text-xs text-gray-400">Bezahlt</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-red-400">{archive.overdueDeliveries}</div>
-                        <div className="text-xs text-gray-400">Überfällig</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-yellow-400">{archive.pendingDeliveries}</div>
-                        <div className="text-xs text-gray-400">Ausstehend</div>
-                      </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{archive.totalDeliveries}</div>
+                      <div className="text-xs text-gray-400">Gesamt</div>
                     </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-400">{archive.paidDeliveries}</div>
+                      <div className="text-xs text-gray-400">Bezahlt</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-400">{archive.overdueDeliveries}</div>
+                      <div className="text-xs text-gray-400">Überfällig</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-yellow-400">{archive.pendingDeliveries}</div>
+                      <div className="text-xs text-gray-400">Ausstehend</div>
+                    </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="border-t border-gray-600/30 mb-4"></div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="text-center">
                         <div className="text-lg font-semibold text-green-400">{archive.paidPackages}</div>
                         <div className="text-xs text-gray-400">Pakete bezahlt</div>

@@ -4,6 +4,7 @@ import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion, Sanction
 import { DiscordService } from '../discord/discord.service';
 import { SettingsService } from '../settings/settings.service';
 import { AuditService } from '../audit/audit.service';
+import { SanctionsService } from '../sanctions/sanctions.service';
 
 @Injectable()
 export class WeeklyDeliveryService {
@@ -12,7 +13,9 @@ export class WeeklyDeliveryService {
     private discordService: DiscordService,
     private settingsService: SettingsService,
     private auditService: AuditService,
+    private sanctionsService: SanctionsService,
   ) {}
+
 
   // Wochenabgabe erstellen
   async createWeeklyDelivery(userId: string, weekStart: Date, weekEnd: Date) {
@@ -606,22 +609,13 @@ export class WeeklyDeliveryService {
     }
 
     for (const delivery of unpaidDeliveries) {
-      // Hole Wochenabgabe-Settings für Sanktions-Betrag
-      const settings = await this.settingsService.getWeeklyDeliverySettings();
-      const sanctionAmount = settings.packages * settings.moneyPerPackage; // Gesamtwert der Wochenabgabe
-
-      // Sanktion erstellen
-      const sanction = await this.prisma.sanction.create({
-        data: {
-          userId: delivery.userId,
-          category: SanctionCategory.NICHT_BEZAHLT,
-          level: 1,
-          description: `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
-          amount: sanctionAmount, // Dynamischer Betrag basierend auf Settings
-          createdById: systemUser.id, // Verwende ersten El Patron als System-User
-          expiresAt: new Date(Date.now() + (28 * 24 * 60 * 60 * 1000)), // 4 Wochen
-        },
-      });
+      // Verwende SanctionsService für die Sanktions-Erstellung
+      const sanction = await this.sanctionsService.createSanction(
+        delivery.userId,
+        SanctionCategory.NICHT_BEZAHLT,
+        `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
+        systemUser.id
+      );
 
       sanctions.push(sanction);
     }
@@ -673,22 +667,13 @@ export class WeeklyDeliveryService {
         data: { status: WeeklyDeliveryStatus.OVERDUE },
       });
 
-      // Hole Wochenabgabe-Settings für Sanktions-Betrag
-      const settings = await this.settingsService.getWeeklyDeliverySettings();
-      const sanctionAmount = settings.packages * settings.moneyPerPackage; // Gesamtwert der Wochenabgabe
-
-      // Sanktion erstellen
-      const sanction = await this.prisma.sanction.create({
-        data: {
-          userId: delivery.userId,
-          category: SanctionCategory.NICHT_BEZAHLT,
-          level: 1,
-          description: `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
-          amount: sanctionAmount, // Dynamischer Betrag basierend auf Settings
-          createdById: systemUser.id, // Verwende ersten El Patron als System-User
-          expiresAt: new Date(Date.now() + (28 * 24 * 60 * 60 * 1000)), // 4 Wochen
-        },
-      });
+      // Verwende SanctionsService für die Sanktions-Erstellung
+      const sanction = await this.sanctionsService.createSanction(
+        delivery.userId,
+        SanctionCategory.NICHT_BEZAHLT,
+        `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
+        systemUser.id
+      );
 
       sanctions.push(sanction);
     }
