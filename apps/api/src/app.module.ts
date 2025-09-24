@@ -14,6 +14,7 @@ import { DiscordModule } from './discord/discord.module';
 import { WeeklyDeliveryModule } from './weekly-delivery/weekly-delivery.module';
 import { SanctionsModule } from './sanctions/sanctions.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { StartupModule } from './startup/startup.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -41,6 +42,7 @@ import { AppService } from './app.service';
     WeeklyDeliveryModule,
     SanctionsModule,
     SchedulerModule,
+    StartupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
