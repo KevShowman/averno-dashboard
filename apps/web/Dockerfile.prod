@@ -129,6 +129,8 @@ self.addEventListener('controllerchange', () => {
 EOF
     echo "✅ Service worker created successfully" && \
     ls -la dist/sw.js
+
+# Kopiere Version.json
 RUN echo "=== Copying Version.json ===" && \
     if [ -f "public/version.json" ]; then \
         cp public/version.json dist/version.json && \
