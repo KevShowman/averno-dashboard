@@ -32,6 +32,7 @@ model User {
   stockMovementsApproved StockMovement[] @relation("movement_approved_by")
   kokainDeposits KokainDeposit[] @relation("deposit_created_by")
   kokainConfirmations KokainDeposit[] @relation("deposit_confirmed_by")
+  kokainRejections KokainDeposit[] @relation("deposit_rejected_by")
   weeklyDeliveries WeeklyDelivery[] @relation("delivery_created_by")
   weeklyDeliveryConfirmations WeeklyDelivery[] @relation("delivery_confirmed_by")
   sanctionsCreated Sanction[] @relation("sanction_created_by")
@@ -205,6 +206,10 @@ model KokainDeposit {
   confirmedById String?
   confirmedBy User?  @relation("deposit_confirmed_by", fields: [confirmedById], references: [id])
   confirmedAt DateTime?
+  rejectedById String?
+  rejectedBy User?  @relation("deposit_rejected_by", fields: [rejectedById], references: [id])
+  rejectedAt DateTime?
+  rejectionReason String?
   note        String?
   uebergabeId String? // Referenz zur Übergabe-Session
   uebergabe   KokainUebergabe? @relation(fields: [uebergabeId], references: [id])

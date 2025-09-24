@@ -679,7 +679,7 @@ export class WeeklyDeliveryService {
       meta: {
         overdueCount: overdueResult.count,
         deletedCount: deletedCount.count,
-        indexedCount: indexResult.length,
+        indexedCount: indexResult.deliveries?.length || 0,
         sanctionsCount: sanctionResult.sanctions?.length || 0,
         currentWeek: currentWeek,
       },

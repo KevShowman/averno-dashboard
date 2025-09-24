@@ -13,7 +13,8 @@ import { WeeklyDeliveryService } from './weekly-delivery.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 interface CreateWeeklyDeliveryDto {
   weekStart: string;
