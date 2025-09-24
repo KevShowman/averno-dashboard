@@ -296,7 +296,7 @@ export default function KokainPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="lasanta-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-400">Bestätigte Pakete</CardTitle>
@@ -308,16 +308,37 @@ export default function KokainPage() {
             <div className="text-xs text-gray-400 mt-1">
               {summary?.totalWeeklyDeliveryPackages || 0} Wochenabgabe, {summary?.totalPayoutPackages || 0} Auszahlung
             </div>
+            <div className="text-xs text-gray-500 mt-1">
+              Wochenabgabe: {formatCurrency((summary?.totalWeeklyDeliveryPackages || 0) * (summary?.kokainPrice || 1000))}, 
+              Auszahlung: {formatCurrency((summary?.totalPayoutPackages || 0) * (summary?.kokainPrice || 1000))}
+            </div>
           </CardContent>
         </Card>
         
         <Card className="lasanta-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Teilnehmer</CardTitle>
+            <CardTitle className="text-sm text-gray-400">Wochenabgabe Gesamt</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {summary?.totalUsers || 0}
+            <div className="text-2xl font-bold text-blue-400">
+              {formatCurrency((summary?.totalWeeklyDeliveryPackages || 0) * (summary?.kokainPrice || 1000))}
+            </div>
+            <div className="text-sm text-gray-400">
+              {summary?.totalWeeklyDeliveryPackages || 0} Pakete
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="lasanta-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-gray-400">Auszahlung Gesamt</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-300">
+              {formatCurrency((summary?.totalPayoutPackages || 0) * (summary?.kokainPrice || 1000))}
+            </div>
+            <div className="text-sm text-gray-400">
+              {summary?.totalPayoutPackages || 0} Pakete
             </div>
           </CardContent>
         </Card>
@@ -801,13 +822,42 @@ export default function KokainPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Summary Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="lasanta-card">
                   <CardContent className="p-4">
                     <div className="text-2xl font-bold text-white">
                       {archiveDetails?.totalPackages || 0}
                     </div>
                     <div className="text-sm text-gray-400">Gesamt Pakete</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {archiveDetails?.totalWeeklyDeliveryPackages || 0} Wochenabgabe, {archiveDetails?.totalPayoutPackages || 0} Auszahlung
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      Wochenabgabe: {formatCurrency((archiveDetails?.totalWeeklyDeliveryPackages || 0) * (archiveDetails?.kokainPrice || 1000))}, 
+                      Auszahlung: {formatCurrency((archiveDetails?.totalPayoutPackages || 0) * (archiveDetails?.kokainPrice || 1000))}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="lasanta-card">
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-blue-400">
+                      {archiveDetails?.totalWeeklyDeliveryPackages || 0}
+                    </div>
+                    <div className="text-sm text-gray-400">Wochenabgabe</div>
+                    <div className="text-xs text-blue-300 mt-1">
+                      {formatCurrency((archiveDetails?.totalWeeklyDeliveryPackages || 0) * (archiveDetails?.kokainPrice || 1000))}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="lasanta-card">
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-gray-300">
+                      {archiveDetails?.totalPayoutPackages || 0}
+                    </div>
+                    <div className="text-sm text-gray-400">Auszahlung</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {formatCurrency((archiveDetails?.totalPayoutPackages || 0) * (archiveDetails?.kokainPrice || 1000))}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card className="lasanta-card">
@@ -816,14 +866,6 @@ export default function KokainPage() {
                       {formatCurrency(archiveDetails?.totalValue || 0)}
                     </div>
                     <div className="text-sm text-gray-400">Gesamtwert</div>
-                  </CardContent>
-                </Card>
-                <Card className="lasanta-card">
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold text-blue-400">
-                      {archiveDetails?.userSummary?.length || 0}
-                    </div>
-                    <div className="text-sm text-gray-400">Teilnehmer</div>
                   </CardContent>
                 </Card>
               </div>
@@ -836,7 +878,9 @@ export default function KokainPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-gray-400">Benutzer</TableHead>
-                        <TableHead className="text-gray-400">Pakete</TableHead>
+                        <TableHead className="text-gray-400">Gesamt Pakete</TableHead>
+                        <TableHead className="text-gray-400">Wochenabgabe</TableHead>
+                        <TableHead className="text-gray-400">Auszahlung</TableHead>
                         <TableHead className="text-gray-400">Wert</TableHead>
                         <TableHead className="text-gray-400">Einzelne Deposits</TableHead>
                       </TableRow>
@@ -860,6 +904,12 @@ export default function KokainPage() {
                           </TableCell>
                           <TableCell className="text-white font-medium">
                             {userData.totalPackages}
+                          </TableCell>
+                          <TableCell className="text-blue-400 font-medium">
+                            {userData.totalWeeklyDeliveryPackages || 0}
+                          </TableCell>
+                          <TableCell className="text-gray-300 font-medium">
+                            {userData.totalPayoutPackages || 0}
                           </TableCell>
                           <TableCell className="text-green-400 font-medium">
                             {formatCurrency(userData.totalValue)}

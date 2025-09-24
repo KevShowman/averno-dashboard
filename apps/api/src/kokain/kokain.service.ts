@@ -121,7 +121,7 @@ export class KokainService {
       
       // Verwende nur die benötigten Pakete für Wochenabgabe
       weeklyDeliveryPackages = Math.min(packages, remainingRequired);
-      payoutPackages = packages - weeklyDeliveryPackages;
+      payoutPackages = Math.max(0, packages - weeklyDeliveryPackages);
 
       // Wochenabgabe Status basierend auf Gesamtpaketen setzen
       let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
@@ -144,7 +144,7 @@ export class KokainService {
         status: DepositStatus.PENDING,
         weeklyDeliveryId: useForWeeklyDelivery ? weeklyDeliveryId : null,
         weeklyDeliveryPackages: weeklyDeliveryPackages > 0 ? weeklyDeliveryPackages : null,
-        payoutPackages: payoutPackages > 0 ? payoutPackages : null,
+        payoutPackages: useForWeeklyDelivery ? (payoutPackages > 0 ? payoutPackages : null) : packages,
       },
       include: {
         user: {
@@ -683,21 +683,30 @@ export class KokainService {
       throw new BadRequestException('Archiv nicht gefunden');
     }
 
-    // Calculate user summaries
+    // Calculate user summaries with weekly delivery separation
     const userSummary = archive.deposits.reduce((acc: any, deposit: any) => {
       const userId = deposit.userId;
       if (!acc[userId]) {
         acc[userId] = {
           user: deposit.user,
           totalPackages: 0,
+          totalWeeklyDeliveryPackages: 0,
+          totalPayoutPackages: 0,
           totalValue: 0,
           deposits: [],
         };
       }
       acc[userId].totalPackages += deposit.packages;
+      acc[userId].totalWeeklyDeliveryPackages += (deposit.weeklyDeliveryPackages || 0);
+      acc[userId].totalPayoutPackages += (deposit.payoutPackages || 0);
       acc[userId].deposits.push(deposit);
       return acc;
     }, {});
+
+    // Calculate totals
+    const totalPackages = archive.deposits.reduce((sum, deposit) => sum + deposit.packages, 0);
+    const totalWeeklyDeliveryPackages = archive.deposits.reduce((sum, deposit) => sum + (deposit.weeklyDeliveryPackages || 0), 0);
+    const totalPayoutPackages = archive.deposits.reduce((sum, deposit) => sum + (deposit.payoutPackages || 0), 0);
 
     // Calculate total value per user
     const kokainPrice = await this.getKokainPrice();
@@ -707,6 +716,9 @@ export class KokainService {
 
     return {
       ...archive,
+      totalPackages,
+      totalWeeklyDeliveryPackages,
+      totalPayoutPackages,
       userSummary: Object.values(userSummary),
       kokainPrice,
     };

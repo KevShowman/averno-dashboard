@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Scale, X, AlertTriangle } from 'lucide-react'
+import { Scale, X, AlertTriangle, Search, User } from 'lucide-react'
+import { weeklyDeliveryApi } from '../lib/api'
 
 interface CreateSanctionModalProps {
   isOpen: boolean
@@ -114,9 +115,55 @@ export default function CreateSanctionModal({
   const [description, setDescription] = useState<string>('')
   const [searchUser, setSearchUser] = useState<string>('')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [searchResults, setSearchResults] = useState<User[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const category = SANCTION_CATEGORIES.find(c => c.key === selectedCategory)
   const selectedPenalty = category?.penalties.find(p => p.level === selectedLevel)
+
+  const searchUsers = async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const response = await weeklyDeliveryApi.getDeliveries()
+      const allUsers = response.data.map((delivery: any) => delivery.user)
+      
+      const uniqueUsers = allUsers.filter((user: User, index: number, self: User[]) => 
+        index === self.findIndex(u => u.id === user.id)
+      )
+      
+      const filtered = uniqueUsers.filter((user: User) =>
+        user.username.toLowerCase().includes(query.toLowerCase()) ||
+        (user.icFirstName && user.icFirstName.toLowerCase().includes(query.toLowerCase())) ||
+        (user.icLastName && user.icLastName.toLowerCase().includes(query.toLowerCase()))
+      )
+      
+      setSearchResults(filtered.slice(0, 10))
+    } catch (error) {
+      console.error('Fehler beim Suchen von Usern:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchUsers(searchUser)
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchUser])
+
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user)
+    setSearchUser('')
+    setSearchResults([])
+  }
 
   const handleCreate = () => {
     if (selectedUser && selectedCategory && description.trim()) {
@@ -132,6 +179,7 @@ export default function CreateSanctionModal({
       setDescription('')
       setSearchUser('')
       setSelectedUser(null)
+      setSearchResults([])
     }
   }
 
@@ -143,6 +191,7 @@ export default function CreateSanctionModal({
     setDescription('')
     setSearchUser('')
     setSelectedUser(null)
+    setSearchResults([])
   }
 
   if (!isOpen) return null
@@ -179,27 +228,64 @@ export default function CreateSanctionModal({
               Benutzer auswählen
             </label>
             <div className="space-y-2">
-              <Input
-                placeholder="Benutzername suchen..."
-                value={searchUser}
-                onChange={(e) => setSearchUser(e.target.value)}
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Benutzername oder IC-Name eingeben..."
+                  value={searchUser}
+                  onChange={(e) => setSearchUser(e.target.value)}
+                  className="pl-10"
+                  disabled={isLoading}
+                />
+              </div>
+              
+              {searchResults.length > 0 && (
+                <div className="max-h-40 overflow-y-auto border border-gray-600 rounded-lg bg-gray-800">
+                  {searchResults.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => handleUserSelect(user)}
+                      className="w-full text-left p-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0"
+                    >
+                      <div className="text-white font-medium">{user.username}</div>
+                      <div className="text-gray-400 text-sm">
+                        {user.icFirstName && user.icLastName 
+                          ? `${user.icFirstName} ${user.icLastName}`
+                          : 'Kein IC-Name verfügbar'
+                        }
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {isSearching && (
+                <div className="text-gray-400 text-sm">Suche...</div>
+              )}
+              
               {selectedUser && (
                 <div className="bg-green-900/20 border border-green-500/20 p-3 rounded-lg">
-                  <div className="text-green-300 font-medium">Ausgewählt:</div>
-                  <div className="text-white">{selectedUser.username}</div>
-                  <div className="text-sm text-gray-400">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="h-4 w-4 text-green-400" />
+                    <span className="text-green-300 font-medium">Ausgewählter Benutzer:</span>
+                  </div>
+                  <div className="text-white text-lg">{selectedUser.username}</div>
+                  <div className="text-green-200 text-sm">
                     {selectedUser.icFirstName && selectedUser.icLastName 
                       ? `${selectedUser.icFirstName} ${selectedUser.icLastName}`
                       : 'Kein IC-Name verfügbar'
                     }
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedUser(null)}
+                    className="mt-2 text-red-400 hover:text-red-300"
+                  >
+                    Auswahl entfernen
+                  </Button>
                 </div>
               )}
-              <div className="text-sm text-gray-400">
-                Hinweis: Benutzer-Auswahl wird über die API implementiert
-              </div>
             </div>
           </div>
 
