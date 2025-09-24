@@ -64,7 +64,6 @@ interface WeeklyDeliveryStats {
 }
 
 export default function WeeklyDeliveryPage() {
-  const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [showExclusions, setShowExclusions] = useState(false)
   const [showPayModal, setShowPayModal] = useState(false)
   const [showCreateExclusionModal, setShowCreateExclusionModal] = useState(false)
@@ -83,10 +82,6 @@ export default function WeeklyDeliveryPage() {
     queryFn: () => weeklyDeliveryApi.getCurrentWeek().then(res => res.data),
   })
 
-  const { data: allDeliveries = [], isLoading: loadingDeliveries } = useQuery({
-    queryKey: ['weekly-delivery', 'all', selectedStatus],
-    queryFn: () => weeklyDeliveryApi.getDeliveries({ status: selectedStatus || undefined }).then(res => res.data),
-  })
 
   const { data: exclusions = [], isLoading: loadingExclusions } = useQuery({
     queryKey: ['weekly-delivery', 'exclusions'],
@@ -568,117 +563,6 @@ export default function WeeklyDeliveryPage() {
             </CardContent>
           </Card>
 
-          {/* All Deliveries */}
-          <Card className="lasanta-card">
-            <CardHeader>
-              <CardTitle>Alle Wochenabgaben</CardTitle>
-              <CardDescription>
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    variant={selectedStatus === '' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedStatus('')}
-                  >
-                    Alle
-                  </Button>
-                  <Button
-                    variant={selectedStatus === 'PENDING' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedStatus('PENDING')}
-                  >
-                    Ausstehend
-                  </Button>
-                  <Button
-                    variant={selectedStatus === 'PAID' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedStatus('PAID')}
-                  >
-                    Bezahlt
-                  </Button>
-                  <Button
-                    variant={selectedStatus === 'CONFIRMED' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedStatus('CONFIRMED')}
-                  >
-                    Bestätigt
-                  </Button>
-                </div>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {allDeliveries.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  Keine Abgaben gefunden
-                </div>
-              ) : (
-                <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Benutzer</TableHead>
-                        <TableHead>Woche</TableHead>
-                        <TableHead>Pakete</TableHead>
-                        <TableHead>Bezahlt</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Bestätigt von</TableHead>
-                        <TableHead>Erstellt</TableHead>
-                        <TableHead>Aktionen</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                  <TableBody>
-                    {allDeliveries.map((delivery: WeeklyDelivery) => (
-                      <TableRow key={delivery.id}>
-                        <TableCell className="font-medium">
-                          {formatUserName(delivery.user)}
-                        </TableCell>
-                        <TableCell>
-                          {formatDate(delivery.weekStart)} - {formatDate(delivery.weekEnd)}
-                        </TableCell>
-                        <TableCell>{delivery.packages}</TableCell>
-                        <TableCell>
-                          {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney.toString().replace(/^0+/, '') || 0).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Schwarzgeld`}
-                          {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(delivery.status)}</TableCell>
-                        <TableCell>
-                          {delivery.confirmedBy?.username || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {formatDate(delivery.weekStart)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {/* Pay Button - nur für El Patron/Don für alle, oder für eigene */}
-                            {canPayForOthers || delivery.userId === user?.id ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handlePayDelivery(delivery)}
-                                disabled={delivery.status === 'CONFIRMED' || delivery.status === 'OVERDUE'}
-                              >
-                                {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
-                              </Button>
-                            ) : null}
-                            
-                            {/* Confirm Button - nur für Leadership */}
-                            {isLeadership && delivery.status === 'PAID' && (
-                              <Button
-                                variant="lasanta"
-                                size="sm"
-                                onClick={() => handleConfirmDelivery(delivery.id)}
-                              >
-                                Bestätigen
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
         </>
       )}
 
@@ -739,11 +623,7 @@ export default function WeeklyDeliveryPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-white">{archive.totalPackages}</div>
-                        <div className="text-xs text-gray-400">Pakete gesamt</div>
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="text-center">
                         <div className="text-lg font-semibold text-green-400">{archive.paidPackages}</div>
                         <div className="text-xs text-gray-400">Pakete bezahlt</div>

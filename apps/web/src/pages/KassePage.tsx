@@ -8,7 +8,29 @@ import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
 import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Plus, Minus } from 'lucide-react'
 import { formatCurrency, formatDate, getTransactionStatusColor, getDisplayName } from '../lib/utils'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  Filler,
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+)
 import MoneyTransactionModal from '../components/MoneyTransactionModal'
 import { toast } from 'sonner'
 
@@ -29,7 +51,7 @@ export default function KassePage() {
     queryFn: () => api.get('/cash/transactions').then(res => res.data),
   })
 
-  const { data: chartData, error: chartError } = useQuery({
+  const { data: chartData, error: chartError, isLoading: chartLoading } = useQuery({
     queryKey: ['cash-chart', selectedRange],
     queryFn: () => api.get(`/cash/chart?range=${selectedRange}`).then(res => res.data),
     retry: 1,
@@ -225,7 +247,13 @@ export default function KassePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {chartError ? (
+          {chartLoading ? (
+            <div className="h-80 flex items-center justify-center text-gray-400">
+              <div className="text-center">
+                <p>Lade Chart-Daten...</p>
+              </div>
+            </div>
+          ) : chartError ? (
             <div className="h-80 flex items-center justify-center text-red-400">
               <div className="text-center">
                 <p>Fehler beim Laden der Daten</p>
@@ -236,39 +264,108 @@ export default function KassePage() {
             </div>
           ) : chartData && chartData.length > 0 ? (
             <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="#9CA3AF"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="#9CA3AF"
-                    fontSize={12}
-                    tickFormatter={(value) => formatCurrency(value)}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: '#1F2937',
-                      border: '1px solid #6A1F2B',
-                      borderRadius: '8px',
-                      color: '#fff'
-                    }}
-                    labelFormatter={(label) => `Datum: ${label}`}
-                    formatter={(value: number) => [formatCurrency(value), 'Saldo']}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="balance" 
-                    stroke="#6A1F2B" 
-                    strokeWidth={2}
-                    dot={{ fill: '#6A1F2B', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, stroke: '#B08D57', strokeWidth: 2 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <Line
+                data={{
+                  labels: chartData.map(item => {
+                    if (selectedRange === 'year') {
+                      return new Date(item.date).toLocaleDateString('de-DE', { month: 'short' })
+                    }
+                    return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+                  }),
+                  datasets: [
+                    {
+                      label: 'Saldo',
+                      data: chartData.map(item => item.balance),
+                      borderColor: 'rgb(106, 31, 43)', // Lasanta rot
+                      backgroundColor: 'rgba(106, 31, 43, 0.1)',
+                      borderWidth: 3,
+                      fill: true,
+                      tension: 0.4,
+                      pointBackgroundColor: 'rgb(106, 31, 43)',
+                      pointBorderColor: 'rgb(176, 141, 87)', // Lasanta gold
+                      pointBorderWidth: 2,
+                      pointRadius: 5,
+                      pointHoverRadius: 7,
+                      pointHoverBorderWidth: 3,
+                    }
+                  ]
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: false
+                    },
+                    tooltip: {
+                      backgroundColor: 'rgb(31, 41, 55)',
+                      titleColor: 'rgb(249, 250, 251)',
+                      bodyColor: 'rgb(249, 250, 251)',
+                      borderColor: 'rgb(106, 31, 43)',
+                      borderWidth: 2,
+                      cornerRadius: 12,
+                      displayColors: false,
+                      titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                      },
+                      bodyFont: {
+                        size: 13
+                      },
+                      callbacks: {
+                        title: (context) => {
+                          const dataIndex = context[0].dataIndex;
+                          return new Date(chartData[dataIndex].date).toLocaleDateString('de-DE');
+                        },
+                        label: (context) => {
+                          const value = context.parsed.y;
+                          return `Saldo: ${formatCurrency(value)}`;
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: {
+                        color: 'rgba(106, 31, 43, 0.2)',
+                        drawBorder: false,
+                      },
+                      ticks: {
+                        color: 'rgb(156, 163, 175)',
+                        font: {
+                          size: 12,
+                          weight: '500'
+                        }
+                      }
+                    },
+                    y: {
+                      grid: {
+                        color: 'rgba(106, 31, 43, 0.2)',
+                        drawBorder: false,
+                      },
+                      ticks: {
+                        color: 'rgb(156, 163, 175)',
+                        font: {
+                          size: 12,
+                          weight: '500'
+                        },
+                        callback: function(value) {
+                          return formatCurrency(value as number);
+                        }
+                      }
+                    }
+                  },
+                  elements: {
+                    point: {
+                      hoverBorderWidth: 3
+                    }
+                  },
+                  interaction: {
+                    intersect: false,
+                    mode: 'index'
+                  }
+                }}
+              />
             </div>
           ) : (
             <div className="h-80 flex items-center justify-center text-gray-400">
