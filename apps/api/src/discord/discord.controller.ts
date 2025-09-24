@@ -117,18 +117,8 @@ export class DiscordController {
   @Roles(Role.EL_PATRON, Role.DON)
   async getRoleMappings() {
     try {
-      // Hier könnten wir die Rollen-Mappings aus der Datenbank abrufen
-      // Für jetzt geben wir eine statische Liste zurück
-      const roleMappings = [
-        { discordRoleId: '1402760679613661224', systemRole: 'EL_PATRON', name: 'El Patron' },
-        { discordRoleId: '1402760800216551494', systemRole: 'DON', name: 'Don' },
-        { discordRoleId: '1402760888561438862', systemRole: 'ASESOR', name: 'Asesor' },
-        { discordRoleId: '1402761109013925909', systemRole: 'LOGISTICA', name: 'Logistica' },
-        { discordRoleId: '1402760961097470025', systemRole: 'ROUTENVERWALTUNG', name: 'Inspector' },
-        { discordRoleId: '1402761049568051331', systemRole: 'ROUTENVERWALTUNG', name: 'Routenverwaltung' },
-        { discordRoleId: '1402761676851511356', systemRole: 'SICARIO', name: 'Sicario' },
-        { discordRoleId: '1402760263341707275', systemRole: 'SOLDADO', name: 'Soldado' }
-      ];
+      // Rollen-Mappings aus der Datenbank abrufen
+      const roleMappings = await this.discordService.getRoleMappings();
 
       return {
         message: 'Rollen-Mappings erfolgreich abgerufen',

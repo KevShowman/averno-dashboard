@@ -470,4 +470,27 @@ export class DiscordService {
       throw error;
     }
   }
+
+  // Rollen-Mappings aus der Datenbank abrufen
+  async getRoleMappings() {
+    try {
+      const mappings = await this.prisma.discordRoleMapping.findMany({
+        where: { isActive: true },
+        select: {
+          discordRoleId: true,
+          systemRole: true,
+          name: true,
+        }
+      });
+
+      return mappings.map(mapping => ({
+        discordRoleId: mapping.discordRoleId,
+        systemRole: mapping.systemRole,
+        name: mapping.name,
+      }));
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Rollen-Mappings:', error);
+      throw error;
+    }
+  }
 }
