@@ -161,7 +161,7 @@ export default function CreateExclusionModal({
                       onClick={() => handleUserSelect(user)}
                       className="w-full text-left p-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0"
                     >
-                      <div className="text-white font-medium">{user.username}</div>
+                      <div className="text-white font-medium">{getDisplayName(user)}</div>
                       <div className="text-gray-400 text-sm">
                         {user.icFirstName && user.icLastName 
                           ? `${user.icFirstName} ${user.icLastName}`

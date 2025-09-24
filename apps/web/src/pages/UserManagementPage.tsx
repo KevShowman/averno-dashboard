@@ -28,6 +28,15 @@ interface Role {
   description: string
 }
 
+interface UserStats {
+  totalUsers: number
+  roles: Array<{
+    role: string
+    count: number
+    name: string
+  }>
+}
+
 const roleIcons = {
   'EL_PATRON': Crown,
   'DON': Shield,
@@ -52,7 +61,7 @@ export default function UserManagementPage() {
     queryFn: () => usersApi.getAllUsers().then(res => res.data),
   })
 
-  const { data: userStats } = useQuery({
+  const { data: userStats, isLoading: statsLoading } = useQuery<UserStats>({
     queryKey: ['user-stats'],
     queryFn: () => usersApi.getUserStats().then(res => res.data),
   })
@@ -107,7 +116,7 @@ export default function UserManagementPage() {
     )
   }
 
-  if (isLoading) {
+  if (isLoading || statsLoading) {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
@@ -147,7 +156,7 @@ export default function UserManagementPage() {
             </CardContent>
           </Card>
 
-          {userStats.roleDistribution.map((roleStat) => {
+          {userStats.roles.map((roleStat) => {
             const Icon = roleIcons[roleStat.role as keyof typeof roleIcons] || UserIcon
             return (
               <Card key={roleStat.role} className="lasanta-card">
@@ -156,7 +165,7 @@ export default function UserManagementPage() {
                     <Icon className="h-5 w-5 text-primary" />
                     <div>
                       <div className="text-2xl font-bold text-white">{roleStat.count}</div>
-                      <div className="text-sm text-gray-400">{roleStat.role}</div>
+                      <div className="text-sm text-gray-400">{roleStat.name}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -219,7 +228,7 @@ export default function UserManagementPage() {
                           {user.avatarUrl ? (
                             <img
                               src={user.avatarUrl}
-                              alt={user.username}
+                              alt={getDisplayName(user)}
                               className="h-6 w-6 rounded-full"
                             />
                           ) : (
@@ -230,7 +239,7 @@ export default function UserManagementPage() {
                               {getDisplayName(user)}
                             </div>
                             <div className="text-gray-400 text-xs">
-                              @{user.username}
+                              @{getDisplayName(user)}
                             </div>
                           </div>
                         </div>

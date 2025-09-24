@@ -169,6 +169,14 @@ export default function DashboardPage() {
                   <div className="flex items-center space-x-3">
                     {module.key === 'lager' && <Package className="h-6 w-6 text-accent" />}
                     {module.key === 'kasse' && <DollarSign className="h-6 w-6 text-accent" />}
+                    {module.key === 'kokain' && <FlaskConical className="h-6 w-6 text-accent" />}
+                    {module.key === 'weekly-delivery' && <Calendar className="h-6 w-6 text-accent" />}
+                    {module.key === 'sanctions' && <Scale className="h-6 w-6 text-accent" />}
+                    {module.key === 'audit' && <Shield className="h-6 w-6 text-accent" />}
+                    {module.key === 'lager-movements' && <Clock className="h-6 w-6 text-accent" />}
+                    {module.key === 'ticker' && <Activity className="h-6 w-6 text-accent" />}
+                    {module.key === 'user-management' && <Users className="h-6 w-6 text-accent" />}
+                    {module.key === 'settings' && <BarChart3 className="h-6 w-6 text-accent" />}
                     <CardTitle className="text-white">{module.name}</CardTitle>
                   </div>
                   <Badge variant="success">Aktiv</Badge>
@@ -194,6 +202,51 @@ export default function DashboardPage() {
                       )}
                     </>
                   )}
+                  {module.key === 'kokain' && (
+                    <>
+                      Kokain-Depot-Verwaltung und Abgaben.
+                      {stats.pendingDeposits > 0 && (
+                        <span className="text-yellow-400 font-medium">
+                          {' '}⏳ {stats.pendingDeposits} ausstehend
+                        </span>
+                      )}
+                    </>
+                  )}
+                  {module.key === 'weekly-delivery' && (
+                    <>
+                      Verwaltung der wöchentlichen Kokain-Abgaben (300 Stück pro Woche).
+                    </>
+                  )}
+                  {module.key === 'sanctions' && (
+                    <>
+                      LaFamilia se cuida, Compadres! Verwaltung von Verstößen und Strafen.
+                    </>
+                  )}
+                  {module.key === 'audit' && (
+                    <>
+                      Vollständige Aktivitäts-Protokollierung und Nachverfolgung aller System-Aktionen.
+                    </>
+                  )}
+                  {module.key === 'lager-movements' && (
+                    <>
+                      Ausstehende Lagerbewegungen genehmigen oder ablehnen.
+                    </>
+                  )}
+                  {module.key === 'ticker' && (
+                    <>
+                      Echtzeit-Aktivitäts-Feed mit Filtern und Statistiken.
+                    </>
+                  )}
+                  {module.key === 'user-management' && (
+                    <>
+                      Verwalte Benutzer-Rollen und Berechtigungen.
+                    </>
+                  )}
+                  {module.key === 'settings' && (
+                    <>
+                      System-Einstellungen und Konfiguration.
+                    </>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -201,6 +254,14 @@ export default function DashboardPage() {
                   <div className="text-sm text-gray-400">
                     {module.key === 'lager' && `${stats.totalItems} Artikel`}
                     {module.key === 'kasse' && `${formatCurrency(stats.currentBalance)} Saldo`}
+                    {module.key === 'kokain' && `${stats.confirmedDeposits} Bestätigt`}
+                    {module.key === 'weekly-delivery' && `Wöchentliche Abgaben`}
+                    {module.key === 'sanctions' && `Regelverstöße & Strafen`}
+                    {module.key === 'audit' && `Alle Aktivitäten`}
+                    {module.key === 'lager-movements' && `Wartende Genehmigungen`}
+                    {module.key === 'ticker' && `Live Updates`}
+                    {module.key === 'user-management' && `Benutzerverwaltung`}
+                    {module.key === 'settings' && `System-Einstellungen`}
                   </div>
                   <Link to={`/${module.key}`}>
                     <Button variant="lasanta" size="sm">
@@ -212,87 +273,6 @@ export default function DashboardPage() {
             </Card>
           ))}
 
-          {/* Zusätzliche System-Module */}
-          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-6 w-6 text-blue-400" />
-                  <CardTitle className="text-white">Wochenabgabe-System</CardTitle>
-                </div>
-                <Badge variant="success">Aktiv</Badge>
-              </div>
-              <CardDescription className="text-gray-400">
-                Verwaltung der wöchentlichen Kokain-Abgaben (300 Stück pro Woche).
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-400">
-                  Wöchentliche Abgaben
-                </div>
-                <Link to="/weekly-delivery">
-                  <Button variant="lasanta" size="sm">
-                    Öffnen
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Scale className="h-6 w-6 text-red-400" />
-                  <CardTitle className="text-white">Sanktionssystem</CardTitle>
-                </div>
-                <Badge variant="success">Aktiv</Badge>
-              </div>
-              <CardDescription className="text-gray-400">
-                LaFamilia se cuida, Compadres! Verwaltung von Verstößen und Strafen.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-400">
-                  Regelverstöße & Strafen
-                </div>
-                <Link to="/sanctions">
-                  <Button variant="lasanta" size="sm">
-                    Öffnen
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Shield className="h-6 w-6 text-blue-400" />
-                  <CardTitle className="text-white">Audit-Logs</CardTitle>
-                </div>
-                <Badge variant="success">Aktiv</Badge>
-              </div>
-              <CardDescription className="text-gray-400">
-                Vollständige Aktivitäts-Protokollierung und Nachverfolgung aller System-Aktionen.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-400">
-                  Alle Aktivitäten
-                </div>
-                <Link to="/audit">
-                  <Button variant="lasanta" size="sm">
-                    Öffnen
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
             <CardHeader>

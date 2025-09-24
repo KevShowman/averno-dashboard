@@ -175,17 +175,42 @@ export class UsersService {
   async getUserStats() {
     const totalUsers = await this.prisma.user.count();
     
-    const roleStats = await this.prisma.user.groupBy({
-      by: ['role'],
-      _count: { role: true },
+    // Hole alle User mit ihren allRoles
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        role: true,
+        allRoles: true,
+      },
     });
+
+    // Zähle alle Rollen (sowohl Hauptrolle als auch allRoles)
+    const roleCounts: { [key: string]: number } = {};
+    
+    users.forEach(user => {
+      // Hauptrolle zählen
+      if (user.role) {
+        roleCounts[user.role] = (roleCounts[user.role] || 0) + 1;
+      }
+      
+      // allRoles zählen
+      if (user.allRoles && user.allRoles.length > 0) {
+        user.allRoles.forEach(role => {
+          roleCounts[role] = (roleCounts[role] || 0) + 1;
+        });
+      }
+    });
+
+    // Konvertiere zu Array für Frontend
+    const roleDistribution = Object.entries(roleCounts).map(([role, count]) => ({
+      role,
+      count,
+      name: this.getRoleDisplayName(role as Role),
+    }));
 
     return {
       totalUsers,
-      roleDistribution: roleStats.map(stat => ({
-        role: stat.role,
-        count: stat._count.role,
-      })),
+      roles: roleDistribution,
     };
   }
 }

@@ -149,7 +149,7 @@ export default function Layout({ children }: LayoutProps) {
               {user.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
-                  alt={user.username}
+                  alt={getDisplayName(user)}
                   className="h-8 w-8 rounded-full"
                 />
               ) : (
@@ -205,7 +205,7 @@ export default function Layout({ children }: LayoutProps) {
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
-                    alt={user.username}
+                    alt={getDisplayName(user)}
                     className="h-8 w-8 rounded-full"
                   />
                 ) : (

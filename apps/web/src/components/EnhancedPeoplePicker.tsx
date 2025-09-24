@@ -153,7 +153,7 @@ export default function EnhancedPeoplePicker({
                   {user.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
-                      alt={user.username}
+                      alt={getDisplayName(user)}
                       className="h-8 w-8 rounded-full"
                     />
                   ) : (
