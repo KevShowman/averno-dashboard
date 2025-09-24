@@ -202,20 +202,7 @@ export default function SanctionsPage() {
     }
   }
 
-  const getCategoryName = (category: string) => {
-    switch (category) {
-      case 'ABMELDUNG':
-        return 'Abmeldung'
-      case 'RESPEKTVERHALTEN':
-        return 'Respektverhalten'
-      case 'FUNKCHECK':
-        return 'Funkcheck'
-      case 'REAKTIONSPFLICHT':
-        return 'Reaktionspflicht'
-      default:
-        return category
-    }
-  }
+  // getCategoryName ist bereits oben definiert - entfernt diese duplizierte Funktion
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('de-DE')
