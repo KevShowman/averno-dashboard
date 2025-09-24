@@ -60,6 +60,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       state.queryClient.clear()
     }
     
+    // Reset login status for next login
+    sessionStorage.removeItem('hasLoggedIn')
+    
     window.location.href = '/login'
   },
 
@@ -89,6 +92,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // Clear all queries and refetch
         state.queryClient.clear()
         state.queryClient.invalidateQueries()
+      }
+      
+      // Check if this is a fresh login (not a page refresh)
+      const isFreshLogin = !sessionStorage.getItem('hasLoggedIn')
+      if (isFreshLogin) {
+        sessionStorage.setItem('hasLoggedIn', 'true')
+        
+        // Clear browser cache for our domain
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => {
+              caches.delete(name)
+            })
+          })
+        }
+        
+        // Force a hard reload to ensure fresh assets
+        window.location.reload()
       }
     } catch (error) {
       console.error('Auth check failed:', error)
