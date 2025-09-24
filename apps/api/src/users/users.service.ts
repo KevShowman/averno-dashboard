@@ -184,21 +184,32 @@ export class UsersService {
       },
     });
 
-    // Zähle alle Rollen (sowohl Hauptrolle als auch allRoles)
+    // Zähle Rollen - jeder User wird nur einmal für seine höchste Rolle gezählt
     const roleCounts: { [key: string]: number } = {};
     
     users.forEach(user => {
-      // Hauptrolle zählen
-      if (user.role) {
-        roleCounts[user.role] = (roleCounts[user.role] || 0) + 1;
-      }
+      // Bestimme die höchste Rolle des Users
+      const userRoles = user.allRoles && user.allRoles.length > 0 ? user.allRoles : [user.role];
       
-      // allRoles zählen
-      if (user.allRoles && user.allRoles.length > 0) {
-        user.allRoles.forEach(role => {
-          roleCounts[role] = (roleCounts[role] || 0) + 1;
-        });
-      }
+      // Rollen-Hierarchie (höhere Zahlen = höhere Berechtigung)
+      const roleHierarchy = {
+        [Role.SOLDADO]: 1,
+        [Role.SICARIO]: 2,
+        [Role.ROUTENVERWALTUNG]: 3,
+        [Role.ASESOR]: 4,
+        [Role.LOGISTICA]: 5,
+        [Role.DON]: 6,
+        [Role.EL_PATRON]: 7,
+      };
+
+      const highestRole = userRoles.reduce((highest, current) => {
+        const currentLevel = roleHierarchy[current as Role] || 0;
+        const highestLevel = roleHierarchy[highest as Role] || 0;
+        return currentLevel > highestLevel ? current : highest;
+      }, userRoles[0]);
+
+      // Zähle nur die höchste Rolle
+      roleCounts[highestRole] = (roleCounts[highestRole] || 0) + 1;
     });
 
     // Konvertiere zu Array für Frontend

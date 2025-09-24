@@ -95,9 +95,13 @@ export class WeeklyDeliveryService {
     const totalPaidMoney = (delivery.paidMoney || 0) + (paidMoney || 0);
     const requiredPackages = delivery.packages;
     
+    // Hole Wochenabgabe-Settings für Geldberechnung
+    const settings = await this.settingsService.getWeeklyDeliverySettings();
+    const requiredMoney = requiredPackages * settings.moneyPerPackage;
+    
     // Status basierend auf Zahlung setzen
     let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
-    if (totalPaidPackages >= requiredPackages || totalPaidMoney >= requiredPackages * 1000) {
+    if (totalPaidPackages >= requiredPackages || totalPaidMoney >= requiredMoney) {
       newStatus = WeeklyDeliveryStatus.PAID;
     } else if (totalPaidPackages > 0 || totalPaidMoney > 0) {
       newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
@@ -349,6 +353,9 @@ export class WeeklyDeliveryService {
       throw new BadRequestException('User ist von der Wochenabgabe ausgeschlossen');
     }
 
+    // Hole Wochenabgabe-Settings
+    const settings = await this.settingsService.getWeeklyDeliverySettings();
+
     const deliveries = [];
     const now = new Date();
     
@@ -380,7 +387,7 @@ export class WeeklyDeliveryService {
             userId,
             weekStart,
             weekEnd,
-            packages: 300,
+            packages: settings.packages,
             paidAmount,
             paidMoney,
             status: WeeklyDeliveryStatus.PAID,
@@ -409,6 +416,9 @@ export class WeeklyDeliveryService {
   async indexAllUsers() {
     // Erst alle Discord-Mitglieder importieren, die noch nicht in der users Tabelle sind
     await this.discordService.importDiscordMembers();
+    
+    // Hole Wochenabgabe-Settings
+    const settings = await this.settingsService.getWeeklyDeliverySettings();
     
     const users = await this.prisma.user.findMany({
       where: {
@@ -462,7 +472,7 @@ export class WeeklyDeliveryService {
               userId: user.id,
               weekStart: currentWeek.start,
               weekEnd: currentWeek.end,
-              packages: 300,
+              packages: settings.packages,
             },
             include: {
               user: {
@@ -513,6 +523,10 @@ export class WeeklyDeliveryService {
         data: { status: WeeklyDeliveryStatus.OVERDUE },
       });
 
+      // Hole Wochenabgabe-Settings für Sanktions-Betrag
+      const settings = await this.settingsService.getWeeklyDeliverySettings();
+      const sanctionAmount = settings.packages * settings.moneyPerPackage; // Gesamtwert der Wochenabgabe
+
       // Sanktion erstellen
       const sanction = await this.prisma.sanction.create({
         data: {
@@ -520,7 +534,7 @@ export class WeeklyDeliveryService {
           category: SanctionCategory.NICHT_BEZAHLT,
           level: 1,
           description: `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
-          amount: 100000, // 100k Schwarzgeld
+          amount: sanctionAmount, // Dynamischer Betrag basierend auf Settings
           createdById: 'system', // System-Sanktion
           expiresAt: new Date(Date.now() + (28 * 24 * 60 * 60 * 1000)), // 4 Wochen
         },

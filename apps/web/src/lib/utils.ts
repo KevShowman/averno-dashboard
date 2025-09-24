@@ -21,10 +21,8 @@ export function formatRelativeTime(date: string | Date) {
 
 export function formatCurrency(amount: number) {
   return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
     minimumFractionDigits: 0,
-  }).format(amount).replace('€', '$ Schwarz')
+  }).format(amount) + ' Schwarzgeld'
 }
 
 export function getRoleColor(role: string) {

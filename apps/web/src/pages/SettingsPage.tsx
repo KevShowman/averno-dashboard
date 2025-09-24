@@ -45,6 +45,10 @@ export default function SettingsPage() {
   
   // Kokain price state
   const [kokainPrice, setKokainPrice] = useState(1000)
+  
+  // Weekly delivery settings states
+  const [weeklyDeliveryPackages, setWeeklyDeliveryPackages] = useState(300)
+  const [weeklyDeliveryMoneyPerPackage, setWeeklyDeliveryMoneyPerPackage] = useState(1000)
 
   // Permission checks
   const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
@@ -63,6 +67,12 @@ export default function SettingsPage() {
     queryKey: ['kokain-price'],
     queryFn: () => api.get('/kokain/price').then(res => res.data),
     enabled: canManageKokainPrice,
+  })
+
+  const { data: weeklyDeliverySettings } = useQuery({
+    queryKey: ['weekly-delivery-settings'],
+    queryFn: () => api.get('/settings/weekly-delivery/values').then(res => res.data),
+    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
   })
 
   // Mutations
@@ -115,6 +125,18 @@ export default function SettingsPage() {
     },
   })
 
+  const saveWeeklyDeliverySettingsMutation = useMutation({
+    mutationFn: (data: { packages: number; moneyPerPackage: number }) =>
+      api.put('/settings/weekly-delivery', data),
+    onSuccess: () => {
+      toast.success('Wochenabgabe-Einstellungen gespeichert')
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery-settings'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Speichern der Einstellungen')
+    },
+  })
+
   // Set initial values
   useEffect(() => {
     if (user?.icFirstName) setIcFirstName(user.icFirstName)
@@ -127,11 +149,35 @@ export default function SettingsPage() {
     }
   }, [kokainPriceData])
 
+  useEffect(() => {
+    if (weeklyDeliverySettings?.packages) {
+      setWeeklyDeliveryPackages(weeklyDeliverySettings.packages)
+    }
+    if (weeklyDeliverySettings?.moneyPerPackage) {
+      setWeeklyDeliveryMoneyPerPackage(weeklyDeliverySettings.moneyPerPackage)
+    }
+  }, [weeklyDeliverySettings])
+
   const handleUpdateIcName = () => {
     if (icFirstName.trim() && icLastName.trim()) {
       updateIcNameMutation.mutate({
         icFirstName: icFirstName.trim(),
         icLastName: icLastName.trim(),
+      })
+    }
+  }
+
+  const handleUpdateKokainPrice = () => {
+    if (kokainPrice > 0) {
+      updateKokainPriceMutation.mutate(kokainPrice)
+    }
+  }
+
+  const handleSaveWeeklyDeliverySettings = () => {
+    if (weeklyDeliveryPackages > 0 && weeklyDeliveryMoneyPerPackage > 0) {
+      saveWeeklyDeliverySettingsMutation.mutate({
+        packages: weeklyDeliveryPackages,
+        moneyPerPackage: weeklyDeliveryMoneyPerPackage,
       })
     }
   }
@@ -185,24 +231,6 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* System Settings - nur für El Patron, Don, Asesor */}
-      {canManageSettings && (
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Settings className="mr-2 h-5 w-5" />
-              System-Einstellungen
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Konfiguriere allgemeine System-Einstellungen
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-400">System-Einstellungen werden hier konfiguriert...</p>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Kokain-System-Einstellungen - für El Patron, Don, Asesor, Routenverwaltung */}
       {canManageKokainPrice && (
         <Card className="lasanta-card">
@@ -245,138 +273,64 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Admin Creation - Only for El Patron */}
-      {user?.role === 'EL_PATRON' && (
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Shield className="mr-2 h-5 w-5" />
-              El Patrón ernennen
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Mache einen Benutzer zum El Patrón über seine Discord ID
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">
-                Discord ID des neuen El Patrón
-              </label>
-              <div className="flex space-x-2">
-                <Input
-                  type="text"
-                  value={newAdminDiscordId}
-                  onChange={(e) => setNewAdminDiscordId(e.target.value)}
-                  className="flex-1"
-                  placeholder="123456789012345678"
-                />
-                <Button
-                  onClick={() => {
-                    if (newAdminDiscordId.trim()) {
-                      makeAdminByIdMutation.mutate(newAdminDiscordId.trim())
-                      setNewAdminDiscordId('')
-                    }
-                  }}
-                  disabled={makeAdminByIdMutation.isPending || !newAdminDiscordId.trim()}
-                  variant="lasanta"
-                >
-                  <Users className="mr-2 h-4 w-4" />
-                  El Patrón machen
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Der Benutzer muss sich mindestens einmal angemeldet haben, bevor er El Patrón werden kann.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Discord Management - nur für El Patron, Don */}
+      {/* Wochenabgabe-Einstellungen - für El Patron und Don */}
       {(user?.role === 'EL_PATRON' || user?.role === 'DON') && (
-        <>
-          <DiscordRoleSync />
-          <DiscordMembersManager />
-        </>
-      )}
-
-      {/* User Management - für El Patron, Don, Asesor, Routenverwaltung */}
-      {canManageUsers && (
         <Card className="lasanta-card">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              Benutzerverwaltung
+              <Package className="mr-2 h-5 w-5" />
+              Wochenabgabe-Einstellungen
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Verwalte Benutzerrollen und Berechtigungen
+              Konfiguriere die wöchentlichen Kokain-Abgaben
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {users && users.length > 0 ? (
-                <div className="space-y-3">
-                  {users.map((u: any) => (
-                    <div key={u.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={u.avatarUrl || '/default-avatar.png'}
-                          alt={u.username}
-                          className="w-8 h-8 rounded-full"
-                        />
-                        <div>
-                          <div className="font-medium text-white">{getDisplayName(u)}</div>
-                          <div className="text-sm text-gray-400">{u.username}</div>
-                          {u.email && (
-                            <div className="text-xs text-gray-500">{u.email}</div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getRoleColor(u.role)}>
-                          {getRoleDisplayName(u.role)}
-                        </Badge>
-                        {!u.icFirstName && !u.icLastName && (
-                          <Badge variant="outline" className="text-yellow-400 border-yellow-400">
-                            Kein IC-Name
-                          </Badge>
-                        )}
-                        {u.id !== user?.id && (
-                          <select
-                            value={u.role}
-                            onChange={(e) => updateUserRoleMutation.mutate({ userId: u.id, role: e.target.value })}
-                            className="bg-gray-700 text-white px-2 py-1 rounded text-sm"
-                          >
-                            <option value="SOLDADO">Soldado</option>
-                            <option value="SICARIO">Sicario</option>
-                            <option value="ROUTENVERWALTUNG">Routenverwaltung</option>
-                            <option value="LOGISTICA">Logistica</option>
-                            <option value="ASESOR">Asesor</option>
-                            <option value="DON">Don</option>
-                            <option value="EL_PATRON">El Patrón</option>
-                          </select>
-                        )}
-                        {u.id === user?.id && (
-                          <Badge variant="outline" className="text-blue-400 border-blue-400">
-                            Du
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">
+                    Pakete pro Woche
+                  </label>
+                  <Input
+                    type="number"
+                    value={weeklyDeliveryPackages}
+                    onChange={(e) => setWeeklyDeliveryPackages(Number(e.target.value))}
+                    placeholder="300"
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Anzahl der Kokain-Pakete, die wöchentlich abgegeben werden müssen
+                  </p>
                 </div>
-              ) : (
-                <div className="text-center py-8 text-gray-400">
-                  <Users className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                  <p>Keine Benutzer gefunden</p>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">
+                    Schwarzgeld pro Paket
+                  </label>
+                  <Input
+                    type="number"
+                    value={weeklyDeliveryMoneyPerPackage}
+                    onChange={(e) => setWeeklyDeliveryMoneyPerPackage(Number(e.target.value))}
+                    placeholder="1000"
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Schwarzgeld-Betrag pro Kokain-Paket für Wochenabgaben
+                  </p>
                 </div>
-              )}
-              {(!users || users.length === 0) && (
-                <div className="text-center py-8 text-gray-400">
-                  <Users className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                  <p>Keine Benutzer gefunden</p>
-                </div>
-              )}
+              </div>
+              
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSaveWeeklyDeliverySettings}
+                  disabled={saveWeeklyDeliverySettingsMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {saveWeeklyDeliverySettingsMutation.isPending ? 'Speichern...' : 'Einstellungen speichern'}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

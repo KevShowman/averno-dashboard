@@ -2,12 +2,14 @@ import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/com
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Role, DepositStatus, WeeklyDeliveryStatus } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class KokainService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    private settingsService: SettingsService,
   ) {}
 
   async createDeposit(userId: string, packages: number, note?: string) {
@@ -117,9 +119,12 @@ export class KokainService {
         throw new BadRequestException('Wochenabgabe wurde bereits vollständig bezahlt');
       }
 
+      // Hole Wochenabgabe-Settings für Berechnung
+      const settings = await this.settingsService.getWeeklyDeliverySettings();
+      
       // Berechne noch benötigte Pakete für Wochenabgabe
       const alreadyPaid = weeklyDelivery.paidAmount || 0;
-      const remainingRequired = Math.max(0, 300 - alreadyPaid);
+      const remainingRequired = Math.max(0, settings.packages - alreadyPaid);
       
       // Verwende nur die benötigten Pakete für Wochenabgabe
       weeklyDeliveryPackages = Math.min(packages, remainingRequired);
@@ -128,7 +133,7 @@ export class KokainService {
       // Wochenabgabe Status basierend auf Gesamtpaketen setzen
       let newStatus: WeeklyDeliveryStatus = WeeklyDeliveryStatus.PENDING;
       const totalPaid = alreadyPaid + weeklyDeliveryPackages;
-      if (totalPaid >= 300) {
+      if (totalPaid >= settings.packages) {
         newStatus = WeeklyDeliveryStatus.PAID;
       } else if (totalPaid > 0) {
         newStatus = WeeklyDeliveryStatus.PARTIALLY_PAID;
