@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/auth'
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import LagerPage from './pages/LagerPage'
@@ -18,8 +19,14 @@ import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
 
 function App() {
-  const { checkAuth, isLoading, user, isAuthenticated } = useAuthStore()
+  const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
+  const queryClient = useQueryClient()
   const [showIcNameModal, setShowIcNameModal] = useState(false)
+
+  // Set the query client in the auth store
+  useEffect(() => {
+    setQueryClient(queryClient)
+  }, [queryClient, setQueryClient])
 
   useEffect(() => {
     checkAuth()

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
+import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
@@ -20,10 +21,13 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
+  const { user, isAuthenticated } = useAuthStore()
+  
   const { data: modules, isLoading: modulesLoading } = useQuery({
     queryKey: ['modules'],
     queryFn: () => api.get('/modules').then(res => res.data),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated && !!user, // Only run when authenticated
   })
 
   const { data: lagerStats } = useQuery({
@@ -32,21 +36,25 @@ export default function DashboardPage() {
       criticalItems: res.data.items.length,
       totalItems: res.data.pagination.total
     })),
+    enabled: isAuthenticated && !!user,
   })
 
   const { data: cashStats } = useQuery({
     queryKey: ['cash-stats'],
     queryFn: () => api.get('/cash/summary').then(res => res.data),
+    enabled: isAuthenticated && !!user,
   })
 
   const { data: kokainStats } = useQuery({
     queryKey: ['kokain-stats'],
     queryFn: () => api.get('/kokain/summary').then(res => res.data),
+    enabled: isAuthenticated && !!user,
   })
 
   const { data: kokainPrice } = useQuery({
     queryKey: ['kokain-price'],
     queryFn: () => api.get('/kokain/price').then(res => res.data),
+    enabled: isAuthenticated && !!user,
   })
 
   const stats: DashboardStats = {

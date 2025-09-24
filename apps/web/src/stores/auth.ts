@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api } from '../lib/api'
+import { QueryClient } from '@tanstack/react-query'
 
 export interface User {
   id: string
@@ -18,6 +19,8 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   isCheckingAuth: boolean
+  queryClient: QueryClient | null
+  setQueryClient: (client: QueryClient) => void
   login: (redirectUrl?: string) => void
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
@@ -28,6 +31,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   isLoading: true,
   isCheckingAuth: false,
+  queryClient: null,
+  
+  setQueryClient: (client: QueryClient) => {
+    set({ queryClient: client })
+  },
 
   login: (redirectUrl = '/app') => {
     // Store the redirect URL for after login
@@ -36,16 +44,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
+    const state = get()
+    
     try {
       await api.post('/auth/logout')
-      set({ user: null, isAuthenticated: false, isLoading: false })
-      window.location.href = '/login'
     } catch (error) {
       console.error('Logout failed:', error)
-      // Force logout on client side even if server request fails
-      set({ user: null, isAuthenticated: false, isLoading: false })
-      window.location.href = '/login'
     }
+    
+    // Clear auth state and invalidate all queries
+    set({ user: null, isAuthenticated: false, isLoading: false })
+    
+    // Clear all queries when logging out
+    if (state.queryClient) {
+      state.queryClient.clear()
+    }
+    
+    window.location.href = '/login'
   },
 
   checkAuth: async () => {
@@ -60,12 +75,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     
     try {
       const response = await api.get('/auth/me')
+      const newUser = response.data
+      
       set({ 
-        user: response.data, 
+        user: newUser, 
         isAuthenticated: true, 
         isLoading: false,
         isCheckingAuth: false
       })
+      
+      // Invalidate all queries when user logs in successfully
+      if (state.queryClient) {
+        state.queryClient.invalidateQueries()
+      }
     } catch (error) {
       console.error('Auth check failed:', error)
       set({ 
