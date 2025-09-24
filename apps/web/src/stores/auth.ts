@@ -95,10 +95,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       
       // Force reload after login to ensure fresh state
-      // This is the same as pressing the refresh button
-      setTimeout(() => {
-        window.location.reload()
-      }, 100)
+      // Only reload if this is a fresh login (not a page refresh)
+      const isFreshLogin = !sessionStorage.getItem('hasLoggedIn')
+      if (isFreshLogin) {
+        sessionStorage.setItem('hasLoggedIn', 'true')
+        // Add a small delay to prevent infinite loops
+        setTimeout(() => {
+          // Double check we're still authenticated before reloading
+          if (get().isAuthenticated) {
+            window.location.reload()
+          }
+        }, 100)
+      }
     } catch (error) {
       console.error('Auth check failed:', error)
       set({ 
