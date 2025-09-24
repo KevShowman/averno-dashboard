@@ -7,14 +7,14 @@ export class SettingsService {
 
   // Alle Settings abrufen
   async getAllSettings() {
-    return this.prisma.setting.findMany({
+    return this.prisma.settings.findMany({
       orderBy: { key: 'asc' },
     });
   }
 
   // Setting nach Key abrufen
   async getSetting(key: string) {
-    const setting = await this.prisma.setting.findUnique({
+    const setting = await this.prisma.settings.findUnique({
       where: { key },
     });
 
@@ -28,17 +28,17 @@ export class SettingsService {
 
   // Setting erstellen oder aktualisieren
   async setSetting(key: string, value: any, type: string = 'string') {
-    const stringValue = this.stringifyValue(value, type);
+    const jsonValue = this.jsonifyValue(value, type);
 
-    return this.prisma.setting.upsert({
+    return this.prisma.settings.upsert({
       where: { key },
       update: {
-        value: stringValue,
+        value: jsonValue,
         type,
       },
       create: {
         key,
-        value: stringValue,
+        value: jsonValue,
         type,
       },
     });
@@ -46,7 +46,7 @@ export class SettingsService {
 
   // Setting löschen
   async deleteSetting(key: string) {
-    return this.prisma.setting.delete({
+    return this.prisma.settings.delete({
       where: { key },
     });
   }
@@ -73,26 +73,27 @@ export class SettingsService {
   }
 
   // Helper methods
-  private parseSettingValue(value: string, type: string) {
+  private parseSettingValue(value: any, type: string) {
     switch (type) {
       case 'number':
-        return Number(value);
+        return typeof value === 'number' ? value : Number(value);
       case 'boolean':
-        return value === 'true';
+        return typeof value === 'boolean' ? value : value === 'true';
       case 'json':
-        return JSON.parse(value);
+        return typeof value === 'object' ? value : JSON.parse(value);
       default:
-        return value;
+        return typeof value === 'string' ? value : String(value);
     }
   }
 
-  private stringifyValue(value: any, type: string): string {
+  private jsonifyValue(value: any, type: string): any {
     switch (type) {
       case 'number':
+        return typeof value === 'number' ? value : Number(value);
       case 'boolean':
-        return String(value);
+        return typeof value === 'boolean' ? value : value === 'true';
       case 'json':
-        return JSON.stringify(value);
+        return typeof value === 'object' ? value : JSON.parse(String(value));
       default:
         return String(value);
     }

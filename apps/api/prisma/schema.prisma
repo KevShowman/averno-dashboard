@@ -69,16 +69,6 @@ model Module {
   @@map("modules")
 }
 
-model Setting {
-  id        String  @id @default(cuid())
-  key       String  @unique // "weekly_delivery_packages", "weekly_delivery_money", etc.
-  value     String  // JSON string or simple value
-  type      String  @default("string") // "string", "number", "boolean", "json"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("settings")
-}
 
 model ItemCategory {
   id    String @id @default(cuid())
@@ -197,6 +187,7 @@ model Settings {
   id    String @id @default(cuid())
   key   String @unique
   value Json
+  type  String @default("string") // "string", "number", "boolean", "json"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
