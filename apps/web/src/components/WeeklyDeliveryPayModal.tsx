@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Package, DollarSign, X } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
 
 interface WeeklyDeliveryPayModalProps {
   isOpen: boolean
@@ -23,13 +25,21 @@ export default function WeeklyDeliveryPayModal({
 }: WeeklyDeliveryPayModalProps) {
   const [paidMoney, setPaidMoney] = useState<number>(0)
 
+  // Lade Wochenabgabe-Settings
+  const { data: weeklyDeliverySettings } = useQuery({
+    queryKey: ['weekly-delivery-settings'],
+    queryFn: () => api.get('/settings/weekly-delivery/values').then(res => res.data),
+  })
+
+  const moneyPerPackage = weeklyDeliverySettings?.moneyPerPackage || 1000
   const totalPaidMoney = currentPaidMoney + paidMoney
-  const requiredMoney = requiredPackages * 1000 // 1000€ pro Paket
+  const requiredMoney = requiredPackages * moneyPerPackage // Dynamischer Betrag pro Paket
   const remainingMoney = requiredMoney - totalPaidMoney
   const isFullyPaid = totalPaidMoney >= requiredMoney
+  const minimumPayment = requiredPackages * moneyPerPackage // Minimum = Gesamtbetrag
 
   const handleConfirm = () => {
-    if (paidMoney >= 300000) { // Minimum 300.000€
+    if (paidMoney >= minimumPayment) { // Dynamisches Minimum
       onConfirm({
         paidMoney: paidMoney,
       })
@@ -85,13 +95,13 @@ export default function WeeklyDeliveryPayModal({
               <div>
                 <div className="text-gray-400">Bereits bezahlt:</div>
                 <div className="text-white">
-                  {currentPaidMoney.toLocaleString('de-DE')} €
+                  {currentPaidMoney.toLocaleString('de-DE')} Schwarzgeld
                 </div>
               </div>
               <div>
                 <div className="text-gray-400">Noch benötigt:</div>
                 <div className="text-white">
-                  {Math.max(0, remainingMoney).toLocaleString('de-DE')} €
+                  {Math.max(0, remainingMoney).toLocaleString('de-DE')} Schwarzgeld
                 </div>
               </div>
             </div>
@@ -108,8 +118,8 @@ export default function WeeklyDeliveryPayModal({
                 <Input
                   id="paidMoney"
                   type="number"
-                  min="300000"
-                  placeholder="Mindestens 300.000 €"
+                  min={minimumPayment}
+                  placeholder={`Mindestens ${minimumPayment.toLocaleString('de-DE')} Schwarzgeld`}
                   value={paidMoney || ''}
                   onChange={(e) => setPaidMoney(Number(e.target.value) || 0)}
                   disabled={isLoading}
@@ -117,7 +127,7 @@ export default function WeeklyDeliveryPayModal({
                 />
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                Minimum: 300.000 € (entspricht 300 Kokain-Paketen)
+                Minimum: {minimumPayment.toLocaleString('de-DE')} Schwarzgeld (entspricht {requiredPackages} Kokain-Paketen)
               </div>
             </div>
           </div>
@@ -129,15 +139,15 @@ export default function WeeklyDeliveryPayModal({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Bereits bezahlt:</span>
-                  <span className="text-white font-medium">{currentPaidMoney.toLocaleString('de-DE')} €</span>
+                  <span className="text-white font-medium">{currentPaidMoney.toLocaleString('de-DE')} Schwarzgeld</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Neu hinzufügen:</span>
-                  <span className="text-white font-medium">{paidMoney.toLocaleString('de-DE')} €</span>
+                  <span className="text-white font-medium">{paidMoney.toLocaleString('de-DE')} Schwarzgeld</span>
                 </div>
                 <div className="flex justify-between border-t border-gray-600 pt-2">
                   <span className="text-gray-400">Gesamt bezahlt:</span>
-                  <span className="text-white font-medium">{totalPaidMoney.toLocaleString('de-DE')} €</span>
+                  <span className="text-white font-medium">{totalPaidMoney.toLocaleString('de-DE')} Schwarzgeld</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Status:</span>
@@ -161,7 +171,7 @@ export default function WeeklyDeliveryPayModal({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={isLoading || paidMoney < 300000}
+              disabled={isLoading || paidMoney < minimumPayment}
               className="flex-1"
             >
               {isLoading ? 'Bezahle...' : 'Bezahlen'}

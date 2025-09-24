@@ -430,14 +430,16 @@ export default function WeeklyDeliveryPage() {
                       </TableCell>
                       <TableCell>{exclusion.createdBy.username}</TableCell>
                       <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deactivateExclusionMutation.mutate(exclusion.id)}
-                          disabled={deactivateExclusionMutation.isPending}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                        {isLeadership && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deactivateExclusionMutation.mutate(exclusion.id)}
+                            disabled={deactivateExclusionMutation.isPending}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -508,7 +510,7 @@ export default function WeeklyDeliveryPage() {
                                 </Button>
                               )
                             )}
-                            {delivery.status === 'PAID' && (
+                            {delivery.status === 'PAID' && isLeadership && (
                               <Button
                                 variant="outline"
                                 size="sm"

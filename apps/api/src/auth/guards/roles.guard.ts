@@ -21,7 +21,7 @@ export class RolesGuard implements CanActivate {
     const { user } = context.switchToHttp().getRequest();
     
     if (!user) {
-      throw new ForbiddenException('User not authenticated');
+      throw new ForbiddenException('Benutzer nicht authentifiziert');
     }
 
     const hasRole = requiredRoles.some((role) => 
@@ -36,7 +36,7 @@ export class RolesGuard implements CanActivate {
     }
     
     if (!hasRole) {
-      throw new ForbiddenException(`Access denied. Required roles: ${requiredRoles.join(', ')}`);
+      throw new ForbiddenException(`Zugriff verweigert. Erforderliche Rollen: ${requiredRoles.join(', ')}`);
     }
 
     return true;

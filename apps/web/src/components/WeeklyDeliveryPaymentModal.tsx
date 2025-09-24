@@ -34,7 +34,7 @@ export default function WeeklyDeliveryPaymentModal({
 
   if (!isOpen) return null
 
-  const weeklyDeliveryPackages = Math.min(depositPackages, 300)
+  const weeklyDeliveryPackages = Math.min(depositPackages, pendingDelivery.packages)
   const payoutPackages = depositPackages - weeklyDeliveryPackages
 
   const handleConfirm = () => {

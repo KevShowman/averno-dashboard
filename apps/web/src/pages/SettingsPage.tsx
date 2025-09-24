@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
 import { api } from '../lib/api'
-import { formatCurrency, getRoleColor, getDisplayName } from '../lib/utils'
+import { formatCurrency, getRoleColor, getDisplayName, hasRole } from '../lib/utils'
 import DiscordRoleSync from '../components/DiscordRoleSync'
 import DiscordMembersManager from '../components/DiscordMembersManager'
 
@@ -54,7 +54,7 @@ export default function SettingsPage() {
   const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
   const canManageSettings = user?.role && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role)
   const canManageKokainPrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
-  const canChangeIcName = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'SICARIO', 'SOLDADO'].includes(user.role)
+  const canChangeIcName = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'LOGISTICA', 'SICARIO', 'SOLDADO'])
 
   // Queries
   const { data: users } = useQuery({

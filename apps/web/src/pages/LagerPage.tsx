@@ -8,7 +8,7 @@ import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
 import { Package, Search, AlertTriangle, Plus, Minus, RotateCcw } from 'lucide-react'
-import { formatDate, getRoleColor } from '../lib/utils'
+import { formatDate, getRoleColor, hasRole } from '../lib/utils'
 import StockMovementModal from '../components/StockMovementModal'
 
 export default function LagerPage() {
@@ -208,7 +208,7 @@ export default function LagerPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          {(user?.role === 'EL_PATRON' || user?.role === 'ASESOR' || user?.role === 'DON') && (
+                          {hasRole(user, ['EL_PATRON', 'ASESOR', 'DON', 'LOGISTICA']) && (
                             <>
                               <Button 
                                 size="sm" 
@@ -248,7 +248,7 @@ export default function LagerPage() {
                               </Button>
                             </>
                           )}
-                          {(user?.role === 'ASESOR' || user?.role === 'SOLDADO') && (
+                          {user?.role === 'SOLDADO' && (
                             <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
                               Nur lesen
                             </Badge>
