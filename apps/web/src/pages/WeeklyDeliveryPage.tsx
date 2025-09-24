@@ -202,6 +202,10 @@ export default function WeeklyDeliveryPage() {
     }
   }
 
+  const handleConfirmDelivery = (deliveryId: string) => {
+    confirmDeliveryMutation.mutate(deliveryId);
+  }
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PENDING':

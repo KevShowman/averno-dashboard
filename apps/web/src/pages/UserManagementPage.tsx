@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Users, Crown, Shield, UserCheck, Package, Route, AlertTriangle, User as UserIcon, Zap } from 'lucide-react'
+import { Users, Crown, Shield, UserCheck, Package, MapPin, AlertTriangle, User as UserIcon, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker'
 
@@ -33,7 +33,7 @@ const roleIcons = {
   'DON': Shield,
   'ASESOR': UserCheck,
   'LOGISTICA': Package,
-  'ROUTENVERWALTUNG': Route,
+  'ROUTENVERWALTUNG': MapPin,
   'SICARIO': AlertTriangle,
   'SOLDADO': UserIcon,
 }

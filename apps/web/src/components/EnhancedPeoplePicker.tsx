@@ -6,7 +6,7 @@ import { Badge } from './ui/badge'
 import { Input } from './ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Checkbox } from './ui/checkbox'
-import { Search, User, X, Crown, Shield, UserCheck, Package, Route, AlertTriangle, Zap } from 'lucide-react'
+import { Search, User, X, Crown, Shield, UserCheck, Package, MapPin, AlertTriangle, Zap } from 'lucide-react'
 import { getDisplayName, getRoleDisplayName, getRoleColor } from '../lib/utils'
 
 interface User {
@@ -40,7 +40,7 @@ const roleIcons = {
   'DON': Shield,
   'ASESOR': UserCheck,
   'LOGISTICA': Package,
-  'ROUTENVERWALTUNG': Route,
+  'ROUTENVERWALTUNG': MapPin,
   'SICARIO': AlertTriangle,
   'SOLDADO': User,
 }
