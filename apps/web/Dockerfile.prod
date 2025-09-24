@@ -32,10 +32,102 @@ RUN echo "=== Current directory structure ===" && find . -name "*.js" -o -name "
 RUN echo "=== Public directory contents ===" && ls -la public/ || echo "Public directory not found"
 RUN echo "=== Dist directory contents ===" && ls -la dist/ || echo "Dist directory not found"
 
-# Kopiere Service Worker und Version.json explizit
-RUN echo "=== Copying Service Worker ===" && \
-    cp public/sw.js dist/sw.js && \
-    echo "✅ Service worker copied successfully" && \
+# Erstelle Service Worker direkt
+RUN echo "=== Creating Service Worker ===" && \
+    cat > dist/sw.js << 'EOF'
+// Service Worker für LaSanta Calavera
+// Handles app updates and cache management
+
+const CACHE_NAME = 'lascanta-v1'
+const STATIC_CACHE = 'lascanta-static-v1'
+
+// Install event - cache static assets
+self.addEventListener('install', (event) => {
+  console.log('SW: Installing...')
+  self.skipWaiting() // Neue SW übernimmt sofort
+})
+
+// Activate event - clean up old caches
+self.addEventListener('activate', (event) => {
+  console.log('SW: Activating...')
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(), // Übernimmt alle Clients sofort
+      caches.keys().then(names => {
+        return Promise.all(
+          names.map(name => {
+            if (name !== CACHE_NAME && name !== STATIC_CACHE) {
+              console.log('SW: Deleting old cache:', name)
+              return caches.delete(name)
+            }
+          })
+        )
+      })
+    ])
+  )
+})
+
+// Fetch event - serve from cache or network
+self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return
+  
+  // Skip external requests
+  if (!event.request.url.startsWith(self.location.origin)) return
+  
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      // Return cached version if available
+      if (response) {
+        return response
+      }
+      
+      // Otherwise fetch from network
+      return fetch(event.request).then(response => {
+        // Don't cache if not a valid response
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response
+        }
+        
+        // Clone the response
+        const responseToCache = response.clone()
+        
+        // Cache static assets
+        if (event.request.url.includes('/assets/') || 
+            event.request.url.includes('.js') || 
+            event.request.url.includes('.css')) {
+          caches.open(STATIC_CACHE).then(cache => {
+            cache.put(event.request, responseToCache)
+          })
+        }
+        
+        return response
+      })
+    })
+  )
+})
+
+// Message event - handle app update requests
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
+// Handle app updates
+self.addEventListener('controllerchange', () => {
+  // Notify all clients about the update
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'APP_UPDATED',
+        message: 'Neue Version verfügbar!'
+      })
+    })
+  })
+})
+EOF
+    echo "✅ Service worker created successfully" && \
     ls -la dist/sw.js
 RUN echo "=== Copying Version.json ===" && \
     if [ -f "public/version.json" ]; then \
