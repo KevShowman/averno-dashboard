@@ -52,6 +52,10 @@ export default defineConfig({
     // Add cache busting to HTML
     assetsInlineLimit: 0,
     // Force new build every time
-    emptyOutDir: true
-  }
+    emptyOutDir: true,
+    // Copy public files including service worker
+    copyPublicDir: true
+  },
+  // Ensure service worker is copied to build output
+  publicDir: 'public'
 })
