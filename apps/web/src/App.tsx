@@ -18,11 +18,15 @@ import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { useVersionCheck } from './hooks/useVersionCheck'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
   const queryClient = useQueryClient()
   const [showIcNameModal, setShowIcNameModal] = useState(false)
+  
+  // Version checking with toast notifications
+  useVersionCheck()
 
   // Set the query client in the auth store
   useEffect(() => {

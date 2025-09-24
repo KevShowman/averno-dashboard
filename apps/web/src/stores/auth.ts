@@ -94,33 +94,83 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         state.queryClient.invalidateQueries()
       }
       
-      // Force component re-rendering after login
-      // This is the React way - no full page reload needed
-      const isFreshLogin = !sessionStorage.getItem('hasLoggedIn')
-      if (isFreshLogin) {
-        sessionStorage.setItem('hasLoggedIn', 'true')
-        
-        // Force a hard refresh to bypass cache issues
-        // This is necessary because the browser has cached old JavaScript files
-        setTimeout(() => {
-          // Clear all caches first
-          if ('caches' in window) {
-            caches.keys().then(names => {
-              names.forEach(name => {
-                caches.delete(name)
-              })
-            })
-          }
-          
-          // Force hard refresh with cache busting
-          const url = new URL(window.location.href)
-          url.searchParams.set('_t', Date.now().toString())
-          url.searchParams.set('_cache', 'bust')
-          
-          // Use location.replace to avoid history entry
-          window.location.replace(url.toString())
-        }, 200)
-      }
+      // Force immediate version check after login
+      // This ensures users with stale cache get the update notification
+      setTimeout(() => {
+        // Check if we need to show update notification for stale cache
+        fetch('/api/version')
+          .then(response => response.json())
+          .then(versionInfo => {
+            const storedVersion = localStorage.getItem('app-version')
+            
+            // If no stored version or version mismatch, show update notification
+            if (!storedVersion || storedVersion !== versionInfo.version) {
+              // Create a simple HTML notification that works even with stale cache
+              const notification = document.createElement('div')
+              notification.innerHTML = `
+                <div style="
+                  position: fixed;
+                  top: 20px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background: #1f2937;
+                  color: white;
+                  padding: 16px 24px;
+                  border-radius: 8px;
+                  border: 1px solid #6A1F2B;
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                  z-index: 9999;
+                  font-family: system-ui, -apple-system, sans-serif;
+                  max-width: 400px;
+                  text-align: center;
+                ">
+                  <div style="font-weight: 600; margin-bottom: 8px;">Neue Version verfügbar!</div>
+                  <div style="font-size: 14px; margin-bottom: 16px; opacity: 0.9;">
+                    Eine neue Version der Anwendung ist verfügbar. Bitte aktualisieren Sie die Seite.
+                  </div>
+                  <button onclick="
+                    if ('caches' in window) {
+                      caches.keys().then(names => {
+                        names.forEach(name => {
+                          caches.delete(name);
+                        });
+                      });
+                    }
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('_t', Date.now().toString());
+                    url.searchParams.set('_cache', 'bust');
+                    window.location.replace(url.toString());
+                  " style="
+                    background: #6A1F2B;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    margin-right: 8px;
+                  ">Aktualisieren</button>
+                  <button onclick="this.parentElement.parentElement.remove()" style="
+                    background: transparent;
+                    color: white;
+                    border: 1px solid #6A1F2B;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-weight: 500;
+                  ">Später</button>
+                </div>
+              `
+              document.body.appendChild(notification)
+            }
+            
+            // Store the current version
+            localStorage.setItem('app-version', versionInfo.version)
+          })
+          .catch(error => {
+            console.warn('Version check failed:', error)
+          })
+      }, 500)
     } catch (error) {
       console.error('Auth check failed:', error)
       set({ 
