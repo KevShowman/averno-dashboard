@@ -22,10 +22,18 @@ FROM base AS build
 # Build für Production
 RUN pnpm run build
 
+# Debug: Zeige alle Verzeichnisse und Dateien
+RUN echo "=== Current directory structure ===" && find . -name "*.js" -o -name "*.json" | head -20
+RUN echo "=== Public directory contents ===" && ls -la public/ || echo "Public directory not found"
+RUN echo "=== Dist directory contents ===" && ls -la dist/ || echo "Dist directory not found"
+
 # Kopiere Service Worker und Version.json explizit
-RUN cp public/sw.js dist/sw.js && echo "Service worker copied successfully" || echo "Failed to copy service worker"
-RUN cp public/version.json dist/version.json && echo "Version.json copied successfully" || echo "Failed to copy version.json"
-RUN echo "Final dist directory contents:" && ls -la dist/
+RUN if [ -f "public/sw.js" ]; then cp public/sw.js dist/sw.js && echo "Service worker copied successfully"; else echo "Service worker not found in public/"; fi
+RUN if [ -f "public/version.json" ]; then cp public/version.json dist/version.json && echo "Version.json copied successfully"; else echo "Version.json not found in public/"; fi
+
+# Finale Überprüfung
+RUN echo "=== Final dist directory contents ===" && ls -la dist/
+RUN echo "=== Checking for sw.js ===" && ls -la dist/sw.js || echo "sw.js not found in dist/"
 
 # Production Stage mit Nginx
 FROM nginx:alpine AS production
