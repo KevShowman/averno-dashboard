@@ -54,8 +54,10 @@ export const sanctionsApi = {
   getUserActiveSanctions: (userId: string) => api.get(`/sanctions/user/${userId}/active`),
   getStats: () => api.get('/sanctions/stats'),
   getCategories: () => api.get('/sanctions/categories'),
-  createSanction: (data: { userId: string; category: string; level: number; description: string }) => 
+  createSanction: (data: { userId: string; category: string; description: string }) => 
     api.post('/sanctions', data),
+  createSanctionManual: (data: { userId: string; category: string; level: number; description: string }) => 
+    api.post('/sanctions/manual', data),
   paySanction: (id: string) => api.patch(`/sanctions/${id}/pay`),
   removeSanction: (id: string) => api.patch(`/sanctions/${id}/remove`),
   cleanupExpired: () => api.post('/sanctions/cleanup'),

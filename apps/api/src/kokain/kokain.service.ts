@@ -21,6 +21,8 @@ export class KokainService {
         packages,
         note,
         status: DepositStatus.PENDING,
+        weeklyDeliveryPackages: null,
+        payoutPackages: packages,
       },
       include: {
         user: {
@@ -143,8 +145,8 @@ export class KokainService {
         note,
         status: DepositStatus.PENDING,
         weeklyDeliveryId: useForWeeklyDelivery ? weeklyDeliveryId : null,
-        weeklyDeliveryPackages: weeklyDeliveryPackages > 0 ? weeklyDeliveryPackages : null,
-        payoutPackages: useForWeeklyDelivery ? (payoutPackages > 0 ? payoutPackages : null) : packages,
+        weeklyDeliveryPackages: useForWeeklyDelivery ? (weeklyDeliveryPackages > 0 ? weeklyDeliveryPackages : null) : null,
+        payoutPackages: useForWeeklyDelivery ? payoutPackages : packages,
       },
       include: {
         user: {

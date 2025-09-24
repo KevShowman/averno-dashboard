@@ -409,9 +409,19 @@ export default function KokainPage() {
                       </TableCell>
                       <TableCell className="text-blue-400 font-medium">
                         {item.weeklyDeliveryPackages || 0}
+                        {(item.weeklyDeliveryPackages || 0) > 0 && (
+                          <div className="text-xs text-blue-300">
+                            {formatCurrency((item.weeklyDeliveryPackages || 0) * (summary?.kokainPrice || 1000))}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="text-gray-300 font-medium">
                         {item.payoutPackages || 0}
+                        {(item.payoutPackages || 0) > 0 && (
+                          <div className="text-xs text-gray-400">
+                            {formatCurrency((item.payoutPackages || 0) * (summary?.kokainPrice || 1000))}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="text-green-400 font-medium">
                         {formatCurrency(item.value)}
@@ -907,9 +917,19 @@ export default function KokainPage() {
                           </TableCell>
                           <TableCell className="text-blue-400 font-medium">
                             {userData.totalWeeklyDeliveryPackages || 0}
+                            {(userData.totalWeeklyDeliveryPackages || 0) > 0 && (
+                              <div className="text-xs text-blue-300">
+                                {formatCurrency((userData.totalWeeklyDeliveryPackages || 0) * (archiveDetails?.kokainPrice || 1000))}
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="text-gray-300 font-medium">
                             {userData.totalPayoutPackages || 0}
+                            {(userData.totalPayoutPackages || 0) > 0 && (
+                              <div className="text-xs text-gray-400">
+                                {formatCurrency((userData.totalPayoutPackages || 0) * (archiveDetails?.kokainPrice || 1000))}
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="text-green-400 font-medium">
                             {formatCurrency(userData.totalValue)}

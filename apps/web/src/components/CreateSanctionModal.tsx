@@ -11,7 +11,6 @@ interface CreateSanctionModalProps {
   onCreate: (data: {
     userId: string
     category: string
-    level: number
     description: string
   }) => void
   isLoading?: boolean
@@ -111,7 +110,6 @@ export default function CreateSanctionModal({
   isLoading = false,
 }: CreateSanctionModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedLevel, setSelectedLevel] = useState<number>(1)
   const [description, setDescription] = useState<string>('')
   const [searchUser, setSearchUser] = useState<string>('')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -119,7 +117,6 @@ export default function CreateSanctionModal({
   const [isSearching, setIsSearching] = useState(false)
 
   const category = SANCTION_CATEGORIES.find(c => c.key === selectedCategory)
-  const selectedPenalty = category?.penalties.find(p => p.level === selectedLevel)
 
   const searchUsers = async (query: string) => {
     if (query.length < 2) {
@@ -170,12 +167,10 @@ export default function CreateSanctionModal({
       onCreate({
         userId: selectedUser.id,
         category: selectedCategory,
-        level: selectedLevel,
         description: description.trim(),
       })
       // Reset form
       setSelectedCategory('')
-      setSelectedLevel(1)
       setDescription('')
       setSearchUser('')
       setSelectedUser(null)
@@ -187,7 +182,6 @@ export default function CreateSanctionModal({
     onClose()
     // Reset form
     setSelectedCategory('')
-    setSelectedLevel(1)
     setDescription('')
     setSearchUser('')
     setSelectedUser(null)
@@ -301,7 +295,6 @@ export default function CreateSanctionModal({
                   variant={selectedCategory === cat.key ? 'default' : 'outline'}
                   onClick={() => {
                     setSelectedCategory(cat.key)
-                    setSelectedLevel(1) // Reset level when category changes
                   }}
                   disabled={isLoading}
                   className="text-left justify-start h-auto p-3"
@@ -315,50 +308,23 @@ export default function CreateSanctionModal({
             </div>
           </div>
 
-          {/* Level Selection */}
+          {/* Auto Level Info */}
           {category && (
-            <div>
-              <label className="text-white block text-sm font-medium mb-2">
-                Level (1-4)
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {category.penalties.map((penalty) => (
-                  <Button
-                    key={penalty.level}
-                    variant={selectedLevel === penalty.level ? 'default' : 'outline'}
-                    onClick={() => setSelectedLevel(penalty.level)}
-                    disabled={isLoading}
-                    className="flex flex-col h-auto p-3"
-                  >
-                    <div className="font-medium">Level {penalty.level}</div>
-                    <div className="text-xs opacity-75">
-                      {penalty.amount && penalty.penalty 
-                        ? `${penalty.amount.toLocaleString()} € / ${penalty.penalty}`
-                        : penalty.amount && `${penalty.amount.toLocaleString()} €`
-                      }
-                      {penalty.penalty && !penalty.amount && penalty.penalty}
-                      {!penalty.amount && !penalty.penalty && 'Verwarnung'}
-                    </div>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Selected Penalty Preview */}
-          {selectedPenalty && (
-            <div className="bg-yellow-900/20 border border-yellow-500/20 p-4 rounded-lg">
+            <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                <span className="font-semibold text-yellow-300">Ausgewählte Strafe:</span>
+                <AlertTriangle className="h-4 w-4 text-blue-400" />
+                <span className="text-blue-300 font-medium">Automatische Level-Berechnung:</span>
               </div>
-              <div className="text-white">
-                {selectedPenalty.amount && selectedPenalty.penalty 
-                  ? `${selectedPenalty.amount.toLocaleString()} € / ${selectedPenalty.penalty}`
-                  : selectedPenalty.amount && `${selectedPenalty.amount.toLocaleString()} €`
-                }
-                {selectedPenalty.penalty && !selectedPenalty.amount && selectedPenalty.penalty}
-                {!selectedPenalty.amount && !selectedPenalty.penalty && 'Verwarnung'}
+              <div className="text-white text-sm">
+                Das Level wird automatisch basierend auf vorherigen Sanktionen derselben Kategorie 
+                innerhalb der letzten 4 Wochen berechnet.
+              </div>
+              <div className="text-blue-200 text-xs mt-1">
+                • Erste Sanktion: Level 1
+                <br />
+                • Wiederholung: Nächstes Level (max. Level 4)
+                <br />
+                • Nach 4 Wochen ohne Verstoß: Zurücksetzung auf Level 1
               </div>
             </div>
           )}

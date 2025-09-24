@@ -128,7 +128,7 @@ export default function SanctionsPage() {
   })
 
   const createSanctionMutation = useMutation({
-    mutationFn: (data: { userId: string; category: string; level: number; description: string }) =>
+    mutationFn: (data: { userId: string; category: string; description: string }) =>
       sanctionsApi.createSanction(data),
     onSuccess: () => {
       toast.success('Sanktion wurde erstellt')

@@ -22,13 +22,32 @@ interface CreateSanctionDto {
   description: string;
 }
 
+interface CreateSanctionWithAutoLevelDto {
+  userId: string;
+  category: SanctionCategory;
+  description: string;
+}
+
 @Controller('sanctions')
 @UseGuards(JwtAuthGuard)
 export class SanctionsController {
   constructor(private sanctionsService: SanctionsService) {}
 
-  // Sanktion erstellen (Leaderschaft: EL_PATRON, DON, ASESOR)
+  // Sanktion erstellen mit automatischem Level (Leaderschaft: EL_PATRON, DON, ASESOR)
   @Post()
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async createSanctionWithAutoLevel(@Body() createDto: CreateSanctionWithAutoLevelDto, @Request() req) {
+    return this.sanctionsService.createSanctionWithAutoLevel(
+      createDto.userId,
+      createDto.category,
+      createDto.description,
+      req.user.id
+    );
+  }
+
+  // Sanktion erstellen mit manuellem Level (Leaderschaft: EL_PATRON, DON, ASESOR)
+  @Post('manual')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   @UseGuards(RolesGuard)
   async createSanction(@Body() createDto: CreateSanctionDto, @Request() req) {

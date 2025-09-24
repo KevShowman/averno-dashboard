@@ -6,7 +6,48 @@ import { Sanction, SanctionCategory, SanctionStatus } from '@prisma/client';
 export class SanctionsService {
   constructor(private prisma: PrismaService) {}
 
-  // Sanktion erstellen
+  // Automatisches Level berechnen basierend auf vorherigen Sanktionen
+  async calculateNextLevel(userId: string, category: SanctionCategory): Promise<number> {
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+
+    const recentSanctions = await this.prisma.sanction.findMany({
+      where: {
+        userId,
+        category,
+        status: SanctionStatus.ACTIVE,
+        createdAt: {
+          gte: fourWeeksAgo,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (recentSanctions.length === 0) {
+      return 1; // Erste Sanktion dieser Kategorie
+    }
+
+    // Höchstes Level der letzten 4 Wochen finden
+    const highestLevel = Math.max(...recentSanctions.map(s => s.level));
+    
+    // Nächstes Level (max. 4)
+    return Math.min(highestLevel + 1, 4);
+  }
+
+  // Sanktion erstellen mit automatischem Level
+  async createSanctionWithAutoLevel(
+    userId: string,
+    category: SanctionCategory,
+    description: string,
+    createdById: string
+  ) {
+    const level = await this.calculateNextLevel(userId, category);
+    return this.createSanction(userId, category, level, description, createdById);
+  }
+
+  // Sanktion erstellen (manuelle Level)
   async createSanction(
     userId: string,
     category: SanctionCategory,
