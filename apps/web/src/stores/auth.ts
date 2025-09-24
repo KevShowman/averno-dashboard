@@ -30,6 +30,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isCheckingAuth: false,
 
   login: (redirectUrl = '/app') => {
+    // Store the redirect URL for after login
+    localStorage.setItem('redirectUrl', redirectUrl)
     window.location.href = `/api/auth/discord`
   },
 

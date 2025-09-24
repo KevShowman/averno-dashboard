@@ -55,7 +55,12 @@ const navigation = [
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
-  const { user, logout } = useAuthStore()
+  const { user, logout, isAuthenticated } = useAuthStore()
+
+  // Don't render navigation if not authenticated
+  if (!isAuthenticated || !user) {
+    return <div className="min-h-screen bg-gray-900">{children}</div>
+  }
 
   return (
     <div className="min-h-screen bg-gray-900">

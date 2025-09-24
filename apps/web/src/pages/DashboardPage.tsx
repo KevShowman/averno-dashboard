@@ -20,9 +20,10 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { data: modules } = useQuery({
+  const { data: modules, isLoading: modulesLoading } = useQuery({
     queryKey: ['modules'],
     queryFn: () => api.get('/modules').then(res => res.data),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   const { data: lagerStats } = useQuery({
@@ -162,7 +163,30 @@ export default function DashboardPage() {
       <div>
         <h2 className="text-xl font-semibold text-white mb-4">Module</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules?.map((module: any) => (
+          {modulesLoading ? (
+            // Loading skeleton for modules
+            Array.from({ length: 6 }).map((_, index) => (
+              <Card key={index} className="lasanta-card">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-6 w-6 bg-gray-600 rounded animate-pulse" />
+                      <div className="h-4 w-24 bg-gray-600 rounded animate-pulse" />
+                    </div>
+                    <div className="h-5 w-16 bg-gray-600 rounded animate-pulse" />
+                  </div>
+                  <div className="h-4 w-full bg-gray-600 rounded animate-pulse" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between items-center">
+                    <div className="h-4 w-20 bg-gray-600 rounded animate-pulse" />
+                    <div className="h-8 w-16 bg-gray-600 rounded animate-pulse" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            modules?.map((module: any) => (
             <Card key={module.key} className="lasanta-card hover:bg-gray-800/50 transition-colors">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -269,10 +293,10 @@ export default function DashboardPage() {
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-
+            </CardContent>
+          </Card>
+          ))
+          )}
 
           <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
             <CardHeader>

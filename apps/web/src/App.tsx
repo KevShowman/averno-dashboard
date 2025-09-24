@@ -18,12 +18,23 @@ import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
 
 function App() {
-  const { checkAuth, isLoading, user } = useAuthStore()
+  const { checkAuth, isLoading, user, isAuthenticated } = useAuthStore()
   const [showIcNameModal, setShowIcNameModal] = useState(false)
 
   useEffect(() => {
     checkAuth()
   }, [checkAuth])
+
+  // Check for redirect URL after login and redirect if needed
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const redirectUrl = localStorage.getItem('redirectUrl')
+      if (redirectUrl && redirectUrl !== window.location.pathname) {
+        localStorage.removeItem('redirectUrl')
+        window.location.href = redirectUrl
+      }
+    }
+  }, [isAuthenticated, user])
 
   // Show IC name modal if user is authenticated but has no IC name
   useEffect(() => {
