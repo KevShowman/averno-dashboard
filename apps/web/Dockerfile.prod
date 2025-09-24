@@ -23,8 +23,9 @@ FROM base AS build
 RUN pnpm run build
 
 # Kopiere Service Worker und Version.json explizit
-RUN cp public/sw.js dist/sw.js || echo "Service worker not found"
-RUN cp public/version.json dist/version.json || echo "Version.json not found"
+RUN cp public/sw.js dist/sw.js && echo "Service worker copied successfully" || echo "Failed to copy service worker"
+RUN cp public/version.json dist/version.json && echo "Version.json copied successfully" || echo "Failed to copy version.json"
+RUN echo "Final dist directory contents:" && ls -la dist/
 
 # Production Stage mit Nginx
 FROM nginx:alpine AS production
