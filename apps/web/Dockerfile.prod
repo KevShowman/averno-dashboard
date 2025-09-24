@@ -16,6 +16,9 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere Source Code
 COPY . .
 
+# Explizit Service Worker kopieren
+COPY public/sw.js ./public/sw.js
+
 # Build Stage
 FROM base AS build
 
@@ -29,16 +32,9 @@ RUN echo "=== Dist directory contents ===" && ls -la dist/ || echo "Dist directo
 
 # Kopiere Service Worker und Version.json explizit
 RUN echo "=== Copying Service Worker ===" && \
-    if [ -f "public/sw.js" ]; then \
-        cp public/sw.js dist/sw.js && \
-        echo "✅ Service worker copied successfully" && \
-        ls -la dist/sw.js; \
-    else \
-        echo "❌ Service worker not found in public/" && \
-        echo "Public directory contents:" && \
-        ls -la public/; \
-        exit 1; \
-    fi
+    cp public/sw.js dist/sw.js && \
+    echo "✅ Service worker copied successfully" && \
+    ls -la dist/sw.js
 RUN echo "=== Copying Version.json ===" && \
     if [ -f "public/version.json" ]; then \
         cp public/version.json dist/version.json && \
