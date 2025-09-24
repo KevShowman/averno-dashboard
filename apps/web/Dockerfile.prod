@@ -22,6 +22,10 @@ FROM base AS build
 # Build für Production
 RUN pnpm run build
 
+# Kopiere Service Worker und Version.json explizit
+RUN cp public/sw.js dist/sw.js || echo "Service worker not found"
+RUN cp public/version.json dist/version.json || echo "Version.json not found"
+
 # Production Stage mit Nginx
 FROM nginx:alpine AS production
 
