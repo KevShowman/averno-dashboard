@@ -11,10 +11,33 @@ import { useAuthStore } from '../stores/auth'
 import CreateSanctionModal from '../components/CreateSanctionModal'
 import ResetSanctionLevelsModal from '../components/ResetSanctionLevelsModal'
 
+// Funktion für human-readable Kategorie-Namen
+function getCategoryDisplayName(category: string): string {
+  switch (category) {
+    case 'ABMELDUNG':
+      return 'Abmeldung'
+    case 'RESPEKTVERHALTEN':
+      return 'Respektverhalten'
+    case 'FUNKCHECK':
+      return 'Funkcheck'
+    case 'REAKTIONSPFLICHT':
+      return 'Reaktionspflicht'
+    case 'NICHT_BEZAHLT':
+      return 'Wochenabgabe nicht bezahlt'
+    case 'NICHT_BEZAHLT_48H':
+      return 'Sanktion nicht bezahlt (48h)'
+    default:
+      return category
+  }
+}
+
+// Alias für Kompatibilität
+const getCategoryName = getCategoryDisplayName;
+
 interface Sanction {
   id: string
   userId: string
-  category: 'ABMELDUNG' | 'RESPEKTVERHALTEN' | 'FUNKCHECK' | 'REAKTIONSPFLICHT'
+  category: 'ABMELDUNG' | 'RESPEKTVERHALTEN' | 'FUNKCHECK' | 'REAKTIONSPFLICHT' | 'NICHT_BEZAHLT' | 'NICHT_BEZAHLT_48H'
   level: number
   description: string
   amount?: number
@@ -432,6 +455,20 @@ export default function SanctionsPage() {
                   onClick={() => setSelectedCategory('REAKTIONSPFLICHT')}
                 >
                   Reaktionspflicht
+                </Button>
+                <Button
+                  variant={selectedCategory === 'NICHT_BEZAHLT' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('NICHT_BEZAHLT')}
+                >
+                  Wochenabgabe nicht bezahlt
+                </Button>
+                <Button
+                  variant={selectedCategory === 'NICHT_BEZAHLT_48H' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('NICHT_BEZAHLT_48H')}
+                >
+                  Sanktion nicht bezahlt (48h)
                 </Button>
               </div>
             )}
