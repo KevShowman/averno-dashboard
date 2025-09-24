@@ -28,8 +28,26 @@ RUN echo "=== Public directory contents ===" && ls -la public/ || echo "Public d
 RUN echo "=== Dist directory contents ===" && ls -la dist/ || echo "Dist directory not found"
 
 # Kopiere Service Worker und Version.json explizit
-RUN if [ -f "public/sw.js" ]; then cp public/sw.js dist/sw.js && echo "Service worker copied successfully"; else echo "Service worker not found in public/"; fi
-RUN if [ -f "public/version.json" ]; then cp public/version.json dist/version.json && echo "Version.json copied successfully"; else echo "Version.json not found in public/"; fi
+RUN echo "=== Copying Service Worker ===" && \
+    if [ -f "public/sw.js" ]; then \
+        cp public/sw.js dist/sw.js && \
+        echo "✅ Service worker copied successfully" && \
+        ls -la dist/sw.js; \
+    else \
+        echo "❌ Service worker not found in public/" && \
+        echo "Public directory contents:" && \
+        ls -la public/; \
+        exit 1; \
+    fi
+RUN echo "=== Copying Version.json ===" && \
+    if [ -f "public/version.json" ]; then \
+        cp public/version.json dist/version.json && \
+        echo "✅ Version.json copied successfully" && \
+        ls -la dist/version.json; \
+    else \
+        echo "❌ Version.json not found in public/" && \
+        exit 1; \
+    fi
 
 # Finale Überprüfung
 RUN echo "=== Final dist directory contents ===" && ls -la dist/
