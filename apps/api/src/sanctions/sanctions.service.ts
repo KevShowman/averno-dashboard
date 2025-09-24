@@ -55,8 +55,8 @@ export class SanctionsService {
             category: SanctionCategory.NICHT_BEZAHLT_48H,
             level,
             description: `Automatische Sanktion: Ursprüngliche Sanktion (${sanction.category}, Level ${sanction.level}) nicht innerhalb von 48 Stunden bezahlt`,
-            penaltyAmount: penalty.amount,
-            penaltyType: penalty.type,
+            amount: penalty.amount,
+            penalty: penalty.penalty,
             expiresAt,
             status: SanctionStatus.ACTIVE,
             createdById: sanction.createdById, // Verwende den Ersteller der ursprünglichen Sanktion
