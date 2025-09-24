@@ -237,4 +237,23 @@ export class UsersService {
       default: return role;
     }
   }
+
+  // IC-Name aktualisieren
+  async updateIcName(userId: string, icFirstName: string, icLastName: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        icFirstName,
+        icLastName,
+      },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        role: true,
+        allRoles: true,
+      },
+    });
+  }
 }

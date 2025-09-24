@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Put,
+  Patch,
   Body,
   Param,
   Query,
@@ -16,6 +17,11 @@ import { Role } from '@prisma/client';
 
 interface UpdateUserRolesDto {
   allRoles: Role[];
+}
+
+interface UpdateIcNameDto {
+  icFirstName: string;
+  icLastName: string;
 }
 
 @Controller('users')
@@ -51,6 +57,19 @@ export class UsersController {
   @Get('stats/overview')
   async getUserStats() {
     return this.usersService.getUserStats();
+  }
+
+  // IC-Name aktualisieren (eigener User oder Leadership)
+  @Patch('ic-name')
+  async updateIcName(
+    @Body() updateDto: UpdateIcNameDto,
+    @Request() req
+  ) {
+    return this.usersService.updateIcName(
+      req.user.id,
+      updateDto.icFirstName,
+      updateDto.icLastName
+    );
   }
 
   // User-Rollen aktualisieren (nur El Patron)
