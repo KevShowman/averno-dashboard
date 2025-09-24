@@ -4,6 +4,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Scale, X, AlertTriangle, Search, User } from 'lucide-react'
 import { weeklyDeliveryApi } from '../lib/api'
+import { getDisplayName } from '../lib/utils'
 
 interface CreateSanctionModalProps {
   isOpen: boolean

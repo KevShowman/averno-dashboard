@@ -5,6 +5,7 @@ import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Calendar, X, Search, User, AlertTriangle } from 'lucide-react'
 import { weeklyDeliveryApi } from '../lib/api'
+import { getDisplayName } from '../lib/utils'
 
 interface CreateExclusionModalProps {
   isOpen: boolean
