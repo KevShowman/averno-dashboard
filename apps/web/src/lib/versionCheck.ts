@@ -36,19 +36,17 @@ export const checkAppVersion = async () => {
 
 // Check version on route changes
 export const setupVersionChecking = () => {
-  // Only run version checking in production or when explicitly enabled
-  if (import.meta.env.PROD || import.meta.env.VITE_ENABLE_VERSION_CHECK === 'true') {
-    // Check version on initial load
-    checkAppVersion();
-    
-    // Check version every 5 minutes
-    setInterval(checkAppVersion, 5 * 60 * 1000);
-    
-    // Check version on visibility change (user switches tabs)
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        checkAppVersion();
-      }
-    });
-  }
+  // Always run version checking (will be disabled in development by the build process)
+  // Check version on initial load
+  checkAppVersion();
+  
+  // Check version every 5 minutes
+  setInterval(checkAppVersion, 5 * 60 * 1000);
+  
+  // Check version on visibility change (user switches tabs)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      checkAppVersion();
+    }
+  });
 };
