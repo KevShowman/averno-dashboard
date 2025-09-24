@@ -26,8 +26,9 @@ export default function DashboardPage() {
   const { data: modules, isLoading: modulesLoading } = useQuery({
     queryKey: ['modules'],
     queryFn: () => api.get('/modules').then(res => res.data),
-    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user, // Only run when authenticated
+    retry: 3, // Retry failed requests
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 
   const { data: lagerStats } = useQuery({
@@ -36,29 +37,33 @@ export default function DashboardPage() {
       criticalItems: res.data.items.length,
       totalItems: res.data.pagination.total
     })),
-    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
+    retry: 3,
+    refetchOnWindowFocus: false,
   })
 
   const { data: cashStats } = useQuery({
     queryKey: ['cash-stats'],
     queryFn: () => api.get('/cash/summary').then(res => res.data),
-    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
+    retry: 3,
+    refetchOnWindowFocus: false,
   })
 
   const { data: kokainStats } = useQuery({
     queryKey: ['kokain-stats'],
     queryFn: () => api.get('/kokain/summary').then(res => res.data),
-    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
+    retry: 3,
+    refetchOnWindowFocus: false,
   })
 
   const { data: kokainPrice } = useQuery({
     queryKey: ['kokain-price'],
     queryFn: () => api.get('/kokain/price').then(res => res.data),
-    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
+    retry: 3,
+    refetchOnWindowFocus: false,
   })
 
   const stats: DashboardStats = {

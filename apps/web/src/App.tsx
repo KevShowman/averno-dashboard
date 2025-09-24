@@ -18,7 +18,6 @@ import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { setupVersionChecking } from './lib/versionCheck'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -34,10 +33,6 @@ function App() {
     checkAuth()
   }, [checkAuth])
 
-  // Setup version checking for cache busting
-  useEffect(() => {
-    setupVersionChecking()
-  }, [])
 
   // Check for redirect URL after login and redirect if needed
   useEffect(() => {

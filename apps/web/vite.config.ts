@@ -48,6 +48,10 @@ export default defineConfig({
     // Ensure deterministic module IDs for better caching
     modulePreload: {
       polyfill: false
-    }
+    },
+    // Add cache busting to HTML
+    assetsInlineLimit: 0,
+    // Force new build every time
+    emptyOutDir: true
   }
 })

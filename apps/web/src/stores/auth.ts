@@ -94,23 +94,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         state.queryClient.invalidateQueries()
       }
       
-      // Check if this is a fresh login (not a page refresh)
-      const isFreshLogin = !sessionStorage.getItem('hasLoggedIn')
-      if (isFreshLogin) {
-        sessionStorage.setItem('hasLoggedIn', 'true')
-        
-        // Clear browser cache for our domain
-        if ('caches' in window) {
-          caches.keys().then(names => {
-            names.forEach(name => {
-              caches.delete(name)
-            })
-          })
-        }
-        
-        // Force a hard reload to ensure fresh assets
+      // Force reload after login to ensure fresh state
+      // This is the same as pressing the refresh button
+      setTimeout(() => {
         window.location.reload()
-      }
+      }, 100)
     } catch (error) {
       console.error('Auth check failed:', error)
       set({ 
