@@ -94,18 +94,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         state.queryClient.invalidateQueries()
       }
       
-      // Force reload after login to ensure fresh state
-      // Only reload if this is a fresh login (not a page refresh)
+      // Force component re-rendering after login
+      // This is the React way - no full page reload needed
       const isFreshLogin = !sessionStorage.getItem('hasLoggedIn')
       if (isFreshLogin) {
         sessionStorage.setItem('hasLoggedIn', 'true')
-        // Add a small delay to prevent infinite loops
+        
+        // Force a hard refresh to bypass cache issues
+        // This is necessary because the browser has cached old JavaScript files
         setTimeout(() => {
-          // Double check we're still authenticated before reloading
-          if (get().isAuthenticated) {
-            window.location.reload()
+          // Clear all caches first
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => {
+                caches.delete(name)
+              })
+            })
           }
-        }, 100)
+          
+          // Force hard refresh with cache busting
+          const url = new URL(window.location.href)
+          url.searchParams.set('_t', Date.now().toString())
+          url.searchParams.set('_cache', 'bust')
+          
+          // Use location.replace to avoid history entry
+          window.location.replace(url.toString())
+        }, 200)
       }
     } catch (error) {
       console.error('Auth check failed:', error)
