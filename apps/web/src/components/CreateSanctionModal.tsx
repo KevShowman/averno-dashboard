@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Scale, X, AlertTriangle, Search, User } from 'lucide-react'
-import { weeklyDeliveryApi } from '../lib/api'
+import { weeklyDeliveryApi, usersApi } from '../lib/api'
 import { getDisplayName } from '../lib/utils'
 
 interface CreateSanctionModalProps {
@@ -127,20 +127,10 @@ export default function CreateSanctionModal({
 
     setIsSearching(true)
     try {
-      const response = await weeklyDeliveryApi.getDeliveries()
-      const allUsers = response.data.map((delivery: any) => delivery.user)
+      const response = await usersApi.searchUsers(query)
+      const allUsers = response.data
       
-      const uniqueUsers = allUsers.filter((user: User, index: number, self: User[]) => 
-        index === self.findIndex(u => u.id === user.id)
-      )
-      
-      const filtered = uniqueUsers.filter((user: User) =>
-        user.username.toLowerCase().includes(query.toLowerCase()) ||
-        (user.icFirstName && user.icFirstName.toLowerCase().includes(query.toLowerCase())) ||
-        (user.icLastName && user.icLastName.toLowerCase().includes(query.toLowerCase()))
-      )
-      
-      setSearchResults(filtered.slice(0, 10))
+      setSearchResults(allUsers.slice(0, 10))
     } catch (error) {
       console.error('Fehler beim Suchen von Usern:', error)
       setSearchResults([])

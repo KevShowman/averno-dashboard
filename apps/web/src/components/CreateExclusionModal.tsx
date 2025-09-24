@@ -4,7 +4,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Calendar, X, Search, User, AlertTriangle } from 'lucide-react'
-import { weeklyDeliveryApi } from '../lib/api'
+import { weeklyDeliveryApi, usersApi } from '../lib/api'
 import { getDisplayName } from '../lib/utils'
 
 interface CreateExclusionModalProps {
@@ -47,17 +47,9 @@ export default function CreateExclusionModal({
     }
     setIsSearching(true)
     try {
-      const response = await weeklyDeliveryApi.getDeliveries()
-      const allUsers = response.data.map((delivery: any) => delivery.user)
-      const uniqueUsers = allUsers.filter((user: User, index: number, self: User[]) => 
-        index === self.findIndex(u => u.id === user.id)
-      )
-      const filtered = uniqueUsers.filter((user: User) =>
-        user.username.toLowerCase().includes(query.toLowerCase()) ||
-        (user.icFirstName && user.icFirstName.toLowerCase().includes(query.toLowerCase())) ||
-        (user.icLastName && user.icLastName.toLowerCase().includes(query.toLowerCase()))
-      )
-      setSearchResults(filtered.slice(0, 10))
+      const response = await usersApi.searchUsers(query)
+      const allUsers = response.data
+      setSearchResults(allUsers.slice(0, 10))
     } catch (error) {
       console.error('Fehler beim Suchen von Usern:', error)
       setSearchResults([])
