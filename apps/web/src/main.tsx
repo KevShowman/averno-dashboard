@@ -6,6 +6,36 @@ import { Toaster } from 'sonner'
 import App from './App.tsx'
 import './index.css'
 
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW: Registered successfully')
+      
+      // Check for updates
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing
+        if (!newSW) return
+        
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // Es gibt bereits eine alte SW, also ist jetzt ein Update da
+            console.log('SW: Update available')
+            window.dispatchEvent(new CustomEvent('app:update-available'))
+          }
+        })
+      })
+      
+      // Check for updates every 5 minutes
+      setInterval(() => {
+        reg.update()
+      }, 5 * 60 * 1000)
+    }).catch(error => {
+      console.error('SW: Registration failed:', error)
+    })
+  })
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
