@@ -86,6 +86,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       // Invalidate all queries when user logs in successfully
       if (state.queryClient) {
+        // Clear all queries and refetch
+        state.queryClient.clear()
         state.queryClient.invalidateQueries()
       }
     } catch (error) {

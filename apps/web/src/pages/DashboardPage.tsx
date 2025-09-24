@@ -26,7 +26,7 @@ export default function DashboardPage() {
   const { data: modules, isLoading: modulesLoading } = useQuery({
     queryKey: ['modules'],
     queryFn: () => api.get('/modules').then(res => res.data),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user, // Only run when authenticated
   })
 
@@ -36,24 +36,28 @@ export default function DashboardPage() {
       criticalItems: res.data.items.length,
       totalItems: res.data.pagination.total
     })),
+    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
   })
 
   const { data: cashStats } = useQuery({
     queryKey: ['cash-stats'],
     queryFn: () => api.get('/cash/summary').then(res => res.data),
+    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
   })
 
   const { data: kokainStats } = useQuery({
     queryKey: ['kokain-stats'],
     queryFn: () => api.get('/kokain/summary').then(res => res.data),
+    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
   })
 
   const { data: kokainPrice } = useQuery({
     queryKey: ['kokain-price'],
     queryFn: () => api.get('/kokain/price').then(res => res.data),
+    staleTime: 0, // Always refetch
     enabled: isAuthenticated && !!user,
   })
 
@@ -305,60 +309,6 @@ export default function DashboardPage() {
           </Card>
           ))
           )}
-
-          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Clock className="h-6 w-6 text-cyan-400" />
-                  <CardTitle className="text-white">Lagerbewegungen</CardTitle>
-                </div>
-                <Badge variant="outline">Pending</Badge>
-              </div>
-              <CardDescription className="text-gray-400">
-                Ausstehende Lagerbewegungen genehmigen oder ablehnen.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-400">
-                  Wartende Genehmigungen
-                </div>
-                <Link to="/lager-movements">
-                  <Button variant="lasanta" size="sm">
-                    Verwalten
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="lasanta-card hover:bg-gray-800/50 transition-colors">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <BarChart3 className="h-6 w-6 text-purple-400" />
-                  <CardTitle className="text-white">Live Ticker</CardTitle>
-                </div>
-                <Badge variant="success">Aktiv</Badge>
-              </div>
-              <CardDescription className="text-gray-400">
-                Echtzeit-Aktivitäts-Feed mit Filtern und Statistiken.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-400">
-                  Live Updates
-                </div>
-                <Link to="/ticker">
-                  <Button variant="lasanta" size="sm">
-                    Öffnen
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

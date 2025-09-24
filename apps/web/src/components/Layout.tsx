@@ -58,7 +58,7 @@ export default function Layout({ children }: LayoutProps) {
   const { user, logout, isAuthenticated } = useAuthStore()
 
   // Don't render navigation if not authenticated
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated) {
     return <div className="min-h-screen bg-gray-900">{children}</div>
   }
 
