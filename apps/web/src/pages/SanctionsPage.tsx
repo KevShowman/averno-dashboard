@@ -473,7 +473,7 @@ export default function SanctionsPage() {
                       {sanction.amount && (
                         <div className="flex items-center gap-1">
                           <DollarSign className="h-4 w-4" />
-                          {sanction.amount.toLocaleString()} €
+                          {sanction.amount.toLocaleString('de-DE')} Schwarzgeld
                         </div>
                       )}
                       {sanction.penalty && (

@@ -488,10 +488,17 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>
                           {formatDate(delivery.weekStart)} - {formatDate(delivery.weekEnd)}
                         </TableCell>
-                        <TableCell>{delivery.packages}</TableCell>
+                        <TableCell>
+                          {delivery.packages}
+                          {delivery.packages !== 300 && (
+                            <span className="text-xs text-gray-400 ml-1">
+                              (Standard: 300)
+                            </span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} €`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} Schwarzgeld`}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
@@ -598,7 +605,7 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{delivery.packages}</TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} €`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} Schwarzgeld`}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>

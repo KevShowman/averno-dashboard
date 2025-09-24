@@ -20,6 +20,9 @@ export function formatRelativeTime(date: string | Date) {
 }
 
 export function formatCurrency(amount: number) {
+  if (isNaN(amount) || amount === null || amount === undefined) {
+    return '0 Schwarzgeld'
+  }
   return new Intl.NumberFormat('de-DE', {
     minimumFractionDigits: 0,
   }).format(amount) + ' Schwarzgeld'
