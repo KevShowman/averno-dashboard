@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from './ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
 import { AlertTriangle, Package, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
+import { api } from '../lib/api'
 
 interface WeeklyDeliveryPaymentModalProps {
   isOpen: boolean
@@ -32,9 +34,17 @@ export default function WeeklyDeliveryPaymentModal({
 }: WeeklyDeliveryPaymentModalProps) {
   const [useForWeeklyDelivery, setUseForWeeklyDelivery] = useState(false)
 
+  // Lade aktuelle Wochenabgabe-Settings
+  const { data: weeklyDeliverySettings } = useQuery({
+    queryKey: ['weekly-delivery-settings'],
+    queryFn: () => api.get('/settings/weekly-delivery/values').then(res => res.data),
+  })
+
   if (!isOpen) return null
 
-  const weeklyDeliveryPackages = Math.min(depositPackages, pendingDelivery.packages)
+  // Verwende aktuelle Settings statt gespeicherte Werte
+  const requiredPackages = weeklyDeliverySettings?.packages || pendingDelivery.packages
+  const weeklyDeliveryPackages = Math.min(depositPackages, requiredPackages)
   const payoutPackages = depositPackages - weeklyDeliveryPackages
 
   const handleConfirm = () => {
@@ -90,7 +100,7 @@ export default function WeeklyDeliveryPaymentModal({
               </div>
               <div>
                 <span className="text-gray-400">Erforderlich:</span>
-                <div className="text-white font-medium">{pendingDelivery.packages} Kokain-Pakete</div>
+                <div className="text-white font-medium">{requiredPackages} Kokain-Pakete</div>
               </div>
               <div>
                 <span className="text-gray-400">Status:</span>
@@ -155,9 +165,9 @@ export default function WeeklyDeliveryPaymentModal({
                 <div className="flex-1">
                   <div className="font-medium text-white">Für Wochenabgabe verwenden</div>
                   <div className="text-sm text-gray-400">
-                    {depositPackages >= 300 
+                    {depositPackages >= requiredPackages 
                       ? `${weeklyDeliveryPackages} Pakete für Wochenabgabe, ${payoutPackages} Pakete als Auszahlung`
-                      : `Nur ${depositPackages} Pakete verfügbar (300 erforderlich)`
+                      : `Nur ${depositPackages} Pakete verfügbar (${requiredPackages} erforderlich)`
                     }
                   </div>
                 </div>

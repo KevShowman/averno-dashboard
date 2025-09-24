@@ -23,9 +23,13 @@ export function formatCurrency(amount: number) {
   if (isNaN(amount) || amount === null || amount === undefined) {
     return '0 Schwarzgeld'
   }
+  // Entferne führende Nullen und formatiere korrekt
+  const cleanAmount = Number(amount.toString().replace(/^0+/, '')) || 0
   return new Intl.NumberFormat('de-DE', {
     minimumFractionDigits: 0,
-  }).format(amount) + ' Schwarzgeld'
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }).format(cleanAmount) + ' Schwarzgeld'
 }
 
 export function getRoleColor(role: string) {

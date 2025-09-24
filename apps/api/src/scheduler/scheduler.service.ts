@@ -12,6 +12,24 @@ export class SchedulerService {
     private sanctionsService: SanctionsService,
   ) {}
 
+  // Automatische Archivierung jeden Sonntag um 23:30 PM (vor dem Reset)
+  @Cron('30 23 * * 0', {
+    name: 'weekly-archive',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleWeeklyArchive() {
+    this.logger.log('📦 Starte wöchentliche Archivierung...');
+    
+    try {
+      const result = await this.weeklyDeliveryService.archiveCurrentWeek('system');
+      this.logger.log(`✅ Woche archiviert: ${result.message}`);
+      this.logger.log(`📊 Archive: ${result.archive.totalDeliveries} Abgaben archiviert`);
+      this.logger.log(`⚖️ Sanktionen: ${result.sanctions.sanctions?.length || 0} Sanktionen erstellt`);
+    } catch (error) {
+      this.logger.error('❌ Fehler bei der wöchentlichen Archivierung:', error);
+    }
+  }
+
   // Automatischer Wochenreset jeden Montag um 03:00 AM
   @Cron('0 3 * * 1', {
     name: 'weekly-reset',

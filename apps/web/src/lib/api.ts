@@ -44,6 +44,9 @@ export const weeklyDeliveryApi = {
   indexAllUsers: () => api.post('/weekly-delivery/index-users'),
   autoSanctionOverdue: () => api.post('/weekly-delivery/auto-sanction'),
   weeklyReset: () => api.post('/weekly-delivery/weekly-reset'),
+  archiveCurrentWeek: () => api.post('/weekly-delivery/archive-current-week'),
+  getArchives: () => api.get('/weekly-delivery/archives'),
+  getArchiveDetails: (id: string) => api.get(`/weekly-delivery/archives/${id}`),
 }
 
 // Sanctions API

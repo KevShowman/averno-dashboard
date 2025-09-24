@@ -618,7 +618,7 @@ export class KokainService {
       take: 50, // Letzte 50 Deposits
       where: {
         status: {
-          in: [DepositStatus.CONFIRMED, DepositStatus.PENDING], // Nur bestätigte und angefragte
+          in: [DepositStatus.CONFIRMED, DepositStatus.PENDING, DepositStatus.REJECTED], // Alle Status
         },
         uebergabeId: null, // Nur Deposits der aktuellen Übergabe (nicht archiviert)
       },
@@ -633,6 +633,14 @@ export class KokainService {
           },
         },
         confirmedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        rejectedBy: {
           select: {
             id: true,
             username: true,

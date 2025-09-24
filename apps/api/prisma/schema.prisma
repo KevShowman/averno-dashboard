@@ -38,6 +38,7 @@ model User {
   sanctionsReceived Sanction[] @relation("sanction_received_by")
   exclusionsReceived WeeklyDeliveryExclusion[] @relation("exclusion_user")
   exclusionsCreated WeeklyDeliveryExclusion[] @relation("exclusion_created_by")
+  archivesCreated WeeklyDeliveryArchive[] @relation("archive_created_by")
 
   @@map("users")
 }
@@ -302,6 +303,26 @@ model WeeklyDeliveryExclusion {
   updatedAt   DateTime @updatedAt
 
   @@map("weekly_delivery_exclusions")
+}
+
+model WeeklyDeliveryArchive {
+  id               String @id @default(cuid())
+  weekStart        DateTime
+  weekEnd          DateTime
+  archiveName      String
+  totalDeliveries  Int
+  paidDeliveries   Int
+  overdueDeliveries Int
+  pendingDeliveries Int
+  totalPackages    Int
+  paidPackages     Int
+  totalMoney       Int
+  deliveryData     Json   // Vollständige Delivery-Daten
+  archivedById     String
+  archivedBy       User   @relation("archive_created_by", fields: [archivedById], references: [id])
+  createdAt        DateTime @default(now())
+
+  @@map("weekly_delivery_archives")
 }
 
 // Sanktionssystem

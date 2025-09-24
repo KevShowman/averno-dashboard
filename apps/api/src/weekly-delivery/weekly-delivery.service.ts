@@ -640,7 +640,7 @@ export class WeeklyDeliveryService {
     const currentWeek = this.getCurrentWeek();
     
     // Alle ausstehenden Abgaben der vorherigen Woche als überfällig markieren
-    await this.prisma.weeklyDelivery.updateMany({
+    const overdueResult = await this.prisma.weeklyDelivery.updateMany({
       where: {
         status: WeeklyDeliveryStatus.PENDING,
         weekEnd: {
@@ -652,17 +652,200 @@ export class WeeklyDeliveryService {
       },
     });
     
+    // Aktuelle Woche zurücksetzen: Alle Abgaben der aktuellen Woche löschen
+    const deletedCount = await this.prisma.weeklyDelivery.deleteMany({
+      where: {
+        weekStart: {
+          gte: currentWeek.start,
+        },
+        weekEnd: {
+          lte: currentWeek.end,
+        },
+      },
+    });
+    
     // Alle User für die neue Woche indexieren (nur wenn noch nicht vorhanden)
     const indexResult = await this.indexAllUsers();
     
     // Automatische Sanktionierung für überfällige Abgaben
     const sanctionResult = await this.autoSanctionOverdue();
 
+    // Audit-Log
+    await this.auditService.log({
+      userId: 'system',
+      action: 'WEEKLY_RESET',
+      entity: 'WeeklyDelivery',
+      entityId: 'system',
+      meta: {
+        overdueCount: overdueResult.count,
+        deletedCount: deletedCount.count,
+        indexedCount: indexResult.length,
+        sanctionsCount: sanctionResult.sanctions?.length || 0,
+        currentWeek: currentWeek,
+      },
+    });
+
     return {
       message: 'Wöchentlicher Reset durchgeführt',
+      overdueCount: overdueResult.count,
+      deletedCurrentWeek: deletedCount.count,
       indexed: indexResult,
       sanctions: sanctionResult,
     };
+  }
+
+  // Archivierung der aktuellen Woche
+  async archiveCurrentWeek(archivedById: string) {
+    const currentWeek = this.getCurrentWeek();
+    
+    // Alle Wochenabgaben der aktuellen Woche abrufen
+    const weeklyDeliveries = await this.prisma.weeklyDelivery.findMany({
+      where: {
+        weekStart: {
+          gte: currentWeek.start,
+        },
+        weekEnd: {
+          lte: currentWeek.end,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+
+    // Statistiken berechnen
+    const totalDeliveries = weeklyDeliveries.length;
+    const paidDeliveries = weeklyDeliveries.filter(d => d.status === 'PAID' || d.status === 'CONFIRMED').length;
+    const overdueDeliveries = weeklyDeliveries.filter(d => d.status === 'OVERDUE').length;
+    const pendingDeliveries = weeklyDeliveries.filter(d => d.status === 'PENDING' || d.status === 'PARTIALLY_PAID').length;
+    
+    const totalPackages = weeklyDeliveries.reduce((sum, d) => sum + d.packages, 0);
+    const paidPackages = weeklyDeliveries
+      .filter(d => d.status === 'PAID' || d.status === 'CONFIRMED')
+      .reduce((sum, d) => sum + (d.paidAmount || 0), 0);
+    
+    const totalMoney = weeklyDeliveries.reduce((sum, d) => sum + (d.paidMoney || 0), 0);
+
+    // Archiv-Eintrag erstellen
+    const archiveName = `Woche ${currentWeek.start.toLocaleDateString('de-DE')} - ${currentWeek.end.toLocaleDateString('de-DE')}`;
+    
+    const archive = await this.prisma.weeklyDeliveryArchive.create({
+      data: {
+        weekStart: currentWeek.start,
+        weekEnd: currentWeek.end,
+        archiveName,
+        totalDeliveries,
+        paidDeliveries,
+        overdueDeliveries,
+        pendingDeliveries,
+        totalPackages,
+        paidPackages,
+        totalMoney,
+        archivedById,
+        deliveryData: weeklyDeliveries.map(d => ({
+          id: d.id,
+          userId: d.userId,
+          user: d.user,
+          packages: d.packages,
+          paidAmount: d.paidAmount,
+          paidMoney: d.paidMoney,
+          status: d.status,
+          note: d.note,
+          createdAt: d.createdAt,
+          confirmedAt: d.confirmedAt,
+        })),
+      },
+    });
+
+    // Alle Wochenabgaben der aktuellen Woche löschen
+    await this.prisma.weeklyDelivery.deleteMany({
+      where: {
+        weekStart: {
+          gte: currentWeek.start,
+        },
+        weekEnd: {
+          lte: currentWeek.end,
+        },
+      },
+    });
+
+    // Automatische Sanktionierung für überfällige Abgaben
+    const sanctionResult = await this.autoSanctionOverdue();
+
+    // Audit-Log
+    await this.auditService.log({
+      userId: archivedById,
+      action: 'WEEKLY_DELIVERY_ARCHIVE',
+      entity: 'WeeklyDeliveryArchive',
+      entityId: archive.id,
+      meta: {
+        weekStart: currentWeek.start,
+        weekEnd: currentWeek.end,
+        totalDeliveries,
+        paidDeliveries,
+        overdueDeliveries,
+        pendingDeliveries,
+        totalPackages,
+        paidPackages,
+        totalMoney,
+        sanctionsCreated: sanctionResult.sanctions?.length || 0,
+      },
+    });
+
+    return {
+      message: 'Woche erfolgreich archiviert',
+      archive,
+      sanctions: sanctionResult,
+    };
+  }
+
+  // Archivierte Wochen abrufen
+  async getArchives() {
+    return this.prisma.weeklyDeliveryArchive.findMany({
+      orderBy: {
+        weekStart: 'desc',
+      },
+      include: {
+        archivedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Archiv-Details abrufen
+  async getArchiveDetails(archiveId: string) {
+    const archive = await this.prisma.weeklyDeliveryArchive.findUnique({
+      where: { id: archiveId },
+      include: {
+        archivedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+
+    if (!archive) {
+      throw new NotFoundException('Archiv nicht gefunden');
+    }
+
+    return archive;
   }
 
   // Development: Alle Wochenabgaben löschen

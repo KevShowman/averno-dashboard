@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, X, UserPlus, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
-import { hasRole } from '../lib/utils'
+import { hasRole, formatDate, getDisplayName, formatCurrency } from '../lib/utils'
 import WeeklyDeliveryPayModal from '../components/WeeklyDeliveryPayModal'
 import CreateExclusionModal from '../components/CreateExclusionModal'
 
@@ -93,6 +93,11 @@ export default function WeeklyDeliveryPage() {
     queryFn: () => weeklyDeliveryApi.getExclusions().then(res => res.data),
   })
 
+  const { data: archives = [], isLoading: loadingArchives } = useQuery({
+    queryKey: ['weekly-delivery-archives'],
+    queryFn: () => weeklyDeliveryApi.getArchives().then(res => res.data),
+  })
+
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ['weekly-delivery', 'stats'],
     queryFn: () => weeklyDeliveryApi.getStats().then(res => res.data),
@@ -159,9 +164,11 @@ export default function WeeklyDeliveryPage() {
 
   const weeklyResetMutation = useMutation({
     mutationFn: () => weeklyDeliveryApi.weeklyReset(),
-    onSuccess: () => {
-      toast.success('Wochenreset wurde durchgeführt')
+    onSuccess: (response) => {
+      const data = response.data
+      toast.success(`Wochenreset durchgeführt: ${data.deletedCurrentWeek} Abgaben gelöscht, ${data.overdueCount} als überfällig markiert`)
       queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] }) // Auch Sanktionen aktualisieren
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Wochenreset')
@@ -178,6 +185,20 @@ export default function WeeklyDeliveryPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Ausschlusses')
+    },
+  })
+
+  const archiveMutation = useMutation({
+    mutationFn: () => weeklyDeliveryApi.archiveCurrentWeek(),
+    onSuccess: (response) => {
+      const data = response.data
+      toast.success(`Woche archiviert: ${data.archive.totalDeliveries} Abgaben, ${data.sanctions.sanctions?.length || 0} Sanktionen erstellt`)
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
+      queryClient.invalidateQueries({ queryKey: ['weekly-delivery-archives'] })
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Archivieren der Woche')
     },
   })
 
@@ -305,6 +326,16 @@ export default function WeeklyDeliveryPage() {
               >
                 <RefreshCw className="h-4 w-4" />
                 Wochenreset
+              </Button>
+              
+              <Button
+                variant="destructive"
+                onClick={() => archiveMutation.mutate()}
+                disabled={archiveMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <Package className="h-4 w-4" />
+                Woche archivieren
               </Button>
             </>
           )}
@@ -498,7 +529,7 @@ export default function WeeklyDeliveryPage() {
                         </TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} Schwarzgeld`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney.toString().replace(/^0+/, '') || 0).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Schwarzgeld`}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
@@ -605,7 +636,7 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{delivery.packages}</TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney).toLocaleString('de-DE')} Schwarzgeld`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney.toString().replace(/^0+/, '') || 0).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Schwarzgeld`}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
@@ -652,6 +683,84 @@ export default function WeeklyDeliveryPage() {
       )}
 
       {/* Pay Modal */}
+      {/* Archive Section */}
+      {archives && archives.length > 0 && (
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Alle Wochenübergaben
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Archivierte Wochenabgaben mit Zusammenfassung
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingArchives ? (
+              <div className="text-center py-8 text-gray-400">Lade Archive...</div>
+            ) : (
+              <div className="space-y-4">
+                {archives.map((archive: any) => (
+                  <div key={archive.id} className="bg-gray-800/50 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-semibold text-white">{archive.archiveName}</h3>
+                        <p className="text-sm text-gray-400">
+                          {formatDate(archive.weekStart)} - {formatDate(archive.weekEnd)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">Archiviert von</p>
+                        <p className="text-white font-medium">
+                          {getDisplayName(archive.archivedBy)}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {formatDate(archive.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-white">{archive.totalDeliveries}</div>
+                        <div className="text-xs text-gray-400">Gesamt</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-400">{archive.paidDeliveries}</div>
+                        <div className="text-xs text-gray-400">Bezahlt</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-red-400">{archive.overdueDeliveries}</div>
+                        <div className="text-xs text-gray-400">Überfällig</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-yellow-400">{archive.pendingDeliveries}</div>
+                        <div className="text-xs text-gray-400">Ausstehend</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-white">{archive.totalPackages}</div>
+                        <div className="text-xs text-gray-400">Pakete gesamt</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-green-400">{archive.paidPackages}</div>
+                        <div className="text-xs text-gray-400">Pakete bezahlt</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-blue-400">{formatCurrency(archive.totalMoney)}</div>
+                        <div className="text-xs text-gray-400">Schwarzgeld gesamt</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <WeeklyDeliveryPayModal
         isOpen={showPayModal}
         onClose={handleClosePayModal}

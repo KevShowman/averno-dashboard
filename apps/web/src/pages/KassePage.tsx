@@ -29,9 +29,10 @@ export default function KassePage() {
     queryFn: () => api.get('/cash/transactions').then(res => res.data),
   })
 
-  const { data: chartData } = useQuery({
+  const { data: chartData, error: chartError } = useQuery({
     queryKey: ['cash-chart', selectedRange],
     queryFn: () => api.get(`/cash/chart?range=${selectedRange}`).then(res => res.data),
+    retry: 1,
   })
 
   const canApprove = user?.role === 'EL_PATRON'
@@ -224,7 +225,16 @@ export default function KassePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {chartData && chartData.length > 0 ? (
+          {chartError ? (
+            <div className="h-80 flex items-center justify-center text-red-400">
+              <div className="text-center">
+                <p>Fehler beim Laden der Daten</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  {chartError.message || 'Unbekannter Fehler'}
+                </p>
+              </div>
+            </div>
+          ) : chartData && chartData.length > 0 ? (
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
@@ -262,7 +272,12 @@ export default function KassePage() {
             </div>
           ) : (
             <div className="h-80 flex items-center justify-center text-gray-400">
-              Keine Daten verfügbar
+              <div className="text-center">
+                <p>Keine Daten verfügbar</p>
+                <p className="text-sm mt-2">
+                  Erstelle Transaktionen um den Saldo-Verlauf zu sehen
+                </p>
+              </div>
             </div>
           )}
         </CardContent>

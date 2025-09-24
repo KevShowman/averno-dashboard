@@ -122,12 +122,12 @@ export default function TickerPage() {
 
   if (kokainDeposits?.deposits) {
     kokainDeposits.deposits.forEach((deposit: any) => {
-      // Nur CONFIRMED Deposits im Ticker anzeigen
+      // Alle Deposit-Status anzeigen (CONFIRMED, PENDING, REJECTED)
       if (deposit.status === 'CONFIRMED') {
         allActivities.push({
           id: `kokain-${deposit.id}`,
           type: 'kokain',
-          timestamp: deposit.createdAt,
+          timestamp: deposit.confirmedAt || deposit.createdAt,
           user: deposit.user,
           action: deposit.status,
           details: {
@@ -151,6 +151,23 @@ export default function TickerPage() {
             packages: deposit.packages,
             note: deposit.note,
             status: deposit.status,
+          }
+        })
+      } else if (deposit.status === 'REJECTED') {
+        // Rejected Deposits anzeigen
+        allActivities.push({
+          id: `kokain-rejected-${deposit.id}`,
+          type: 'kokain',
+          timestamp: deposit.rejectedAt || deposit.createdAt,
+          user: deposit.user,
+          action: deposit.status,
+          details: {
+            packages: deposit.packages,
+            note: deposit.note,
+            status: deposit.status,
+            rejectedBy: deposit.rejectedBy,
+            rejectedAt: deposit.rejectedAt,
+            rejectionReason: deposit.rejectionReason,
           }
         })
       }

@@ -177,6 +177,28 @@ export class WeeklyDeliveryController {
     return this.weeklyDeliveryService.deactivateExclusion(id);
   }
 
+  // Archivierung der aktuellen Woche (Leaderschaft)
+  @Post('archive-current-week')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @UseGuards(RolesGuard)
+  async archiveCurrentWeek(@CurrentUser() user: User) {
+    return this.weeklyDeliveryService.archiveCurrentWeek(user.id);
+  }
+
+  // Archivierte Wochen abrufen
+  @Get('archives')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  async getArchives() {
+    return this.weeklyDeliveryService.getArchives();
+  }
+
+  // Archiv-Details abrufen
+  @Get('archives/:id')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  async getArchiveDetails(@Param('id') archiveId: string) {
+    return this.weeklyDeliveryService.getArchiveDetails(archiveId);
+  }
+
   // Development: Alle Wochenabgaben löschen
   @Post('clear-all')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
