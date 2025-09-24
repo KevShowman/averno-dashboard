@@ -609,8 +609,8 @@ export class WeeklyDeliveryService {
     }
 
     for (const delivery of unpaidDeliveries) {
-      // Verwende SanctionsService für die Sanktions-Erstellung
-      const sanction = await this.sanctionsService.createSanction(
+      // Verwende SanctionsService für die Sanktions-Erstellung mit automatischem Level
+      const sanction = await this.sanctionsService.createSanctionWithAutoLevel(
         delivery.userId,
         SanctionCategory.NICHT_BEZAHLT,
         `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,
@@ -667,8 +667,8 @@ export class WeeklyDeliveryService {
         data: { status: WeeklyDeliveryStatus.OVERDUE },
       });
 
-      // Verwende SanctionsService für die Sanktions-Erstellung
-      const sanction = await this.sanctionsService.createSanction(
+      // Verwende SanctionsService für die Sanktions-Erstellung mit automatischem Level
+      const sanction = await this.sanctionsService.createSanctionWithAutoLevel(
         delivery.userId,
         SanctionCategory.NICHT_BEZAHLT,
         `Wochenabgabe nicht bezahlt (Woche: ${delivery.weekStart.toLocaleDateString('de-DE')} - ${delivery.weekEnd.toLocaleDateString('de-DE')})`,

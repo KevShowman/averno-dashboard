@@ -12,8 +12,8 @@ export class SchedulerService {
     private sanctionsService: SanctionsService,
   ) {}
 
-  // Automatische Archivierung jeden Sonntag um 23:30 PM (vor dem Reset)
-  @Cron('30 23 * * 0', {
+  // Automatische Archivierung jeden Montag um 00:01 AM
+  @Cron('1 0 * * 1', {
     name: 'weekly-archive',
     timeZone: 'Europe/Berlin',
   })
@@ -30,8 +30,8 @@ export class SchedulerService {
     }
   }
 
-  // Automatischer Wochenreset jeden Montag um 03:00 AM
-  @Cron('0 3 * * 1', {
+  // Automatischer Wochenreset jeden Montag um 00:01 AM
+  @Cron('1 0 * * 1', {
     name: 'weekly-reset',
     timeZone: 'Europe/Berlin',
   })
@@ -64,8 +64,8 @@ export class SchedulerService {
     }
   }
 
-  // Automatische Sanktionierung überfälliger Abgaben jeden Tag um 01:00 AM
-  @Cron('0 1 * * *', {
+  // Automatische Sanktionierung überfälliger Abgaben jeden Montag um 00:01 AM
+  @Cron('1 0 * * 1', {
     name: 'auto-sanction-overdue',
     timeZone: 'Europe/Berlin',
   })
@@ -80,8 +80,8 @@ export class SchedulerService {
     }
   }
 
-  // Automatische 48h-Sanktionierung alle 6 Stunden
-  @Cron('0 */6 * * *', {
+  // Automatische 48h-Sanktionierung jeden Montag um 00:01 AM
+  @Cron('1 0 * * 1', {
     name: 'auto-sanction-48h',
     timeZone: 'Europe/Berlin',
   })
