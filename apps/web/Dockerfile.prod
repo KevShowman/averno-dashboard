@@ -27,32 +27,31 @@ FROM base AS build
 # Build für Production
 RUN pnpm run build
 
-# Debug: Zeige alle Verzeichnisse und Dateien
+# Debug: Zeige Verzeichnisse und Dateien
 RUN echo "=== Current directory structure ===" && find . -name "*.js" -o -name "*.json" | head -20
 RUN echo "=== Public directory contents ===" && ls -la public/ || echo "Public directory not found"
 RUN echo "=== Dist directory contents ===" && ls -la dist/ || echo "Dist directory not found"
 
 # Erstelle Service Worker direkt
 RUN echo "=== Creating Service Worker ===" && \
-    cat > dist/sw.js << 'EOF'
+    mkdir -p dist && \
+    cat > dist/sw.js <<'EOF'
 // Service Worker für LaSanta Calavera
 // Handles app updates and cache management
 
 const CACHE_NAME = 'lascanta-v1'
 const STATIC_CACHE = 'lascanta-static-v1'
 
-// Install event - cache static assets
 self.addEventListener('install', (event) => {
   console.log('SW: Installing...')
-  self.skipWaiting() // Neue SW übernimmt sofort
+  self.skipWaiting()
 })
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('SW: Activating...')
   event.waitUntil(
     Promise.all([
-      self.clients.claim(), // Übernimmt alle Clients sofort
+      self.clients.claim(),
       caches.keys().then(names => {
         return Promise.all(
           names.map(name => {
@@ -67,56 +66,39 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// Fetch event - serve from cache or network
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
   if (event.request.method !== 'GET') return
-  
-  // Skip external requests
   if (!event.request.url.startsWith(self.location.origin)) return
-  
+
   event.respondWith(
     caches.match(event.request).then(response => {
-      // Return cached version if available
-      if (response) {
-        return response
-      }
-      
-      // Otherwise fetch from network
+      if (response) return response
+
       return fetch(event.request).then(response => {
-        // Don't cache if not a valid response
         if (!response || response.status !== 200 || response.type !== 'basic') {
           return response
         }
-        
-        // Clone the response
         const responseToCache = response.clone()
-        
-        // Cache static assets
-        if (event.request.url.includes('/assets/') || 
-            event.request.url.includes('.js') || 
+        if (event.request.url.includes('/assets/') ||
+            event.request.url.includes('.js') ||
             event.request.url.includes('.css')) {
           caches.open(STATIC_CACHE).then(cache => {
             cache.put(event.request, responseToCache)
           })
         }
-        
         return response
       })
     })
   )
 })
 
-// Message event - handle app update requests
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
   }
 })
 
-// Handle app updates
 self.addEventListener('controllerchange', () => {
-  // Notify all clients about the update
   self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({
@@ -127,8 +109,7 @@ self.addEventListener('controllerchange', () => {
   })
 })
 EOF
-    echo "✅ Service worker created successfully" && \
-    ls -la dist/sw.js
+RUN echo "✅ Service worker created successfully" && ls -la dist/sw.js
 
 # Kopiere Version.json
 RUN echo "=== Copying Version.json ===" && \
@@ -148,33 +129,23 @@ RUN echo "=== Checking for sw.js ===" && ls -la dist/sw.js || echo "sw.js not fo
 # Production Stage mit Nginx
 FROM nginx:alpine AS production
 
-# Kopiere custom nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
-
-# Kopiere built files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Erstelle non-root user
-RUN addgroup -g 1001 -S nginx-user
-RUN adduser -S nginx-user -u 1001 -G nginx-user
+RUN addgroup -g 1001 -S nginx-user && \
+    adduser -S nginx-user -u 1001 -G nginx-user && \
+    chown -R nginx-user:nginx-user /usr/share/nginx/html && \
+    chown -R nginx-user:nginx-user /var/cache/nginx && \
+    chown -R nginx-user:nginx-user /var/log/nginx && \
+    chown -R nginx-user:nginx-user /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx-user:nginx-user /var/run/nginx.pid
 
-# Setze Berechtigungen
-RUN chown -R nginx-user:nginx-user /usr/share/nginx/html
-RUN chown -R nginx-user:nginx-user /var/cache/nginx
-RUN chown -R nginx-user:nginx-user /var/log/nginx
-RUN chown -R nginx-user:nginx-user /etc/nginx/conf.d
-RUN touch /var/run/nginx.pid
-RUN chown -R nginx-user:nginx-user /var/run/nginx.pid
-
-# Wechsle zu non-root user
 USER nginx-user
 
-# Exponiere Port
 EXPOSE 80
 
-# Health Check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
 
-# Starte Nginx
 CMD ["nginx", "-g", "daemon off;"]
