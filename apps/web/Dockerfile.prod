@@ -16,8 +16,10 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere Source Code
 COPY . .
 
-# Explizit Service Worker kopieren
-COPY public/sw.js ./public/sw.js
+# Prüfe ob Service Worker vorhanden ist
+RUN echo "=== Checking for sw.js ===" && \
+    find . -name "sw.js" -type f && \
+    ls -la public/ || echo "Public directory not found"
 
 # Build Stage
 FROM base AS build
