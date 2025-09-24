@@ -230,7 +230,7 @@ export default function KassePage() {
               <div className="text-center">
                 <p>Fehler beim Laden der Daten</p>
                 <p className="text-sm text-gray-400 mt-2">
-                  {chartError.message || 'Unbekannter Fehler'}
+                  {chartError instanceof Error ? chartError.message : 'Unbekannter Fehler'}
                 </p>
               </div>
             </div>
