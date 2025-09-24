@@ -163,58 +163,6 @@ export class WeeklyDeliveryService {
     });
   }
 
-  // Aktuelle Woche abrufen
-  async getCurrentWeekDeliveries() {
-    const currentWeek = this.getCurrentWeek();
-    
-    return this.getWeeklyDeliveries(undefined, undefined, currentWeek.start, currentWeek.end);
-  }
-
-  // Ausschluss erstellen
-  async createExclusion(userId: string, reason: string, startDate: Date, endDate?: Date, createdById: string) {
-    const exclusion = await this.prisma.weeklyDeliveryExclusion.create({
-      data: {
-        userId,
-        reason,
-        startDate,
-        endDate,
-        isActive: true,
-        createdById,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-    });
-
-    // Retrigger Index: Entferne alle aktiven Wochenabgaben für diesen User
-    const currentWeek = this.getCurrentWeek();
-    await this.prisma.weeklyDelivery.deleteMany({
-      where: {
-        userId,
-        weekStart: {
-          gte: startDate,
-        },
-        status: {
-          in: [WeeklyDeliveryStatus.PENDING, WeeklyDeliveryStatus.PARTIALLY_PAID],
-        },
-      },
-    });
-
-    return exclusion;
-  }
 
   // Alle Wochenabgaben abrufen
   async getWeeklyDeliveries(status?: WeeklyDeliveryStatus, userId?: string, weekStart?: Date, weekEnd?: Date) {
@@ -285,54 +233,20 @@ export class WeeklyDeliveryService {
 
   // Aktuelle Woche abrufen
   async getCurrentWeekDeliveries() {
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Montag
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sonntag
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    return this.prisma.weeklyDelivery.findMany({
-      where: {
-        weekStart: {
-          gte: startOfWeek,
-        },
-        weekEnd: {
-          lte: endOfWeek,
-        },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-        confirmedBy: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+    const currentWeek = this.getCurrentWeek();
+    
+    return this.getWeeklyDeliveries(undefined, undefined, currentWeek.start, currentWeek.end);
   }
 
   // Ausschluss erstellen
-  async createExclusion(userId: string, reason: string, startDate: Date, createdById: string, endDate?: Date) {
-    return this.prisma.weeklyDeliveryExclusion.create({
+  async createExclusion(userId: string, reason: string, startDate: Date, endDate: Date | undefined, createdById: string) {
+    const exclusion = await this.prisma.weeklyDeliveryExclusion.create({
       data: {
         userId,
         reason,
         startDate,
         endDate,
+        isActive: true,
         createdById,
       },
       include: {
@@ -352,6 +266,21 @@ export class WeeklyDeliveryService {
         },
       },
     });
+
+    // Retrigger Index: Entferne alle aktiven Wochenabgaben für diesen User
+    await this.prisma.weeklyDelivery.deleteMany({
+      where: {
+        userId,
+        weekStart: {
+          gte: startDate,
+        },
+        status: {
+          in: [WeeklyDeliveryStatus.PENDING, WeeklyDeliveryStatus.PARTIALLY_PAID],
+        },
+      },
+    });
+
+    return exclusion;
   }
 
   // Ausschlüsse abrufen
