@@ -213,4 +213,17 @@ export class UsersService {
       roles: roleDistribution,
     };
   }
+
+  private getRoleDisplayName(role: Role): string {
+    switch (role) {
+      case Role.EL_PATRON: return 'El Patrón';
+      case Role.DON: return 'Don';
+      case Role.ASESOR: return 'Asesor';
+      case Role.ROUTENVERWALTUNG: return 'Routenverwaltung';
+      case Role.LOGISTICA: return 'Logistica';
+      case Role.SICARIO: return 'Sicario';
+      case Role.SOLDADO: return 'Soldado';
+      default: return role;
+    }
+  }
 }
