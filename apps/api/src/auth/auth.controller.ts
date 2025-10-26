@@ -27,16 +27,17 @@ export class AuthController {
     const tokens = await this.authService.generateTokens(user);
 
     // Set HTTP-only cookies
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      secure: false, // Set to false for HTTP in production
+      secure: isProduction, // true for HTTPS in production
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: false, // Set to false for HTTP in production
+      secure: isProduction, // true for HTTPS in production
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -67,16 +68,17 @@ export class AuthController {
       const tokens = await this.authService.refreshTokens(refreshToken);
 
       // Set new cookies
+      const isProduction = process.env.NODE_ENV === 'production';
       res.cookie('access_token', tokens.accessToken, {
         httpOnly: true,
-        secure: false, // Set to false for HTTP in production
+        secure: isProduction, // true for HTTPS in production
         sameSite: 'lax',
         maxAge: 15 * 60 * 1000, // 15 minutes
       });
 
       res.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
-        secure: false, // Set to false for HTTP in production
+        secure: isProduction, // true for HTTPS in production
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
