@@ -2,7 +2,7 @@ import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const DEFAULT_ADMIN_DISCORD_ID = '1040754827589865472';
+const DEFAULT_ADMIN_DISCORD_ID = process.env.ADMIN_DISCORD_ID || '1040754827589865472';
 
 async function setDefaultAdmin() {
   try {

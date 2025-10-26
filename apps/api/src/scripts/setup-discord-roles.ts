@@ -9,37 +9,37 @@ async function setupDiscordRoles() {
     // Discord-Rollen-Mappings definieren
     const roleMappings = [
       {
-        discordRoleId: '1402760679613661224', // El Patron
+        discordRoleId: '1431388062474309701', // El Patron
         systemRole: Role.EL_PATRON,
         name: 'El Patron'
       },
       {
-        discordRoleId: '1402760800216551494', // Don
+        discordRoleId: '1431388062474309699', // Don
         systemRole: Role.DON,
         name: 'Don'
       },
       {
-        discordRoleId: '1402760888561438862', // Asesor
+        discordRoleId: '1431388062474309698', // Asesor
         systemRole: Role.ASESOR,
         name: 'Asesor'
       },
       {
-        discordRoleId: '1402760961097470025', // Inspector
+        discordRoleId: '1431388062474309697', // Inspector
         systemRole: Role.ROUTENVERWALTUNG, // Inspector wird als Routenverwaltung gemappt
         name: 'Inspector'
       },
       {
-        discordRoleId: '1402761049568051331', // Routenverwaltung
+        discordRoleId: '1431388062449139715', // Routenverwaltung
         systemRole: Role.ROUTENVERWALTUNG,
         name: 'Routenverwaltung'
       },
       {
-        discordRoleId: '1402761676851511356', // Sicario
+        discordRoleId: '1431388062449139716', // Sicario
         systemRole: Role.SICARIO,
         name: 'Sicario'
       },
       {
-        discordRoleId: '1402760263341707275', // Soldado
+        discordRoleId: '1431388062427906220', // Soldado
         systemRole: Role.SOLDADO,
         name: 'Soldado'
       }
