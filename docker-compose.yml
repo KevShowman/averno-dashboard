@@ -41,9 +41,9 @@ services:
       DISCORD_CLIENT_SECRET: "${DISCORD_CLIENT_SECRET}"
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
       DISCORD_GUILD_ID: "${DISCORD_GUILD_ID}"
-      DISCORD_REDIRECT_URI: "http://localhost:3000/api/auth/discord/callback"
-      FRONTEND_URL: "http://localhost:5173"
-      API_BASE_URL: "http://localhost:3000"
+      DISCORD_REDIRECT_URI: "http://lsc-nc.de:3000/api/auth/discord/callback"
+      FRONTEND_URL: "https://lsc-nc.de/"
+      API_BASE_URL: "http://lsc-nc.de:3000"
     depends_on:
       db:
         condition: service_healthy
@@ -63,7 +63,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: "http://localhost:3000/api"
+      VITE_API_URL: "http://lsc-nc.de:3000/api"
       NODE_ENV: development
       DOCKER: "true"
     depends_on:
