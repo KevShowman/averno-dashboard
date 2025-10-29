@@ -1,29 +1,4 @@
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:15-alpine
-    container_name: lasanta-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: lasanta
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: lasanta_db
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-      POSTGRES_HOST_AUTH_METHOD: "trust"
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lasanta -d lasanta_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    networks:
-      - lasanta-network
-
   # NestJS API
   api:
     build:
@@ -34,7 +9,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "postgresql://lasanta:${POSTGRES_PASSWORD}@db:5432/lasanta_db?schema=public"
+      DATABASE_URL: "${DATABASE_URL}"
       NODE_ENV: production
       HOST: "0.0.0.0"
       PORT: 3000
@@ -46,12 +21,9 @@ services:
       DISCORD_CLIENT_SECRET: "${DISCORD_CLIENT_SECRET}"
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
       DISCORD_GUILD_ID: "${DISCORD_GUILD_ID}"
-      DISCORD_REDIRECT_URI: "https://lsc-nc.de/api/auth/discord/callback"
-      FRONTEND_URL: "https://lsc-nc.de"
-      API_BASE_URL: "https://lsc-nc.de"
-    depends_on:
-      db:
-        condition: service_healthy
+      DISCORD_REDIRECT_URI: "${DISCORD_REDIRECT_URI}"
+      FRONTEND_URL: "${FRONTEND_URL}"
+      API_BASE_URL: "${API_BASE_URL}"
     volumes:
       - api_uploads:/app/uploads
       - api_logs:/app/logs
@@ -92,8 +64,6 @@ services:
       - lasanta-network
 
 volumes:
-  postgres_data:
-    driver: local
   api_uploads:
     driver: local
   api_logs:
