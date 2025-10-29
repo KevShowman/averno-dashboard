@@ -1,4 +1,14 @@
-# PostgreSQL Setup für Plesk
+# ⚠️ VERALTET: PostgreSQL Setup für Plesk
+
+**Hinweis**: Die Anwendung verwendet jetzt **MySQL/MariaDB** statt PostgreSQL!
+
+Siehe stattdessen:
+- `MYSQL_MIGRATION_GUIDE.md` - Vollständige MySQL-Anleitung
+- `PLESK_DEPLOYMENT.md` - Aktualisierte Deployment-Anleitung
+
+---
+
+# PostgreSQL Setup für Plesk (VERALTET)
 
 ## Problem: MySQL/MariaDB vs PostgreSQL
 

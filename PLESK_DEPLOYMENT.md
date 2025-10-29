@@ -4,41 +4,60 @@ Diese Anleitung beschreibt das Deployment der LaSanta Website auf Plesk mit exte
 
 ## 1. Datenbank in Plesk einrichten
 
-### ⚠️ WICHTIG: PostgreSQL erforderlich!
+### ✅ MySQL/MariaDB Datenbank verwenden
 
-Die Anwendung benötigt **PostgreSQL** (nicht MySQL/MariaDB!):
-- ✅ PostgreSQL → Port 5432
-- ❌ MySQL/MariaDB → Port 3306 (NICHT kompatibel!)
+Die Anwendung verwendet jetzt **MySQL/MariaDB** (Port 3306):
+- ✅ MySQL/MariaDB → Port 3306 (bereits in Plesk verfügbar!)
+- ℹ️ Diese Datenbank sollte bereits existieren
 
-### PostgreSQL Datenbank erstellen
+### Datenbank-Informationen
 
-**Falls PostgreSQL nicht verfügbar ist**, siehe: `PLESK_POSTGRESQL_SETUP.md`
+Ihre Plesk-Datenbank:
+- **Datenbankname**: `lsc_website`
+- **Benutzer**: `lsc`
+- **Passwort**: [Ihr Passwort aus Plesk]
+- **Host**: `localhost`
+- **Port**: `3306`
+
+Falls Sie die Datenbank noch erstellen müssen:
 
 1. In Plesk: **Datenbanken** → **Datenbank hinzufügen**
-2. Wählen Sie **PostgreSQL** (NICHT MySQL!)
+2. Wählen Sie **MySQL/MariaDB**
 3. Datenbank-Details:
-   - **Datenbankname**: `lsc_website` (oder eigener Name)
-   - **Benutzer**: `lsc` (oder eigener Name)
+   - **Datenbankname**: `lsc_website`
+   - **Benutzer**: `lsc`
    - **Passwort**: Sicheres Passwort generieren
-   - **Host**: `localhost` (Standard)
-   - **Port**: `5432` (Standard für PostgreSQL)
+   - **Host**: `localhost`
+   - **Port**: `3306`
 
 **Notieren Sie sich alle Zugangsdaten!**
 
-### PostgreSQL für Docker konfigurieren
+### MySQL/MariaDB für Docker konfigurieren
 
-Docker-Container können nicht direkt auf `localhost` zugreifen. Konfigurieren Sie PostgreSQL:
+Docker-Container können nicht direkt auf `localhost` zugreifen. Konfigurieren Sie MariaDB:
 
 ```bash
-# Bearbeiten Sie /etc/postgresql/*/main/pg_hba.conf
-# Fügen Sie hinzu:
-host    all             all             172.17.0.0/16           md5
+# Bearbeiten Sie die MariaDB-Konfiguration
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
 
-# PostgreSQL neu starten
-sudo systemctl restart postgresql
+# Ändern Sie:
+# bind-address = 127.0.0.1
+# zu:
+bind-address = 0.0.0.0
+
+# Speichern und MariaDB neu starten
+sudo systemctl restart mariadb
+
+# Benutzer-Rechte für Docker-Netzwerke setzen
+mysql -u root -p << 'SQL'
+GRANT ALL PRIVILEGES ON lsc_website.* TO 'lsc'@'%' IDENTIFIED BY 'IHR_PASSWORT';
+GRANT ALL PRIVILEGES ON lsc_website.* TO 'lsc'@'172.17.%' IDENTIFIED BY 'IHR_PASSWORT';
+GRANT ALL PRIVILEGES ON lsc_website.* TO 'lsc'@'172.16.%' IDENTIFIED BY 'IHR_PASSWORT';
+FLUSH PRIVILEGES;
+SQL
 ```
 
-Siehe `PLESK_POSTGRESQL_SETUP.md` für Details!
+Siehe `MYSQL_MIGRATION_GUIDE.md` für Details!
 
 ## 2. Umgebungsvariablen konfigurieren
 
@@ -46,18 +65,18 @@ Erstellen Sie eine `.env` Datei im Projekt-Root mit folgendem Inhalt:
 
 ```bash
 # ==============================================
-# DATABASE (Plesk PostgreSQL)
+# DATABASE (Plesk MySQL/MariaDB)
 # ==============================================
 # WICHTIG: Verwenden Sie NICHT localhost für Docker!
 # 
 # Option 1: Docker Bridge IP (empfohlen)
-DATABASE_URL=postgresql://lsc:IHR_PASSWORT@172.17.0.1:5432/lsc_website?schema=public
+DATABASE_URL=mysql://lsc:IHR_PASSWORT@172.17.0.1:3306/lsc_website
 
-# Option 2: Externe Server-IP (wenn von außen erreichbar)
-# DATABASE_URL=postgresql://lsc:IHR_PASSWORT@135.116.64.230:5432/lsc_website?schema=public
+# Option 2: host.docker.internal
+# DATABASE_URL=mysql://lsc:IHR_PASSWORT@host.docker.internal:3306/lsc_website
 
-# Option 3: host.docker.internal (manchmal funktioniert das)
-# DATABASE_URL=postgresql://lsc:IHR_PASSWORT@host.docker.internal:5432/lsc_website?schema=public
+# Option 3: Externe Server-IP (wenn von außen erreichbar)
+# DATABASE_URL=mysql://lsc:IHR_PASSWORT@135.116.64.230:3306/lsc_website
 
 # ==============================================
 # JWT SECRETS
@@ -105,11 +124,15 @@ Vor dem ersten Start müssen Sie die Datenbank-Migrationen ausführen:
 # SSH in Ihren Plesk Server
 cd /var/www/vhosts/lsc-nc.de/crc-ws/apps/api
 
-# Prisma Migrationen ausführen (einmalig)
-npx prisma migrate deploy
+# Alte PostgreSQL-Migrationen entfernen (falls vorhanden)
+rm -rf prisma/migrations/*
 
-# Optional: Prisma Client neu generieren
+# Prisma Client für MySQL generieren
 npx prisma generate
+
+# Migrationen ausführen (einmalig)
+DATABASE_URL='mysql://lsc:IHR_PASSWORT@172.17.0.1:3306/lsc_website' \
+  npx prisma migrate deploy
 ```
 
 Alternativ können Sie die Migrationen auch im API-Container ausführen:
@@ -127,6 +150,8 @@ pnpm prisma migrate deploy
 # Container verlassen
 exit
 ```
+
+**Wichtig**: Verwenden Sie einfache Anführungszeichen `'` wenn Ihr Passwort Sonderzeichen enthält!
 
 ## 4. Docker Stack in Plesk starten
 
@@ -339,7 +364,7 @@ Die Logs werden automatisch in den Volumes gespeichert:
 |---------|--------------|------------------|
 | API     | 3000         | https://lsc-nc.de/api/ (via Plesk Proxy) |
 | Web     | 8080         | https://lsc-nc.de/ (via Plesk Proxy) |
-| DB      | 5432         | localhost (Plesk DB, nicht im Container) |
+| DB (MySQL) | 3306      | localhost (Plesk DB, nicht im Container) |
 
 ## 12. Kontakt & Support
 
