@@ -319,7 +319,7 @@ export default function KassePage() {
                         },
                         label: (context) => {
                           const value = context.parsed.y;
-                          return `Saldo: ${formatCurrency(value)}`;
+                          return `Saldo: ${formatCurrency(value ?? 0)}`;
                         }
                       }
                     }
