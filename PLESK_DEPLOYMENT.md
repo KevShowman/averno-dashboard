@@ -4,17 +4,41 @@ Diese Anleitung beschreibt das Deployment der LaSanta Website auf Plesk mit exte
 
 ## 1. Datenbank in Plesk einrichten
 
+### ⚠️ WICHTIG: PostgreSQL erforderlich!
+
+Die Anwendung benötigt **PostgreSQL** (nicht MySQL/MariaDB!):
+- ✅ PostgreSQL → Port 5432
+- ❌ MySQL/MariaDB → Port 3306 (NICHT kompatibel!)
+
 ### PostgreSQL Datenbank erstellen
+
+**Falls PostgreSQL nicht verfügbar ist**, siehe: `PLESK_POSTGRESQL_SETUP.md`
+
 1. In Plesk: **Datenbanken** → **Datenbank hinzufügen**
-2. Wählen Sie **PostgreSQL**
+2. Wählen Sie **PostgreSQL** (NICHT MySQL!)
 3. Datenbank-Details:
-   - **Datenbankname**: `lasanta_db` (oder eigener Name)
-   - **Benutzer**: `lasanta_user` (oder eigener Name)
+   - **Datenbankname**: `lsc_website` (oder eigener Name)
+   - **Benutzer**: `lsc` (oder eigener Name)
    - **Passwort**: Sicheres Passwort generieren
    - **Host**: `localhost` (Standard)
-   - **Port**: `5432` (Standard)
+   - **Port**: `5432` (Standard für PostgreSQL)
 
 **Notieren Sie sich alle Zugangsdaten!**
+
+### PostgreSQL für Docker konfigurieren
+
+Docker-Container können nicht direkt auf `localhost` zugreifen. Konfigurieren Sie PostgreSQL:
+
+```bash
+# Bearbeiten Sie /etc/postgresql/*/main/pg_hba.conf
+# Fügen Sie hinzu:
+host    all             all             172.17.0.0/16           md5
+
+# PostgreSQL neu starten
+sudo systemctl restart postgresql
+```
+
+Siehe `PLESK_POSTGRESQL_SETUP.md` für Details!
 
 ## 2. Umgebungsvariablen konfigurieren
 
@@ -24,7 +48,16 @@ Erstellen Sie eine `.env` Datei im Projekt-Root mit folgendem Inhalt:
 # ==============================================
 # DATABASE (Plesk PostgreSQL)
 # ==============================================
-DATABASE_URL=postgresql://lasanta_user:IHR_PASSWORT@localhost:5432/lasanta_db?schema=public
+# WICHTIG: Verwenden Sie NICHT localhost für Docker!
+# 
+# Option 1: Docker Bridge IP (empfohlen)
+DATABASE_URL=postgresql://lsc:IHR_PASSWORT@172.17.0.1:5432/lsc_website?schema=public
+
+# Option 2: Externe Server-IP (wenn von außen erreichbar)
+# DATABASE_URL=postgresql://lsc:IHR_PASSWORT@135.116.64.230:5432/lsc_website?schema=public
+
+# Option 3: host.docker.internal (manchmal funktioniert das)
+# DATABASE_URL=postgresql://lsc:IHR_PASSWORT@host.docker.internal:5432/lsc_website?schema=public
 
 # ==============================================
 # JWT SECRETS

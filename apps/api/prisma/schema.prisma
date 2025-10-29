@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -19,8 +19,8 @@ model User {
   avatarUrl    String?
   email        String?
   role         Role    @default(SOLDADO)
-  allRoles     Role[]  // Alle System-Rollen des Users
-  discordRoles String[] // Discord Rollen-IDs
+  allRoles     Json    @default("[]") // Alle System-Rollen des Users (JSON array)
+  discordRoles Json    @default("[]") // Discord Rollen-IDs (JSON array)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
@@ -91,7 +91,7 @@ model Item {
   currentStock Int    @default(0)
   reservedStock Int   @default(0)
   isLocked     Boolean @default(false)
-  tags         String[] // Prisma text[] in Postgres
+  tags         Json    @default("[]") // Tags als JSON array (MySQL hat keine nativen Arrays)
   location     String? // Regal/Standort
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

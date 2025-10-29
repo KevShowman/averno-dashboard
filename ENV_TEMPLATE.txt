@@ -13,17 +13,25 @@
 # ==============================================
 # DATABASE (External Plesk PostgreSQL)
 # ==============================================
+# ⚠️ WICHTIG: Ihre Plesk-Datenbank MUSS PostgreSQL sein (nicht MySQL/MariaDB)!
+# Port 5432 = PostgreSQL ✅
+# Port 3306 = MySQL/MariaDB ❌ (nicht kompatibel!)
+#
 # Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public
 # 
-# Wichtig für Docker:
-# - Verwenden Sie 'host.docker.internal' statt 'localhost' wenn der
-#   Container nicht auf die lokale DB zugreifen kann
-# - Oder verwenden Sie die Server-IP-Adresse
+# Für Docker Container verwenden Sie die EXTERNE IP oder host.docker.internal:
 #
-DATABASE_URL=postgresql://lasanta_user:PASSWORT_HIER_EINTRAGEN@localhost:5432/lasanta_db?schema=public
+# Option 1: Externe IP (wenn von außen erreichbar)
+DATABASE_URL=postgresql://lsc:PASSWORT_HIER_EINTRAGEN@135.116.64.230:5432/lsc_website?schema=public
 
-# Für Docker Container (falls localhost nicht funktioniert):
-# DATABASE_URL=postgresql://lasanta_user:PASSWORT_HIER_EINTRAGEN@host.docker.internal:5432/lasanta_db?schema=public
+# Option 2: host.docker.internal (für lokale Verbindung vom Container)
+# DATABASE_URL=postgresql://lsc:PASSWORT_HIER_EINTRAGEN@host.docker.internal:5432/lsc_website?schema=public
+
+# Option 3: Docker Bridge IP (172.17.0.1 ist meist die Host-IP vom Container aus)
+# DATABASE_URL=postgresql://lsc:PASSWORT_HIER_EINTRAGEN@172.17.0.1:5432/lsc_website?schema=public
+
+# ❌ NICHT verwenden: localhost (funktioniert NICHT vom Container aus!)
+# DATABASE_URL=postgresql://lsc:PASSWORT@localhost:5432/lsc_website?schema=public
 
 # ==============================================
 # JWT CONFIGURATION
