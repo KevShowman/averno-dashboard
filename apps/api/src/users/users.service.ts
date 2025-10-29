@@ -136,9 +136,9 @@ export class UsersService {
     return this.prisma.user.findMany({
       where: {
         OR: [
-          { username: { contains: searchTerm, mode: 'insensitive' } },
-          { icFirstName: { contains: searchTerm, mode: 'insensitive' } },
-          { icLastName: { contains: searchTerm, mode: 'insensitive' } },
+          { username: { contains: searchTerm } },
+          { icFirstName: { contains: searchTerm } },
+          { icLastName: { contains: searchTerm } },
         ],
       },
       select: {
@@ -189,7 +189,9 @@ export class UsersService {
     
     users.forEach(user => {
       // Alle Rollen des Users (allRoles oder fallback auf role)
-      const userRoles = user.allRoles && user.allRoles.length > 0 ? user.allRoles : [user.role];
+      // JSON zu Array casten (MySQL verwendet Json statt native Arrays)
+      const allRoles = Array.isArray(user.allRoles) ? user.allRoles as Role[] : [];
+      const userRoles = allRoles.length > 0 ? allRoles : [user.role];
       
       // Zähle jede Rolle des Users
       userRoles.forEach(role => {

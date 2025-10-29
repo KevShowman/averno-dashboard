@@ -157,7 +157,9 @@ export class DiscordService {
       return false;
     }
 
-    return user.allRoles.includes(requiredRole);
+    // JSON zu Array casten (MySQL verwendet Json statt native Arrays)
+    const allRoles = Array.isArray(user.allRoles) ? user.allRoles : [];
+    return allRoles.includes(requiredRole);
   }
 
   async getUserById(userId: string) {
