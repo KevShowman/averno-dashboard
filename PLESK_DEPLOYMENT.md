@@ -102,7 +102,64 @@ exit
 3. **Compose File**: Wählen Sie `docker-compose.prod.yml`
 4. Klicken Sie auf **Run**
 
-## 5. Überprüfung
+**Wichtig**: Die Container laufen auf internen Ports:
+- API: Port 3000 (intern)
+- Web: Port 8080 (intern)
+
+Diese sind NICHT direkt von außen erreichbar. Sie müssen im nächsten Schritt den Reverse Proxy konfigurieren.
+
+## 5. Plesk Reverse Proxy konfigurieren
+
+Da Plesk bereits einen Webserver auf Port 80/443 betreibt, müssen Sie Plesk als Reverse Proxy einrichten.
+
+### Nginx Direktiven hinzufügen
+
+1. Gehen Sie zu **Websites & Domains** → Ihre Domain
+2. Klicken Sie auf **Apache & nginx Settings**
+3. Fügen Sie im Bereich **"Additional nginx directives"** hinzu:
+
+```nginx
+# API Backend Proxy
+location /api/ {
+    proxy_pass http://localhost:3000/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_cache_bypass $http_upgrade;
+    proxy_read_timeout 300s;
+    proxy_connect_timeout 75s;
+}
+
+# Frontend Proxy (Root)
+location / {
+    proxy_pass http://localhost:8080/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_cache_bypass $http_upgrade;
+}
+```
+
+4. Klicken Sie auf **OK** oder **Apply**
+
+Siehe auch: `PLESK_REVERSE_PROXY.md` für detaillierte Anweisungen
+
+## 6. SSL/HTTPS aktivieren
+
+1. In Plesk: **SSL/TLS Certificates**
+2. Wählen Sie **Let's Encrypt**
+3. Aktivieren Sie das Zertifikat für Ihre Domain
+4. Aktivieren Sie **"Permanent SEO-safe 301 redirect from HTTP to HTTPS"**
+
+## 7. Überprüfung
 
 ### Container-Status prüfen
 ```bash
@@ -110,9 +167,10 @@ docker ps
 ```
 
 Folgende Container sollten laufen:
-- `lasanta-api` (NestJS Backend)
-- `lasanta-web` (React Frontend)
-- `lasanta-nginx` (Reverse Proxy)
+- `lasanta-api` (NestJS Backend) - Port 3000 intern
+- `lasanta-web` (React Frontend) - Port 8080 intern
+
+**Hinweis**: Es gibt KEINEN `lasanta-nginx` Container - Plesk fungiert als Reverse Proxy!
 
 ### Logs überprüfen
 ```bash
@@ -122,8 +180,9 @@ docker logs lasanta-api
 # Web Logs
 docker logs lasanta-web
 
-# Nginx Logs
-docker logs lasanta-nginx
+# Plesk Nginx Logs (Host-System)
+tail -f /var/log/nginx/error.log
+tail -f /var/www/vhosts/lsc-nc.de/logs/error_log
 ```
 
 ### Datenbank-Verbindung testen
@@ -135,7 +194,25 @@ docker exec -it lasanta-api sh
 node -e "const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); prisma.\$connect().then(() => console.log('DB Connected!')).catch(console.error)"
 ```
 
-## 6. Troubleshooting
+### Webseite testen
+```bash
+# API Health Check
+curl https://lsc-nc.de/api/health
+
+# Frontend
+# Öffnen Sie https://lsc-nc.de im Browser
+```
+
+## 8. Troubleshooting
+
+### Problem: Port 80/443 bereits belegt
+
+**Symptom**: `Error: bind: address already in use`
+
+**Lösung**: 
+- Dies ist normal auf Plesk! Die Container laufen auf internen Ports (3000, 8080)
+- Konfigurieren Sie den Reverse Proxy wie in Schritt 5 beschrieben
+- Siehe auch: `PLESK_REVERSE_PROXY.md`
 
 ### Problem: Datenbank-Verbindung schlägt fehl
 
@@ -168,7 +245,27 @@ DATABASE_URL="postgresql://lasanta_user:PASSWORT@localhost:5432/lasanta_db?schem
 2. Stellen Sie sicher, dass Port 80/443 in Plesk freigegeben ist
 3. Überprüfen Sie die Firewall-Einstellungen
 
-## 7. Backup & Wartung
+### Problem: 502 Bad Gateway
+
+**Symptom**: Webseite zeigt 502-Fehler
+
+**Lösungen**:
+1. Prüfen Sie, ob Container laufen: `docker ps`
+2. Prüfen Sie Container-Logs: `docker logs lasanta-api` und `docker logs lasanta-web`
+3. Testen Sie direkt: `curl http://localhost:3000/health` und `curl http://localhost:8080`
+4. Überprüfen Sie die Nginx-Proxy-Konfiguration in Plesk
+
+### Problem: CORS-Fehler im Browser
+
+**Symptom**: Console zeigt CORS-Policy-Fehler
+
+**Lösung**: Prüfen Sie die `.env` Datei:
+```bash
+FRONTEND_URL=https://lsc-nc.de  # Muss mit der tatsächlichen Domain übereinstimmen!
+API_BASE_URL=https://lsc-nc.de
+```
+
+## 9. Backup & Wartung
 
 ### Datenbank-Backup erstellen
 ```bash
@@ -190,7 +287,7 @@ Die Logs werden automatisch in den Volumes gespeichert:
 - `api_logs`: API Logs
 - `api_uploads`: Hochgeladene Dateien
 
-## 8. Wichtige Hinweise
+## 10. Wichtige Hinweise
 
 ⚠️ **Sicherheit**:
 - Verwenden Sie **starke Passwörter** für die Datenbank
@@ -203,7 +300,15 @@ Die Logs werden automatisch in den Volumes gespeichert:
 - Überwachen Sie die Datenbank-Größe regelmäßig
 - Nutzen Sie Plesk's Monitoring-Tools
 
-## 9. Kontakt & Support
+## 11. Port-Übersicht
+
+| Service | Interner Port | Externer Zugriff |
+|---------|--------------|------------------|
+| API     | 3000         | https://lsc-nc.de/api/ (via Plesk Proxy) |
+| Web     | 8080         | https://lsc-nc.de/ (via Plesk Proxy) |
+| DB      | 5432         | localhost (Plesk DB, nicht im Container) |
+
+## 12. Kontakt & Support
 
 Bei Problemen:
 1. Überprüfen Sie die Container-Logs
