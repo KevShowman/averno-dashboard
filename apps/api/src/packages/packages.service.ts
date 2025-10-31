@@ -115,7 +115,7 @@ export class PackagesService {
         throw new BadRequestException('Wochenabgabe nicht gefunden oder nicht berechtigt');
       }
 
-      if (weeklyDelivery.status === WeeklyDeliveryStatus.PAID || weeklyDelivery.status === WeeklyDeliveryStatus.CONFIRMED) {
+      if (weeklyDelivery.status === WeeklyDeliveryStatus.PAID) {
         throw new BadRequestException('Wochenabgabe wurde bereits vollständig bezahlt');
       }
 
