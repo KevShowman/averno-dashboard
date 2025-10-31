@@ -3,7 +3,7 @@ services:
   api:
     build:
       context: ./apps/api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: lasanta-api
     restart: unless-stopped
     ports:
