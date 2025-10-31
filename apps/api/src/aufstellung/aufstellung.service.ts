@@ -219,12 +219,11 @@ export class AufstellungService {
 
     for (const user of usersWithoutResponse) {
       try {
-        const sanction = await this.sanctionsService.createSanction(
+        const sanction = await this.sanctionsService.createSanctionWithAutoLevel(
           user.id,
           'REAKTIONSPFLICHT',
           `Keine Reaktion auf Aufstellung vom ${aufstellung.date.toLocaleDateString('de-DE')} - ${aufstellung.reason}`,
           aufstellung.createdById, // Der Ersteller der Aufstellung ist der Sanktions-Ersteller
-          'system',
         );
         sanctions.push(sanction);
       } catch (error) {
