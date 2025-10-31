@@ -20,7 +20,7 @@ interface WeeklyDelivery {
   packages: number
   paidAmount?: number
   paidMoney?: number
-  status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'CONFIRMED' | 'OVERDUE'
+  status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE'
   confirmedAt?: string
   note?: string
   user: {
@@ -111,16 +111,7 @@ export default function WeeklyDeliveryPage() {
     },
   })
 
-  const confirmDeliveryMutation = useMutation({
-    mutationFn: (id: string) => weeklyDeliveryApi.confirmDelivery(id),
-    onSuccess: () => {
-      toast.success('Wochenabgabe wurde bestätigt')
-      queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Bestätigen')
-    },
-  })
+  // Bestätigen-Workflow entfernt - PAID ist jetzt der finale Status
 
   const deactivateExclusionMutation = useMutation({
     mutationFn: (id: string) => weeklyDeliveryApi.deactivateExclusion(id),
@@ -218,9 +209,7 @@ export default function WeeklyDeliveryPage() {
     }
   }
 
-  const handleConfirmDelivery = (deliveryId: string) => {
-    confirmDeliveryMutation.mutate(deliveryId);
-  }
+  // Bestätigen-Funktion entfernt
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -229,9 +218,7 @@ export default function WeeklyDeliveryPage() {
       case 'PARTIALLY_PAID':
         return <Badge variant="outline" className="text-orange-600 border-orange-600">Teilbezahlt</Badge>
       case 'PAID':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">Bezahlt</Badge>
-      case 'CONFIRMED':
-        return <Badge variant="outline" className="text-green-600 border-green-600">Bestätigt</Badge>
+        return <Badge variant="outline" className="text-green-600 border-green-600">Bezahlt</Badge>
       case 'OVERDUE':
         return <Badge variant="outline" className="text-red-600 border-red-600">Überfällig</Badge>
       default:
@@ -524,7 +511,7 @@ export default function WeeklyDeliveryPage() {
                         </TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && `${Number(delivery.paidMoney.toString().replace(/^0+/, '') || 0).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Schwarzgeld`}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && formatCurrency(delivery.paidMoney)}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery.status)}</TableCell>
@@ -542,16 +529,6 @@ export default function WeeklyDeliveryPage() {
                                   {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
                                 </Button>
                               )
-                            )}
-                            {delivery.status === 'PAID' && isLeadership && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => confirmDeliveryMutation.mutate(delivery.id)}
-                                disabled={confirmDeliveryMutation.isPending}
-                              >
-                                Bestätigen
-                              </Button>
                             )}
                           </div>
                         </TableCell>

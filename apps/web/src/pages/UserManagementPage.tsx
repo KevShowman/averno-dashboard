@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { usersApi } from '../lib/api'
+import { usersApi, discordApi } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
 import { hasRole } from '../lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Users, Crown, Shield, UserCheck, Package, MapPin, AlertTriangle, User as UserIcon, Zap } from 'lucide-react'
+import { Users, Crown, Shield, UserCheck, Package, MapPin, AlertTriangle, User as UserIcon, Zap, Trash2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker'
 
@@ -52,8 +52,9 @@ export default function UserManagementPage() {
   const queryClient = useQueryClient()
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
-  // Prüfen ob User El Patron ist
+  // Prüfen ob User El Patron oder Don ist
   const isElPatron = hasRole(currentUser, 'EL_PATRON')
+  const canManageUsers = currentUser?.role && ['EL_PATRON', 'DON'].includes(currentUser.role)
 
   // Queries
   const { data: allUsers = [], isLoading } = useQuery({
@@ -81,12 +82,43 @@ export default function UserManagementPage() {
     },
   })
 
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId: string) => usersApi.deleteUser(userId),
+    onSuccess: () => {
+      toast.success('Benutzer wurde erfolgreich gelöscht')
+      queryClient.invalidateQueries({ queryKey: ['all-users'] })
+      queryClient.invalidateQueries({ queryKey: ['user-stats'] })
+      setSelectedUser(null)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Löschen des Benutzers')
+    },
+  })
+
+  const syncDiscordMutation = useMutation({
+    mutationFn: () => discordApi.syncAndRemoveInactive(),
+    onSuccess: (data) => {
+      toast.success(`Discord-Sync abgeschlossen: ${data.data.removed} User entfernt, ${data.data.imported} neu importiert`)
+      queryClient.invalidateQueries({ queryKey: ['all-users'] })
+      queryClient.invalidateQueries({ queryKey: ['user-stats'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler bei der Discord-Synchronisierung')
+    },
+  })
+
   const handleUserSelect = (user: User | null) => {
     setSelectedUser(user)
   }
 
   const handleRoleUpdate = (userId: string, allRoles: string[]) => {
     updateUserRolesMutation.mutate({ userId, allRoles })
+  }
+
+  const handleDeleteUser = (userId: string, username: string) => {
+    if (window.confirm(`Möchtest du ${username} wirklich löschen? Dies kann nicht rückgängig gemacht werden.`)) {
+      deleteUserMutation.mutate(userId)
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -139,6 +171,17 @@ export default function UserManagementPage() {
             Verwalte Benutzer-Rollen und Berechtigungen
           </p>
         </div>
+        {canManageUsers && (
+          <Button
+            onClick={() => syncDiscordMutation.mutate()}
+            disabled={syncDiscordMutation.isPending}
+            variant="outline"
+            className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${syncDiscordMutation.isPending ? 'animate-spin' : ''}`} />
+            Discord Sync
+          </Button>
+        )}
       </div>
 
       {/* Stats */}
@@ -267,15 +310,28 @@ export default function UserManagementPage() {
                         {formatDate(user.createdAt)}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleUserSelect(user)}
-                          className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
-                        >
-                          <Zap className="h-3 w-3 mr-1" />
-                          Verwalten
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUserSelect(user)}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+                          >
+                            <Zap className="h-3 w-3 mr-1" />
+                            Verwalten
+                          </Button>
+                          {canManageUsers && user.id !== currentUser?.id && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteUser(user.id, getDisplayName(user))}
+                              disabled={deleteUserMutation.isPending}
+                              className="text-red-400 border-red-400 hover:bg-red-400/10"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

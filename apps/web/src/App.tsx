@@ -7,9 +7,10 @@ import DashboardPage from './pages/DashboardPage'
 import LagerPage from './pages/LagerPage'
 import LagerMovementsPage from './pages/LagerMovementsPage'
 import KassePage from './pages/KassePage'
-import KokainPage from './pages/KokainPage'
+import PackagesPage from './pages/PackagesPage'
 import AuditPage from './pages/AuditPage'
 import SettingsPage from './pages/SettingsPage'
+import AufstellungenPage from './pages/AufstellungenPage'
 import TickerPage from './pages/TickerPage'
 import WeeklyDeliveryPage from './pages/WeeklyDeliveryPage'
 import SanctionsPage from './pages/SanctionsPage'
@@ -96,10 +97,10 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/kokain" element={
+        <Route path="/packages" element={
           <ProtectedRoute>
             <Layout>
-              <KokainPage />
+              <PackagesPage />
             </Layout>
           </ProtectedRoute>
         } />
@@ -142,6 +143,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <UserManagementPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/aufstellungen" element={
+          <ProtectedRoute>
+            <Layout>
+              <AufstellungenPage />
             </Layout>
           </ProtectedRoute>
         } />

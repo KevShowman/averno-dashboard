@@ -4,12 +4,12 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Role, User } from '@prisma/client';
-import { KokainService } from './kokain.service';
+import { PackagesService } from './packages.service';
 
-@Controller('kokain')
+@Controller('packages')
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class KokainController {
-  constructor(private kokainService: KokainService) {}
+export class PackagesController {
+  constructor(private packagesService: PackagesService) {}
 
   @Post('deposit')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
@@ -18,17 +18,17 @@ export class KokainController {
     @Body('note') note: string,
     @CurrentUser() user: User,
   ) {
-    return this.kokainService.createDeposit(user.id, packages, note);
+    return this.packagesService.createDeposit(user.id, packages, note);
   }
 
   // Prüfen ob User eine ausstehende Wochenabgabe hat
   @Get('check-weekly-delivery')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async checkPendingWeeklyDelivery(@CurrentUser() user: User) {
-    return this.kokainService.checkPendingWeeklyDelivery(user.id);
+    return this.packagesService.checkPendingWeeklyDelivery(user.id);
   }
 
-  // Kokain-Deposit mit Wochenabgabe-Integration erstellen
+  // Package-Deposit mit Wochenabgabe-Integration erstellen
   @Post('deposit-with-weekly-delivery')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async createDepositWithWeeklyDelivery(
@@ -38,7 +38,7 @@ export class KokainController {
     @Body('weeklyDeliveryId') weeklyDeliveryId: string,
     @CurrentUser() user: User,
   ) {
-    return this.kokainService.createDepositWithWeeklyDelivery(
+    return this.packagesService.createDepositWithWeeklyDelivery(
       user.id,
       packages,
       note,
@@ -50,13 +50,13 @@ export class KokainController {
   @Get('deposits/pending')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getPendingDeposits() {
-    return this.kokainService.getPendingDeposits();
+    return this.packagesService.getPendingDeposits();
   }
 
   @Get('deposits/confirmed')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getConfirmedDeposits() {
-    return this.kokainService.getConfirmedDeposits();
+    return this.packagesService.getConfirmedDeposits();
   }
 
   @Patch('deposit/:id/confirm')
@@ -65,11 +65,11 @@ export class KokainController {
     @Param('id') depositId: string,
     @CurrentUser() user: User,
   ) {
-    if (!this.kokainService.canConfirmDeposit(user.role)) {
+    if (!this.packagesService.canConfirmDeposit(user.role)) {
       throw new BadRequestException('Keine Berechtigung zum Bestätigen von Deposits');
     }
     
-    return this.kokainService.confirmDeposit(depositId, user.id);
+    return this.packagesService.confirmDeposit(depositId, user.id);
   }
 
   @Patch('deposit/:id/reject')
@@ -79,32 +79,32 @@ export class KokainController {
     @Body('reason') reason: string,
     @CurrentUser() user: User,
   ) {
-    if (!this.kokainService.canConfirmDeposit(user.role)) {
+    if (!this.packagesService.canConfirmDeposit(user.role)) {
       throw new BadRequestException('Keine Berechtigung zum Ablehnen von Deposits');
     }
     
-    return this.kokainService.rejectDeposit(depositId, user.id, reason);
+    return this.packagesService.rejectDeposit(depositId, user.id, reason);
   }
 
   @Get('summary')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getCurrentDepositSummary() {
-    return this.kokainService.getCurrentDepositSummary();
+    return this.packagesService.getCurrentDepositSummary();
   }
 
   @Get('price')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
-  async getKokainPrice() {
-    return { price: await this.kokainService.getKokainPrice() };
+  async getPackagePrice() {
+    return { price: await this.packagesService.getPackagePrice() };
   }
 
   @Post('price')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
-  async setKokainPrice(
+  async setPackagePrice(
     @Body('price') price: number,
     @CurrentUser() user: User,
   ) {
-    return this.kokainService.setKokainPrice(price, user.id);
+    return this.packagesService.setPackagePrice(price, user.id);
   }
 
   @Post('archive')
@@ -113,25 +113,25 @@ export class KokainController {
     @Body('name') archiveName: string,
     @CurrentUser() user: User,
   ) {
-    return this.kokainService.archiveCurrentDeposits(user.id, archiveName);
+    return this.packagesService.archiveCurrentDeposits(user.id, archiveName);
   }
 
   @Get('deposits/recent')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SOLDADO)
   async getRecentDeposits() {
-    return this.kokainService.getRecentDeposits();
+    return this.packagesService.getRecentDeposits();
   }
 
   @Get('archives')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
-  async getArchivedUebergaben() {
-    return this.kokainService.getArchivedUebergaben();
+  async getArchivedHandovers() {
+    return this.packagesService.getArchivedHandovers();
   }
 
   @Get('archives/:id')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
   async getArchiveDetails(@Param('id') archiveId: string) {
-    return this.kokainService.getArchiveDetails(archiveId);
+    return this.packagesService.getArchiveDetails(archiveId);
   }
 
   @Delete('deposit/:id')
@@ -141,10 +141,10 @@ export class KokainController {
     @Body('reason') reason: string,
     @CurrentUser() user: User,
   ) {
-    if (!this.kokainService.canConfirmDeposit(user.role)) {
+    if (!this.packagesService.canConfirmDeposit(user.role)) {
       throw new BadRequestException('Keine Berechtigung zum Entfernen von Deposits');
     }
     
-    return this.kokainService.removePendingDeposit(depositId, user.id, reason);
+    return this.packagesService.removePendingDeposit(depositId, user.id, reason);
   }
 }

@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { WeeklyDeliveryService } from '../weekly-delivery/weekly-delivery.service';
 import { SanctionsService } from '../sanctions/sanctions.service';
+import { DiscordService } from '../discord/discord.service';
+import { AufstellungService } from '../aufstellung/aufstellung.service';
 
 @Injectable()
 export class SchedulerService {
@@ -10,6 +12,8 @@ export class SchedulerService {
   constructor(
     private weeklyDeliveryService: WeeklyDeliveryService,
     private sanctionsService: SanctionsService,
+    private discordService: DiscordService,
+    private aufstellungService: AufstellungService,
   ) {}
 
   // Automatische Archivierung jeden Montag um 00:01 AM
@@ -122,5 +126,80 @@ export class SchedulerService {
   async manualAutoSanction48h() {
     this.logger.log('🔧 Manuelle 48h-Sanktionierung gestartet...');
     return this.handleAutoSanction48h();
+  }
+
+  // Discord-User-Synchronisierung jeden Tag um 03:00 AM
+  @Cron('0 3 * * *', {
+    name: 'discord-user-sync',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleDiscordUserSync() {
+    this.logger.log('🔄 Starte Discord-User-Synchronisierung...');
+    
+    try {
+      const result = await this.discordService.syncUsersAndRemoveInactive();
+      this.logger.log(`✅ Discord-Synchronisierung abgeschlossen:`);
+      this.logger.log(`   - ${result.removed} User entfernt (nicht mehr im Discord)`);
+      this.logger.log(`   - ${result.imported} neue User importiert`);
+      this.logger.log(`   - ${result.updated} User aktualisiert`);
+      this.logger.log(`   - ${result.totalDiscordMembers} User im Discord gefunden`);
+    } catch (error) {
+      this.logger.error('❌ Fehler bei der Discord-Synchronisierung:', error);
+    }
+  }
+
+  // Manueller Test der Discord-Synchronisierung (für Entwicklung)
+  async manualDiscordSync() {
+    this.logger.log('🔧 Manuelle Discord-Synchronisierung gestartet...');
+    return this.handleDiscordUserSync();
+  }
+
+  // Automatische Sanktionierung nicht-reagierender Aufstellungs-Teilnehmer
+  // Läuft jede Stunde um zu prüfen ob Deadlines abgelaufen sind
+  @Cron('0 * * * *', {
+    name: 'aufstellung-sanction-check',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleAufstellungSanctionCheck() {
+    this.logger.log('🔍 Prüfe Aufstellungen mit abgelaufener Deadline...');
+    
+    try {
+      // Hole alle Aufstellungen deren Deadline abgelaufen ist
+      const allAufstellungen = await this.aufstellungService.getAllAufstellungen();
+      const now = new Date();
+      
+      let totalSanctioned = 0;
+      
+      for (const aufstellung of allAufstellungen) {
+        // Nur wenn Deadline abgelaufen und in der Vergangenheit (max 24h zurück)
+        const deadlineDate = new Date(aufstellung.deadline);
+        const hoursSinceDeadline = (now.getTime() - deadlineDate.getTime()) / (1000 * 60 * 60);
+        
+        if (hoursSinceDeadline > 0 && hoursSinceDeadline <= 24) {
+          try {
+            const result = await this.aufstellungService.sanctionNonResponders(aufstellung.id);
+            totalSanctioned += result.sanctionedUsers;
+            
+            if (result.sanctionedUsers > 0) {
+              this.logger.log(`⚖️ ${result.sanctionedUsers} User sanktioniert für Aufstellung "${aufstellung.reason}"`);
+            }
+          } catch (error) {
+            // Fehler ignorieren (z.B. bereits sanktioniert)
+          }
+        }
+      }
+      
+      if (totalSanctioned > 0) {
+        this.logger.log(`✅ Aufstellungs-Sanktionierung abgeschlossen: ${totalSanctioned} User sanktioniert`);
+      }
+    } catch (error) {
+      this.logger.error('❌ Fehler bei der Aufstellungs-Sanktionierung:', error);
+    }
+  }
+
+  // Manueller Test der Aufstellungs-Sanktionierung (für Entwicklung)
+  async manualAufstellungSanction() {
+    this.logger.log('🔧 Manuelle Aufstellungs-Sanktionierung gestartet...');
+    return this.handleAufstellungSanctionCheck();
   }
 }

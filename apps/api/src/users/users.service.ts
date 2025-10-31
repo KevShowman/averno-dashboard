@@ -243,4 +243,43 @@ export class UsersService {
       },
     });
   }
+
+  // User löschen (Fallback wenn Discord-Sync nicht funktioniert)
+  async deleteUser(userId: string, requestingUserId: string) {
+    // Prüfe ob User existiert
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User nicht gefunden');
+    }
+
+    // Verhindere dass User sich selbst löscht
+    if (userId === requestingUserId) {
+      throw new BadRequestException('Du kannst dich nicht selbst löschen');
+    }
+
+    // Lösche User
+    await this.prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return {
+      message: `User ${user.username} wurde erfolgreich gelöscht`,
+      deletedUser: {
+        id: user.id,
+        username: user.username,
+        icFirstName: user.icFirstName,
+        icLastName: user.icLastName,
+      },
+    };
+  }
 }

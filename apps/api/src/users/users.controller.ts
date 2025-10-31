@@ -3,6 +3,7 @@ import {
   Get,
   Put,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -86,5 +87,16 @@ export class UsersController {
       updateDto.allRoles,
       req.user.id
     );
+  }
+
+  // User löschen (nur El Patron und Don als Fallback)
+  @Delete(':id')
+  @Roles(Role.EL_PATRON, Role.DON)
+  @UseGuards(RolesGuard)
+  async deleteUser(
+    @Param('id') userId: string,
+    @Request() req
+  ) {
+    return this.usersService.deleteUser(userId, req.user.id);
   }
 }

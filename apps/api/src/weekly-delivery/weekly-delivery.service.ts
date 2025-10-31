@@ -86,8 +86,8 @@ export class WeeklyDeliveryService {
       throw new NotFoundException('Wochenabgabe nicht gefunden');
     }
 
-    if (delivery.status !== WeeklyDeliveryStatus.PENDING) {
-      throw new BadRequestException('Wochenabgabe wurde bereits bezahlt');
+    if (delivery.status === WeeklyDeliveryStatus.PAID) {
+      throw new BadRequestException('Wochenabgabe wurde bereits vollständig bezahlt');
     }
 
     // Mindestens eine Zahlungsmethode muss angegeben werden
@@ -151,63 +151,7 @@ export class WeeklyDeliveryService {
     return updatedDelivery;
   }
 
-  // Wochenabgabe bestätigen
-  async confirmWeeklyDelivery(deliveryId: string, confirmedById: string) {
-    const delivery = await this.prisma.weeklyDelivery.findUnique({
-      where: { id: deliveryId },
-    });
-
-    if (!delivery) {
-      throw new NotFoundException('Wochenabgabe nicht gefunden');
-    }
-
-    if (delivery.status !== WeeklyDeliveryStatus.PAID) {
-      throw new BadRequestException('Wochenabgabe muss zuerst bezahlt werden');
-    }
-
-    const confirmedDelivery = await this.prisma.weeklyDelivery.update({
-      where: { id: deliveryId },
-      data: {
-        status: WeeklyDeliveryStatus.CONFIRMED,
-        confirmedById,
-        confirmedAt: new Date(),
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-        confirmedBy: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-    });
-
-    // Audit-Log
-    await this.auditService.log({
-      userId: confirmedById,
-      action: 'WEEKLY_DELIVERY_CONFIRM',
-      entity: 'WeeklyDelivery',
-      entityId: deliveryId,
-      meta: {
-        targetUserId: delivery.userId,
-        weekStart: delivery.weekStart,
-        weekEnd: delivery.weekEnd,
-        packages: delivery.packages,
-        paidAmount: delivery.paidAmount,
-        paidMoney: delivery.paidMoney,
-      },
-    });
-
-    return confirmedDelivery;
-  }
+  // Bestätigen-Workflow entfernt - PAID ist nun der finale Status
 
   // Recent deliveries für Live-Ticker
   async getRecentDeliveries() {
@@ -771,13 +715,13 @@ export class WeeklyDeliveryService {
 
     // Statistiken berechnen
     const totalDeliveries = weeklyDeliveries.length;
-    const paidDeliveries = weeklyDeliveries.filter(d => d.status === 'PAID' || d.status === 'CONFIRMED').length;
+    const paidDeliveries = weeklyDeliveries.filter(d => d.status === 'PAID').length;
     const overdueDeliveries = weeklyDeliveries.filter(d => d.status === 'OVERDUE').length;
     const pendingDeliveries = weeklyDeliveries.filter(d => d.status === 'PENDING' || d.status === 'PARTIALLY_PAID').length;
     
     const totalPackages = weeklyDeliveries.reduce((sum, d) => sum + d.packages, 0);
     const paidPackages = weeklyDeliveries
-      .filter(d => d.status === 'PAID' || d.status === 'CONFIRMED')
+      .filter(d => d.status === 'PAID')
       .reduce((sum, d) => sum + (d.paidAmount || 0), 0);
     
     const totalMoney = weeklyDeliveries.reduce((sum, d) => sum + (d.paidMoney || 0), 0);
@@ -937,7 +881,7 @@ export class WeeklyDeliveryService {
       where: { status: WeeklyDeliveryStatus.PAID },
     });
     const confirmedDeliveries = await this.prisma.weeklyDelivery.count({
-      where: { status: WeeklyDeliveryStatus.CONFIRMED },
+      where: { status: WeeklyDeliveryStatus.PAID },
     });
     const overdueDeliveries = await this.prisma.weeklyDelivery.count({
       where: { status: WeeklyDeliveryStatus.OVERDUE },

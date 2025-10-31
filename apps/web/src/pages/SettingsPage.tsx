@@ -43,8 +43,8 @@ export default function SettingsPage() {
   // Admin creation states
   const [newAdminDiscordId, setNewAdminDiscordId] = useState('')
   
-  // Kokain price state
-  const [kokainPrice, setKokainPrice] = useState(1000)
+  // Package price state
+  const [packagePrice, setPackagePrice] = useState(1000)
   
   // Weekly delivery settings states
   const [weeklyDeliveryPackages, setWeeklyDeliveryPackages] = useState(300)
@@ -53,7 +53,7 @@ export default function SettingsPage() {
   // Permission checks
   const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
   const canManageSettings = user?.role && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role)
-  const canManageKokainPrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
+  const canManagePackagePrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
   const canChangeIcName = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'LOGISTICA', 'SICARIO', 'SOLDADO'])
 
   // Queries
@@ -63,10 +63,10 @@ export default function SettingsPage() {
     enabled: canManageUsers,
   })
 
-  const { data: kokainPriceData } = useQuery({
-    queryKey: ['kokain-price'],
-    queryFn: () => api.get('/kokain/price').then(res => res.data),
-    enabled: canManageKokainPrice,
+  const { data: packagePriceData } = useQuery({
+    queryKey: ['packages-price'],
+    queryFn: () => packagesApi.getPrice().then(res => res.data),
+    enabled: canManagePackagePrice,
   })
 
   const { data: weeklyDeliverySettings } = useQuery({
@@ -113,15 +113,16 @@ export default function SettingsPage() {
     },
   })
 
-  const updateKokainPriceMutation = useMutation({
+  const updatePackagePriceMutation = useMutation({
     mutationFn: (price: number) =>
-      api.post('/kokain/price', { price }),
+      packagesApi.setPrice(price),
     onSuccess: () => {
-      toast.success('Kokain-Preis aktualisiert')
-      queryClient.invalidateQueries({ queryKey: ['kokain-price'] })
+      toast.success('Paket-Preis aktualisiert')
+      queryClient.invalidateQueries({ queryKey: ['packages-price'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-summary'] })
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Kokain-Preises')
+      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Paket-Preises')
     },
   })
 
@@ -144,10 +145,10 @@ export default function SettingsPage() {
   }, [user])
 
   useEffect(() => {
-    if (kokainPriceData?.price) {
-      setKokainPrice(kokainPriceData.price)
+    if (packagePriceData?.price) {
+      setPackagePrice(packagePriceData.price)
     }
-  }, [kokainPriceData])
+  }, [packagePriceData])
 
   useEffect(() => {
     if (weeklyDeliverySettings?.packages) {
@@ -167,9 +168,9 @@ export default function SettingsPage() {
     }
   }
 
-  const handleUpdateKokainPrice = () => {
-    if (kokainPrice > 0) {
-      updateKokainPriceMutation.mutate(kokainPrice)
+  const handleUpdatePackagePrice = () => {
+    if (packagePrice > 0) {
+      updatePackagePriceMutation.mutate(packagePrice)
     }
   }
 
@@ -246,19 +247,19 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm text-gray-400 mb-2 block">
-                Preis pro Kokain-Paket (Schwarzgeld)
+                Preis pro Paket (Schwarzgeld)
               </label>
               <div className="flex space-x-2">
                 <Input
                   type="number"
-                  value={kokainPrice}
-                  onChange={(e) => setKokainPrice(Number(e.target.value))}
+                  value={packagePrice}
+                  onChange={(e) => setPackagePrice(Number(e.target.value))}
                   className="flex-1"
                   placeholder="1000"
                 />
                 <Button
-                  onClick={() => updateKokainPriceMutation.mutate(kokainPrice)}
-                  disabled={updateKokainPriceMutation.isPending}
+                  onClick={() => updatePackagePriceMutation.mutate(packagePrice)}
+                  disabled={updatePackagePriceMutation.isPending}
                   variant="lasanta"
                 >
                   <Save className="mr-2 h-4 w-4" />
@@ -266,7 +267,7 @@ export default function SettingsPage() {
                 </Button>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Aktueller Preis: {formatCurrency(kokainPriceData?.price || 1000)} pro Paket
+                Aktueller Preis: {formatCurrency(packagePriceData?.price || 1000)} pro Paket
               </p>
             </div>
           </CardContent>

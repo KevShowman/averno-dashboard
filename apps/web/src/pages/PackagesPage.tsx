@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, kokainApi } from '../lib/api'
+import { api, packagesApi } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -26,7 +26,7 @@ import { formatDate, formatCurrency, getDisplayName } from '../lib/utils'
 import { toast } from 'sonner'
 import WeeklyDeliveryPaymentModal from '../components/WeeklyDeliveryPaymentModal'
 
-export default function KokainPage() {
+export default function PackagesPage() {
   const user = useAuthStore((state) => state.user)
   const queryClient = useQueryClient()
   const [showDepositModal, setShowDepositModal] = useState(false)
@@ -40,48 +40,48 @@ export default function KokainPage() {
   const [pendingWeeklyDelivery, setPendingWeeklyDelivery] = useState<any>(null)
 
   const { data: pendingDeposits, isLoading: pendingLoading } = useQuery({
-    queryKey: ['kokain-pending-deposits'],
-    queryFn: () => api.get('/kokain/deposits/pending').then(res => res.data),
+    queryKey: ['packages-pending-deposits'],
+    queryFn: () => packagesApi.getPendingDeposits().then(res => res.data),
   })
 
   const { data: confirmedDeposits, isLoading: confirmedLoading } = useQuery({
-    queryKey: ['kokain-confirmed-deposits'],
-    queryFn: () => api.get('/kokain/deposits/confirmed').then(res => res.data),
+    queryKey: ['packages-confirmed-deposits'],
+    queryFn: () => packagesApi.getConfirmedDeposits().then(res => res.data),
   })
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['kokain-summary'],
-    queryFn: () => api.get('/kokain/summary').then(res => res.data),
+    queryKey: ['packages-summary'],
+    queryFn: () => packagesApi.getSummary().then(res => res.data),
   })
 
   // Prüfen ob User eine ausstehende Wochenabgabe hat
   const { data: weeklyDeliveryCheck } = useQuery({
-    queryKey: ['kokain-weekly-delivery-check'],
-    queryFn: () => kokainApi.checkPendingWeeklyDelivery().then(res => res.data),
+    queryKey: ['packages-weekly-delivery-check'],
+    queryFn: () => packagesApi.checkPendingWeeklyDelivery().then(res => res.data),
   })
 
   const { data: priceData } = useQuery({
-    queryKey: ['kokain-price'],
-    queryFn: () => api.get('/kokain/price').then(res => res.data),
+    queryKey: ['packages-price'],
+    queryFn: () => packagesApi.getPrice().then(res => res.data),
   })
 
   const { data: archives } = useQuery({
-    queryKey: ['kokain-archives'],
-    queryFn: () => api.get('/kokain/archives').then(res => res.data),
+    queryKey: ['packages-archives'],
+    queryFn: () => packagesApi.getHandovers().then(res => res.data),
   })
 
   const { data: archiveDetails } = useQuery({
-    queryKey: ['kokain-archive-details', selectedArchive?.id],
-    queryFn: () => api.get(`/kokain/archives/${selectedArchive.id}`).then(res => res.data),
+    queryKey: ['packages-archive-details', selectedArchive?.id],
+    queryFn: () => selectedArchive ? packagesApi.getHandoverDetails(selectedArchive.id).then(res => res.data) : null,
     enabled: !!selectedArchive?.id,
   })
 
   const confirmDepositMutation = useMutation({
-    mutationFn: (depositId: string) => api.patch(`/kokain/deposit/${depositId}/confirm`),
+    mutationFn: (depositId: string) => packagesApi.confirmDeposit(depositId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-confirmed-deposits'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-confirmed-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-summary'] })
       toast.success('Deposit bestätigt!')
     },
     onError: (error: any) => {
@@ -91,10 +91,10 @@ export default function KokainPage() {
 
   const rejectDepositMutation = useMutation({
     mutationFn: ({ depositId, reason }: { depositId: string; reason: string }) => 
-      api.patch(`/kokain/deposit/${depositId}/reject`, { reason }),
+      packagesApi.rejectDeposit(depositId, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-confirmed-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-confirmed-deposits'] })
       toast.success('Deposit abgelehnt!')
     },
     onError: (error: any) => {
@@ -104,9 +104,9 @@ export default function KokainPage() {
 
   const createDepositMutation = useMutation({
     mutationFn: ({ packages, note }: { packages: number; note: string }) => 
-      api.post('/kokain/deposit', { packages, note }),
+      packagesApi.createDeposit({ packages, note }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-pending-deposits'] })
       setShowDepositModal(false)
       setDepositPackages('')
       setDepositNote('')
@@ -117,17 +117,17 @@ export default function KokainPage() {
     },
   })
 
-  // Mutation für Kokain-Deposit mit Wochenabgabe-Integration
+  // Mutation für Package-Deposit mit Wochenabgabe-Integration
   const createDepositWithWeeklyDeliveryMutation = useMutation({
     mutationFn: (data: { 
       packages: number; 
       note?: string; 
       useForWeeklyDelivery: boolean; 
       weeklyDeliveryId: string 
-    }) => kokainApi.createDepositWithWeeklyDelivery(data),
+    }) => packagesApi.createDepositWithWeeklyDelivery(data),
     onSuccess: () => {
-      toast.success('Kokain-Deposit mit Wochenabgabe-Integration erstellt')
-      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
+      toast.success('Paket-Deposit mit Wochenabgabe-Integration erstellt')
+      queryClient.invalidateQueries({ queryKey: ['packages-pending-deposits'] })
       queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
       setShowDepositModal(false)
       setShowWeeklyDeliveryModal(false)
@@ -140,10 +140,10 @@ export default function KokainPage() {
   })
 
   const updatePriceMutation = useMutation({
-    mutationFn: (price: number) => api.post('/kokain/price', { price }),
+    mutationFn: (price: number) => packagesApi.setPrice(price),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kokain-price'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-price'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-summary'] })
       setShowPriceModal(false)
       setNewPrice('')
       toast.success('Preis aktualisiert!')
@@ -154,11 +154,11 @@ export default function KokainPage() {
   })
 
   const archiveMutation = useMutation({
-    mutationFn: (name: string) => api.post('/kokain/archive', { name }),
+    mutationFn: (name: string) => packagesApi.archiveHandover(name),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kokain-confirmed-deposits'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-summary'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-archives'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-confirmed-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-archives'] })
       toast.success('Aktuelle Deposits archiviert!')
     },
     onError: (error: any) => {
@@ -168,11 +168,11 @@ export default function KokainPage() {
 
   const removeDepositMutation = useMutation({
     mutationFn: ({ depositId, reason }: { depositId: string; reason: string }) => 
-      api.delete(`/kokain/deposit/${depositId}`, { data: { reason } }),
+      packagesApi.deleteDeposit(depositId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kokain-pending-deposits'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-confirmed-deposits'] })
-      queryClient.invalidateQueries({ queryKey: ['kokain-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-pending-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-confirmed-deposits'] })
+      queryClient.invalidateQueries({ queryKey: ['packages-summary'] })
       toast.success('Deposit wurde entfernt!')
     },
     onError: (error: any) => {
@@ -254,10 +254,10 @@ export default function KokainPage() {
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center">
             <Package className="mr-3 h-8 w-8 text-accent" />
-            Kokain-Deposits
+            Paket-Deposits
           </h1>
           <p className="text-gray-400 mt-2">
-            Verwalte Kokain-Deposit-Anfragen und Übergaben
+            Verwalte Paket-Deposit-Anfragen und Übergaben
           </p>
         </div>
         <div className="flex space-x-2">
@@ -309,8 +309,8 @@ export default function KokainPage() {
               {summary?.totalWeeklyDeliveryPackages || 0} Wochenabgabe, {summary?.totalPayoutPackages || 0} Auszahlung
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              Wochenabgabe: {formatCurrency((summary?.totalWeeklyDeliveryPackages || 0) * (summary?.kokainPrice || 1000))}, 
-              Auszahlung: {formatCurrency((summary?.totalPayoutPackages || 0) * (summary?.kokainPrice || 1000))}
+              Wochenabgabe: {formatCurrency((summary?.totalWeeklyDeliveryPackages || 0) * (summary?.packagePrice || 1000))}, 
+              Auszahlung: {formatCurrency((summary?.totalPayoutPackages || 0) * (summary?.packagePrice || 1000))}
             </div>
           </CardContent>
         </Card>
@@ -321,7 +321,7 @@ export default function KokainPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-400">
-              {formatCurrency((summary?.totalWeeklyDeliveryPackages || 0) * (summary?.kokainPrice || 1000))}
+              {formatCurrency((summary?.totalWeeklyDeliveryPackages || 0) * (summary?.packagePrice || 1000))}
             </div>
             <div className="text-sm text-gray-400">
               {summary?.totalWeeklyDeliveryPackages || 0} Pakete

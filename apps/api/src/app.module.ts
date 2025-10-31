@@ -9,12 +9,13 @@ import { AuditModule } from './audit/audit.module';
 import { ModulesModule } from './modules/modules.module';
 import { UsersModule } from './users/users.module';
 import { SettingsModule } from './settings/settings.module';
-import { KokainModule } from './kokain/kokain.module';
+import { PackagesModule } from './packages/packages.module';
 import { DiscordModule } from './discord/discord.module';
 import { WeeklyDeliveryModule } from './weekly-delivery/weekly-delivery.module';
 import { SanctionsModule } from './sanctions/sanctions.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { StartupModule } from './startup/startup.module';
+import { AufstellungModule } from './aufstellung/aufstellung.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -37,12 +38,13 @@ import { AppService } from './app.service';
     ModulesModule,
     UsersModule,
     SettingsModule,
-    KokainModule,
+    PackagesModule,
     DiscordModule,
     WeeklyDeliveryModule,
     SanctionsModule,
     SchedulerModule,
     StartupModule,
+    AufstellungModule,
   ],
   controllers: [AppController],
   providers: [AppService],

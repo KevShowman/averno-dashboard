@@ -131,4 +131,10 @@ export class DiscordController {
       };
     }
   }
+
+  @Post('sync-and-remove-inactive')
+  @Roles(Role.EL_PATRON, Role.DON)
+  async syncUsersAndRemoveInactive() {
+    return this.discordService.syncUsersAndRemoveInactive();
+  }
 }

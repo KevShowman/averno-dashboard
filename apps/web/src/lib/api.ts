@@ -33,7 +33,6 @@ export const weeklyDeliveryApi = {
     api.post('/weekly-delivery', data),
   payDelivery: (id: string, data: { paidAmount?: number; paidMoney?: number }) => 
     api.patch(`/weekly-delivery/${id}/pay`, data),
-  confirmDelivery: (id: string) => api.patch(`/weekly-delivery/${id}/confirm`),
   getExclusions: (params?: { isActive?: string }) => 
     api.get('/weekly-delivery/exclusions', { params }),
   createExclusion: (data: { userId: string; reason: string; startDate: string; endDate?: string }) => 
@@ -86,28 +85,53 @@ export const usersApi = {
   getAvailableRoles: () => api.get('/users/roles/available'),
   getUserStats: () => api.get('/users/stats/overview'),
   updateUserRoles: (id: string, data: { allRoles: string[] }) => api.put(`/users/${id}/roles`, data),
+  deleteUser: (id: string) => api.delete(`/users/${id}`),
 }
 
-// Kokain API (erweitert um Wochenabgabe-Integration)
-export const kokainApi = {
+// Packages API (früher Kokain, jetzt allgemein für Pakete)
+export const packagesApi = {
   createDeposit: (data: { packages: number; note?: string }) => 
-    api.post('/kokain/deposit', data),
-  checkPendingWeeklyDelivery: () => api.get('/kokain/check-weekly-delivery'),
+    api.post('/packages/deposit', data),
+  checkPendingWeeklyDelivery: () => api.get('/packages/check-weekly-delivery'),
   createDepositWithWeeklyDelivery: (data: { 
     packages: number; 
     note?: string; 
     useForWeeklyDelivery: boolean; 
     weeklyDeliveryId: string 
-  }) => api.post('/kokain/deposit-with-weekly-delivery', data),
-  getPendingDeposits: () => api.get('/kokain/deposits/pending'),
-  getConfirmedDeposits: () => api.get('/kokain/deposits/confirmed'),
-  confirmDeposit: (id: string) => api.patch(`/kokain/deposit/${id}/confirm`),
-  rejectDeposit: (id: string, reason: string) => api.patch(`/kokain/deposit/${id}/reject`, { reason }),
-  deleteDeposit: (id: string) => api.delete(`/kokain/deposit/${id}`),
-  getUebergaben: () => api.get('/kokain/uebergaben'),
-  createUebergabe: (data: { name: string }) => api.post('/kokain/uebergabe', data),
-  archiveUebergabe: (id: string) => api.patch(`/kokain/uebergabe/${id}/archive`),
-  getDepositsByUebergabe: (uebergabeId: string) => api.get(`/kokain/uebergabe/${uebergabeId}/deposits`),
-  getStats: () => api.get('/kokain/stats'),
+  }) => api.post('/packages/deposit-with-weekly-delivery', data),
+  getPendingDeposits: () => api.get('/packages/deposits/pending'),
+  getConfirmedDeposits: () => api.get('/packages/deposits/confirmed'),
+  confirmDeposit: (id: string) => api.patch(`/packages/deposit/${id}/confirm`),
+  rejectDeposit: (id: string, reason: string) => api.patch(`/packages/deposit/${id}/reject`, { reason }),
+  deleteDeposit: (id: string) => api.delete(`/packages/deposit/${id}`),
+  getHandovers: () => api.get('/packages/archives'),
+  archiveHandover: (name: string) => api.post('/packages/archive', { name }),
+  getHandoverDetails: (id: string) => api.get(`/packages/archives/${id}`),
+  getSummary: () => api.get('/packages/summary'),
+  getPrice: () => api.get('/packages/price'),
+  setPrice: (price: number) => api.post('/packages/price', { price }),
+  getRecentDeposits: () => api.get('/packages/deposits/recent'),
+}
+
+// Discord API
+export const discordApi = {
+  getAllowedMembers: () => api.get('/discord/allowed-members'),
+  syncAllMembers: () => api.post('/discord/sync-all'),
+  getUserRole: (discordId: string) => api.get(`/discord/user-role/${discordId}`),
+  syncAndRemoveInactive: () => api.post('/discord/sync-and-remove-inactive'),
+}
+
+// Aufstellung API
+export const aufstellungApi = {
+  create: (data: { date: string; time: string; reason: string }) =>
+    api.post('/aufstellung', data),
+  getAll: () => api.get('/aufstellung'),
+  getUpcoming: () => api.get('/aufstellung/upcoming'),
+  getMyPending: () => api.get('/aufstellung/my-pending'),
+  getById: (id: string) => api.get(`/aufstellung/${id}`),
+  respond: (id: string, status: 'COMING' | 'NOT_COMING' | 'UNSURE') =>
+    api.post(`/aufstellung/${id}/respond`, { status }),
+  sanctionNonResponders: (id: string) => api.post(`/aufstellung/${id}/sanction-non-responders`),
+  delete: (id: string) => api.delete(`/aufstellung/${id}`),
 }
 

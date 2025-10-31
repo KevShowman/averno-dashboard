@@ -495,4 +495,72 @@ export class DiscordService {
       throw error;
     }
   }
+
+  // Synchronisiert User mit Discord und entfernt User die nicht mehr im Server sind
+  async syncUsersAndRemoveInactive() {
+    try {
+      console.log('Starte Discord-User-Synchronisierung...');
+      
+      // Alle Discord-Mitglieder mit erlaubten Rollen abrufen
+      const discordMembers = await this.getMembersWithAllowedRoles();
+      const discordMemberIds = new Set(discordMembers.map(m => m.discordId));
+      
+      // Alle User in der Datenbank abrufen
+      const allDbUsers = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          discordId: true,
+          username: true,
+          role: true,
+        }
+      });
+      
+      // User die nicht mehr im Discord sind
+      const usersToRemove = allDbUsers.filter(user => !discordMemberIds.has(user.discordId));
+      
+      let removedCount = 0;
+      const removedUsers = [];
+      
+      for (const user of usersToRemove) {
+        try {
+          // Lösche den User aus der Datenbank
+          await this.prisma.user.delete({
+            where: { id: user.id }
+          });
+          
+          removedCount++;
+          removedUsers.push({
+            id: user.id,
+            username: user.username,
+            discordId: user.discordId
+          });
+          
+          console.log(`✓ User entfernt: ${user.username} (Discord-ID: ${user.discordId})`);
+        } catch (error) {
+          console.error(`Fehler beim Entfernen von User ${user.username}:`, error);
+        }
+      }
+      
+      // Synchronisiere verbleibende User
+      const syncResult = await this.syncAllMembersWithAllowedRoles();
+      
+      console.log(`Discord-Synchronisierung abgeschlossen:
+        - ${removedCount} User entfernt (nicht mehr im Discord)
+        - ${syncResult.imported} neue User importiert
+        - ${syncResult.updated} User aktualisiert
+        - ${discordMemberIds.size} User im Discord gefunden`);
+      
+      return {
+        removed: removedCount,
+        removedUsers,
+        imported: syncResult.imported,
+        updated: syncResult.updated,
+        totalDiscordMembers: discordMemberIds.size,
+        errors: syncResult.errors
+      };
+    } catch (error) {
+      console.error('Fehler bei der Discord-User-Synchronisierung:', error);
+      throw error;
+    }
+  }
 }

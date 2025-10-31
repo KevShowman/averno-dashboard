@@ -74,13 +74,7 @@ export class WeeklyDeliveryController {
     );
   }
 
-  // Wochenabgabe bestätigen (Leaderschaft: EL_PATRON, DON, ASESOR)
-  @Patch(':id/confirm')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  @UseGuards(RolesGuard)
-  async confirmWeeklyDelivery(@Param('id') id: string, @Request() req) {
-    return this.weeklyDeliveryService.confirmWeeklyDelivery(id, req.user.id);
-  }
+  // Bestätigen-Workflow entfernt - PAID ist nun der finale Status
 
   // Alle Wochenabgaben abrufen
   @Get()

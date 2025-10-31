@@ -5,7 +5,7 @@ import { AuditService } from '../audit/audit.service';
 import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
-export class KokainService {
+export class PackagesService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
@@ -17,7 +17,7 @@ export class KokainService {
       throw new BadRequestException('Anzahl der Pakete muss größer als 0 sein');
     }
 
-    const deposit = await this.prisma.kokainDeposit.create({
+    const deposit = await this.prisma.packageDeposit.create({
       data: {
         userId,
         packages,
@@ -39,8 +39,8 @@ export class KokainService {
 
     await this.auditService.log({
       userId,
-      action: 'KOKAIN_DEPOSIT_CREATED',
-      entity: 'KokainDeposit',
+      action: 'PACKAGE_DEPOSIT_CREATED',
+      entity: 'PackageDeposit',
       entityId: deposit.id,
       meta: {
         packages,
@@ -77,7 +77,7 @@ export class KokainService {
             icLastName: true,
           },
         },
-        kokainDeposits: {
+        packageDeposits: {
           where: {
             status: DepositStatus.CONFIRMED,
           },
@@ -91,7 +91,7 @@ export class KokainService {
     return pendingDelivery;
   }
 
-  // Kokain-Deposit mit Wochenabgabe-Integration erstellen
+  // Package-Deposit mit Wochenabgabe-Integration erstellen
   async createDepositWithWeeklyDelivery(
     userId: string, 
     packages: number, 
@@ -143,7 +143,7 @@ export class KokainService {
       // Hier nur die Berechnung für den Deposit speichern
     }
 
-    const deposit = await this.prisma.kokainDeposit.create({
+    const deposit = await this.prisma.packageDeposit.create({
       data: {
         userId,
         packages,
@@ -178,8 +178,8 @@ export class KokainService {
 
     await this.auditService.log({
       userId,
-      action: 'KOKAIN_DEPOSIT_CREATED',
-      entity: 'KokainDeposit',
+      action: 'PACKAGE_DEPOSIT_CREATED',
+      entity: 'PackageDeposit',
       entityId: deposit.id,
       meta: {
         packages,
@@ -211,7 +211,7 @@ export class KokainService {
   }
 
   async getPendingDeposits() {
-    return this.prisma.kokainDeposit.findMany({
+    return this.prisma.packageDeposit.findMany({
       where: {
         status: DepositStatus.PENDING,
       },
@@ -233,7 +233,7 @@ export class KokainService {
   }
 
   async getConfirmedDeposits() {
-    return this.prisma.kokainDeposit.findMany({
+    return this.prisma.packageDeposit.findMany({
       where: {
         status: DepositStatus.CONFIRMED,
         uebergabeId: null, // Nur Deposits der aktuellen Übergabe (nicht archiviert)
@@ -260,7 +260,7 @@ export class KokainService {
   }
 
   async confirmDeposit(depositId: string, confirmedById: string) {
-    const deposit = await this.prisma.kokainDeposit.findUnique({
+    const deposit = await this.prisma.packageDeposit.findUnique({
       where: { id: depositId },
       include: { 
         user: true,
@@ -281,7 +281,7 @@ export class KokainService {
       const weeklyDelivery = deposit.weeklyDelivery;
       
       // Berechne neue Status basierend auf allen bestätigten Deposits für diese Wochenabgabe
-      const allConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
+      const allConfirmedDeposits = await this.prisma.packageDeposit.findMany({
         where: {
           weeklyDeliveryId: deposit.weeklyDeliveryId,
           status: DepositStatus.CONFIRMED,
@@ -311,7 +311,7 @@ export class KokainService {
       });
     }
 
-    const confirmedDeposit = await this.prisma.kokainDeposit.update({
+    const confirmedDeposit = await this.prisma.packageDeposit.update({
       where: { id: depositId },
       data: {
         status: DepositStatus.CONFIRMED,
@@ -349,8 +349,8 @@ export class KokainService {
 
     await this.auditService.log({
       userId: confirmedById,
-      action: 'KOKAIN_DEPOSIT_CONFIRMED',
-      entity: 'KokainDeposit',
+      action: 'PACKAGE_DEPOSIT_CONFIRMED',
+      entity: 'PackageDeposit',
       entityId: depositId,
       meta: {
         packages: deposit.packages,
@@ -364,7 +364,7 @@ export class KokainService {
   }
 
   async rejectDeposit(depositId: string, rejectedById: string, reason?: string) {
-    const deposit = await this.prisma.kokainDeposit.findUnique({
+    const deposit = await this.prisma.packageDeposit.findUnique({
       where: { id: depositId },
       include: {
         weeklyDelivery: true,
@@ -388,7 +388,7 @@ export class KokainService {
       let newPaidAmount = 0;
       
       // Finde alle anderen bestätigten Deposits für diese Wochenabgabe
-      const otherConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
+      const otherConfirmedDeposits = await this.prisma.packageDeposit.findMany({
         where: {
           weeklyDeliveryId: deposit.weeklyDeliveryId,
           status: DepositStatus.CONFIRMED,
@@ -420,7 +420,7 @@ export class KokainService {
       });
     }
 
-    const rejectedDeposit = await this.prisma.kokainDeposit.update({
+    const rejectedDeposit = await this.prisma.packageDeposit.update({
       where: { id: depositId },
       data: {
         status: DepositStatus.REJECTED,
@@ -459,8 +459,8 @@ export class KokainService {
 
     await this.auditService.log({
       userId: rejectedById,
-      action: 'KOKAIN_DEPOSIT_REJECTED',
-      entity: 'KokainDeposit',
+      action: 'PACKAGE_DEPOSIT_REJECTED',
+      entity: 'PackageDeposit',
       entityId: depositId,
       meta: {
         packages: deposit.packages,
@@ -474,7 +474,7 @@ export class KokainService {
   }
 
   async getCurrentDepositSummary() {
-    const confirmedDeposits = await this.prisma.kokainDeposit.findMany({
+    const confirmedDeposits = await this.prisma.packageDeposit.findMany({
       where: {
         status: DepositStatus.CONFIRMED,
         uebergabeId: null, // Nur aktuelle Deposits (nicht archivierte)
@@ -510,8 +510,8 @@ export class KokainService {
       return acc;
     }, {} as Record<string, { user: any; packages: number; weeklyDeliveryPackages: number; payoutPackages: number }>);
 
-    // Kokain-Preis aus Settings holen
-    const kokainPrice = await this.getKokainPrice();
+    // Paket-Preis aus Settings holen
+    const packagePrice = await this.getPackagePrice();
 
     return {
       totalPackages,
@@ -520,38 +520,38 @@ export class KokainService {
       totalUsers: Object.keys(userCounts).length,
       userDeposits: Object.values(userCounts).map(item => ({
         ...item,
-        value: item.packages * kokainPrice,
+        value: item.packages * packagePrice,
       })),
-      totalValue: totalPackages * kokainPrice,
-      kokainPrice,
+      totalValue: totalPackages * packagePrice,
+      packagePrice,
     };
   }
 
-  async getKokainPrice(): Promise<number> {
+  async getPackagePrice(): Promise<number> {
     const setting = await this.prisma.settings.findUnique({
-      where: { key: 'kokain_price_per_package' },
+      where: { key: 'package_price_per_unit' },
     });
 
     return setting ? (setting.value as number) : 1000; // Default: 1000 Schwarzgeld pro Paket
   }
 
-  async setKokainPrice(price: number, updatedById: string) {
+  async setPackagePrice(price: number, updatedById: string) {
     if (price <= 0) {
       throw new BadRequestException('Preis muss größer als 0 sein');
     }
 
     const setting = await this.prisma.settings.upsert({
-      where: { key: 'kokain_price_per_package' },
+      where: { key: 'package_price_per_unit' },
       update: { value: price },
       create: {
-        key: 'kokain_price_per_package',
+        key: 'package_price_per_unit',
         value: price,
       },
     });
 
     await this.auditService.log({
       userId: updatedById,
-      action: 'KOKAIN_PRICE_UPDATED',
+      action: 'PACKAGE_PRICE_UPDATED',
       entity: 'Settings',
       entityId: setting.id,
       meta: {
@@ -563,7 +563,7 @@ export class KokainService {
   }
 
   async archiveCurrentDeposits(archivedById: string, archiveName?: string) {
-    const confirmedDeposits = await this.prisma.kokainDeposit.findMany({
+    const confirmedDeposits = await this.prisma.packageDeposit.findMany({
       where: {
         status: DepositStatus.CONFIRMED,
         uebergabeId: null, // Nur Deposits die noch nicht archiviert sind
@@ -575,9 +575,9 @@ export class KokainService {
     }
 
     const totalPackages = confirmedDeposits.reduce((sum, deposit) => sum + deposit.packages, 0);
-    const totalValue = totalPackages * (await this.getKokainPrice());
+    const totalValue = totalPackages * (await this.getPackagePrice());
 
-    const archive = await this.prisma.kokainUebergabe.create({
+    const archive = await this.prisma.packageHandover.create({
       data: {
         name: archiveName || `Übergabe ${new Date().toLocaleDateString('de-DE')}`,
         totalPackages,
@@ -588,7 +588,7 @@ export class KokainService {
     });
 
     // Alle bestätigten Deposits mit der Archiv-ID verknüpfen
-    await this.prisma.kokainDeposit.updateMany({
+    await this.prisma.packageDeposit.updateMany({
       where: {
         status: DepositStatus.CONFIRMED,
         uebergabeId: null,
@@ -600,8 +600,8 @@ export class KokainService {
 
     await this.auditService.log({
       userId: archivedById,
-      action: 'KOKAIN_DEPOSITS_ARCHIVED',
-      entity: 'KokainUebergabe',
+      action: 'PACKAGE_DEPOSITS_ARCHIVED',
+      entity: 'PackageHandover',
       entityId: archive.id,
       meta: {
         totalPackages,
@@ -614,7 +614,7 @@ export class KokainService {
   }
 
   async getRecentDeposits() {
-    return this.prisma.kokainDeposit.findMany({
+    return this.prisma.packageDeposit.findMany({
       take: 50, // Letzte 50 Deposits
       where: {
         status: {
@@ -655,8 +655,8 @@ export class KokainService {
     });
   }
 
-  async getArchivedUebergaben() {
-    return this.prisma.kokainUebergabe.findMany({
+  async getArchivedHandovers() {
+    return this.prisma.packageHandover.findMany({
       where: {
         isActive: false,
       },
@@ -667,7 +667,7 @@ export class KokainService {
   }
 
   async getArchiveDetails(archiveId: string) {
-    const archive = await this.prisma.kokainUebergabe.findUnique({
+    const archive = await this.prisma.packageHandover.findUnique({
       where: { id: archiveId },
       include: {
         deposits: {
@@ -724,9 +724,9 @@ export class KokainService {
     const totalPayoutPackages = archive.deposits.reduce((sum, deposit) => sum + (deposit.payoutPackages || 0), 0);
 
     // Calculate total value per user
-    const kokainPrice = await this.getKokainPrice();
+    const packagePrice = await this.getPackagePrice();
     Object.values(userSummary).forEach((userData: any) => {
-      userData.totalValue = userData.totalPackages * kokainPrice;
+      userData.totalValue = userData.totalPackages * packagePrice;
     });
 
     return {
@@ -735,12 +735,12 @@ export class KokainService {
       totalWeeklyDeliveryPackages,
       totalPayoutPackages,
       userSummary: Object.values(userSummary),
-      kokainPrice,
+      packagePrice,
     };
   }
 
   async removePendingDeposit(depositId: string, removedById: string, reason: string) {
-    const deposit = await this.prisma.kokainDeposit.findUnique({
+    const deposit = await this.prisma.packageDeposit.findUnique({
       where: { id: depositId },
       include: { 
         user: true,
@@ -767,7 +767,7 @@ export class KokainService {
       const weeklyDelivery = deposit.weeklyDelivery;
       
       // Berechne neuen Status basierend auf verbleibenden bestätigten Deposits
-      const remainingConfirmedDeposits = await this.prisma.kokainDeposit.findMany({
+      const remainingConfirmedDeposits = await this.prisma.packageDeposit.findMany({
         where: {
           weeklyDeliveryId: deposit.weeklyDeliveryId,
           status: DepositStatus.CONFIRMED,
@@ -798,14 +798,14 @@ export class KokainService {
     }
 
     // Deposit löschen
-    await this.prisma.kokainDeposit.delete({
+    await this.prisma.packageDeposit.delete({
       where: { id: depositId },
     });
 
     await this.auditService.log({
       userId: removedById,
-      action: 'KOKAIN_DEPOSIT_REMOVED',
-      entity: 'KokainDeposit',
+      action: 'PACKAGE_DEPOSIT_REMOVED',
+      entity: 'PackageDeposit',
       entityId: depositId,
       meta: {
         packages: deposit.packages,

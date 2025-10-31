@@ -61,7 +61,7 @@ export default function WeeklyDeliveryPayModal({
                 Wochenabgabe bezahlen
               </CardTitle>
               <CardDescription>
-                Bezahle deine wöchentliche Abgabe von {requiredPackages} Kokain-Paketen mit Schwarzgeld
+                Bezahle deine wöchentliche Abgabe von {requiredPackages} Paketen mit Schwarzgeld
               </CardDescription>
             </div>
             <Button
@@ -84,7 +84,7 @@ export default function WeeklyDeliveryPayModal({
             </div>
             <div className="text-white text-sm">
               Für die Wochenabgabe können nur Schwarzgeld-Zahlungen verwendet werden. 
-              Für Kokain-Pakete verwende das Kokain-System.
+              Für Pakete verwende das Paket-System.
             </div>
           </div>
 
@@ -127,7 +127,7 @@ export default function WeeklyDeliveryPayModal({
                 />
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                Minimum: {minimumPayment.toLocaleString('de-DE')} Schwarzgeld (entspricht {requiredPackages} Kokain-Paketen)
+                Minimum: {minimumPayment.toLocaleString('de-DE')} Schwarzgeld (entspricht {requiredPackages} Paketen)
               </div>
             </div>
           </div>

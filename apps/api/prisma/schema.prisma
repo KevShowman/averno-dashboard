@@ -30,9 +30,9 @@ model User {
   moneyTxApproved MoneyTransaction[] @relation("tx_approved_by")
   stockMovements StockMovement[] @relation("movement_created_by")
   stockMovementsApproved StockMovement[] @relation("movement_approved_by")
-  kokainDeposits KokainDeposit[] @relation("deposit_created_by")
-  kokainConfirmations KokainDeposit[] @relation("deposit_confirmed_by")
-  kokainRejections KokainDeposit[] @relation("deposit_rejected_by")
+  packageDeposits PackageDeposit[] @relation("deposit_created_by")
+  packageConfirmations PackageDeposit[] @relation("deposit_confirmed_by")
+  packageRejections PackageDeposit[] @relation("deposit_rejected_by")
   weeklyDeliveries WeeklyDelivery[] @relation("delivery_created_by")
   weeklyDeliveryConfirmations WeeklyDelivery[] @relation("delivery_confirmed_by")
   sanctionsCreated Sanction[] @relation("sanction_created_by")
@@ -40,6 +40,8 @@ model User {
   exclusionsReceived WeeklyDeliveryExclusion[] @relation("exclusion_user")
   exclusionsCreated WeeklyDeliveryExclusion[] @relation("exclusion_created_by")
   archivesCreated WeeklyDeliveryArchive[] @relation("archive_created_by")
+  aufstellungenCreated Aufstellung[] @relation("aufstellung_created_by")
+  aufstellungResponses AufstellungResponse[] @relation("aufstellung_responses")
 
   @@map("users")
 }
@@ -196,12 +198,12 @@ model Settings {
   @@map("settings")
 }
 
-// Kokain-Deposit System
-model KokainDeposit {
+// Package-Deposit System (früher Kokain)
+model PackageDeposit {
   id          String @id @default(cuid())
   userId      String
   user        User   @relation("deposit_created_by", fields: [userId], references: [id])
-  packages    Int    // Anzahl Kokain-Pakete
+  packages    Int    // Anzahl Pakete
   status      DepositStatus @default(PENDING)
   confirmedById String?
   confirmedBy User?  @relation("deposit_confirmed_by", fields: [confirmedById], references: [id])
@@ -212,7 +214,7 @@ model KokainDeposit {
   rejectionReason String?
   note        String?
   uebergabeId String? // Referenz zur Übergabe-Session
-  uebergabe   KokainUebergabe? @relation(fields: [uebergabeId], references: [id])
+  uebergabe   PackageHandover? @relation(fields: [uebergabeId], references: [id])
   // Wochenabgabe Integration
   weeklyDeliveryId String? // Referenz zur Wochenabgabe
   weeklyDelivery   WeeklyDelivery? @relation(fields: [weeklyDeliveryId], references: [id])
@@ -221,7 +223,7 @@ model KokainDeposit {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("kokain_deposits")
+  @@map("package_deposits")
 }
 
 enum DepositStatus {
@@ -231,7 +233,7 @@ enum DepositStatus {
 }
 
 // Übergabe-Sessions für Archivierung
-model KokainUebergabe {
+model PackageHandover {
   id          String @id @default(cuid())
   name        String // z.B. "Übergabe Dezember 2024"
   totalPackages Int
@@ -242,9 +244,9 @@ model KokainUebergabe {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  deposits    KokainDeposit[]
+  deposits    PackageDeposit[]
 
-  @@map("kokain_uebergaben")
+  @@map("package_handovers")
 }
 
 model DiscordRoleMapping {
@@ -266,8 +268,8 @@ model WeeklyDelivery {
   user        User   @relation("delivery_created_by", fields: [userId], references: [id])
   weekStart   DateTime // Start der Woche (Montag)
   weekEnd     DateTime // Ende der Woche (Sonntag)
-  packages    Int    @default(300) // Standard: 300 Kokain-Pakete
-  paidAmount  Int?   // Bezahlte Menge in Kokain-Paketen
+  packages    Int    @default(300) // Standard: 300 Pakete
+  paidAmount  Int?   // Bezahlte Menge in Paketen
   paidMoney   Int?   // Bezahlte Menge in Schwarzgeld
   status      WeeklyDeliveryStatus @default(PENDING)
   confirmedById String?
@@ -280,7 +282,7 @@ model WeeklyDelivery {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  kokainDeposits KokainDeposit[]
+  packageDeposits PackageDeposit[]
 
   @@map("weekly_deliveries")
 }
@@ -289,7 +291,6 @@ enum WeeklyDeliveryStatus {
   PENDING
   PARTIALLY_PAID
   PAID
-  CONFIRMED
   OVERDUE
 }
 
@@ -365,4 +366,41 @@ enum SanctionStatus {
   PAID
   EXPIRED
   CANCELLED
+}
+
+// Aufstellungssystem
+model Aufstellung {
+  id          String @id @default(cuid())
+  createdById String
+  createdBy   User   @relation("aufstellung_created_by", fields: [createdById], references: [id])
+  date        DateTime // Datum und Uhrzeit der Aufstellung
+  reason      String  // Grund/Location der Aufstellung
+  deadline    DateTime // Deadline für Reaktionen (= date)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  responses   AufstellungResponse[]
+
+  @@map("aufstellungen")
+}
+
+model AufstellungResponse {
+  id             String @id @default(cuid())
+  aufstellungId  String
+  aufstellung    Aufstellung @relation(fields: [aufstellungId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User   @relation("aufstellung_responses", fields: [userId], references: [id], onDelete: Cascade)
+  status         AufstellungResponseStatus
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([aufstellungId, userId])
+  @@map("aufstellung_responses")
+}
+
+enum AufstellungResponseStatus {
+  COMING      // Kommt
+  NOT_COMING  // Kommt nicht
+  UNSURE      // Unsicher
 }

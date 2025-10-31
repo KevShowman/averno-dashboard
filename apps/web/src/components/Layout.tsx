@@ -13,11 +13,12 @@ import {
   LogOut,
   User,
   Activity,
-  FlaskConical,
   Clock,
   Calendar,
   Scale,
-  Users
+  Users,
+  PackageOpen,
+  CalendarCheck
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -43,8 +44,9 @@ const navigation = [
   { name: 'Lager', href: '/lager', icon: Package },
   { name: 'Lagerbewegungen', href: '/lager-movements', icon: Clock },
   { name: 'Kasse', href: '/kasse', icon: DollarSign },
-  { name: 'Kokain', href: '/kokain', icon: FlaskConical },
+  { name: 'Pakete', href: '/packages', icon: PackageOpen },
   { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
+  { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
   { name: 'Sanktionen', href: '/sanctions', icon: Scale },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
