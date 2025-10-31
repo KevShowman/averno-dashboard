@@ -17,7 +17,7 @@ interface DashboardStats {
   weekChange: number
   pendingDeposits: number
   confirmedDeposits: number
-  kokainPrice: number
+  packagePrice: number
 }
 
 export default function DashboardPage() {
@@ -65,17 +65,17 @@ export default function DashboardPage() {
     refetchOnWindowFocus: false,
   })
 
-  const { data: kokainStats } = useQuery({
-    queryKey: ['kokain-stats'],
-    queryFn: () => api.get('/kokain/summary').then(res => res.data),
+  const { data: packageStats } = useQuery({
+    queryKey: ['packages-stats'],
+    queryFn: () => api.get('/packages/summary').then(res => res.data),
     enabled: isAuthenticated && !!user,
     retry: 3,
     refetchOnWindowFocus: false,
   })
 
-  const { data: kokainPrice } = useQuery({
-    queryKey: ['kokain-price'],
-    queryFn: () => api.get('/kokain/price').then(res => res.data),
+  const { data: packagePrice } = useQuery({
+    queryKey: ['packages-price'],
+    queryFn: () => api.get('/packages/price').then(res => res.data),
     enabled: isAuthenticated && !!user,
     retry: 3,
     refetchOnWindowFocus: false,
@@ -88,9 +88,9 @@ export default function DashboardPage() {
     pendingTransactions: cashStats?.pendingTransactions || 0,
     todayChange: cashStats?.todayChange || 0,
     weekChange: cashStats?.weekChange || 0,
-    pendingDeposits: kokainStats?.pendingDeposits || 0,
-    confirmedDeposits: kokainStats?.confirmedDeposits || 0,
-    kokainPrice: kokainPrice?.price || 0,
+    pendingDeposits: packageStats?.pendingDeposits || 0,
+    confirmedDeposits: packageStats?.confirmedDeposits || 0,
+    packagePrice: packagePrice?.price || 0,
   }
 
   return (

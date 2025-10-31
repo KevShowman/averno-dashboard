@@ -9,7 +9,7 @@ import { Activity, Package, DollarSign, TrendingUp, TrendingDown, RotateCcw, Plu
 import { formatDate, formatCurrency, getRoleColor, getRoleDisplayName, getMovementTypeColor, getTransactionStatusColor, getDisplayName } from '../lib/utils'
 
 export default function TickerPage() {
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'lager' | 'kasse' | 'kokain' | 'weekly-delivery' | 'sanctions'>('all')
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'lager' | 'kasse' | 'packages' | 'weekly-delivery' | 'sanctions'>('all')
 
   const { data: stockMovements, isLoading: stockLoading } = useQuery({
     queryKey: ['recent-stock-movements'],
@@ -23,10 +23,10 @@ export default function TickerPage() {
     enabled: selectedFilter === 'all' || selectedFilter === 'kasse',
   })
 
-  const { data: kokainDeposits, isLoading: kokainLoading } = useQuery({
-    queryKey: ['recent-kokain-deposits'],
-    queryFn: () => api.get('/kokain/deposits/recent').then(res => res.data),
-    enabled: selectedFilter === 'all' || selectedFilter === 'kokain',
+  const { data: packageDeposits, isLoading: packagesLoading } = useQuery({
+    queryKey: ['recent-package-deposits'],
+    queryFn: () => api.get('/packages/deposits/recent').then(res => res.data),
+    enabled: selectedFilter === 'all' || selectedFilter === 'packages',
   })
 
   const { data: weeklyDeliveries, isLoading: weeklyLoading } = useQuery({
@@ -120,13 +120,13 @@ export default function TickerPage() {
     })
   }
 
-  if (kokainDeposits?.deposits) {
-    kokainDeposits.deposits.forEach((deposit: any) => {
+  if (packageDeposits?.deposits) {
+    packageDeposits.deposits.forEach((deposit: any) => {
       // Alle Deposit-Status anzeigen (CONFIRMED, PENDING, REJECTED)
       if (deposit.status === 'CONFIRMED') {
         allActivities.push({
           id: `kokain-${deposit.id}`,
-          type: 'kokain',
+          type: 'packages',
           timestamp: deposit.confirmedAt || deposit.createdAt,
           user: deposit.user,
           action: deposit.status,
@@ -142,7 +142,7 @@ export default function TickerPage() {
         // Pending Deposits als "angefragt" anzeigen
         allActivities.push({
           id: `kokain-pending-${deposit.id}`,
-          type: 'kokain',
+          type: 'packages',
           timestamp: deposit.createdAt,
           user: deposit.user,
           action: deposit.status,
@@ -157,7 +157,7 @@ export default function TickerPage() {
         // Rejected Deposits anzeigen
         allActivities.push({
           id: `kokain-rejected-${deposit.id}`,
-          type: 'kokain',
+          type: 'packages',
           timestamp: deposit.rejectedAt || deposit.createdAt,
           user: deposit.user,
           action: deposit.status,
@@ -238,7 +238,7 @@ export default function TickerPage() {
         case 'KORREKTUR': return <RotateCcw className="h-4 w-4 text-yellow-400" />
         default: return <DollarSign className="h-4 w-4" />
       }
-    } else if (type === 'kokain') {
+    } else if (type === 'packages') {
       switch (action) {
         case 'PENDING': return <Clock className="h-4 w-4 text-yellow-400" />
         case 'CONFIRMED': return <CheckCircle className="h-4 w-4 text-green-400" />
@@ -285,7 +285,7 @@ export default function TickerPage() {
         'KORREKTUR': 'Korrektur',
       }
       return actionMap[action] || action
-    } else if (type === 'kokain') {
+    } else if (type === 'packages') {
       const actionMap: Record<string, string> = {
         'PENDING': 'Deposit angefragt',
         'CONFIRMED': 'Deposit bestätigt',
@@ -314,7 +314,7 @@ export default function TickerPage() {
     }
   }
 
-  const isLoading = stockLoading || cashLoading || kokainLoading || weeklyLoading || sanctionsLoading
+  const isLoading = stockLoading || cashLoading || packagesLoading || weeklyLoading || sanctionsLoading
 
   return (
     <div className="space-y-6">
@@ -355,12 +355,12 @@ export default function TickerPage() {
             Kasse
           </Button>
           <Button
-            variant={selectedFilter === 'kokain' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('kokain')}
+            variant={selectedFilter === 'packages' ? "default" : "outline"}
+            onClick={() => setSelectedFilter('packages')}
             size="sm"
           >
-            <FlaskConical className="mr-2 h-4 w-4" />
-            Kokain
+            <Package className="mr-2 h-4 w-4" />
+            Pakete
           </Button>
           <Button
             variant={selectedFilter === 'weekly-delivery' ? "default" : "outline"}
@@ -421,11 +421,11 @@ export default function TickerPage() {
         
         <Card className="lasanta-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Kokain-Deposits</CardTitle>
+            <CardTitle className="text-sm text-gray-400">Paket-Deposits</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-400">
-              {allActivities.filter(activity => activity.type === 'kokain').length}
+              {allActivities.filter(activity => activity.type === 'packages').length}
             </div>
           </CardContent>
         </Card>
@@ -491,13 +491,13 @@ export default function TickerPage() {
                         <Badge variant={
                           activity.type === 'lager' ? 'outline' : 
                           activity.type === 'kasse' ? 'secondary' :
-                          activity.type === 'kokain' ? 'destructive' :
+                          activity.type === 'packages' ? 'destructive' :
                           activity.type === 'weekly-delivery' ? 'default' :
                           activity.type === 'sanctions' ? 'destructive' : 'secondary'
                         }>
                           {activity.type === 'lager' ? 'Lager' : 
                            activity.type === 'kasse' ? 'Kasse' :
-                           activity.type === 'kokain' ? 'Kokain' :
+                           activity.type === 'packages' ? 'Pakete' :
                            activity.type === 'weekly-delivery' ? 'Wochenabgabe' :
                            activity.type === 'sanctions' ? 'Sanktionen' : 'Unbekannt'}
                         </Badge>
@@ -510,7 +510,7 @@ export default function TickerPage() {
                               ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
                               : activity.type === 'lager' 
                                 ? getMovementTypeColor(activity.action)
-                                : activity.type === 'kokain'
+                                : activity.type === 'packages'
                                   ? activity.action === 'CONFIRMED' 
                                     ? 'bg-green-500/20 text-green-400 border-green-500/30'
                                     : activity.action === 'REJECTED'
@@ -540,7 +540,7 @@ export default function TickerPage() {
                               Menge: {activity.details.quantity}
                             </div>
                           </div>
-                        ) : activity.type === 'kokain' ? (
+                        ) : activity.type === 'packages' ? (
                           <div>
                             <div className="font-medium">
                               {activity.details.packages} Pakete

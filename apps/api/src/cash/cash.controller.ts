@@ -77,7 +77,7 @@ export class CashController {
   }
 
   @Get('chart')
-  async getChartData(@Query('range') range?: 'week' | 'month' | 'year') {
+  async getChartData(@Query('range') range?: 'today' | 'week' | 'month' | 'year' | 'all') {
     return this.cashService.getChartData(range);
   }
 }

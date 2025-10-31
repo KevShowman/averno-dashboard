@@ -315,12 +315,17 @@ export class CashService {
       .sort();
   }
 
-  async getChartData(range: 'week' | 'month' | 'year' = 'month') {
+  async getChartData(range: 'today' | 'week' | 'month' | 'year' | 'all' = 'week') {
     const now = new Date();
     let startDate: Date;
     let groupBy: string;
 
     switch (range) {
+      case 'today':
+        // Start of today
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        groupBy = 'hour';
+        break;
       case 'week':
         startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         groupBy = 'day';
@@ -332,6 +337,15 @@ export class CashService {
       case 'year':
         startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
         groupBy = 'month';
+        break;
+      case 'all':
+        // Get first transaction date
+        const firstTransaction = await this.prisma.moneyTransaction.findFirst({
+          where: { status: TransactionStatus.APPROVED },
+          orderBy: { createdAt: 'asc' },
+        });
+        startDate = firstTransaction ? firstTransaction.createdAt : new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        groupBy = 'day';
         break;
     }
 
@@ -369,13 +383,22 @@ export class CashService {
       }
     }
 
-    // Group by day/month
+    // Group by hour/day/month
     const grouped = new Map<string, { income: number; expenses: number }>();
     
     for (const tx of transactions) {
-      const dateKey = groupBy === 'day' 
-        ? tx.createdAt.toISOString().split('T')[0]
-        : tx.createdAt.toISOString().substring(0, 7);
+      let dateKey: string;
+      
+      if (groupBy === 'hour') {
+        // Format as YYYY-MM-DDTHH:00
+        const date = new Date(tx.createdAt);
+        dateKey = `${date.toISOString().split('T')[0]}T${String(date.getHours()).padStart(2, '0')}:00`;
+      } else if (groupBy === 'day') {
+        dateKey = tx.createdAt.toISOString().split('T')[0];
+      } else {
+        // month
+        dateKey = tx.createdAt.toISOString().substring(0, 7);
+      }
 
       if (!grouped.has(dateKey)) {
         grouped.set(dateKey, { income: 0, expenses: 0 });

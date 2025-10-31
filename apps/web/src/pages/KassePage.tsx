@@ -37,7 +37,7 @@ import { toast } from 'sonner'
 export default function KassePage() {
   const user = useAuthStore((state) => state.user)
   const queryClient = useQueryClient()
-  const [selectedRange, setSelectedRange] = useState('month')
+  const [selectedRange, setSelectedRange] = useState('week')
   const [showTransactionModal, setShowTransactionModal] = useState(false)
   const [transactionType, setTransactionType] = useState<'EINZAHLUNG' | 'AUSZAHLUNG'>('EINZAHLUNG')
 
@@ -241,10 +241,40 @@ export default function KassePage() {
       {/* Chart */}
       <Card className="lasanta-card">
         <CardHeader>
-          <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
-          <CardDescription className="text-gray-400">
-            Entwicklung des Schwarzgeld-Saldos über Zeit
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
+              <CardDescription className="text-gray-400">
+                Entwicklung des Schwarzgeld-Saldos über Zeit
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={selectedRange === 'today' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedRange('today')}
+                className={selectedRange === 'today' ? 'bg-gold-600 hover:bg-gold-700' : ''}
+              >
+                Heute
+              </Button>
+              <Button
+                variant={selectedRange === 'week' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedRange('week')}
+                className={selectedRange === 'week' ? 'bg-gold-600 hover:bg-gold-700' : ''}
+              >
+                7 Tage
+              </Button>
+              <Button
+                variant={selectedRange === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedRange('all')}
+                className={selectedRange === 'all' ? 'bg-gold-600 hover:bg-gold-700' : ''}
+              >
+                Gesamt
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {chartLoading ? (
@@ -267,8 +297,10 @@ export default function KassePage() {
               <Line
                 data={{
                   labels: chartData.map(item => {
-                    if (selectedRange === 'year') {
-                      return new Date(item.date).toLocaleDateString('de-DE', { month: 'short' })
+                    if (selectedRange === 'today') {
+                      return new Date(item.date).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+                    } else if (selectedRange === 'all') {
+                      return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' })
                     }
                     return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
                   }),

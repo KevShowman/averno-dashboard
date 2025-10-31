@@ -279,7 +279,7 @@ export default function AufstellungenPage() {
                 variant={showCreateForm ? "outline" : "default"}
                 size="sm"
                 onClick={() => setShowCreateForm(!showCreateForm)}
-                className={showCreateForm ? "" : "bg-gold-600 hover:bg-gold-700"}
+                className={showCreateForm ? "border-red-500/50 text-red-400 hover:bg-red-900/20 hover:border-red-500" : "bg-gold-600 hover:bg-gold-700 text-white"}
               >
                 {showCreateForm ? (
                   <>
@@ -307,7 +307,7 @@ export default function AufstellungenPage() {
                     type="date"
                     value={createData.date}
                     onChange={(e) => setCreateData({ ...createData, date: e.target.value })}
-                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500"
+                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -319,7 +319,7 @@ export default function AufstellungenPage() {
                     type="time"
                     value={createData.time}
                     onChange={(e) => setCreateData({ ...createData, time: e.target.value })}
-                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500"
+                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white"
                   />
                 </div>
               </div>
@@ -333,7 +333,7 @@ export default function AufstellungenPage() {
                   onChange={(e) => setCreateData({ ...createData, reason: e.target.value })}
                   placeholder="z.B. Casa Meeting, Routenplanung, Geschäftsabwicklung..."
                   rows={4}
-                  className="bg-dark-700 border-gold-500/30 focus:border-gold-500 resize-none"
+                  className="bg-dark-700 border-gold-500/30 focus:border-gold-500 resize-none text-white placeholder:text-gray-500"
                 />
               </div>
               <Button

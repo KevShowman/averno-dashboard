@@ -21,7 +21,15 @@ export function formatRelativeTime(date: string | Date) {
 
 export function formatCurrency(amount: number | string) {
   // Konvertiere zu Number und entferne führende Nullen
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
+  let numAmount: number
+  
+  if (typeof amount === 'string') {
+    // Entferne führende Nullen und konvertiere zu Number
+    const cleaned = amount.replace(/^0+/, '') || '0'
+    numAmount = parseInt(cleaned, 10)
+  } else {
+    numAmount = amount
+  }
   
   if (isNaN(numAmount) || numAmount === null || numAmount === undefined) {
     return '0 Schwarzgeld'
