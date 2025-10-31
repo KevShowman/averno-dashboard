@@ -26,17 +26,13 @@ RUN pnpm run build
 # Production Stage
 FROM node:18-alpine AS production
 
-# Installiere pnpm und wget
-RUN npm install -g pnpm && apk add --no-cache wget
-
-# Erstelle non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
+# Installiere pnpm, wget und OpenSSL
+RUN npm install -g pnpm && apk add --no-cache wget openssl openssl-dev
 
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-# Kopiere package files und installiere ALLE dependencies (inkl. dev)
+# Kopiere package files und installiere ALLE dependencies (inkl. dev für Prisma)
 COPY package.json ./
 RUN pnpm install --no-frozen-lockfile
 
@@ -48,18 +44,17 @@ COPY --from=build /app/prisma ./prisma
 COPY startup.sh ./startup.sh
 RUN chmod +x ./startup.sh
 
-# Generiere Prisma Client für Production
+# Generiere Prisma Client für Production (als root, damit Schreibrechte vorhanden)
 RUN pnpm exec prisma generate
-
-# Installiere prisma als dependency (nicht dev) für Migrationen
-RUN pnpm add prisma @prisma/client
 
 # Erstelle Verzeichnisse für Uploads und Logs
 RUN mkdir -p uploads logs
-RUN chown -R nestjs:nodejs uploads logs startup.sh
 
-# Wechsle zu non-root user
-USER nestjs
+# Setze Umgebungsvariable für OpenSSL
+ENV OPENSSL_CONF=/etc/ssl/openssl.cnf
+
+# Container läuft als root für Prisma-Migrationen beim Start
+# NestJS selbst hat keine privilegierten Operationen
 
 # Exponiere Port
 EXPOSE 3000

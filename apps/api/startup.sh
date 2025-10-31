@@ -3,20 +3,18 @@ set -e
 
 echo "🚀 Starting LaSanta Calavera API..."
 
-# Warte kurz auf Datenbank-Verbindung
+# Warte auf Datenbank-Verbindung
 echo "⏳ Waiting for database connection..."
-sleep 3
+sleep 5
 
 # Prisma Migration mit accept-data-loss flag
 echo "📦 Running Prisma migrations..."
-npx prisma migrate deploy --accept-data-loss || {
+if npx prisma migrate deploy --accept-data-loss; then
+    echo "✅ Migrations applied successfully"
+else
     echo "⚠️  Migration failed, trying with db push..."
     npx prisma db push --accept-data-loss --skip-generate
-}
-
-# Generiere Prisma Client
-echo "🔄 Generating Prisma Client..."
-npx prisma generate
+fi
 
 # Starte die Anwendung
 echo "✅ Starting NestJS application..."
