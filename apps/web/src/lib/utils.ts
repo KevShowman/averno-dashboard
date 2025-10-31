@@ -19,17 +19,19 @@ export function formatRelativeTime(date: string | Date) {
   return formatDistanceToNow(new Date(date), { addSuffix: true, locale: de })
 }
 
-export function formatCurrency(amount: number) {
-  if (isNaN(amount) || amount === null || amount === undefined) {
+export function formatCurrency(amount: number | string) {
+  // Konvertiere zu Number und entferne führende Nullen
+  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
+  
+  if (isNaN(numAmount) || numAmount === null || numAmount === undefined) {
     return '0 Schwarzgeld'
   }
-  // Entferne führende Nullen und formatiere korrekt
-  const cleanAmount = Number(amount.toString().replace(/^0+/, '')) || 0
+  
   return new Intl.NumberFormat('de-DE', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
     useGrouping: true,
-  }).format(cleanAmount) + ' Schwarzgeld'
+  }).format(numAmount) + ' Schwarzgeld'
 }
 
 export function getRoleColor(role: string) {

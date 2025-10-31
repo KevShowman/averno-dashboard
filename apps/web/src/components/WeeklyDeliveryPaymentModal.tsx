@@ -100,7 +100,7 @@ export default function WeeklyDeliveryPaymentModal({
               </div>
               <div>
                 <span className="text-gray-400">Erforderlich:</span>
-                <div className="text-white font-medium">{requiredPackages} Kokain-Pakete</div>
+                <div className="text-white font-medium">{requiredPackages} Pakete
               </div>
               <div>
                 <span className="text-gray-400">Status:</span>
@@ -115,11 +115,11 @@ export default function WeeklyDeliveryPaymentModal({
           <div className="bg-gray-800/50 rounded-lg p-4">
             <h3 className="font-semibold text-white mb-2 flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Dein Kokain-Deposit
+              Dein Paket-Deposit
             </h3>
             <div className="text-center">
               <div className="text-3xl font-bold text-white">{depositPackages}</div>
-              <div className="text-gray-400">Kokain-Pakete</div>
+              <div className="text-gray-400">Pakete</div>
             </div>
           </div>
 
@@ -181,7 +181,7 @@ export default function WeeklyDeliveryPaymentModal({
               <div className="bg-blue-900/20 border border-blue-500/20 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Package className="h-4 w-4 text-blue-400" />
-                  <span className="font-semibold text-blue-300">Zahlungsmethode: Kokain-Pakete</span>
+                  <span className="font-semibold text-blue-300">Zahlungsmethode: Pakete</span>
                 </div>
                 <div className="text-blue-200 text-sm">
                   {weeklyDeliveryPackages} Pakete werden für die Wochenabgabe verwendet

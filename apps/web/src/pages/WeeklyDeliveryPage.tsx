@@ -254,7 +254,7 @@ export default function WeeklyDeliveryPage() {
         <div>
           <h1 className="text-3xl font-bold text-white">Wochenabgabe-System</h1>
           <p className="text-gray-400 mt-2">
-            Verwaltung der wöchentlichen Kokain-Abgaben (300 Stück pro Woche)
+            Verwaltung der wöchentlichen Paket-Abgaben (300 Stück pro Woche)
           </p>
         </div>
         <div className="flex gap-2">
@@ -326,7 +326,7 @@ export default function WeeklyDeliveryPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Card className="lasanta-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
@@ -366,22 +366,10 @@ export default function WeeklyDeliveryPage() {
           <Card className="lasanta-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-blue-500" />
+                <CheckCircle className="h-5 w-5 text-green-500" />
                 <div>
                   <div className="text-2xl font-bold text-white">{stats.paid}</div>
                   <div className="text-sm text-gray-400">Bezahlt</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.confirmed}</div>
-                  <div className="text-sm text-gray-400">Bestätigt</div>
                 </div>
               </div>
             </CardContent>

@@ -372,7 +372,7 @@ export default function PackagesPage() {
           <CardHeader>
             <CardTitle className="text-white">Aktuelle Deposits</CardTitle>
             <CardDescription className="text-gray-400">
-              Übersicht aller bestätigten Kokain-Deposits
+              Übersicht aller bestätigten Paket-Deposits
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -717,9 +717,9 @@ export default function PackagesPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-md lasanta-card">
             <CardHeader>
-              <CardTitle className="text-white">Kokain-Deposit anfragen</CardTitle>
+              <CardTitle className="text-white">Paket-Deposit anfragen</CardTitle>
               <CardDescription className="text-gray-400">
-                Gib die Anzahl der Kokain-Pakete an, die du abgeben möchtest
+                Gib die Anzahl der Pakete an, die du abgeben möchtest
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -768,7 +768,7 @@ export default function PackagesPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-md lasanta-card">
             <CardHeader>
-              <CardTitle className="text-white">Kokain-Preis ändern</CardTitle>
+              <CardTitle className="text-white">Paket-Preis ändern</CardTitle>
               <CardDescription className="text-gray-400">
                 Aktueller Preis: {formatCurrency(priceData?.price || 0)} pro Paket
               </CardDescription>

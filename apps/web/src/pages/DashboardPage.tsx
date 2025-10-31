@@ -5,8 +5,8 @@ import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock, Calendar, Scale } from 'lucide-react'
-import { formatCurrency } from '../lib/utils'
+import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock, Calendar, Scale, PackageOpen, CalendarCheck, FileText, Settings } from 'lucide-react'
+import { formatCurrency, hasRole } from '../lib/utils'
 
 interface DashboardStats {
   criticalItems: number
@@ -23,13 +23,28 @@ interface DashboardStats {
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuthStore()
   
-  const { data: modules, isLoading: modulesLoading } = useQuery({
-    queryKey: ['modules'],
-    queryFn: () => api.get('/modules').then(res => res.data),
-    enabled: isAuthenticated && !!user, // Only run when authenticated
-    retry: 3, // Retry failed requests
-    refetchOnWindowFocus: false, // Don't refetch on window focus
+  // Alle Module mit Berechtigungsprüfung
+  const allModules = [
+    { key: 'lager', name: 'Lager', requiresRole: null },
+    { key: 'lager-movements', name: 'Lagerbewegungen', requiresRole: null },
+    { key: 'kasse', name: 'Kasse', requiresRole: null },
+    { key: 'packages', name: 'Pakete', requiresRole: null },
+    { key: 'weekly-delivery', name: 'Wochenabgabe', requiresRole: null },
+    { key: 'aufstellungen', name: 'Aufstellungen', requiresRole: null },
+    { key: 'sanctions', name: 'Sanktionen', requiresRole: null },
+    { key: 'user-management', name: 'Benutzerverwaltung', requiresRole: 'EL_PATRON' },
+    { key: 'ticker', name: 'Live-Ticker', requiresRole: null },
+    { key: 'audit', name: 'Audit-Log', requiresRole: null },
+    { key: 'settings', name: 'Einstellungen', requiresRole: null },
+  ]
+
+  // Filtere Module basierend auf Berechtigungen
+  const modules = allModules.filter(module => {
+    if (!module.requiresRole) return true
+    return hasRole(user, module.requiresRole)
   })
+  
+  const modulesLoading = false
 
   const { data: lagerStats } = useQuery({
     queryKey: ['lager-stats'],
@@ -161,9 +176,9 @@ export default function DashboardPage() {
         <Card className="lasanta-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
-              Kokain-Deposits
+              Paket-Deposits
             </CardTitle>
-            <FlaskConical className="h-4 w-4 text-green-400" />
+            <PackageOpen className="h-4 w-4 text-green-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
@@ -210,14 +225,15 @@ export default function DashboardPage() {
                   <div className="flex items-center space-x-3">
                     {module.key === 'lager' && <Package className="h-6 w-6 text-accent" />}
                     {module.key === 'kasse' && <DollarSign className="h-6 w-6 text-accent" />}
-                    {module.key === 'kokain' && <FlaskConical className="h-6 w-6 text-accent" />}
+                    {module.key === 'packages' && <PackageOpen className="h-6 w-6 text-accent" />}
+                    {module.key === 'aufstellungen' && <CalendarCheck className="h-6 w-6 text-accent" />}
                     {module.key === 'weekly-delivery' && <Calendar className="h-6 w-6 text-accent" />}
                     {module.key === 'sanctions' && <Scale className="h-6 w-6 text-accent" />}
-                    {module.key === 'audit' && <Shield className="h-6 w-6 text-accent" />}
+                    {module.key === 'audit' && <FileText className="h-6 w-6 text-accent" />}
                     {module.key === 'lager-movements' && <Clock className="h-6 w-6 text-accent" />}
                     {module.key === 'ticker' && <Activity className="h-6 w-6 text-accent" />}
                     {module.key === 'user-management' && <Users className="h-6 w-6 text-accent" />}
-                    {module.key === 'settings' && <BarChart3 className="h-6 w-6 text-accent" />}
+                    {module.key === 'settings' && <Settings className="h-6 w-6 text-accent" />}
                     <CardTitle className="text-white">{module.name}</CardTitle>
                   </div>
                   <Badge variant="success">Aktiv</Badge>
@@ -243,9 +259,9 @@ export default function DashboardPage() {
                       )}
                     </>
                   )}
-                  {module.key === 'kokain' && (
+                  {module.key === 'packages' && (
                     <>
-                      Kokain-Depot-Verwaltung und Abgaben.
+                      Paket-Depot-Verwaltung und Abgaben.
                       {stats.pendingDeposits > 0 && (
                         <span className="text-yellow-400 font-medium">
                           {' '}⏳ {stats.pendingDeposits} ausstehend
@@ -255,7 +271,12 @@ export default function DashboardPage() {
                   )}
                   {module.key === 'weekly-delivery' && (
                     <>
-                      Verwaltung der wöchentlichen Kokain-Abgaben (300 Stück pro Woche).
+                      Verwaltung der wöchentlichen Paket-Abgaben (300 Stück pro Woche).
+                    </>
+                  )}
+                  {module.key === 'aufstellungen' && (
+                    <>
+                      Verwaltung von Terminen und Teilnahme-Reaktionen.
                     </>
                   )}
                   {module.key === 'sanctions' && (
@@ -295,7 +316,8 @@ export default function DashboardPage() {
                   <div className="text-sm text-gray-400">
                     {module.key === 'lager' && `${stats.totalItems} Artikel`}
                     {module.key === 'kasse' && `${formatCurrency(stats.currentBalance)} Saldo`}
-                    {module.key === 'kokain' && `${stats.confirmedDeposits} Bestätigt`}
+                    {module.key === 'packages' && `${stats.confirmedDeposits} Bestätigt`}
+                    {module.key === 'aufstellungen' && `Aufstellungen & Termine`}
                     {module.key === 'weekly-delivery' && `Wöchentliche Abgaben`}
                     {module.key === 'sanctions' && `Regelverstöße & Strafen`}
                     {module.key === 'audit' && `Alle Aktivitäten`}
