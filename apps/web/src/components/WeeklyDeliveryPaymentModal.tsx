@@ -100,7 +100,7 @@ export default function WeeklyDeliveryPaymentModal({
               </div>
               <div>
                 <span className="text-gray-400">Erforderlich:</span>
-                <div className="text-white font-medium">{requiredPackages} Pakete
+                <div className="text-white font-medium">{requiredPackages} Pakete</div>
               </div>
               <div>
                 <span className="text-gray-400">Status:</span>
