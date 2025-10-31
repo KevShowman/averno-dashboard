@@ -44,15 +44,19 @@ RUN pnpm install --no-frozen-lockfile
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 
+# Kopiere startup script
+COPY startup.sh ./startup.sh
+RUN chmod +x ./startup.sh
+
 # Generiere Prisma Client für Production
 RUN pnpm exec prisma generate
 
-# Entferne dev dependencies
-RUN pnpm prune --prod
+# Installiere prisma als dependency (nicht dev) für Migrationen
+RUN pnpm add prisma @prisma/client
 
 # Erstelle Verzeichnisse für Uploads und Logs
 RUN mkdir -p uploads logs
-RUN chown -R nestjs:nodejs uploads logs
+RUN chown -R nestjs:nodejs uploads logs startup.sh
 
 # Wechsle zu non-root user
 USER nestjs
@@ -61,8 +65,8 @@ USER nestjs
 EXPOSE 3000
 
 # Health Check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Starte Anwendung
-CMD ["node", "dist/main.js"]
+# Starte Anwendung mit Migrations-Script
+CMD ["./startup.sh"]
