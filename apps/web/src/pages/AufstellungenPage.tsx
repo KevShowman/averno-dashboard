@@ -20,7 +20,7 @@ import {
   Trash2,
   AlertTriangle,
 } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuthStore } from '../stores/auth'
 
 interface Aufstellung {
   id: string
@@ -60,7 +60,7 @@ interface Aufstellung {
 }
 
 export default function AufstellungenPage() {
-  const { user } = useAuth()
+  const { user } = useAuthStore()
   const queryClient = useQueryClient()
 
   const [showCreateForm, setShowCreateForm] = useState(false)

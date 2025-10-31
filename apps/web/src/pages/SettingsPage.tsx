@@ -14,7 +14,7 @@ import {
   FlaskConical
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
-import { api } from '../lib/api'
+import { api, packagesApi } from '../lib/api'
 import { formatCurrency, getRoleColor, getDisplayName, hasRole } from '../lib/utils'
 import DiscordRoleSync from '../components/DiscordRoleSync'
 import DiscordMembersManager from '../components/DiscordMembersManager'
@@ -232,16 +232,16 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Kokain-System-Einstellungen - für El Patron, Don, Asesor, Routenverwaltung */}
-      {canManageKokainPrice && (
+      {/* Paket-System-Einstellungen - für El Patron, Don, Asesor, Routenverwaltung */}
+      {canManagePackagePrice && (
         <Card className="lasanta-card">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <FlaskConical className="mr-2 h-5 w-5" />
-              Kokain-System-Einstellungen
+              Paket-System-Einstellungen
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Konfiguriere Preise und Einstellungen für das Kokain-Deposit-System
+              Konfiguriere Preise und Einstellungen für das Paket-Deposit-System
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -283,7 +283,7 @@ export default function SettingsPage() {
               Wochenabgabe-Einstellungen
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Konfiguriere die wöchentlichen Kokain-Abgaben
+              Konfiguriere die wöchentlichen Paket-Abgaben
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -301,7 +301,7 @@ export default function SettingsPage() {
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                   <p className="text-xs text-gray-500">
-                    Anzahl der Kokain-Pakete, die wöchentlich abgegeben werden müssen
+                    Anzahl der Pakete, die wöchentlich abgegeben werden müssen
                   </p>
                 </div>
                 
@@ -317,7 +317,7 @@ export default function SettingsPage() {
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                   <p className="text-xs text-gray-500">
-                    Schwarzgeld-Betrag pro Kokain-Paket für Wochenabgaben
+                    Schwarzgeld-Betrag pro Paket für Wochenabgaben
                   </p>
                 </div>
               </div>
