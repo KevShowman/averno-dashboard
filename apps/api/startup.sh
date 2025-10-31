@@ -7,14 +7,11 @@ echo "🚀 Starting LaSanta Calavera API..."
 echo "⏳ Waiting for database connection..."
 sleep 5
 
-# Prisma Migration mit accept-data-loss flag
-echo "📦 Running Prisma migrations..."
-if npx prisma migrate deploy --accept-data-loss; then
-    echo "✅ Migrations applied successfully"
-else
-    echo "⚠️  Migration failed, trying with db push..."
-    npx prisma db push --accept-data-loss --skip-generate
-fi
+# Prisma DB Push (mit force für Production)
+echo "📦 Syncing database schema..."
+npx prisma db push --accept-data-loss --skip-generate
+
+echo "✅ Database schema synchronized"
 
 # Starte die Anwendung
 echo "✅ Starting NestJS application..."
