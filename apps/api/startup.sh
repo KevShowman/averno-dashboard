@@ -15,5 +15,5 @@ echo "✅ Database schema synchronized"
 
 # Starte die Anwendung
 echo "✅ Starting NestJS application..."
-exec node dist/main.js
+exec node dist/src/main.js
 

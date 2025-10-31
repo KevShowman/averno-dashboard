@@ -42,10 +42,10 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere built application
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
 # Debug: Prüfe ob main.js existiert
-RUN echo "=== Checking copied files ===" && ls -la dist/ && test -f dist/main.js && echo "✅ main.js found" || echo "❌ main.js NOT found"
+RUN echo "=== Checking copied files ===" && \
+    test -f dist/src/main.js && echo "✅ main.js found at dist/src/main.js" || echo "❌ main.js NOT found"
 
 # Kopiere startup script
 COPY startup.sh ./startup.sh
