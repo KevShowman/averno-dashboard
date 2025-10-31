@@ -307,7 +307,7 @@ export default function AufstellungenPage() {
                     type="date"
                     value={createData.date}
                     onChange={(e) => setCreateData({ ...createData, date: e.target.value })}
-                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white"
+                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white [color-scheme:dark]"
                   />
                 </div>
                 <div className="space-y-2">
@@ -319,7 +319,7 @@ export default function AufstellungenPage() {
                     type="time"
                     value={createData.time}
                     onChange={(e) => setCreateData({ ...createData, time: e.target.value })}
-                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white"
+                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white [color-scheme:dark]"
                   />
                 </div>
               </div>
