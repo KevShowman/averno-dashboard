@@ -911,13 +911,13 @@ export default function AufstellungenPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {exclusionsLoading && <div className="text-gray-400">Lädt Ausschlüsse...</div>}
-            {exclusionsError && (
+            {exclusionsLoading ? (
+              <div className="text-gray-400">Lädt Ausschlüsse...</div>
+            ) : exclusionsError ? (
               <div className="text-red-400">
-                Fehler beim Laden: {exclusionsError instanceof Error ? exclusionsError.message : 'Unbekannter Fehler'}
+                Fehler beim Laden: {String((exclusionsError as any)?.message || 'Unbekannter Fehler')}
               </div>
-            )}
-            {!exclusionsLoading && exclusions && exclusions.length > 0 ? (
+            ) : exclusions && exclusions.length > 0 ? (
               <div className="space-y-3">
                 {exclusions.map((exclusion: any) => (
                   <div
