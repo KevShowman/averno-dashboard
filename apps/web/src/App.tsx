@@ -42,6 +42,9 @@ function App() {
     const path = window.location.pathname;
     if (path !== '/discord-error' && path !== '/login') {
       checkAuth();
+    } else {
+      // Set loading to false for unprotected routes
+      useAuthStore.setState({ isLoading: false });
     }
   }, [checkAuth])
 
