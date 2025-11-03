@@ -29,11 +29,10 @@ export class AbmeldungController {
     @Body() createDto: CreateAbmeldungDto,
     @CurrentUser() user: User,
   ) {
-    const startDate = new Date(createDto.startDate);
-    const endDate = new Date(createDto.endDate);
-    
-    // Setze endDate auf 23:59:59 um Single-Day Abmeldungen korrekt zu erfassen
-    endDate.setHours(23, 59, 59, 999);
+    // Parse Dates als UTC Midnight um Timezone-Probleme zu vermeiden
+    // Frontend sendet: "2025-11-06" → speichere als "2025-11-06T00:00:00.000Z"
+    const startDate = new Date(createDto.startDate + 'T00:00:00.000Z');
+    const endDate = new Date(createDto.endDate + 'T23:59:59.999Z');
     
     return this.abmeldungService.createAbmeldung(
       user.id,
@@ -69,12 +68,20 @@ export class AbmeldungController {
     @Body() updateDto: UpdateAbmeldungDto,
     @CurrentUser() user: User,
   ) {
+    // Parse Dates als UTC (konsistent mit create)
+    const startDate = updateDto.startDate 
+      ? new Date(updateDto.startDate + 'T00:00:00.000Z') 
+      : undefined;
+    const endDate = updateDto.endDate 
+      ? new Date(updateDto.endDate + 'T23:59:59.999Z') 
+      : undefined;
+    
     return this.abmeldungService.updateAbmeldung(
       id,
       user.id,
       user.role,
-      updateDto.startDate ? new Date(updateDto.startDate) : undefined,
-      updateDto.endDate ? new Date(updateDto.endDate) : undefined,
+      startDate,
+      endDate,
       updateDto.reason,
     );
   }

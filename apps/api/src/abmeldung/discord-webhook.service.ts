@@ -30,16 +30,18 @@ export class AbmeldungWebhookService {
       ? abmeldung.endDate 
       : new Date(abmeldung.endDate);
     
-    // Formatiere Datum für Discord
+    // Formatiere Datum für Discord (UTC um Shifts zu vermeiden)
     const formattedStartDate = startDate.toLocaleDateString('de-DE', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
+      timeZone: 'UTC',
     });
     const formattedEndDate = endDate.toLocaleDateString('de-DE', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
+      timeZone: 'UTC',
     });
 
     // Berechne Anzahl Tage (EXAKT wie im Frontend mit UTC)

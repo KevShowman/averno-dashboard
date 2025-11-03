@@ -101,10 +101,13 @@ export default function AbmeldungenPage() {
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('de-DE', {
+    // Parse as UTC to avoid timezone shifts
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('de-DE', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
+      timeZone: 'UTC',
     });
   };
 
