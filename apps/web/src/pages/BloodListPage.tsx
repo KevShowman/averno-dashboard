@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
-import { Skull, Plus, UserX, User, Phone, Steam, Calendar, AlertTriangle, History, TrendingUp } from 'lucide-react';
+import { Skull, Plus, UserX, User, Phone, Gamepad2, Calendar, AlertTriangle, History, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '../stores/auth';
 
@@ -252,7 +252,7 @@ export default function BloodListPage() {
                             <span>{member.telefon}</span>
                           </div>
                           <div className="flex items-center gap-2 text-gray-300">
-                            <Steam className="h-4 w-4 text-gray-400" />
+                            <Gamepad2 className="h-4 w-4 text-gray-400" />
                             <span className="truncate">{member.steam}</span>
                           </div>
                           <div className="flex items-center gap-2 text-gray-300">

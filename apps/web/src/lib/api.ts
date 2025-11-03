@@ -138,27 +138,27 @@ export const aufstellungApi = {
 // Abmeldung API
 export const abmeldungApi = {
   create: (data: { startDate: string; endDate: string; reason?: string }) =>
-    api.post('/abmeldung', data),
-  getAll: () => api.get('/abmeldung'),
-  getCurrent: () => api.get('/abmeldung/current'),
-  getMy: () => api.get('/abmeldung/my'),
+    api.post('/abmeldung', data).then(res => res.data),
+  getAll: () => api.get('/abmeldung').then(res => res.data),
+  getCurrent: () => api.get('/abmeldung/current').then(res => res.data),
+  getMy: () => api.get('/abmeldung/my').then(res => res.data),
   update: (id: string, data: { startDate?: string; endDate?: string; reason?: string }) =>
-    api.patch(`/abmeldung/${id}`, data),
-  delete: (id: string) => api.delete(`/abmeldung/${id}`),
-  cleanup: () => api.post('/abmeldung/cleanup'),
+    api.patch(`/abmeldung/${id}`, data).then(res => res.data),
+  delete: (id: string) => api.delete(`/abmeldung/${id}`).then(res => res.data),
+  cleanup: () => api.post('/abmeldung/cleanup').then(res => res.data),
 };
 
 // BloodList API
 export const bloodListApi = {
   bloodIn: (data: { vorname: string; nachname: string; telefon: number; steam: string; bloodinDurch: string }) =>
-    api.post('/bloodlist/blood-in', data),
+    api.post('/bloodlist/blood-in', data).then(res => res.data),
   bloodOut: (data: { identifier: string; grund: string }) =>
-    api.post('/bloodlist/blood-out', data),
-  getActive: () => api.get('/bloodlist/active'),
-  getHistory: () => api.get('/bloodlist/history'),
-  getAll: () => api.get('/bloodlist/all'),
-  getStats: () => api.get('/bloodlist/stats'),
-  search: (query: string) => api.get('/bloodlist/search', { params: { q: query } }),
-  getById: (id: string) => api.get(`/bloodlist/${id}`),
+    api.post('/bloodlist/blood-out', data).then(res => res.data),
+  getActive: () => api.get('/bloodlist/active').then(res => res.data),
+  getHistory: () => api.get('/bloodlist/history').then(res => res.data),
+  getAll: () => api.get('/bloodlist/all').then(res => res.data),
+  getStats: () => api.get('/bloodlist/stats').then(res => res.data),
+  search: (query: string) => api.get('/bloodlist/search', { params: { q: query } }).then(res => res.data),
+  getById: (id: string) => api.get(`/bloodlist/${id}`).then(res => res.data),
 };
 
