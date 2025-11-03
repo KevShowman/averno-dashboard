@@ -560,7 +560,7 @@ export class SanctionsService {
         }
         break;
 
-      case SanctionCategory.UNNÖTIGES_BOXEN_SCHIESSEN:
+      case SanctionCategory.UNNOETIGES_BOXEN_SCHIESSEN:
         switch (level) {
           case 1: return { amount: 75000 };
           case 2: return { amount: 150000 };
