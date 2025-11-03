@@ -512,7 +512,8 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>{getStatusBadge(delivery)}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && (
+                            {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && 
+                             !delivery.isAbgemeldet && (
                               // Nur El Patron und Don können für andere bezahlen, andere nur für sich selbst
                               (canPayForOthers || delivery.userId === user?.id) && (
                                 <Button

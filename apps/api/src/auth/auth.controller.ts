@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards, Req, Res, Body } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Req, Res, Body, UseFilters } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
+import { DiscordAuthExceptionFilter } from './filters/discord-auth-exception.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -16,51 +17,46 @@ export class AuthController {
 
   @Get('discord')
   @UseGuards(AuthGuard('discord'))
+  @UseFilters(DiscordAuthExceptionFilter)
   async discordLogin() {
     // This will redirect to Discord OAuth
   }
 
   @Get('discord/callback')
   @UseGuards(AuthGuard('discord'))
+  @UseFilters(DiscordAuthExceptionFilter)
   async discordCallback(@Req() req: Request, @Res() res: Response) {
-    try {
-      const user = req.user as User;
-      const tokens = await this.authService.generateTokens(user);
+    const user = req.user as User;
+    const tokens = await this.authService.generateTokens(user);
 
-      // Set HTTP-only cookies
-      const isProduction = process.env.NODE_ENV === 'production';
-      res.cookie('access_token', tokens.accessToken, {
-        httpOnly: true,
-        secure: isProduction, // true for HTTPS in production
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 1000, // 1 hour
-      });
+    // Set HTTP-only cookies
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: isProduction, // true for HTTPS in production
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
 
-      res.cookie('refresh_token', tokens.refreshToken, {
-        httpOnly: true,
-        secure: isProduction, // true for HTTPS in production
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: isProduction, // true for HTTPS in production
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
-      // Log the login
-      await this.auditService.log({
-        userId: user.id,
-        action: 'USER_LOGIN',
-        entity: 'User',
-        entityId: user.id,
-        meta: { method: 'discord' },
-      });
+    // Log the login
+    await this.auditService.log({
+      userId: user.id,
+      action: 'USER_LOGIN',
+      entity: 'User',
+      entityId: user.id,
+      meta: { method: 'discord' },
+    });
 
-      // Redirect to frontend
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      res.redirect(`${frontendUrl}/app`);
-    } catch (error) {
-      // Handle Discord auth errors
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      const message = encodeURIComponent(error.message || 'Benutzer ist nicht im Discord-Server oder hat keine Rollen');
-      res.redirect(`${frontendUrl}/discord-error?message=${message}&type=discord_access`);
-    }
+    // Redirect to frontend
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/app`);
   }
 
   @Post('refresh')

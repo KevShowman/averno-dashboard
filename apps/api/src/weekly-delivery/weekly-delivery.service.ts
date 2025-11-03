@@ -627,6 +627,23 @@ export class WeeklyDeliveryService {
     }
 
     for (const delivery of overdueDeliveries) {
+      // Prüfe, ob User für den Zeitraum abgemeldet war (>2 Tage)
+      const abmeldungCheck = await this.abmeldungService.isUserAbgemeldetForPeriod(
+        delivery.userId,
+        delivery.weekStart,
+        delivery.weekEnd
+      );
+
+      // Wenn abgemeldet (>2 Tage), keine Sanktion, aber Status auf OVERDUE setzen
+      if (abmeldungCheck.isAbgemeldet) {
+        await this.prisma.weeklyDelivery.update({
+          where: { id: delivery.id },
+          data: { status: WeeklyDeliveryStatus.OVERDUE },
+        });
+        console.log(`⏭️  Überspringe Sanktion für ${delivery.user.username}: Abgemeldet (${abmeldungCheck.abgemeldeteDays} Tag(e))`);
+        continue; // Keine Sanktion für abgemeldete User
+      }
+
       // Status auf OVERDUE setzen
       await this.prisma.weeklyDelivery.update({
         where: { id: delivery.id },
