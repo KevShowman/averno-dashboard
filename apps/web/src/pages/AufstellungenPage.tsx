@@ -103,9 +103,14 @@ export default function AufstellungenPage() {
   })
 
   // Query: Exclusions
-  const { data: exclusions } = useQuery({
+  const { data: exclusions, isLoading: exclusionsLoading, error: exclusionsError } = useQuery({
     queryKey: ['aufstellung-exclusions'],
-    queryFn: () => aufstellungApi.getExclusions(),
+    queryFn: async () => {
+      console.log('🔍 Fetching exclusions...')
+      const data = await aufstellungApi.getExclusions()
+      console.log('📦 Exclusions data:', data)
+      return data
+    },
   })
 
   // Mutation: Erstellen
@@ -906,7 +911,9 @@ export default function AufstellungenPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {exclusions && exclusions.length > 0 ? (
+            {exclusionsLoading && <div className="text-gray-400">Lädt Ausschlüsse...</div>}
+            {exclusionsError && <div className="text-red-400">Fehler beim Laden: {(exclusionsError as any).message}</div>}
+            {!exclusionsLoading && exclusions && exclusions.length > 0 ? (
               <div className="space-y-3">
                 {exclusions.map((exclusion: any) => (
                   <div
@@ -960,11 +967,13 @@ export default function AufstellungenPage() {
                   </div>
                 ))}
               </div>
-            ) : (
+            ) : !exclusionsLoading ? (
               <div className="text-center text-gray-400 py-8">
                 Keine Ausschlüsse vorhanden
+                {exclusions && <div className="text-xs mt-2">Array length: {exclusions.length}</div>}
+                {exclusions && <div className="text-xs mt-2">Data: {JSON.stringify(exclusions)}</div>}
               </div>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       )}
