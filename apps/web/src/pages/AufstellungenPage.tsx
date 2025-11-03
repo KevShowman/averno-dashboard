@@ -105,7 +105,7 @@ export default function AufstellungenPage() {
   // Query: Exclusions
   const { data: exclusions } = useQuery({
     queryKey: ['aufstellung-exclusions'],
-    queryFn: () => aufstellungApi.getExclusions().then(res => res.data),
+    queryFn: () => aufstellungApi.getExclusions(),
   })
 
   // Mutation: Erstellen
@@ -158,6 +158,7 @@ export default function AufstellungenPage() {
       toast.success('Ausschluss wurde erstellt')
       queryClient.invalidateQueries({ queryKey: ['aufstellung-exclusions'] })
       setShowCreateExclusionModal(false)
+      setShowExclusions(true) // Zeige die Exclusions-Liste automatisch an
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Ausschlusses')
@@ -259,15 +260,16 @@ export default function AufstellungenPage() {
             <Button
               variant="outline"
               onClick={() => setShowExclusions(!showExclusions)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-gold-500/50 text-gold-400 hover:bg-gold-900/20 hover:border-gold-500"
             >
               <Users className="h-4 w-4" />
               {showExclusions ? 'Aufstellungen anzeigen' : 'Ausschlüsse anzeigen'}
             </Button>
             
             <Button
+              variant="outline"
               onClick={() => setShowCreateExclusionModal(true)}
-              className="flex items-center gap-2 bg-gold-600 hover:bg-gold-700 text-white"
+              className="flex items-center gap-2 border-gold-500/50 text-gold-400 hover:bg-gold-900/20 hover:border-gold-500"
             >
               <UserPlus className="h-4 w-4" />
               Ausschluss erstellen
