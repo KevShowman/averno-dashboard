@@ -265,23 +265,25 @@ model DiscordRoleMapping {
 
 // Wochenabgabe System
 model WeeklyDelivery {
-  id            String               @id @default(cuid())
-  userId        String
-  user          User                 @relation("delivery_created_by", fields: [userId], references: [id])
-  weekStart     DateTime // Start der Woche (Montag)
-  weekEnd       DateTime // Ende der Woche (Sonntag)
-  packages      Int                  @default(300) // Standard: 300 Pakete
-  paidAmount    Int? // Bezahlte Menge in Paketen
-  paidMoney     Int? // Bezahlte Menge in Schwarzgeld
-  status        WeeklyDeliveryStatus @default(PENDING)
-  confirmedById String?
-  confirmedBy   User?                @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
-  confirmedAt   DateTime?
-  note          String?
-  isPrepaid     Boolean              @default(false) // Vorauszahlung für mehrere Wochen
-  prepaidWeeks  Int? // Anzahl der vorausbezahlten Wochen
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  id              String               @id @default(cuid())
+  userId          String
+  user            User                 @relation("delivery_created_by", fields: [userId], references: [id])
+  weekStart       DateTime // Start der Woche (Montag)
+  weekEnd         DateTime // Ende der Woche (Sonntag)
+  packages        Int                  @default(300) // Standard: 300 Pakete
+  paidAmount      Int? // Bezahlte Menge in Paketen
+  paidMoney       Int? // Bezahlte Menge in Schwarzgeld
+  status          WeeklyDeliveryStatus @default(PENDING)
+  confirmedById   String?
+  confirmedBy     User?                @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt     DateTime?
+  note            String?
+  isPrepaid       Boolean              @default(false) // Vorauszahlung für mehrere Wochen
+  prepaidWeeks    Int? // Anzahl der vorausbezahlten Wochen
+  isAbgemeldet    Boolean              @default(false) // Persistent: User war >2 Tage abgemeldet
+  abgemeldeteDays Int? // Anzahl der abgemeldeten Tage während dieser Woche
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   // Relations
   packageDeposits PackageDeposit[]

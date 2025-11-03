@@ -7,12 +7,13 @@ import { AlertCircle, RefreshCw, LogOut, Shield, Users } from 'lucide-react';
 export default function DiscordErrorPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(30);
 
   const errorMessage = searchParams.get('message') || 'Benutzer ist nicht im Discord-Server oder hat keine Rollen';
   const errorType = searchParams.get('type') || 'discord_access';
 
   useEffect(() => {
+    // Verhindere Auto-Logout für 30 Sekunden (genug Zeit zum Lesen)
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -25,6 +26,7 @@ export default function DiscordErrorPage() {
     }, 1000);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogout = () => {

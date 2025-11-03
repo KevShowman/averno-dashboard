@@ -77,6 +77,9 @@ export class AbmeldungService {
     // Retrospektive Anwendung: Aufstellungen im Zeitraum automatisch auf NOT_COMING setzen
     await this.applyAbmeldungToAufstellungen(userId, startDate, endDate);
 
+    // Retrospektive Anwendung: Markiere Wochenabgaben als "Abgemeldet" (persistent)
+    await this.markWeeklyDeliveriesAsAbgemeldet(userId, startDate, endDate);
+
     // Sende Discord-Benachrichtigung
     try {
       await this.webhookService.sendAbmeldungNotification(abmeldung);
@@ -99,6 +102,65 @@ export class AbmeldungService {
     });
 
     return abmeldung;
+  }
+
+  // Retrospektiv: Markiere Wochenabgaben persistent als "Abgemeldet"
+  private async markWeeklyDeliveriesAsAbgemeldet(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    // Finde alle WeeklyDeliveries für diesen User, die sich mit der Abmeldung überschneiden
+    const deliveries = await this.prisma.weeklyDelivery.findMany({
+      where: {
+        userId,
+        OR: [
+          {
+            // Delivery Start liegt im Abmeldung-Zeitraum
+            weekStart: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+          {
+            // Delivery End liegt im Abmeldung-Zeitraum
+            weekEnd: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+          {
+            // Abmeldung liegt komplett innerhalb der Delivery
+            AND: [
+              { weekStart: { lte: startDate } },
+              { weekEnd: { gte: endDate } },
+            ],
+          },
+        ],
+      },
+    });
+
+    for (const delivery of deliveries) {
+      // Berechne wie viele Tage der Abmeldung sich mit dieser Woche überschneiden
+      const overlapStart = delivery.weekStart > startDate ? delivery.weekStart : startDate;
+      const overlapEnd = delivery.weekEnd < endDate ? delivery.weekEnd : endDate;
+      
+      const overlapMs = overlapEnd.getTime() - overlapStart.getTime();
+      const overlapDays = Math.ceil(overlapMs / (1000 * 60 * 60 * 24)) + 1;
+
+      // Wenn >2 Tage abgemeldet, markiere persistent als "Abgemeldet"
+      if (overlapDays > 2) {
+        await this.prisma.weeklyDelivery.update({
+          where: { id: delivery.id },
+          data: {
+            isAbgemeldet: true,
+            abgemeldeteDays: overlapDays,
+          },
+        });
+
+        console.log(`✅ WeeklyDelivery ${delivery.id} markiert als Abgemeldet (${overlapDays} Tage)`);
+      }
+    }
   }
 
   // Retrospektiv: Setze User bei Aufstellungen im Zeitraum auf NOT_COMING

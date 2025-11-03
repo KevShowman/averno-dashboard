@@ -38,7 +38,11 @@ function App() {
   }, [queryClient, setQueryClient])
 
   useEffect(() => {
-    checkAuth()
+    // Don't check auth on error pages or login page
+    const path = window.location.pathname;
+    if (path !== '/discord-error' && path !== '/login') {
+      checkAuth();
+    }
   }, [checkAuth])
 
 
@@ -71,8 +75,9 @@ function App() {
   return (
     <ErrorBoundary>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        {/* Unprotected Routes - always accessible */}
         <Route path="/discord-error" element={<DiscordErrorPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/app" element={
           <ProtectedRoute>
             <Layout>

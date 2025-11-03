@@ -18,23 +18,11 @@ export class DiscordWebhookService {
     }
 
     const aufstellungDate = new Date(aufstellung.date);
-    const now = new Date();
     
-    // Berechne Zeitdifferenz
-    const diffMs = aufstellungDate.getTime() - now.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    // Unix Timestamp für Discord (Sekunden seit 1970)
+    const unixTimestamp = Math.floor(aufstellungDate.getTime() / 1000);
     
-    let timeUntilText = '';
-    if (diffDays > 0) {
-      timeUntilText = `in ${diffDays} Tag${diffDays !== 1 ? 'en' : ''}`;
-    } else if (diffHours > 0) {
-      timeUntilText = `in ${diffHours} Stunde${diffHours !== 1 ? 'n' : ''}`;
-    } else {
-      timeUntilText = 'bald';
-    }
-
-    // Formatiere Datum und Uhrzeit
+    // Formatiere Datum und Uhrzeit für statische Anzeige
     const dateStr = aufstellungDate.toLocaleDateString('de-DE', {
       day: '2-digit',
       month: '2-digit',
@@ -64,7 +52,7 @@ export class DiscordWebhookService {
         },
         {
           name: '⏰ DEADLINE',
-          value: timeUntilText,
+          value: `<t:${unixTimestamp}:R>`,
           inline: false,
         },
         {
