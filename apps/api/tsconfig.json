@@ -20,5 +20,9 @@
     "paths": {
       "@/*": ["src/*"]
     }
-  }
+  },
+  "exclude": [
+    "src/scripts/find-ghost-users.ts",
+    "src/scripts/remove-ghost-users.ts"
+  ]
 }

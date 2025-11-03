@@ -31,14 +31,8 @@ export class BloodListService {
     // Validierung: Name bereits bei aktivem Mitglied?
     const existingByName = await this.prisma.bloodRecord.findFirst({
       where: {
-        vorname: {
-          equals: vorname,
-          mode: 'insensitive',
-        },
-        nachname: {
-          equals: nachname,
-          mode: 'insensitive',
-        },
+        vorname,
+        nachname,
         status: BloodStatus.ACTIVE,
       },
     });
@@ -99,14 +93,8 @@ export class BloodListService {
 
         bloodRecord = await this.prisma.bloodRecord.findFirst({
           where: {
-            vorname: {
-              equals: vorname,
-              mode: 'insensitive',
-            },
-            nachname: {
-              equals: nachname,
-              mode: 'insensitive',
-            },
+            vorname,
+            nachname,
             status: BloodStatus.ACTIVE,
           },
         });
@@ -239,19 +227,16 @@ export class BloodListService {
           {
             vorname: {
               contains: query,
-              mode: 'insensitive',
             },
           },
           {
             nachname: {
               contains: query,
-              mode: 'insensitive',
             },
           },
           {
             steam: {
               contains: query,
-              mode: 'insensitive',
             },
           },
           ...(isNaN(searchNumber)
