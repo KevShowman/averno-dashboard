@@ -114,7 +114,7 @@ export class DiscordService {
             // 3. Weekly Delivery (Exclusions, Archives, dann Deliveries)
             await tx.weeklyDeliveryExclusion.deleteMany({ where: { userId: user.id } });
             await tx.weeklyDeliveryExclusion.deleteMany({ where: { createdById: user.id } });
-            await tx.weeklyDeliveryArchive.deleteMany({ where: { createdById: user.id } });
+            await tx.weeklyDeliveryArchive.deleteMany({ where: { archivedById: user.id } });
             await tx.weeklyDelivery.deleteMany({ where: { userId: user.id } });
             
             // 4. Sanctions
