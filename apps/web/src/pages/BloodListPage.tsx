@@ -55,7 +55,7 @@ export default function BloodListPage() {
   const { data: history = [] } = useQuery({
     queryKey: ['bloodlist', 'history'],
     queryFn: () => bloodListApi.getHistory(),
-    enabled: isLeadership && showHistory,
+    enabled: !!isLeadership && showHistory,
   });
 
   const { data: stats } = useQuery({
@@ -66,8 +66,8 @@ export default function BloodListPage() {
   // Mutations
   const bloodInMutation = useMutation({
     mutationFn: bloodListApi.bloodIn,
-    onSuccess: (response) => {
-      toast.success(response.data.message || 'Blood In erfolgreich');
+    onSuccess: (data) => {
+      toast.success(data.message || 'Blood In erfolgreich');
       queryClient.invalidateQueries({ queryKey: ['bloodlist'] });
       setShowBloodInModal(false);
       setBloodInData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
@@ -79,8 +79,8 @@ export default function BloodListPage() {
 
   const bloodOutMutation = useMutation({
     mutationFn: bloodListApi.bloodOut,
-    onSuccess: (response) => {
-      toast.success(response.data.message || 'Blood Out erfolgreich');
+    onSuccess: (data) => {
+      toast.success(data.message || 'Blood Out erfolgreich');
       queryClient.invalidateQueries({ queryKey: ['bloodlist'] });
       setShowBloodOutModal(false);
       setBloodOutData({ identifier: '', grund: '' });
