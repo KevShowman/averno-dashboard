@@ -11,6 +11,8 @@ import PackagesPage from './pages/PackagesPage'
 import AuditPage from './pages/AuditPage'
 import SettingsPage from './pages/SettingsPage'
 import AufstellungenPage from './pages/AufstellungenPage'
+import AbmeldungenPage from './pages/AbmeldungenPage'
+import BloodListPage from './pages/BloodListPage'
 import TickerPage from './pages/TickerPage'
 import WeeklyDeliveryPage from './pages/WeeklyDeliveryPage'
 import SanctionsPage from './pages/SanctionsPage'
@@ -150,6 +152,20 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <AufstellungenPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/abmeldungen" element={
+          <ProtectedRoute>
+            <Layout>
+              <AbmeldungenPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/bloodlist" element={
+          <ProtectedRoute>
+            <Layout>
+              <BloodListPage />
             </Layout>
           </ProtectedRoute>
         } />

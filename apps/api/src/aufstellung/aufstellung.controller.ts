@@ -17,6 +17,13 @@ interface RespondAufstellungDto {
   status: AufstellungResponseStatus;
 }
 
+interface CreateExclusionDto {
+  userId: string;
+  reason: string;
+  startDate: string; // ISO string
+  endDate?: string; // ISO string, optional
+}
+
 @Controller('aufstellung')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AufstellungController {
@@ -32,8 +39,8 @@ export class AufstellungController {
     @Body() createDto: CreateAufstellungDto,
     @CurrentUser() user: User,
   ) {
-    // Kombiniere Datum und Uhrzeit
-    const dateTime = new Date(`${createDto.date}T${createDto.time}:00.000Z`);
+    // Kombiniere Datum und Uhrzeit (ohne Z für lokale Zeit)
+    const dateTime = new Date(`${createDto.date}T${createDto.time}:00.000`);
     
     const aufstellung = await this.aufstellungService.createAufstellung(
       user.id,
@@ -102,6 +109,52 @@ export class AufstellungController {
   @Roles(Role.EL_PATRON, Role.DON)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
+  }
+
+  // ===== EXCLUSIONS =====
+
+  // Exclusion erstellen (nur El Patron, Don, Asesor)
+  @Post('exclusions')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async createExclusion(
+    @Body() createDto: CreateExclusionDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.aufstellungService.createExclusion(
+      createDto.userId,
+      createDto.reason,
+      new Date(createDto.startDate),
+      createDto.endDate ? new Date(createDto.endDate) : null,
+      user.id,
+    );
+  }
+
+  // Alle Exclusions abrufen (nur Leaderschaft)
+  @Get('exclusions')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async getAllExclusions() {
+    return this.aufstellungService.getAllExclusions();
+  }
+
+  // Aktive Exclusions abrufen (nur Leaderschaft)
+  @Get('exclusions/active')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async getActiveExclusions() {
+    return this.aufstellungService.getActiveExclusions();
+  }
+
+  // Exclusion deaktivieren (nur El Patron, Don)
+  @Patch('exclusions/:id/deactivate')
+  @Roles(Role.EL_PATRON, Role.DON)
+  async deactivateExclusion(@Param('id') id: string) {
+    return this.aufstellungService.deactivateExclusion(id);
+  }
+
+  // Exclusion löschen (nur El Patron)
+  @Delete('exclusions/:id')
+  @Roles(Role.EL_PATRON)
+  async deleteExclusion(@Param('id') id: string) {
+    return this.aufstellungService.deleteExclusion(id);
   }
 }
 

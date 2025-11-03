@@ -16,6 +16,8 @@ import { SanctionsModule } from './sanctions/sanctions.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { StartupModule } from './startup/startup.module';
 import { AufstellungModule } from './aufstellung/aufstellung.module';
+import { AbmeldungModule } from './abmeldung/abmeldung.module';
+import { BloodListModule } from './bloodlist/bloodlist.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -45,6 +47,8 @@ import { AppService } from './app.service';
     SchedulerModule,
     StartupModule,
     AufstellungModule,
+    AbmeldungModule,
+    BloodListModule,
   ],
   controllers: [AppController],
   providers: [AppService],

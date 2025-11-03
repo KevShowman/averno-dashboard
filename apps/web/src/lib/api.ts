@@ -133,5 +133,32 @@ export const aufstellungApi = {
     api.post(`/aufstellung/${id}/respond`, { status }),
   sanctionNonResponders: (id: string) => api.post(`/aufstellung/${id}/sanction-non-responders`),
   delete: (id: string) => api.delete(`/aufstellung/${id}`),
-}
+};
+
+// Abmeldung API
+export const abmeldungApi = {
+  create: (data: { startDate: string; endDate: string; reason?: string }) =>
+    api.post('/abmeldung', data),
+  getAll: () => api.get('/abmeldung'),
+  getCurrent: () => api.get('/abmeldung/current'),
+  getMy: () => api.get('/abmeldung/my'),
+  update: (id: string, data: { startDate?: string; endDate?: string; reason?: string }) =>
+    api.patch(`/abmeldung/${id}`, data),
+  delete: (id: string) => api.delete(`/abmeldung/${id}`),
+  cleanup: () => api.post('/abmeldung/cleanup'),
+};
+
+// BloodList API
+export const bloodListApi = {
+  bloodIn: (data: { vorname: string; nachname: string; telefon: number; steam: string; bloodinDurch: string }) =>
+    api.post('/bloodlist/blood-in', data),
+  bloodOut: (data: { identifier: string; grund: string }) =>
+    api.post('/bloodlist/blood-out', data),
+  getActive: () => api.get('/bloodlist/active'),
+  getHistory: () => api.get('/bloodlist/history'),
+  getAll: () => api.get('/bloodlist/all'),
+  getStats: () => api.get('/bloodlist/stats'),
+  search: (query: string) => api.get('/bloodlist/search', { params: { q: query } }),
+  getById: (id: string) => api.get(`/bloodlist/${id}`),
+};
 

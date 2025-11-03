@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { WeeklyDelivery, WeeklyDeliveryStatus, WeeklyDeliveryExclusion, SanctionCategory } from '@prisma/client';
 import { DiscordService } from '../discord/discord.service';
 import { SettingsService } from '../settings/settings.service';
 import { AuditService } from '../audit/audit.service';
 import { SanctionsService } from '../sanctions/sanctions.service';
+import { AbmeldungService } from '../abmeldung/abmeldung.service';
 
 @Injectable()
 export class WeeklyDeliveryService {
@@ -14,6 +15,8 @@ export class WeeklyDeliveryService {
     private settingsService: SettingsService,
     private auditService: AuditService,
     private sanctionsService: SanctionsService,
+    @Inject(forwardRef(() => AbmeldungService))
+    private abmeldungService: AbmeldungService,
   ) {}
 
 
@@ -230,7 +233,7 @@ export class WeeklyDeliveryService {
       return [];
     }
 
-    return this.prisma.weeklyDelivery.findMany({
+    const deliveries = await this.prisma.weeklyDelivery.findMany({
       where,
       include: {
         user: {
@@ -252,6 +255,25 @@ export class WeeklyDeliveryService {
         weekStart: 'desc',
       },
     });
+
+    // Prüfe für jede Delivery, ob User abgemeldet ist (>2 Tage)
+    const deliveriesWithAbmeldungStatus = await Promise.all(
+      deliveries.map(async (delivery) => {
+        const abmeldungStatus = await this.abmeldungService.isUserAbgemeldetForPeriod(
+          delivery.userId,
+          delivery.weekStart,
+          delivery.weekEnd,
+        );
+
+        return {
+          ...delivery,
+          isAbgemeldet: abmeldungStatus.isAbgemeldet,
+          abgemeldeteDays: abmeldungStatus.abgemeldeteDays,
+        };
+      }),
+    );
+
+    return deliveriesWithAbmeldungStatus;
   }
 
   // Aktuelle Woche abrufen

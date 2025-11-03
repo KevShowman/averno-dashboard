@@ -11,105 +11,107 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(cuid())
-  discordId    String  @unique
+  id           String   @id @default(cuid())
+  discordId    String   @unique
   username     String
   icFirstName  String? // IC Vorname
   icLastName   String? // IC Nachname
   avatarUrl    String?
   email        String?
-  role         Role    @default(SOLDADO)
-  allRoles     Json    @default("[]") // Alle System-Rollen des Users (JSON array)
-  discordRoles Json    @default("[]") // Discord Rollen-IDs (JSON array)
+  role         Role     @default(SOLDADO)
+  allRoles     Json     @default("[]") // Alle System-Rollen des Users (JSON array)
+  discordRoles Json     @default("[]") // Discord Rollen-IDs (JSON array)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
+
   // Relations
-  actions      ActionLog[]
-  moneyTxCreated MoneyTransaction[] @relation("tx_created_by")
-  moneyTxApproved MoneyTransaction[] @relation("tx_approved_by")
-  stockMovements StockMovement[] @relation("movement_created_by")
-  stockMovementsApproved StockMovement[] @relation("movement_approved_by")
-  packageDeposits PackageDeposit[] @relation("deposit_created_by")
-  packageConfirmations PackageDeposit[] @relation("deposit_confirmed_by")
-  packageRejections PackageDeposit[] @relation("deposit_rejected_by")
-  weeklyDeliveries WeeklyDelivery[] @relation("delivery_created_by")
-  weeklyDeliveryConfirmations WeeklyDelivery[] @relation("delivery_confirmed_by")
-  sanctionsCreated Sanction[] @relation("sanction_created_by")
-  sanctionsReceived Sanction[] @relation("sanction_received_by")
-  exclusionsReceived WeeklyDeliveryExclusion[] @relation("exclusion_user")
-  exclusionsCreated WeeklyDeliveryExclusion[] @relation("exclusion_created_by")
-  archivesCreated WeeklyDeliveryArchive[] @relation("archive_created_by")
-  aufstellungenCreated Aufstellung[] @relation("aufstellung_created_by")
-  aufstellungResponses AufstellungResponse[] @relation("aufstellung_responses")
+  actions                       ActionLog[]
+  moneyTxCreated                MoneyTransaction[]        @relation("tx_created_by")
+  moneyTxApproved               MoneyTransaction[]        @relation("tx_approved_by")
+  stockMovements                StockMovement[]           @relation("movement_created_by")
+  stockMovementsApproved        StockMovement[]           @relation("movement_approved_by")
+  packageDeposits               PackageDeposit[]          @relation("deposit_created_by")
+  packageConfirmations          PackageDeposit[]          @relation("deposit_confirmed_by")
+  packageRejections             PackageDeposit[]          @relation("deposit_rejected_by")
+  weeklyDeliveries              WeeklyDelivery[]          @relation("delivery_created_by")
+  weeklyDeliveryConfirmations   WeeklyDelivery[]          @relation("delivery_confirmed_by")
+  sanctionsCreated              Sanction[]                @relation("sanction_created_by")
+  sanctionsReceived             Sanction[]                @relation("sanction_received_by")
+  exclusionsReceived            WeeklyDeliveryExclusion[] @relation("exclusion_user")
+  exclusionsCreated             WeeklyDeliveryExclusion[] @relation("exclusion_created_by")
+  archivesCreated               WeeklyDeliveryArchive[]   @relation("archive_created_by")
+  aufstellungenCreated          Aufstellung[]             @relation("aufstellung_created_by")
+  aufstellungResponses          AufstellungResponse[]     @relation("aufstellung_responses")
+  aufstellungExclusionsReceived AufstellungExclusion[]    @relation("aufstellung_exclusion_user")
+  aufstellungExclusionsCreated  AufstellungExclusion[]    @relation("aufstellung_exclusion_created_by")
+  abmeldungenCreated            Abmeldung[]               @relation("abmeldung_user")
 
   @@map("users")
 }
 
-enum Role { 
+enum Role {
   // Alte Rollen (temporär für Migration)
   ADMIN
   QUARTIERMEISTER
   MITGLIED
   GAST
   // Neue Rollen
-  EL_PATRON        // Admin, höchste Rolle
-  DON              // Sub-Admin
-  ASESOR           // Alles muss genehmigt werden
+  EL_PATRON // Admin, höchste Rolle
+  DON // Sub-Admin
+  ASESOR // Alles muss genehmigt werden
   ROUTENVERWALTUNG // Kann Kokain-Deposits bestätigen
-  LOGISTICA        // Kann Lagerbewegungen bestätigen
-  SICARIO          // Erweiterte Berechtigungen
-  SOLDADO          // Normales Mitglied, nur lesen
+  LOGISTICA // Kann Lagerbewegungen bestätigen
+  SICARIO // Erweiterte Berechtigungen
+  SOLDADO // Normales Mitglied, nur lesen
 }
 
 model Module {
-  id        String  @id @default(cuid())
-  key       String  @unique // "lager", "kasse", future modules
+  id        String   @id @default(cuid())
+  key       String   @unique // "lager", "kasse", future modules
   name      String
-  enabled   Boolean @default(true)
+  enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("modules")
 }
 
-
 model ItemCategory {
-  id    String @id @default(cuid())
-  name  String @unique
-  items Item[]
+  id        String   @id @default(cuid())
+  name      String   @unique
+  items     Item[]
   createdAt DateTime @default(now())
 
   @@map("item_categories")
 }
 
 model Item {
-  id           String @id @default(cuid())
-  name         String
-  sku          String? @unique
-  categoryId   String
-  category     ItemCategory @relation(fields: [categoryId], references: [id])
-  minStock     Int    @default(0)
-  currentStock Int    @default(0)
-  reservedStock Int   @default(0)
-  isLocked     Boolean @default(false)
-  tags         Json    @default("[]") // Tags als JSON array (MySQL hat keine nativen Arrays)
-  location     String? // Regal/Standort
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
+  id            String       @id @default(cuid())
+  name          String
+  sku           String?      @unique
+  categoryId    String
+  category      ItemCategory @relation(fields: [categoryId], references: [id])
+  minStock      Int          @default(0)
+  currentStock  Int          @default(0)
+  reservedStock Int          @default(0)
+  isLocked      Boolean      @default(false)
+  tags          Json         @default("[]") // Tags als JSON array (MySQL hat keine nativen Arrays)
+  location      String? // Regal/Standort
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
   // Relations
   stockEntries StockMovement[]
 
   @@map("items")
 }
 
-enum MovementType { 
-  IN 
-  OUT 
-  ADJUST 
-  RESERVE 
-  RELEASE 
+enum MovementType {
+  IN
+  OUT
+  ADJUST
+  RESERVE
+  RELEASE
 }
 
 enum MovementStatus {
@@ -119,51 +121,51 @@ enum MovementStatus {
 }
 
 model StockMovement {
-  id          String @id @default(cuid())
-  itemId      String
-  item        Item   @relation(fields: [itemId], references: [id])
-  type        MovementType
-  quantity    Int
-  previousStock Int
-  newStock    Int
-  note        String?
-  reference   String? // Auftrag/Person/Event
-  batchNumber String? // für Serien/Batches
-  status      MovementStatus @default(PENDING)
-  approvedById String?
-  approvedBy  User?  @relation("movement_approved_by", fields: [approvedById], references: [id])
-  approvedAt  DateTime?
+  id              String         @id @default(cuid())
+  itemId          String
+  item            Item           @relation(fields: [itemId], references: [id])
+  type            MovementType
+  quantity        Int
+  previousStock   Int
+  newStock        Int
+  note            String?
+  reference       String? // Auftrag/Person/Event
+  batchNumber     String? // für Serien/Batches
+  status          MovementStatus @default(PENDING)
+  approvedById    String?
+  approvedBy      User?          @relation("movement_approved_by", fields: [approvedById], references: [id])
+  approvedAt      DateTime?
   rejectionReason String?
-  createdById String
-  createdBy   User   @relation("movement_created_by", fields: [createdById], references: [id])
-  createdAt   DateTime @default(now())
+  createdById     String
+  createdBy       User           @relation("movement_created_by", fields: [createdById], references: [id])
+  createdAt       DateTime       @default(now())
 
   @@map("stock_movements")
 }
 
 model MoneyTransaction {
-  id          String @id @default(cuid())
-  kind        MoneyKind
-  amount      Int // in Einheiten (1 = 1$ Schwarz)
-  category    String?
-  note        String?
-  reference   String? // Auftrag/Person
-  status      TransactionStatus @default(PENDING)
+  id           String            @id @default(cuid())
+  kind         MoneyKind
+  amount       Int // in Einheiten (1 = 1$ Schwarz)
+  category     String?
+  note         String?
+  reference    String? // Auftrag/Person
+  status       TransactionStatus @default(PENDING)
   approvedById String?
-  createdById String
-  createdBy   User   @relation("tx_created_by", fields: [createdById], references: [id])
-  approvedBy  User?  @relation("tx_approved_by", fields: [approvedById], references: [id])
-  approvedAt  DateTime?
-  createdAt   DateTime @default(now())
+  createdById  String
+  createdBy    User              @relation("tx_created_by", fields: [createdById], references: [id])
+  approvedBy   User?             @relation("tx_approved_by", fields: [approvedById], references: [id])
+  approvedAt   DateTime?
+  createdAt    DateTime          @default(now())
 
   @@map("money_transactions")
 }
 
-enum MoneyKind { 
-  EINZAHLUNG 
-  AUSZAHLUNG 
-  TRANSFER 
-  KORREKTUR 
+enum MoneyKind {
+  EINZAHLUNG
+  AUSZAHLUNG
+  TRANSFER
+  KORREKTUR
 }
 
 enum TransactionStatus {
@@ -173,9 +175,9 @@ enum TransactionStatus {
 }
 
 model ActionLog {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  user      User   @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   action    String // e.g. "ITEM_CREATE", "MOVE_OUT", "MONEY_TX"
   entity    String // "Item", "StockMovement", "MoneyTransaction"
   entityId  String
@@ -188,10 +190,10 @@ model ActionLog {
 }
 
 model Settings {
-  id    String @id @default(cuid())
-  key   String @unique
-  value Json
-  type  String @default("string") // "string", "number", "boolean", "json"
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  type      String   @default("string") // "string", "number", "boolean", "json"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -200,28 +202,28 @@ model Settings {
 
 // Package-Deposit System (früher Kokain)
 model PackageDeposit {
-  id          String @id @default(cuid())
-  userId      String
-  user        User   @relation("deposit_created_by", fields: [userId], references: [id])
-  packages    Int    // Anzahl Pakete
-  status      DepositStatus @default(PENDING)
-  confirmedById String?
-  confirmedBy User?  @relation("deposit_confirmed_by", fields: [confirmedById], references: [id])
-  confirmedAt DateTime?
-  rejectedById String?
-  rejectedBy User?  @relation("deposit_rejected_by", fields: [rejectedById], references: [id])
-  rejectedAt DateTime?
-  rejectionReason String?
-  note        String?
-  uebergabeId String? // Referenz zur Übergabe-Session
-  uebergabe   PackageHandover? @relation(fields: [uebergabeId], references: [id])
+  id                     String           @id @default(cuid())
+  userId                 String
+  user                   User             @relation("deposit_created_by", fields: [userId], references: [id])
+  packages               Int // Anzahl Pakete
+  status                 DepositStatus    @default(PENDING)
+  confirmedById          String?
+  confirmedBy            User?            @relation("deposit_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt            DateTime?
+  rejectedById           String?
+  rejectedBy             User?            @relation("deposit_rejected_by", fields: [rejectedById], references: [id])
+  rejectedAt             DateTime?
+  rejectionReason        String?
+  note                   String?
+  uebergabeId            String? // Referenz zur Übergabe-Session
+  uebergabe              PackageHandover? @relation(fields: [uebergabeId], references: [id])
   // Wochenabgabe Integration
-  weeklyDeliveryId String? // Referenz zur Wochenabgabe
-  weeklyDelivery   WeeklyDelivery? @relation(fields: [weeklyDeliveryId], references: [id])
+  weeklyDeliveryId       String? // Referenz zur Wochenabgabe
+  weeklyDelivery         WeeklyDelivery?  @relation(fields: [weeklyDeliveryId], references: [id])
   weeklyDeliveryPackages Int? // Pakete die für Wochenabgabe verwendet wurden
-  payoutPackages Int? // Pakete die als Auszahlung verwendet wurden
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  payoutPackages         Int? // Pakete die als Auszahlung verwendet wurden
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
 
   @@map("package_deposits")
 }
@@ -234,52 +236,52 @@ enum DepositStatus {
 
 // Übergabe-Sessions für Archivierung
 model PackageHandover {
-  id          String @id @default(cuid())
-  name        String // z.B. "Übergabe Dezember 2024"
+  id            String    @id @default(cuid())
+  name          String // z.B. "Übergabe Dezember 2024"
   totalPackages Int
-  totalValue  Int // Gesamtwert in Schwarzgeld
-  isActive    Boolean @default(true)
-  archivedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  totalValue    Int // Gesamtwert in Schwarzgeld
+  isActive      Boolean   @default(true)
+  archivedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
-  deposits    PackageDeposit[]
+  deposits PackageDeposit[]
 
   @@map("package_handovers")
 }
 
 model DiscordRoleMapping {
-  id          String @id @default(cuid())
-  discordRoleId String @unique // Discord Rollen-ID
-  systemRole  Role   // System-Rolle
-  name        String // Name der Discord-Rolle
-  isActive    Boolean @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  discordRoleId String   @unique // Discord Rollen-ID
+  systemRole    Role // System-Rolle
+  name          String // Name der Discord-Rolle
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("discord_role_mappings")
 }
 
 // Wochenabgabe System
 model WeeklyDelivery {
-  id          String @id @default(cuid())
-  userId      String
-  user        User   @relation("delivery_created_by", fields: [userId], references: [id])
-  weekStart   DateTime // Start der Woche (Montag)
-  weekEnd     DateTime // Ende der Woche (Sonntag)
-  packages    Int    @default(300) // Standard: 300 Pakete
-  paidAmount  Int?   // Bezahlte Menge in Paketen
-  paidMoney   Int?   // Bezahlte Menge in Schwarzgeld
-  status      WeeklyDeliveryStatus @default(PENDING)
+  id            String               @id @default(cuid())
+  userId        String
+  user          User                 @relation("delivery_created_by", fields: [userId], references: [id])
+  weekStart     DateTime // Start der Woche (Montag)
+  weekEnd       DateTime // Ende der Woche (Sonntag)
+  packages      Int                  @default(300) // Standard: 300 Pakete
+  paidAmount    Int? // Bezahlte Menge in Paketen
+  paidMoney     Int? // Bezahlte Menge in Schwarzgeld
+  status        WeeklyDeliveryStatus @default(PENDING)
   confirmedById String?
-  confirmedBy User?  @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
-  confirmedAt DateTime?
-  note        String?
-  isPrepaid   Boolean @default(false) // Vorauszahlung für mehrere Wochen
-  prepaidWeeks Int?   // Anzahl der vorausbezahlten Wochen
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  confirmedBy   User?                @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt   DateTime?
+  note          String?
+  isPrepaid     Boolean              @default(false) // Vorauszahlung für mehrere Wochen
+  prepaidWeeks  Int? // Anzahl der vorausbezahlten Wochen
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
   // Relations
   packageDeposits PackageDeposit[]
@@ -296,58 +298,58 @@ enum WeeklyDeliveryStatus {
 
 // Wochenabgabe Ausschlüsse
 model WeeklyDeliveryExclusion {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User   @relation("exclusion_user", fields: [userId], references: [id])
+  user        User      @relation("exclusion_user", fields: [userId], references: [id])
   reason      String
   startDate   DateTime
   endDate     DateTime?
-  isActive    Boolean @default(true)
+  isActive    Boolean   @default(true)
   createdById String
-  createdBy   User   @relation("exclusion_created_by", fields: [createdById], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdBy   User      @relation("exclusion_created_by", fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("weekly_delivery_exclusions")
 }
 
 model WeeklyDeliveryArchive {
-  id               String @id @default(cuid())
-  weekStart        DateTime
-  weekEnd          DateTime
-  archiveName      String
-  totalDeliveries  Int
-  paidDeliveries   Int
+  id                String   @id @default(cuid())
+  weekStart         DateTime
+  weekEnd           DateTime
+  archiveName       String
+  totalDeliveries   Int
+  paidDeliveries    Int
   overdueDeliveries Int
   pendingDeliveries Int
-  totalPackages    Int
-  paidPackages     Int
-  totalMoney       Int
-  deliveryData     Json   // Vollständige Delivery-Daten
-  archivedById     String
-  archivedBy       User   @relation("archive_created_by", fields: [archivedById], references: [id])
-  createdAt        DateTime @default(now())
+  totalPackages     Int
+  paidPackages      Int
+  totalMoney        Int
+  deliveryData      Json // Vollständige Delivery-Daten
+  archivedById      String
+  archivedBy        User     @relation("archive_created_by", fields: [archivedById], references: [id])
+  createdAt         DateTime @default(now())
 
   @@map("weekly_delivery_archives")
 }
 
 // Sanktionssystem
 model Sanction {
-  id          String @id @default(cuid())
+  id          String           @id @default(cuid())
   userId      String
-  user        User   @relation("sanction_received_by", fields: [userId], references: [id])
+  user        User             @relation("sanction_received_by", fields: [userId], references: [id])
   category    SanctionCategory
-  level       Int    @default(1) // 1-4, Level bestimmt Strafe
+  level       Int              @default(1) // 1-4, Level bestimmt Strafe
   description String
-  amount      Int?   // Geldstrafe in Schwarzgeld
+  amount      Int? // Geldstrafe in Schwarzgeld
   penalty     String? // Spezielle Strafe (z.B. "LaSanta Calavera Brücke 1x")
-  status      SanctionStatus @default(ACTIVE)
+  status      SanctionStatus   @default(ACTIVE)
   createdById String
-  createdBy   User   @relation("sanction_created_by", fields: [createdById], references: [id])
+  createdBy   User             @relation("sanction_created_by", fields: [createdById], references: [id])
   paidAt      DateTime?
   expiresAt   DateTime? // Für automatische Bereinigung nach 4 Wochen
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   @@map("sanctions")
 }
@@ -359,6 +361,21 @@ enum SanctionCategory {
   REAKTIONSPFLICHT
   NICHT_BEZAHLT
   NICHT_BEZAHLT_48H
+  // Neue Sanktionen
+  RESPEKTLOS_ZIVILISTEN
+  RESPEKTLOS_FAMILIE
+  TOETUNG_FAMILIENMITGLIEDER
+  SEXUELLE_BELAESTIGUNG
+  UNNÖTIGES_BOXEN_SCHIESSEN
+  MISSACHTUNG_ANWEISUNGEN
+  FEHLEN_AUFSTELLUNG
+  NICHT_ANMELDEN_FUNKCHECK
+
+  KLEIDERORDNUNG
+  MUNITIONSVERSCHWENDUNG
+  CASA_OHNE_ANKUENDIGUNG
+  FUNKPFLICHT_MISSACHTUNG
+  FUNKDISZIPLIN_MISSACHTUNG
 }
 
 enum SanctionStatus {
@@ -370,37 +387,93 @@ enum SanctionStatus {
 
 // Aufstellungssystem
 model Aufstellung {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   createdById String
-  createdBy   User   @relation("aufstellung_created_by", fields: [createdById], references: [id])
+  createdBy   User     @relation("aufstellung_created_by", fields: [createdById], references: [id])
   date        DateTime // Datum und Uhrzeit der Aufstellung
-  reason      String  // Grund/Location der Aufstellung
+  reason      String // Grund/Location der Aufstellung
   deadline    DateTime // Deadline für Reaktionen (= date)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  responses   AufstellungResponse[]
+  responses AufstellungResponse[]
 
   @@map("aufstellungen")
 }
 
+// Aufstellung-Ausschlüsse (wie Wochenabgabe-Ausschlüsse)
+model AufstellungExclusion {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation("aufstellung_exclusion_user", fields: [userId], references: [id])
+  reason      String
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  createdById String
+  createdBy   User      @relation("aufstellung_exclusion_created_by", fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("aufstellung_exclusions")
+}
+
 model AufstellungResponse {
-  id             String @id @default(cuid())
-  aufstellungId  String
-  aufstellung    Aufstellung @relation(fields: [aufstellungId], references: [id], onDelete: Cascade)
-  userId         String
-  user           User   @relation("aufstellung_responses", fields: [userId], references: [id], onDelete: Cascade)
-  status         AufstellungResponseStatus
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String                    @id @default(cuid())
+  aufstellungId String
+  aufstellung   Aufstellung               @relation(fields: [aufstellungId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                      @relation("aufstellung_responses", fields: [userId], references: [id], onDelete: Cascade)
+  status        AufstellungResponseStatus
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
 
   @@unique([aufstellungId, userId])
   @@map("aufstellung_responses")
 }
 
 enum AufstellungResponseStatus {
-  COMING      // Kommt
-  NOT_COMING  // Kommt nicht
-  UNSURE      // Unsicher
+  COMING // Kommt
+  NOT_COMING // Kommt nicht
+  UNSURE // Unsicher
+}
+
+// Abmeldungssystem
+model Abmeldung {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation("abmeldung_user", fields: [userId], references: [id])
+  startDate DateTime // Start der Abmeldung
+  endDate   DateTime // Ende der Abmeldung
+  reason    String? // Grund der Abmeldung (optional)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("abmeldungen")
+}
+
+// BloodList System - Mitgliederverwaltung
+model BloodRecord {
+  id                 String        @id @default(cuid())
+  vorname            String
+  nachname           String
+  telefon            Int
+  steam              String
+  bloodinDurch       String // Wer hat Blood In durchgeführt
+  bloodinTimestamp   DateTime      @default(now())
+  status             BloodStatus   @default(ACTIVE)
+  bloodoutTimestamp  DateTime?
+  bloodoutDurch      String?
+  bloodoutGrund      String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@unique([telefon, status]) // Telefon muss unique sein für ACTIVE Status
+  @@map("blood_records")
+}
+
+enum BloodStatus {
+  ACTIVE
+  BLOODOUT
 }

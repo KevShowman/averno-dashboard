@@ -333,7 +333,7 @@ export default function AufstellungenPage() {
                   onChange={(e) => setCreateData({ ...createData, reason: e.target.value })}
                   placeholder="z.B. Casa Meeting, Routenplanung, Geschäftsabwicklung..."
                   rows={4}
-                  className="bg-dark-700 border-gold-500/30 focus:border-gold-500 resize-none text-white placeholder:text-gray-500"
+                  className="!bg-gray-800 border-gold-500/30 focus:border-gold-500 resize-none text-white placeholder:text-gray-500 [color-scheme:dark]"
                 />
               </div>
               <Button

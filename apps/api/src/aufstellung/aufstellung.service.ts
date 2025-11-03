@@ -1,13 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { AufstellungResponseStatus, Role } from '@prisma/client';
 import { SanctionsService } from '../sanctions/sanctions.service';
+import { AbmeldungService } from '../abmeldung/abmeldung.service';
 
 @Injectable()
 export class AufstellungService {
   constructor(
     private prisma: PrismaService,
     private sanctionsService: SanctionsService,
+    @Inject(forwardRef(() => AbmeldungService))
+    private abmeldungService: AbmeldungService,
   ) {}
 
   // Erstelle neue Aufstellung
@@ -40,7 +43,45 @@ export class AufstellungService {
       },
     });
 
+    // Automatisch abgemeldete User auf "Kommt nicht" setzen
+    await this.autoSetAbgemeldetUserNotComing(aufstellung.id, date);
+
     return aufstellung;
+  }
+
+  // Automatisch abgemeldete User auf "Kommt nicht" setzen
+  private async autoSetAbgemeldetUserNotComing(aufstellungId: string, aufstellungDate: Date) {
+    // Hole alle User
+    const allUsers = await this.prisma.user.findMany({
+      select: {
+        id: true,
+      },
+    });
+
+    // Prüfe für jeden User, ob er abgemeldet ist
+    for (const user of allUsers) {
+      const isAbgemeldet = await this.abmeldungService.isUserAbgemeldet(user.id, aufstellungDate);
+      
+      if (isAbgemeldet) {
+        // Setze Response automatisch auf NOT_COMING
+        await this.prisma.aufstellungResponse.upsert({
+          where: {
+            aufstellungId_userId: {
+              aufstellungId,
+              userId: user.id,
+            },
+          },
+          update: {
+            status: AufstellungResponseStatus.NOT_COMING,
+          },
+          create: {
+            aufstellungId,
+            userId: user.id,
+            status: AufstellungResponseStatus.NOT_COMING,
+          },
+        });
+      }
+    }
   }
 
   // Alle Aufstellungen abrufen
@@ -213,27 +254,65 @@ export class AufstellungService {
     });
 
     const respondedUserIds = new Set(aufstellung.responses.map(r => r.userId));
-    const usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
+    let usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
+
+    // Ausgeschlossene User filtern (die aktive Exclusions haben)
+    const exclusions = await this.prisma.aufstellungExclusion.findMany({
+      where: {
+        isActive: true,
+        startDate: { lte: aufstellung.date },
+        OR: [
+          { endDate: null },
+          { endDate: { gte: aufstellung.date } },
+        ],
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const excludedUserIds = new Set(exclusions.map(e => e.userId));
+    usersWithoutResponse = usersWithoutResponse.filter(user => !excludedUserIds.has(user.id));
 
     const sanctions = [];
+    const skippedUsers = [];
 
     for (const user of usersWithoutResponse) {
       try {
+        // Prüfe ob User bereits eine Sanktion für diese spezifische Aufstellung hat
+        const existingSanction = await this.prisma.sanction.findFirst({
+          where: {
+            userId: user.id,
+            category: 'REAKTIONSPFLICHT',
+            description: {
+              contains: aufstellung.date.toLocaleDateString('de-DE'),
+            },
+          },
+        });
+
+        if (existingSanction) {
+          skippedUsers.push({ user, reason: 'Bereits sanktioniert' });
+          continue;
+        }
+
         const sanction = await this.sanctionsService.createSanctionWithAutoLevel(
           user.id,
           'REAKTIONSPFLICHT',
           `Keine Reaktion auf Aufstellung vom ${aufstellung.date.toLocaleDateString('de-DE')} - ${aufstellung.reason}`,
-          aufstellung.createdById, // Der Ersteller der Aufstellung ist der Sanktions-Ersteller
+          aufstellung.createdById,
         );
         sanctions.push(sanction);
       } catch (error) {
         console.error(`Fehler beim Sanktionieren von User ${user.username}:`, error);
+        skippedUsers.push({ user, reason: error.message });
       }
     }
 
     return {
-      message: `${sanctions.length} User wurden sanktioniert`,
+      message: `${sanctions.length} User wurden sanktioniert, ${skippedUsers.length} übersprungen, ${excludedUserIds.size} ausgeschlossen`,
       sanctionedUsers: sanctions.length,
+      skippedUsers: skippedUsers.length,
+      excludedUsers: excludedUserIds.size,
       sanctions,
     };
   }
@@ -321,6 +400,142 @@ export class AufstellungService {
 
     // Filtere nur die, wo User noch nicht reagiert hat
     return allUpcoming.filter(auf => auf.responses.length === 0);
+  }
+
+  // Exclusion erstellen
+  async createExclusion(
+    userId: string,
+    reason: string,
+    startDate: Date,
+    endDate: Date | null,
+    createdById: string,
+  ) {
+    const exclusion = await this.prisma.aufstellungExclusion.create({
+      data: {
+        userId,
+        reason,
+        startDate,
+        endDate,
+        createdById,
+        isActive: true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    return exclusion;
+  }
+
+  // Alle Exclusions abrufen
+  async getAllExclusions() {
+    return this.prisma.aufstellungExclusion.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  // Aktive Exclusions abrufen
+  async getActiveExclusions() {
+    return this.prisma.aufstellungExclusion.findMany({
+      where: {
+        isActive: true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        startDate: 'desc',
+      },
+    });
+  }
+
+  // Exclusion deaktivieren
+  async deactivateExclusion(id: string) {
+    const exclusion = await this.prisma.aufstellungExclusion.findUnique({
+      where: { id },
+    });
+
+    if (!exclusion) {
+      throw new NotFoundException('Exclusion nicht gefunden');
+    }
+
+    return this.prisma.aufstellungExclusion.update({
+      where: { id },
+      data: {
+        isActive: false,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Exclusion löschen
+  async deleteExclusion(id: string) {
+    const exclusion = await this.prisma.aufstellungExclusion.findUnique({
+      where: { id },
+    });
+
+    if (!exclusion) {
+      throw new NotFoundException('Exclusion nicht gefunden');
+    }
+
+    await this.prisma.aufstellungExclusion.delete({
+      where: { id },
+    });
+
+    return { message: 'Exclusion wurde gelöscht' };
   }
 }
 

@@ -18,7 +18,9 @@ import {
   Scale,
   Users,
   PackageOpen,
-  CalendarCheck
+  CalendarCheck,
+  CalendarDays,
+  Droplet
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -47,6 +49,8 @@ const navigation = [
   { name: 'Pakete', href: '/packages', icon: PackageOpen },
   { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
   { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
+  { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
+  { name: 'Blood List', href: '/bloodlist', icon: Droplet },
   { name: 'Sanktionen', href: '/sanctions', icon: Scale },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },

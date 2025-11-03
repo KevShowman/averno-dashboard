@@ -522,6 +522,124 @@ export class SanctionsService {
           case 4: return { amount: 500000, penalty: 'Blood Out' };
         }
         break;
+
+      case SanctionCategory.RESPEKTLOS_ZIVILISTEN:
+        switch (level) {
+          case 1: return { amount: 150000 };
+          case 2: return { amount: 300000 };
+          case 3: return { amount: 450000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.RESPEKTLOS_FAMILIE:
+        switch (level) {
+          case 1: return { amount: 75000, penalty: '1. Warnung' };
+          case 2: return { amount: 150000, penalty: '2. Warnung' };
+          case 3: return { amount: 300000, penalty: '3. Warnung' };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.TOETUNG_FAMILIENMITGLIEDER:
+        switch (level) {
+          case 1: return { amount: 130000 };
+          case 2: return { amount: 260000 };
+          case 3: return { amount: 400000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.SEXUELLE_BELAESTIGUNG:
+        // Sofortiges Blood Out bei allen Levels
+        switch (level) {
+          case 1: return { penalty: 'Blood Out' };
+          case 2: return { penalty: 'Blood Out' };
+          case 3: return { penalty: 'Blood Out' };
+          case 4: return { penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.UNNÖTIGES_BOXEN_SCHIESSEN:
+        switch (level) {
+          case 1: return { amount: 75000 };
+          case 2: return { amount: 150000 };
+          case 3: return { amount: 300000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.MISSACHTUNG_ANWEISUNGEN:
+        switch (level) {
+          case 1: return { amount: 130000 };
+          case 2: return { amount: 260000 };
+          case 3: return { amount: 400000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.FEHLEN_AUFSTELLUNG:
+        switch (level) {
+          case 1: return { amount: 100000 };
+          case 2: return { amount: 200000 };
+          case 3: return { amount: 400000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.NICHT_ANMELDEN_FUNKCHECK:
+        switch (level) {
+          case 1: return { amount: 125000, penalty: '' };
+          case 2: return { amount: 250000, penalty: '' };
+          case 3: return { amount: 400000, penalty: '' };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.KLEIDERORDNUNG:
+        switch (level) {
+          case 1: return { amount: 75000, penalty: '' };
+          case 2: return { amount: 150000, penalty: '' };
+          case 3: return { amount: 300000, penalty: '' };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.MUNITIONSVERSCHWENDUNG:
+        switch (level) {
+          case 1: return { amount: 100000 };
+          case 2: return { amount: 200000 };
+          case 3: return { amount: 400000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.CASA_OHNE_ANKUENDIGUNG:
+        switch (level) {
+          case 1: return { amount: 100000 };
+          case 2: return { amount: 200000 };
+          case 3: return { amount: 400000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.FUNKPFLICHT_MISSACHTUNG:
+        switch (level) {
+          case 1: return { amount: 150000 };
+          case 2: return { amount: 300000 };
+          case 3: return { amount: 450000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
+
+      case SanctionCategory.FUNKDISZIPLIN_MISSACHTUNG:
+        switch (level) {
+          case 1: return { amount: 150000 };
+          case 2: return { amount: 300000 };
+          case 3: return { amount: 450000 };
+          case 4: return { amount: 500000, penalty: 'Blood Out' };
+        }
+        break;
     }
 
     return {};
