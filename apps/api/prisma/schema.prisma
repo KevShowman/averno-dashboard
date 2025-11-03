@@ -63,6 +63,7 @@ enum Role {
   LOGISTICA // Kann Lagerbewegungen bestätigen
   SICARIO // Erweiterte Berechtigungen
   SOLDADO // Normales Mitglied, nur lesen
+  FUTURO // Anwärter, niedrigste Rolle, nur lesen
 }
 
 model Module {

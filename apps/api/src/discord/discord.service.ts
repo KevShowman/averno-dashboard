@@ -202,6 +202,7 @@ export class DiscordService {
 
       // Rollen-Hierarchie definieren (höhere Zahlen = höhere Berechtigung)
       const roleHierarchy = {
+        [Role.FUTURO]: 0, // Niedrigste Rolle
         [Role.SOLDADO]: 1,
         [Role.SICARIO]: 2,
         [Role.ROUTENVERWALTUNG]: 3,

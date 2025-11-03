@@ -37,6 +37,7 @@ const getRoleDisplayName = (role: string) => {
     case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
     case 'LOGISTICA': return 'Logistica'
     case 'SOLDADO': return 'Soldado'
+    case 'FUTURO': return 'Futuro'
     default: return role
   }
 }

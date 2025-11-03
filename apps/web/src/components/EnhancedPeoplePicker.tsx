@@ -43,6 +43,7 @@ const roleIcons = {
   'ROUTENVERWALTUNG': MapPin,
   'SICARIO': AlertTriangle,
   'SOLDADO': User,
+  'FUTURO': User,
 }
 
 export default function EnhancedPeoplePicker({

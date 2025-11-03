@@ -93,6 +93,7 @@ export default function DiscordMembersManager() {
       case 'ROUTENVERWALTUNG': return 'bg-orange-900/20 text-orange-400 border-orange-400'
       case 'SICARIO': return 'bg-yellow-900/20 text-yellow-400 border-yellow-400'
       case 'SOLDADO': return 'bg-gray-900/20 text-gray-400 border-gray-400'
+      case 'FUTURO': return 'bg-slate-900/20 text-slate-500 border-slate-600'
       default: return 'bg-gray-900/20 text-gray-400 border-gray-400'
     }
   }
@@ -106,6 +107,7 @@ export default function DiscordMembersManager() {
       case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
       case 'SICARIO': return 'Sicario'
       case 'SOLDADO': return 'Soldado'
+      case 'FUTURO': return 'Futuro'
       default: return role
     }
   }

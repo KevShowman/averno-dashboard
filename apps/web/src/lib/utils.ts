@@ -58,6 +58,8 @@ export function getRoleColor(role: string) {
       return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
     case 'SOLDADO':
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+    case 'FUTURO':
+      return 'bg-slate-600/20 text-slate-500 border-slate-600/30'
     default:
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
   }
@@ -79,6 +81,8 @@ export function getRoleDisplayName(role: string) {
       return 'Sicario'
     case 'SOLDADO':
       return 'Soldado'
+    case 'FUTURO':
+      return 'Futuro'
     default:
       return role
   }

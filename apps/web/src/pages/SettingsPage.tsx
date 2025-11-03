@@ -28,6 +28,7 @@ const getRoleDisplayName = (role: string) => {
     case 'LOGISTICA': return 'Logistica'
     case 'SICARIO': return 'Sicario'
     case 'SOLDADO': return 'Soldado'
+    case 'FUTURO': return 'Futuro'
     default: return role
   }
 }
@@ -54,7 +55,7 @@ export default function SettingsPage() {
   const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
   const canManageSettings = user?.role && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role)
   const canManagePackagePrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
-  const canChangeIcName = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'LOGISTICA', 'SICARIO', 'SOLDADO'])
+  const canChangeIcName = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'LOGISTICA', 'SICARIO', 'SOLDADO', 'FUTURO'])
 
   // Queries
   const { data: users } = useQuery({

@@ -45,6 +45,7 @@ const roleIcons = {
   'ROUTENVERWALTUNG': MapPin,
   'SICARIO': AlertTriangle,
   'SOLDADO': UserIcon,
+  'FUTURO': UserIcon,
 }
 
 export default function UserManagementPage() {
