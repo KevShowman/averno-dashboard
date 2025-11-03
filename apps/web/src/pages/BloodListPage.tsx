@@ -182,7 +182,7 @@ export default function BloodListPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Aktive Mitglieder</p>
-                  <p className="text-3xl font-bold text-white">{stats.data.totalActive}</p>
+                  <p className="text-3xl font-bold text-white">{stats.totalActive}</p>
                 </div>
                 <User className="h-12 w-12 text-red-400 opacity-50" />
               </div>
@@ -193,7 +193,7 @@ export default function BloodListPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Blood Outs</p>
-                  <p className="text-3xl font-bold text-white">{stats.data.totalBloodOuts}</p>
+                  <p className="text-3xl font-bold text-white">{stats.totalBloodOuts}</p>
                 </div>
                 <UserX className="h-12 w-12 text-gray-400 opacity-50" />
               </div>
@@ -204,7 +204,7 @@ export default function BloodListPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Gesamt Records</p>
-                  <p className="text-3xl font-bold text-white">{stats.data.totalRecords}</p>
+                  <p className="text-3xl font-bold text-white">{stats.totalRecords}</p>
                 </div>
                 <TrendingUp className="h-12 w-12 text-gold-400 opacity-50" />
               </div>

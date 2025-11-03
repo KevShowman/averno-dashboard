@@ -17,9 +17,9 @@ export class AbmeldungService {
     endDate: Date,
     reason?: string,
   ) {
-    // Validierung: startDate muss vor endDate liegen
-    if (startDate >= endDate) {
-      throw new BadRequestException('Startdatum muss vor dem Enddatum liegen');
+    // Validierung: startDate darf nicht nach endDate liegen (gleich ist OK für einzelne Tage)
+    if (startDate > endDate) {
+      throw new BadRequestException('Startdatum darf nicht nach dem Enddatum liegen');
     }
 
     // Prüfe auf überlappende Abmeldungen
@@ -150,14 +150,24 @@ export class AbmeldungService {
     });
   }
 
-  // Aktuelle Abmeldungen (heute oder in der Zukunft)
+  // Aktuelle Abmeldungen (nur die, die JETZT gerade aktiv sind)
   async getCurrentAbmeldungen() {
     const now = new Date();
+    
     return this.prisma.abmeldung.findMany({
       where: {
-        endDate: {
-          gte: now,
-        },
+        AND: [
+          {
+            startDate: {
+              lte: now, // Bereits begonnen
+            },
+          },
+          {
+            endDate: {
+              gte: now, // Noch nicht vorbei
+            },
+          },
+        ],
       },
       include: {
         user: {
@@ -321,8 +331,8 @@ export class AbmeldungService {
     const newStartDate = startDate || abmeldung.startDate;
     const newEndDate = endDate || abmeldung.endDate;
 
-    if (newStartDate >= newEndDate) {
-      throw new BadRequestException('Startdatum muss vor dem Enddatum liegen');
+    if (newStartDate > newEndDate) {
+      throw new BadRequestException('Startdatum darf nicht nach dem Enddatum liegen');
     }
 
     return this.prisma.abmeldung.update({

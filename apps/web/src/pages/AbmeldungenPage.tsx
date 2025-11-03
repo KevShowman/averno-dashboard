@@ -197,7 +197,7 @@ export default function AbmeldungenPage() {
               Aktuell abgemeldet ({currentAbmeldungen.length})
             </CardTitle>
             <CardDescription className="text-green-300/70">
-              Diese Abmeldungen sind gerade aktiv oder beginnen bald
+              Diese Abmeldungen sind gerade aktiv
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -353,19 +353,21 @@ export default function AbmeldungenPage() {
                 <div className="flex gap-2">
                   <Button
                     type="button"
-                    variant={!isRangeMode ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setIsRangeMode(false)}
-                    className={!isRangeMode ? 'bg-gold-600' : ''}
+                    className={!isRangeMode 
+                      ? 'bg-gradient-to-r from-gold-600 to-gold-700 text-white hover:from-gold-700 hover:to-gold-800' 
+                      : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700 hover:text-white'}
                   >
                     Einzelner Tag
                   </Button>
                   <Button
                     type="button"
-                    variant={isRangeMode ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setIsRangeMode(true)}
-                    className={isRangeMode ? 'bg-gold-600' : ''}
+                    className={isRangeMode 
+                      ? 'bg-gradient-to-r from-gold-600 to-gold-700 text-white hover:from-gold-700 hover:to-gold-800' 
+                      : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700 hover:text-white'}
                   >
                     Zeitraum
                   </Button>
