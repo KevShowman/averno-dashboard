@@ -29,10 +29,16 @@ export class AbmeldungController {
     @Body() createDto: CreateAbmeldungDto,
     @CurrentUser() user: User,
   ) {
+    const startDate = new Date(createDto.startDate);
+    const endDate = new Date(createDto.endDate);
+    
+    // Setze endDate auf 23:59:59 um Single-Day Abmeldungen korrekt zu erfassen
+    endDate.setHours(23, 59, 59, 999);
+    
     return this.abmeldungService.createAbmeldung(
       user.id,
-      new Date(createDto.startDate),
-      new Date(createDto.endDate),
+      startDate,
+      endDate,
       createDto.reason,
     );
   }

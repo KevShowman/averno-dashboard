@@ -128,30 +128,29 @@ export class SchedulerService {
     return this.handleAutoSanction48h();
   }
 
-  // Discord-User-Synchronisierung jeden Tag um 03:00 AM
-  @Cron('0 3 * * *', {
-    name: 'discord-user-sync',
+  // Discord Member Sync - alle 5 Minuten
+  @Cron('*/5 * * * *', {
+    name: 'discord-member-sync',
     timeZone: 'Europe/Berlin',
   })
-  async handleDiscordUserSync() {
-    this.logger.log('🔄 Starte Discord-User-Synchronisierung...');
+  async handleDiscordMemberSync() {
+    this.logger.log('🔄 Starte Discord Member Sync (Ghost User Removal)...');
     
     try {
-      const result = await this.discordService.syncUsersAndRemoveInactive();
-      this.logger.log(`✅ Discord-Synchronisierung abgeschlossen:`);
-      this.logger.log(`   - ${result.removed} User entfernt (nicht mehr im Discord)`);
-      this.logger.log(`   - ${result.imported} neue User importiert`);
-      this.logger.log(`   - ${result.updated} User aktualisiert`);
-      this.logger.log(`   - ${result.totalDiscordMembers} User im Discord gefunden`);
+      const result = await this.discordService.syncDiscordMembers();
+      
+      if (result.deleted > 0) {
+        this.logger.log(`✅ Discord Sync abgeschlossen: ${result.deleted} Ghost Users gelöscht (${result.total} User in DB)`);
+      }
     } catch (error) {
-      this.logger.error('❌ Fehler bei der Discord-Synchronisierung:', error);
+      this.logger.error('❌ Fehler beim Discord Member Sync:', error);
     }
   }
 
   // Manueller Test der Discord-Synchronisierung (für Entwicklung)
   async manualDiscordSync() {
-    this.logger.log('🔧 Manuelle Discord-Synchronisierung gestartet...');
-    return this.handleDiscordUserSync();
+    this.logger.log('🔧 Manueller Discord Member Sync gestartet...');
+    return this.handleDiscordMemberSync();
   }
 
   // Automatische Sanktionierung nicht-reagierender Aufstellungs-Teilnehmer

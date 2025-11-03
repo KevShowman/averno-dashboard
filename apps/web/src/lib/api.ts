@@ -12,6 +12,17 @@ export const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Handle Discord access errors (400 Bad Request)
+    if (error.response?.status === 400) {
+      const message = error.response?.data?.message || '';
+      if (message.includes('Discord-Server') || message.includes('keine Rollen')) {
+        const encodedMessage = encodeURIComponent(message);
+        window.location.href = `/discord-error?message=${encodedMessage}&type=discord_access`;
+        return Promise.reject(error);
+      }
+    }
+    
+    // Handle unauthorized (401)
     if (error.response?.status === 401) {
       // Only redirect if we're not already on the login page
       // This prevents redirect loops

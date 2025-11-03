@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock, Calendar, Scale, PackageOpen, CalendarCheck, FileText, Settings } from 'lucide-react'
+import { Package, DollarSign, AlertTriangle, TrendingUp, Users, Activity, FlaskConical, Shield, BarChart3, Clock, Calendar, Scale, PackageOpen, CalendarCheck, CalendarDays, Droplet, FileText, Settings } from 'lucide-react'
 import { formatCurrency, hasRole } from '../lib/utils'
 
 interface DashboardStats {
@@ -31,6 +31,8 @@ export default function DashboardPage() {
     { key: 'packages', name: 'Pakete', requiresRole: null },
     { key: 'weekly-delivery', name: 'Wochenabgabe', requiresRole: null },
     { key: 'aufstellungen', name: 'Aufstellungen', requiresRole: null },
+    { key: 'abmeldungen', name: 'Abmeldungen', requiresRole: null },
+    { key: 'bloodlist', name: 'Blood List', requiresRole: null },
     { key: 'sanctions', name: 'Sanktionen', requiresRole: null },
     { key: 'user-management', name: 'Benutzerverwaltung', requiresRole: 'EL_PATRON' },
     { key: 'ticker', name: 'Live-Ticker', requiresRole: null },
@@ -227,6 +229,8 @@ export default function DashboardPage() {
                     {module.key === 'kasse' && <DollarSign className="h-6 w-6 text-accent" />}
                     {module.key === 'packages' && <PackageOpen className="h-6 w-6 text-accent" />}
                     {module.key === 'aufstellungen' && <CalendarCheck className="h-6 w-6 text-accent" />}
+                    {module.key === 'abmeldungen' && <CalendarDays className="h-6 w-6 text-accent" />}
+                    {module.key === 'bloodlist' && <Droplet className="h-6 w-6 text-red-500" />}
                     {module.key === 'weekly-delivery' && <Calendar className="h-6 w-6 text-accent" />}
                     {module.key === 'sanctions' && <Scale className="h-6 w-6 text-accent" />}
                     {module.key === 'audit' && <FileText className="h-6 w-6 text-accent" />}
@@ -279,6 +283,16 @@ export default function DashboardPage() {
                       Verwaltung von Terminen und Teilnahme-Reaktionen.
                     </>
                   )}
+                  {module.key === 'abmeldungen' && (
+                    <>
+                      Verwalte Abwesenheiten für Aufstellungen und Wochenabgaben.
+                    </>
+                  )}
+                  {module.key === 'bloodlist' && (
+                    <>
+                      Blood In & Blood Out - Familienmitglieder-Verwaltung.
+                    </>
+                  )}
                   {module.key === 'sanctions' && (
                     <>
                       LaFamilia se cuida, Compadres! Verwaltung von Verstößen und Strafen.
@@ -318,6 +332,8 @@ export default function DashboardPage() {
                     {module.key === 'kasse' && `${formatCurrency(stats.currentBalance)} Saldo`}
                     {module.key === 'packages' && `${stats.confirmedDeposits} Bestätigt`}
                     {module.key === 'aufstellungen' && `Aufstellungen & Termine`}
+                    {module.key === 'abmeldungen' && `Abwesenheiten`}
+                    {module.key === 'bloodlist' && `Blood Records`}
                     {module.key === 'weekly-delivery' && `Wöchentliche Abgaben`}
                     {module.key === 'sanctions' && `Regelverstöße & Strafen`}
                     {module.key === 'audit' && `Alle Aktivitäten`}

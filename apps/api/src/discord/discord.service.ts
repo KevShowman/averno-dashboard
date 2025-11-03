@@ -52,6 +52,80 @@ export class DiscordService {
     }
   }
 
+  // Synchronisiere alle Discord-Mitglieder mit der Datenbank
+  async syncDiscordMembers(): Promise<{ deleted: number; total: number }> {
+    try {
+      console.log('🔄 Starte Discord Member Sync...');
+
+      // Hole alle Discord-Mitglieder
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members?limit=1000`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Discord API Fehler: ${response.status}`);
+      }
+
+      const discordMembers = await response.json();
+      const discordIds = new Set(discordMembers.map((m: any) => m.user.id));
+
+      console.log(`📊 Discord Members: ${discordIds.size}`);
+
+      // Hole alle User aus der DB
+      const dbUsers = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          discordId: true,
+          username: true,
+          icFirstName: true,
+          icLastName: true,
+        },
+      });
+
+      console.log(`📊 DB Users: ${dbUsers.length}`);
+
+      // Finde User die nicht mehr im Discord sind
+      const usersToDelete = dbUsers.filter(user => !discordIds.has(user.discordId));
+
+      console.log(`🗑️  User zum Löschen: ${usersToDelete.length}`);
+
+      // Lösche Ghost Users
+      let deletedCount = 0;
+      for (const user of usersToDelete) {
+        try {
+          await this.prisma.user.delete({
+            where: { id: user.id },
+          });
+          
+          const displayName = user.icFirstName && user.icLastName
+            ? `${user.icFirstName} ${user.icLastName}`
+            : user.username;
+          
+          console.log(`  ✅ Gelöscht: ${displayName} (${user.discordId})`);
+          deletedCount++;
+        } catch (error) {
+          console.error(`  ❌ Fehler beim Löschen von ${user.username}:`, error.message);
+        }
+      }
+
+      console.log(`✅ Sync abgeschlossen: ${deletedCount} von ${usersToDelete.length} Ghost Users gelöscht`);
+
+      return {
+        deleted: deletedCount,
+        total: dbUsers.length,
+      };
+    } catch (error) {
+      console.error('❌ Fehler beim Discord Member Sync:', error.message);
+      return { deleted: 0, total: 0 };
+    }
+  }
+
   async validateUserAccess(discordId: string): Promise<{ hasAccess: boolean; highestRole?: Role; allRoles?: Role[]; reason?: string }> {
     try {
       // Discord-Rollen des Benutzers abrufen

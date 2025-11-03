@@ -13,6 +13,9 @@ export class StartupService implements OnModuleInit {
     try {
       // Index all Discord users on startup
       await this.indexAllUsers();
+      
+      // Sync Discord members and remove ghost users
+      await this.syncDiscordMembers();
     } catch (error) {
       this.logger.error('❌ Error during startup user indexing:', error);
       // Don't throw - we don't want to crash the app if Discord is unreachable
@@ -39,6 +42,23 @@ export class StartupService implements OnModuleInit {
     } catch (error) {
       this.logger.error('❌ Failed to index Discord users:', error);
       throw error;
+    }
+  }
+
+  private async syncDiscordMembers() {
+    try {
+      this.logger.log('🔄 Syncing Discord members (removing ghost users)...');
+      
+      const result = await this.discordService.syncDiscordMembers();
+      
+      if (result.deleted > 0) {
+        this.logger.log(`✅ Discord sync completed: ${result.deleted} ghost users removed`);
+      } else {
+        this.logger.log(`✅ Discord sync completed: No ghost users found`);
+      }
+    } catch (error) {
+      this.logger.error('❌ Failed to sync Discord members:', error);
+      // Don't throw - we don't want to crash the app
     }
   }
 }

@@ -13,6 +13,7 @@ import SettingsPage from './pages/SettingsPage'
 import AufstellungenPage from './pages/AufstellungenPage'
 import AbmeldungenPage from './pages/AbmeldungenPage'
 import BloodListPage from './pages/BloodListPage'
+import DiscordErrorPage from './pages/DiscordErrorPage'
 import TickerPage from './pages/TickerPage'
 import WeeklyDeliveryPage from './pages/WeeklyDeliveryPage'
 import SanctionsPage from './pages/SanctionsPage'
@@ -71,6 +72,7 @@ function App() {
     <ErrorBoundary>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/discord-error" element={<DiscordErrorPage />} />
         <Route path="/app" element={
           <ProtectedRoute>
             <Layout>
