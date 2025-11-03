@@ -92,6 +92,54 @@ export class AufstellungController {
     return this.aufstellungService.getMyPendingAufstellungen(user.id);
   }
 
+  // ===== EXCLUSIONS (vor :id Route!) =====
+
+  // Aktive Exclusions abrufen (nur Leaderschaft)
+  @Get('exclusions/active')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async getActiveExclusions() {
+    return this.aufstellungService.getActiveExclusions();
+  }
+
+  // Alle Exclusions abrufen (nur Leaderschaft)
+  @Get('exclusions')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async getAllExclusions() {
+    return this.aufstellungService.getAllExclusions();
+  }
+
+  // Exclusion erstellen (nur El Patron, Don, Asesor)
+  @Post('exclusions')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async createExclusion(
+    @Body() createDto: CreateExclusionDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.aufstellungService.createExclusion(
+      createDto.userId,
+      createDto.reason,
+      new Date(createDto.startDate),
+      createDto.endDate ? new Date(createDto.endDate) : null,
+      user.id,
+    );
+  }
+
+  // Exclusion deaktivieren (nur El Patron, Don)
+  @Patch('exclusions/:id/deactivate')
+  @Roles(Role.EL_PATRON, Role.DON)
+  async deactivateExclusion(@Param('id') id: string) {
+    return this.aufstellungService.deactivateExclusion(id);
+  }
+
+  // Exclusion löschen (nur El Patron)
+  @Delete('exclusions/:id')
+  @Roles(Role.EL_PATRON)
+  async deleteExclusion(@Param('id') id: string) {
+    return this.aufstellungService.deleteExclusion(id);
+  }
+
+  // ===== AUFSTELLUNG BY ID (muss nach allen spezifischen Routes kommen!) =====
+
   // Einzelne Aufstellung mit Details
   @Get(':id')
   async getAufstellungById(@Param('id') id: string) {
@@ -124,52 +172,6 @@ export class AufstellungController {
   @Roles(Role.EL_PATRON, Role.DON)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
-  }
-
-  // ===== EXCLUSIONS =====
-
-  // Exclusion erstellen (nur El Patron, Don, Asesor)
-  @Post('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  async createExclusion(
-    @Body() createDto: CreateExclusionDto,
-    @CurrentUser() user: User,
-  ) {
-    return this.aufstellungService.createExclusion(
-      createDto.userId,
-      createDto.reason,
-      new Date(createDto.startDate),
-      createDto.endDate ? new Date(createDto.endDate) : null,
-      user.id,
-    );
-  }
-
-  // Aktive Exclusions abrufen (nur Leaderschaft)
-  @Get('exclusions/active')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  async getActiveExclusions() {
-    return this.aufstellungService.getActiveExclusions();
-  }
-
-  // Alle Exclusions abrufen (nur Leaderschaft)
-  @Get('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  async getAllExclusions() {
-    return this.aufstellungService.getAllExclusions();
-  }
-
-  // Exclusion deaktivieren (nur El Patron, Don)
-  @Patch('exclusions/:id/deactivate')
-  @Roles(Role.EL_PATRON, Role.DON)
-  async deactivateExclusion(@Param('id') id: string) {
-    return this.aufstellungService.deactivateExclusion(id);
-  }
-
-  // Exclusion löschen (nur El Patron)
-  @Delete('exclusions/:id')
-  @Roles(Role.EL_PATRON)
-  async deleteExclusion(@Param('id') id: string) {
-    return this.aufstellungService.deleteExclusion(id);
   }
 }
 
