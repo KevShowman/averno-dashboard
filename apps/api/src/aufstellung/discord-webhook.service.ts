@@ -87,6 +87,7 @@ export class DiscordWebhookService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          username: 'Aufstellungen Bot',
           content: '@everyone',
           embeds: [embed],
         }),

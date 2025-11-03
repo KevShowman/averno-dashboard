@@ -7,15 +7,18 @@ export class AbmeldungWebhookService {
   private readonly baseUrl: string;
 
   constructor(private configService: ConfigService) {
-    // Nutze entweder eine separate Webhook URL für Abmeldungen oder die Standard-Webhook URL
-    this.webhookUrl = this.configService.get<string>('DISCORD_ABMELDUNG_WEBHOOK_URL') 
-      || this.configService.get<string>('DISCORD_WEBHOOK_URL');
+    // Nutze die separate Webhook URL für Abmeldungen (Channel ID: 1431388063195594983)
+    this.webhookUrl = this.configService.get<string>('DISCORD_ABMELDUNG_WEBHOOK_URL');
     this.baseUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    
+    if (!this.webhookUrl) {
+      console.error('⚠️  DISCORD_ABMELDUNG_WEBHOOK_URL nicht konfiguriert! Abmeldungs-Benachrichtigungen werden nicht gesendet.');
+    }
   }
 
   async sendAbmeldungNotification(abmeldung: any) {
     if (!this.webhookUrl) {
-      console.warn('DISCORD_WEBHOOK_URL nicht konfiguriert, überspringe Discord-Benachrichtigung');
+      console.warn('⚠️  DISCORD_ABMELDUNG_WEBHOOK_URL nicht konfiguriert, überspringe Discord-Benachrichtigung');
       return;
     }
 
@@ -99,6 +102,8 @@ export class AbmeldungWebhookService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          username: 'Abmeldungen Bot',
+          avatar_url: 'https://cdn.discordapp.com/emojis/1234567890.png', // Optional: Custom Avatar
           embeds: [embed],
         }),
       });

@@ -109,9 +109,11 @@ export default function AbmeldungenPage() {
   };
 
   const formatDateRange = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    // Parse dates without time to avoid timezone issues
+    const startDate = new Date(start.split('T')[0] + 'T00:00:00');
+    const endDate = new Date(end.split('T')[0] + 'T00:00:00');
     
+    // Compare dates only (not time)
     if (startDate.toDateString() === endDate.toDateString()) {
       return formatDate(start);
     }
@@ -120,8 +122,9 @@ export default function AbmeldungenPage() {
   };
 
   const getDaysCount = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    // Parse dates without time to avoid timezone issues
+    const startDate = new Date(start.split('T')[0] + 'T00:00:00');
+    const endDate = new Date(end.split('T')[0] + 'T00:00:00');
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return days;
   };

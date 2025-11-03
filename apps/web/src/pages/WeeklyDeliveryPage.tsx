@@ -23,6 +23,8 @@ interface WeeklyDelivery {
   status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE'
   confirmedAt?: string
   note?: string
+  isAbgemeldet?: boolean
+  abgemeldeteDays?: number
   user: {
     id: string
     username: string
@@ -211,8 +213,13 @@ export default function WeeklyDeliveryPage() {
 
   // Bestätigen-Funktion entfernt
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (delivery: WeeklyDelivery) => {
+    // Check if user is abgemeldet (>2 days)
+    if (delivery.isAbgemeldet) {
+      return <Badge variant="outline" className="text-red-600 border-red-600 bg-red-900/20">Abgemeldet ({delivery.abgemeldeteDays} Tag(e))</Badge>
+    }
+    
+    switch (delivery.status) {
       case 'PENDING':
         return <Badge variant="outline" className="text-yellow-600 border-yellow-600">Ausstehend</Badge>
       case 'PARTIALLY_PAID':
@@ -222,7 +229,7 @@ export default function WeeklyDeliveryPage() {
       case 'OVERDUE':
         return <Badge variant="outline" className="text-red-600 border-red-600">Überfällig</Badge>
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{delivery.status}</Badge>
     }
   }
 
@@ -502,7 +509,7 @@ export default function WeeklyDeliveryPage() {
                           {delivery.paidMoney && delivery.paidMoney > 0 && formatCurrency(delivery.paidMoney)}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
                         </TableCell>
-                        <TableCell>{getStatusBadge(delivery.status)}</TableCell>
+                        <TableCell>{getStatusBadge(delivery)}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && (

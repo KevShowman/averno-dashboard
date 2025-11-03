@@ -1,10 +1,14 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { BloodStatus } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class BloodListService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   // Blood In - Neues Mitglied aufnehmen
   async bloodIn(
@@ -52,6 +56,21 @@ export class BloodListService {
         steam,
         bloodinDurch,
         status: BloodStatus.ACTIVE,
+      },
+    });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: null, // System action
+      action: 'BLOOD_IN',
+      entity: 'BloodRecord',
+      entityId: bloodRecord.id,
+      meta: {
+        vorname,
+        nachname,
+        telefon,
+        steam,
+        bloodinDurch,
       },
     });
 
@@ -115,6 +134,21 @@ export class BloodListService {
         bloodoutTimestamp: new Date(),
         bloodoutDurch,
         bloodoutGrund: grund,
+      },
+    });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: null, // System action
+      action: 'BLOOD_OUT',
+      entity: 'BloodRecord',
+      entityId: updatedRecord.id,
+      meta: {
+        vorname: updatedRecord.vorname,
+        nachname: updatedRecord.nachname,
+        telefon: updatedRecord.telefon,
+        grund,
+        bloodoutDurch,
       },
     });
 

@@ -2,12 +2,14 @@ import { Injectable, NotFoundException, BadRequestException, ForbiddenException 
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Role } from '@prisma/client';
 import { AbmeldungWebhookService } from './discord-webhook.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AbmeldungService {
   constructor(
     private prisma: PrismaService,
     private webhookService: AbmeldungWebhookService,
+    private auditService: AuditService,
   ) {}
 
   // Erstelle neue Abmeldung
@@ -82,6 +84,19 @@ export class AbmeldungService {
       console.error('Fehler beim Senden der Discord-Benachrichtigung:', error);
       // Fehler nicht werfen, Abmeldung wurde trotzdem erstellt
     }
+
+    // Audit Log
+    await this.auditService.log({
+      userId,
+      action: 'ABMELDUNG_CREATED',
+      entity: 'Abmeldung',
+      entityId: abmeldung.id,
+      meta: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        reason: reason || null,
+      },
+    });
 
     return abmeldung;
   }
@@ -297,6 +312,19 @@ export class AbmeldungService {
 
     await this.prisma.abmeldung.delete({
       where: { id: abmeldungId },
+    });
+
+    // Audit Log
+    await this.auditService.log({
+      userId,
+      action: 'ABMELDUNG_DELETED',
+      entity: 'Abmeldung',
+      entityId: abmeldungId,
+      meta: {
+        deletedUserId: abmeldung.userId,
+        startDate: abmeldung.startDate.toISOString(),
+        endDate: abmeldung.endDate.toISOString(),
+      },
     });
 
     return { message: 'Abmeldung wurde gelöscht' };

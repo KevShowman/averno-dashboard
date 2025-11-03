@@ -95,12 +95,50 @@ export class DiscordService {
 
       console.log(`🗑️  User zum Löschen: ${usersToDelete.length}`);
 
-      // Lösche Ghost Users
+      // Lösche Ghost Users (mit CASCADE delete aller abhängigen Datensätze)
       let deletedCount = 0;
       for (const user of usersToDelete) {
         try {
-          await this.prisma.user.delete({
-            where: { id: user.id },
+          // Verwende Transaction um alle abhängigen Datensätze zu löschen
+          await this.prisma.$transaction(async (tx) => {
+            // Lösche alle abhängigen Datensätze in der richtigen Reihenfolge
+            // 1. Abmeldungen
+            await tx.abmeldung.deleteMany({ where: { userId: user.id } });
+            
+            // 2. Aufstellungen (Responses, Exclusions, dann Aufstellungen selbst)
+            await tx.aufstellungResponse.deleteMany({ where: { userId: user.id } });
+            await tx.aufstellungExclusion.deleteMany({ where: { userId: user.id } });
+            await tx.aufstellungExclusion.deleteMany({ where: { createdById: user.id } });
+            await tx.aufstellung.deleteMany({ where: { createdById: user.id } });
+            
+            // 3. Weekly Delivery (Exclusions, Archives, dann Deliveries)
+            await tx.weeklyDeliveryExclusion.deleteMany({ where: { userId: user.id } });
+            await tx.weeklyDeliveryExclusion.deleteMany({ where: { createdById: user.id } });
+            await tx.weeklyDeliveryArchive.deleteMany({ where: { createdById: user.id } });
+            await tx.weeklyDelivery.deleteMany({ where: { userId: user.id } });
+            
+            // 4. Sanctions
+            await tx.sanction.deleteMany({ where: { userId: user.id } });
+            await tx.sanction.deleteMany({ where: { createdById: user.id } });
+            
+            // 5. Packages
+            await tx.packageDeposit.deleteMany({ where: { userId: user.id } });
+            await tx.packageDeposit.deleteMany({ where: { confirmedById: user.id } });
+            await tx.packageDeposit.deleteMany({ where: { rejectedById: user.id } });
+            
+            // 6. Stock Movements
+            await tx.stockMovement.deleteMany({ where: { createdById: user.id } });
+            await tx.stockMovement.deleteMany({ where: { approvedById: user.id } });
+            
+            // 7. Money Transactions
+            await tx.moneyTransaction.deleteMany({ where: { createdById: user.id } });
+            await tx.moneyTransaction.deleteMany({ where: { approvedById: user.id } });
+            
+            // 8. Action Logs (zuletzt, da diese Audit-Trail sind)
+            await tx.actionLog.deleteMany({ where: { userId: user.id } });
+            
+            // 9. Jetzt den User löschen
+            await tx.user.delete({ where: { id: user.id } });
           });
           
           const displayName = user.icFirstName && user.icLastName
