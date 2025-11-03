@@ -144,18 +144,18 @@ export class AufstellungController {
     );
   }
 
-  // Alle Exclusions abrufen (nur Leaderschaft)
-  @Get('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
-  async getAllExclusions() {
-    return this.aufstellungService.getAllExclusions();
-  }
-
   // Aktive Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions/active')
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   async getActiveExclusions() {
     return this.aufstellungService.getActiveExclusions();
+  }
+
+  // Alle Exclusions abrufen (nur Leaderschaft)
+  @Get('exclusions')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async getAllExclusions() {
+    return this.aufstellungService.getAllExclusions();
   }
 
   // Exclusion deaktivieren (nur El Patron, Don)
