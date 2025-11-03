@@ -144,6 +144,14 @@ export const aufstellungApi = {
     api.post(`/aufstellung/${id}/respond`, { status }),
   sanctionNonResponders: (id: string) => api.post(`/aufstellung/${id}/sanction-non-responders`),
   delete: (id: string) => api.delete(`/aufstellung/${id}`),
+  
+  // Exclusions
+  createExclusion: (data: { userId: string; reason: string; startDate: string; endDate?: string }) =>
+    api.post('/aufstellung/exclusions', data).then(res => res.data),
+  getExclusions: () => api.get('/aufstellung/exclusions').then(res => res.data),
+  getActiveExclusions: () => api.get('/aufstellung/exclusions/active').then(res => res.data),
+  deactivateExclusion: (id: string) => api.patch(`/aufstellung/exclusions/${id}/deactivate`).then(res => res.data),
+  deleteExclusion: (id: string) => api.delete(`/aufstellung/exclusions/${id}`).then(res => res.data),
 };
 
 // Abmeldung API

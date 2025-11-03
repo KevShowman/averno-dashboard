@@ -23,8 +23,11 @@ import {
   BarChart3,
   Zap,
   Shield,
+  UserPlus,
+  RefreshCw,
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
+import CreateExclusionModal from '../components/CreateExclusionModal'
 
 interface Aufstellung {
   id: string
@@ -68,6 +71,8 @@ export default function AufstellungenPage() {
   const queryClient = useQueryClient()
 
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showExclusions, setShowExclusions] = useState(false)
+  const [showCreateExclusionModal, setShowCreateExclusionModal] = useState(false)
   const [selectedAufstellung, setSelectedAufstellung] = useState<string | null>(null)
   const [createData, setCreateData] = useState({
     date: '',
@@ -95,6 +100,12 @@ export default function AufstellungenPage() {
     queryKey: ['aufstellung-details', selectedAufstellung],
     queryFn: () => aufstellungApi.getById(selectedAufstellung!).then(res => res.data),
     enabled: !!selectedAufstellung,
+  })
+
+  // Query: Exclusions
+  const { data: exclusions } = useQuery({
+    queryKey: ['aufstellung-exclusions'],
+    queryFn: () => aufstellungApi.getExclusions(),
   })
 
   // Mutation: Erstellen
@@ -136,6 +147,36 @@ export default function AufstellungenPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Sanktionieren')
+    },
+  })
+
+  // Mutations: Exclusions
+  const createExclusionMutation = useMutation({
+    mutationFn: (data: { userId: string; reason: string; startDate: string; endDate?: string }) =>
+      aufstellungApi.createExclusion(data),
+    onSuccess: () => {
+      toast.success('Ausschluss wurde erstellt')
+      queryClient.invalidateQueries({ queryKey: ['aufstellung-exclusions'] })
+      setShowCreateExclusionModal(false)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Erstellen des Ausschlusses')
+    },
+  })
+
+  const deactivateExclusionMutation = useMutation({
+    mutationFn: aufstellungApi.deactivateExclusion,
+    onSuccess: () => {
+      toast.success('Ausschluss wurde deaktiviert')
+      queryClient.invalidateQueries({ queryKey: ['aufstellung-exclusions'] })
+    },
+  })
+
+  const deleteExclusionMutation = useMutation({
+    mutationFn: aufstellungApi.deleteExclusion,
+    onSuccess: () => {
+      toast.success('Ausschluss wurde gelöscht')
+      queryClient.invalidateQueries({ queryKey: ['aufstellung-exclusions'] })
     },
   })
 
@@ -203,14 +244,37 @@ export default function AufstellungenPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white flex items-center">
-          <Calendar className="mr-3 h-8 w-8 text-accent" />
-          Aufstellungen
-        </h1>
-        <p className="text-gray-400 mt-2">
-          Verwalte Termine und Reaktionen der Familia
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white flex items-center">
+            <Calendar className="mr-3 h-8 w-8 text-accent" />
+            Aufstellungen
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Verwalte Termine und Reaktionen der Familia
+          </p>
+        </div>
+        {canManageAufstellungen && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowExclusions(!showExclusions)}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              {showExclusions ? 'Aufstellungen anzeigen' : 'Ausschlüsse anzeigen'}
+            </Button>
+            
+            <Button
+              variant="default"
+              onClick={() => setShowCreateExclusionModal(true)}
+              className="flex items-center gap-2 bg-gold-600 hover:bg-gold-700"
+            >
+              <UserPlus className="h-4 w-4" />
+              Ausschluss erstellen
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Ausstehende Benachrichtigungen - Prominent */}
@@ -830,6 +894,87 @@ export default function AufstellungenPage() {
           </div>
         )}
       </div>
+
+      {/* Exclusions List */}
+      {showExclusions && canManageAufstellungen && (
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white">Ausschlüsse von Aufstellungen</CardTitle>
+            <CardDescription className="text-gray-400">
+              User, die von Aufstellungen ausgeschlossen sind und nicht sanktioniert werden
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {exclusions && exclusions.length > 0 ? (
+              <div className="space-y-3">
+                {exclusions.map((exclusion: any) => (
+                  <div
+                    key={exclusion.id}
+                    className="flex items-center justify-between p-4 bg-gray-800/50 border border-gray-700 rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium text-white">
+                        {exclusion.user.icFirstName && exclusion.user.icLastName
+                          ? `${exclusion.user.icFirstName} ${exclusion.user.icLastName}`
+                          : exclusion.user.username}
+                      </div>
+                      <div className="text-sm text-gray-400 mt-1">{exclusion.reason}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {exclusion.startDate && exclusion.endDate
+                          ? `${new Date(exclusion.startDate).toLocaleDateString('de-DE')} - ${
+                              exclusion.endDate 
+                                ? new Date(exclusion.endDate).toLocaleDateString('de-DE')
+                                : 'Unbegrenzt'
+                            }`
+                          : 'Dauerhaft'}
+                        {!exclusion.isActive && (
+                          <span className="ml-2 text-yellow-500">(Deaktiviert)</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {exclusion.isActive && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deactivateExclusionMutation.mutate(exclusion.id)}
+                          disabled={deactivateExclusionMutation.isPending}
+                        >
+                          Deaktivieren
+                        </Button>
+                      )}
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm('Ausschluss wirklich löschen?')) {
+                            deleteExclusionMutation.mutate(exclusion.id)
+                          }
+                        }}
+                        disabled={deleteExclusionMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-400 py-8">
+                Keine Ausschlüsse vorhanden
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Create Exclusion Modal */}
+      <CreateExclusionModal
+        isOpen={showCreateExclusionModal}
+        onClose={() => setShowCreateExclusionModal(false)}
+        onCreate={createExclusionMutation.mutate}
+        isLoading={createExclusionMutation.isPending}
+      />
     </div>
   )
 }

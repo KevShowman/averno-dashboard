@@ -355,7 +355,7 @@ export default function SettingsPage() {
             </div>
             
             <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-              <div className="text-2xl font-bold text-white">v1.0.0</div>
+              <div className="text-2xl font-bold text-white">v1.2.0</div>
               <div className="text-sm text-gray-400">System-Version</div>
             </div>
             
