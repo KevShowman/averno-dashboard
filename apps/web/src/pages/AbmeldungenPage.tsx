@@ -109,12 +109,12 @@ export default function AbmeldungenPage() {
   };
 
   const formatDateRange = (start: string, end: string) => {
-    // Parse dates without time to avoid timezone issues
-    const startDate = new Date(start.split('T')[0] + 'T00:00:00');
-    const endDate = new Date(end.split('T')[0] + 'T00:00:00');
+    // Parse dates - extract only the date part
+    const startDateStr = start.split('T')[0];
+    const endDateStr = end.split('T')[0];
     
-    // Compare dates only (not time)
-    if (startDate.toDateString() === endDate.toDateString()) {
+    // Compare date strings directly
+    if (startDateStr === endDateStr) {
       return formatDate(start);
     }
     
@@ -122,10 +122,14 @@ export default function AbmeldungenPage() {
   };
 
   const getDaysCount = (start: string, end: string) => {
-    // Parse dates without time to avoid timezone issues
-    const startDate = new Date(start.split('T')[0] + 'T00:00:00');
-    const endDate = new Date(end.split('T')[0] + 'T00:00:00');
-    const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    // Parse dates - extract only the date part and use UTC to avoid timezone shifts
+    const startDateStr = start.split('T')[0];
+    const endDateStr = end.split('T')[0];
+    
+    const startDate = new Date(startDateStr + 'T00:00:00Z');
+    const endDate = new Date(endDateStr + 'T00:00:00Z');
+    
+    const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return days;
   };
 

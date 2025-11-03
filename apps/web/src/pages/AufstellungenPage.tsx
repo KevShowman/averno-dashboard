@@ -163,8 +163,17 @@ export default function AufstellungenPage() {
   const formatDateTime = (dateStr: string) => {
     const date = new Date(dateStr)
     return {
-      date: date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-      time: date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
+      date: date.toLocaleDateString('de-DE', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        timeZone: 'Europe/Berlin'
+      }),
+      time: date.toLocaleTimeString('de-DE', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        timeZone: 'Europe/Berlin'
+      }),
     }
   }
 

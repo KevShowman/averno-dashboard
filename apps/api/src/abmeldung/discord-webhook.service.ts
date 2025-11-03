@@ -22,12 +22,13 @@ export class AbmeldungWebhookService {
       return;
     }
 
-    // Parse dates - extract date part and use local midnight (same as frontend)
-    const startDateStr = abmeldung.startDate.split('T')[0];
-    const endDateStr = abmeldung.endDate.split('T')[0];
-    
-    const startDate = new Date(startDateStr + 'T00:00:00');
-    const endDate = new Date(endDateStr + 'T00:00:00');
+    // Parse dates - handle both Date objects and strings
+    const startDate = abmeldung.startDate instanceof Date 
+      ? abmeldung.startDate 
+      : new Date(abmeldung.startDate);
+    const endDate = abmeldung.endDate instanceof Date 
+      ? abmeldung.endDate 
+      : new Date(abmeldung.endDate);
     
     // Formatiere Datum für Discord
     const formattedStartDate = startDate.toLocaleDateString('de-DE', {
@@ -41,11 +42,17 @@ export class AbmeldungWebhookService {
       year: 'numeric',
     });
 
-    // Berechne Anzahl Tage (EXAKT wie im Frontend)
-    const diffDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    // Berechne Anzahl Tage (EXAKT wie im Frontend mit UTC)
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    const startDateUTC = new Date(startDateStr + 'T00:00:00Z');
+    const endDateUTC = new Date(endDateStr + 'T00:00:00Z');
+    
+    const diffDays = Math.floor((endDateUTC.getTime() - startDateUTC.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
     // Ist es ein einzelner Tag oder ein Zeitraum?
-    const isSingleDay = formattedStartDate === formattedEndDate;
+    const isSingleDay = startDateStr === endDateStr;
     const dateRange = isSingleDay ? formattedStartDate : `${formattedStartDate} - ${formattedEndDate}`;
 
     // User Info

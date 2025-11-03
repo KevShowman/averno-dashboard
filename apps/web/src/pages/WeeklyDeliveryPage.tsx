@@ -216,7 +216,7 @@ export default function WeeklyDeliveryPage() {
   const getStatusBadge = (delivery: WeeklyDelivery) => {
     // Check if user is abgemeldet (>2 days)
     if (delivery.isAbgemeldet) {
-      return <Badge variant="outline" className="text-red-600 border-red-600 bg-red-900/20">Abgemeldet ({delivery.abgemeldeteDays} Tag(e))</Badge>
+      return <Badge variant="outline" className="text-red-600 border-red-600 bg-red-900/20">Abgemeldet</Badge>
     }
     
     switch (delivery.status) {
