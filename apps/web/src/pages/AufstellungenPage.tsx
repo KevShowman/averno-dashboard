@@ -105,7 +105,7 @@ export default function AufstellungenPage() {
   // Query: Exclusions
   const { data: exclusions } = useQuery({
     queryKey: ['aufstellung-exclusions'],
-    queryFn: () => aufstellungApi.getExclusions(),
+    queryFn: () => aufstellungApi.getExclusions().then(res => res.data),
   })
 
   // Mutation: Erstellen
@@ -266,9 +266,8 @@ export default function AufstellungenPage() {
             </Button>
             
             <Button
-              variant="default"
               onClick={() => setShowCreateExclusionModal(true)}
-              className="flex items-center gap-2 bg-gold-600 hover:bg-gold-700"
+              className="flex items-center gap-2 bg-gold-600 hover:bg-gold-700 text-white"
             >
               <UserPlus className="h-4 w-4" />
               Ausschluss erstellen
@@ -974,6 +973,7 @@ export default function AufstellungenPage() {
         onClose={() => setShowCreateExclusionModal(false)}
         onCreate={createExclusionMutation.mutate}
         isLoading={createExclusionMutation.isPending}
+        type="aufstellung"
       />
     </div>
   )

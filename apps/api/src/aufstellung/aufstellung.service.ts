@@ -160,12 +160,33 @@ export class AufstellungService {
     });
 
     const respondedUserIds = new Set(aufstellung.responses.map(r => r.userId));
-    const usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
+    let usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
+
+    // Ausgeschlossene User filtern (die aktive Exclusions haben)
+    const exclusions = await this.prisma.aufstellungExclusion.findMany({
+      where: {
+        isActive: true,
+        startDate: { lte: aufstellung.date },
+        OR: [
+          { endDate: null },
+          { endDate: { gte: aufstellung.date } },
+        ],
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const excludedUserIds = new Set(exclusions.map(e => e.userId));
+    usersWithoutResponse = usersWithoutResponse.filter(user => !excludedUserIds.has(user.id));
+
+    // Total sollte nur nicht-ausgeschlossene User zählen
+    const totalNonExcluded = allUsers.length - excludedUserIds.size;
 
     return {
       ...aufstellung,
       stats: {
-        total: allUsers.length,
+        total: totalNonExcluded,
         coming: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.COMING).length,
         notComing: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.NOT_COMING).length,
         unsure: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.UNSURE).length,

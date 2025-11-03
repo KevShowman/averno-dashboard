@@ -17,6 +17,7 @@ interface CreateExclusionModalProps {
     endDate?: string
   }) => void
   isLoading?: boolean
+  type?: 'wochenabgabe' | 'aufstellung'
 }
 
 interface User {
@@ -31,6 +32,7 @@ export default function CreateExclusionModal({
   onClose,
   onCreate,
   isLoading = false,
+  type = 'wochenabgabe',
 }: CreateExclusionModalProps) {
   const [searchUser, setSearchUser] = useState<string>('')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -113,7 +115,10 @@ export default function CreateExclusionModal({
                 Ausschluss erstellen
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Erstelle einen Ausschluss von der Wochenabgabe
+                {type === 'aufstellung' 
+                  ? 'Erstelle einen Ausschluss von Aufstellungen'
+                  : 'Erstelle einen Ausschluss von der Wochenabgabe'
+                }
               </CardDescription>
             </div>
             <Button
@@ -249,8 +254,10 @@ export default function CreateExclusionModal({
               <span className="text-blue-300 font-medium">Hinweis:</span>
             </div>
             <div className="text-white text-sm">
-              Der Benutzer wird von der Wochenabgabe ausgeschlossen. Bei einem permanenten Ausschluss 
-              (ohne Enddatum) kann er später manuell wieder hinzugefügt werden.
+              {type === 'aufstellung'
+                ? 'Der Benutzer wird von Aufstellungen ausgeschlossen und nicht automatisch sanktioniert. Bei einem permanenten Ausschluss (ohne Enddatum) kann er später manuell wieder hinzugefügt werden.'
+                : 'Der Benutzer wird von der Wochenabgabe ausgeschlossen. Bei einem permanenten Ausschluss (ohne Enddatum) kann er später manuell wieder hinzugefügt werden.'
+              }
             </div>
           </div>
 
