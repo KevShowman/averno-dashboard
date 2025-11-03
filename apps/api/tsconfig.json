@@ -23,6 +23,10 @@
   },
   "exclude": [
     "src/scripts/find-ghost-users.ts",
-    "src/scripts/remove-ghost-users.ts"
+    "src/scripts/remove-ghost-users.ts",
+    "src/scripts/diagnose-discord-roles.ts",
+    "src/scripts/check-discord-mappings.ts",
+    "src/scripts/fix-discord-mappings.ts",
+    "src/scripts/add-futuro-role.ts"
   ]
 }
