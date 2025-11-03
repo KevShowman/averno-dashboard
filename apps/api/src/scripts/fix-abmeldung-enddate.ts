@@ -23,7 +23,7 @@ async function fixAbmeldungEndDates() {
           data: { endDate },
         });
         
-        console.log(`✅ Fixed: ${abmeldung.user ? 'User ' + abmeldung.userId : 'Unknown'} - ${abmeldung.startDate.toLocaleDateString('de-DE')} bis ${endDate.toLocaleDateString('de-DE')}`);
+        console.log(`✅ Fixed: User ${abmeldung.userId} - ${abmeldung.startDate.toLocaleDateString('de-DE')} bis ${endDate.toLocaleDateString('de-DE')}`);
         fixed++;
       }
     }
