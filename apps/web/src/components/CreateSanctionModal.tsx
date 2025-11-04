@@ -102,6 +102,160 @@ const SANCTION_CATEGORIES: SanctionCategory[] = [
       { level: 4, amount: 500000, penalty: 'Blood Out' },
     ],
   },
+  {
+    key: 'RESPEKTLOS_ZIVILISTEN',
+    name: 'Respektlos gegenüber Zivilisten',
+    description: 'Unhöfliches oder respektloses Verhalten gegenüber Zivilisten',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 250000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'RESPEKTLOS_FAMILIE',
+    name: 'Respektlos gegenüber Familie',
+    description: 'Respektloses Verhalten gegenüber Familienmitgliedern',
+    penalties: [
+      { level: 1, amount: 100000 },
+      { level: 2, amount: 250000 },
+      { level: 3, amount: 500000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'TOETUNG_FAMILIENMITGLIEDER',
+    name: 'Tötung von Familienmitgliedern',
+    description: 'Angriff oder Tötung von Mitgliedern der Familie',
+    penalties: [
+      { level: 1, amount: 500000, penalty: 'Blood Out' },
+      { level: 2, amount: 500000, penalty: 'Blood Out' },
+      { level: 3, amount: 500000, penalty: 'Blood Out' },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'SEXUELLE_BELAESTIGUNG',
+    name: 'Sexuelle Belästigung',
+    description: 'Sexuelle Belästigung oder unangemessenes Verhalten',
+    penalties: [
+      { level: 1, amount: 250000 },
+      { level: 2, amount: 500000 },
+      { level: 3, amount: 500000, penalty: 'Blood Out' },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'UNNOETIGES_BOXEN_SCHIESSEN',
+    name: 'Unnötiges Boxen/Schießen',
+    description: 'Gewaltanwendung ohne Grund',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 150000 },
+      { level: 3, amount: 300000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'MISSACHTUNG_ANWEISUNGEN',
+    name: 'Missachtung von Anweisungen',
+    description: 'Nichtbefolgen direkter Anweisungen',
+    penalties: [
+      { level: 1, amount: 75000 },
+      { level: 2, amount: 150000 },
+      { level: 3, amount: 300000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'FEHLEN_AUFSTELLUNG',
+    name: 'Fehlen bei Aufstellung',
+    description: 'Nicht erscheinen bei wichtigen Aufstellungen',
+    penalties: [
+      { level: 1, penalty: 'Joker' },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 250000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'NICHT_ANMELDEN_FUNKCHECK',
+    name: 'Nicht beim Funkcheck angemeldet',
+    description: 'Fehlende Anmeldung beim Funkcheck',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 250000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'KLEIDERORDNUNG',
+    name: 'Kleiderordnung nicht eingehalten',
+    description: 'Tragen falscher oder unangemessener Kleidung',
+    penalties: [
+      { level: 1, amount: 25000 },
+      { level: 2, amount: 50000 },
+      { level: 3, amount: 100000 },
+      { level: 4, amount: 250000 },
+    ],
+  },
+  {
+    key: 'MUNITIONSVERSCHWENDUNG',
+    name: 'Munitionsverschwendung',
+    description: 'Unnötige Verschwendung von Munition',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 200000 },
+      { level: 4, amount: 400000 },
+    ],
+  },
+  {
+    key: 'CASA_OHNE_ANKUENDIGUNG',
+    name: 'Casa ohne Ankündigung betreten',
+    description: 'Betreten der Casa ohne vorherige Ankündigung',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 200000 },
+      { level: 4, amount: 400000 },
+    ],
+  },
+  {
+    key: 'FUNKPFLICHT_MISSACHTUNG',
+    name: 'Funkpflicht missachtet',
+    description: 'Nichtnutzung des Funks trotz Pflicht',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 250000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'FUNKDISZIPLIN_MISSACHTUNG',
+    name: 'Funkdisziplin missachtet',
+    description: 'Störung oder Missachtung der Funkdisziplin',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 100000 },
+      { level: 3, amount: 250000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
+  {
+    key: 'WOCHENABGABE_NICHT_ENTRICHTET',
+    name: 'Wochenabgabe nicht entrichtet',
+    description: 'Wochenabgabe trotz Verpflichtung nicht bezahlt (Familiensammeln)',
+    penalties: [
+      { level: 1, amount: 50000 },
+      { level: 2, amount: 150000 },
+      { level: 3, amount: 300000 },
+      { level: 4, amount: 500000, penalty: 'Blood Out' },
+    ],
+  },
 ]
 
 export default function CreateSanctionModal({
