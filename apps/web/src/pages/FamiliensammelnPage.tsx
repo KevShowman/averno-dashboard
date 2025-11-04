@@ -331,8 +331,8 @@ export default function FamiliensammelnPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <EnhancedPeoplePicker
-                value={null}
-                onChange={handleAddParticipation}
+                selectedUser={null}
+                onUserSelect={handleAddParticipation}
                 placeholder="User auswählen..."
               />
               <Button
