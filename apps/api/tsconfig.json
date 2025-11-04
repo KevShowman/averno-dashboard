@@ -27,7 +27,6 @@
     "src/scripts/diagnose-discord-roles.ts",
     "src/scripts/check-discord-mappings.ts",
     "src/scripts/fix-discord-mappings.ts",
-    "src/scripts/add-futuro-role.ts",
-    "src/scripts/add-lsd-item.ts"
+    "src/scripts/add-futuro-role.ts"
   ]
 }
