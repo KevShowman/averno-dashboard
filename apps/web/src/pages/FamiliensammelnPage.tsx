@@ -47,7 +47,7 @@ export default function FamiliensammelnPage() {
   const [showUserPicker, setShowUserPicker] = useState(false);
   const [showStatistics, setShowStatistics] = useState(false);
 
-  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR' || user?.role === 'SICARIO';
+  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR';
 
   // Query: Aktuelle Woche
   const { data: currentWeek, isLoading } = useQuery<Week>({
@@ -158,16 +158,14 @@ export default function FamiliensammelnPage() {
             Mindestens 3 von 6 Tagen Teilnahme erforderlich
           </p>
         </div>
-        {isLeadership && (
-          <Button
-            variant="outline"
-            onClick={() => setShowStatistics(!showStatistics)}
-            className="border-gold-500/50 text-gold-400 hover:bg-gold-900/20 hover:border-gold-500"
-          >
-            <TrendingUp className="h-4 w-4 mr-2" />
-            {showStatistics ? 'Wochenansicht' : 'Statistik anzeigen'}
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          onClick={() => setShowStatistics(!showStatistics)}
+          className="border-gold-500/50 text-gold-400 hover:bg-gold-900/20 hover:border-gold-500"
+        >
+          <TrendingUp className="h-4 w-4 mr-2" />
+          {showStatistics ? 'Wochenansicht' : 'Statistik anzeigen'}
+        </Button>
       </div>
 
       {/* Statistik-Ansicht */}
