@@ -4,6 +4,7 @@ import { WeeklyDeliveryService } from '../weekly-delivery/weekly-delivery.servic
 import { SanctionsService } from '../sanctions/sanctions.service';
 import { DiscordService } from '../discord/discord.service';
 import { AufstellungService } from '../aufstellung/aufstellung.service';
+import { FamiliensammelnService } from '../familiensammeln/familiensammeln.service';
 
 @Injectable()
 export class SchedulerService {
@@ -14,6 +15,7 @@ export class SchedulerService {
     private sanctionsService: SanctionsService,
     private discordService: DiscordService,
     private aufstellungService: AufstellungService,
+    private familiensammelnService: FamiliensammelnService,
   ) {}
 
   // Automatische Archivierung jeden Montag um 00:01 AM
@@ -200,5 +202,66 @@ export class SchedulerService {
   async manualAufstellungSanction() {
     this.logger.log('🔧 Manuelle Aufstellungs-Sanktionierung gestartet...');
     return this.handleAufstellungSanctionCheck();
+  }
+
+  // Familiensammeln: Prüfung und Sanktionierung am Sonntag um 23:55
+  @Cron('55 23 * * 0', {
+    name: 'familiensammeln-check',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleFamiliensammelnCheck() {
+    this.logger.log('👨‍👩‍👧‍👦 Prüfe Familiensammeln-Teilnahmen...');
+    
+    try {
+      const currentWeek = await this.familiensammelnService.getCurrentWeek();
+      const statistics = await this.familiensammelnService.getWeekStatistics(currentWeek.id);
+      
+      let totalSanctioned = 0;
+      
+      for (const stat of statistics.statistics) {
+        // Wenn User weniger als 3 Tage teilgenommen hat
+        if (stat.participationCount < 3) {
+          // Prüfe ob Wochenabgabe bezahlt wurde
+          const weekStart = new Date(currentWeek.weekStart);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekEnd.getDate() + 6); // Bis Sonntag
+          
+          const weeklyDelivery = await this.weeklyDeliveryService.getWeeklyDeliveryForUser(
+            stat.user.id,
+            weekStart,
+            weekEnd,
+          );
+          
+          // Wenn Wochenabgabe nicht bezahlt wurde -> Sanktion
+          if (weeklyDelivery && weeklyDelivery.status !== 'PAID') {
+            await this.sanctionsService.createSanction({
+              userId: stat.user.id,
+              category: 'WOCHENABGABE_NICHT_ENTRICHTET',
+              level: 1,
+              description: `Weniger als 3 Tage beim Familiensammeln teilgenommen (${stat.participationCount} Tag(e)) und Wochenabgabe nicht bezahlt`,
+              amount: 50000, // 50k Schwarzgeld Strafe
+              createdById: 'system',
+            });
+            
+            totalSanctioned++;
+            this.logger.log(`⚖️ Sanktion erstellt für ${stat.user.username}: ${stat.participationCount} Tag(e) Familiensammeln, Wochenabgabe nicht bezahlt`);
+          }
+        }
+      }
+      
+      if (totalSanctioned > 0) {
+        this.logger.log(`✅ Familiensammeln-Prüfung abgeschlossen: ${totalSanctioned} Sanktionen erstellt`);
+      } else {
+        this.logger.log('✅ Familiensammeln-Prüfung abgeschlossen: Keine Sanktionen erforderlich');
+      }
+    } catch (error) {
+      this.logger.error('❌ Fehler bei der Familiensammeln-Prüfung:', error);
+    }
+  }
+
+  // Manueller Test der Familiensammeln-Prüfung (für Entwicklung)
+  async manualFamiliensammelnCheck() {
+    this.logger.log('🔧 Manuelle Familiensammeln-Prüfung gestartet...');
+    return this.handleFamiliensammelnCheck();
   }
 }

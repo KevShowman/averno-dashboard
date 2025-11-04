@@ -5,6 +5,7 @@ import { WeeklyDeliveryModule } from '../weekly-delivery/weekly-delivery.module'
 import { SanctionsModule } from '../sanctions/sanctions.module';
 import { DiscordModule } from '../discord/discord.module';
 import { AufstellungModule } from '../aufstellung/aufstellung.module';
+import { FamiliensammelnModule } from '../familiensammeln/familiensammeln.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AufstellungModule } from '../aufstellung/aufstellung.module';
     SanctionsModule,
     DiscordModule,
     AufstellungModule,
+    FamiliensammelnModule,
   ],
   providers: [SchedulerService],
   exports: [SchedulerService],

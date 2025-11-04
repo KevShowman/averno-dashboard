@@ -913,4 +913,22 @@ export class WeeklyDeliveryService {
       overdue: overdueDeliveries,
     };
   }
+
+  /**
+   * Holt die Wochenabgabe für einen User in einem bestimmten Zeitraum
+   * Wird vom Familiensammeln-System verwendet
+   */
+  async getWeeklyDeliveryForUser(userId: string, weekStart: Date, weekEnd: Date) {
+    return this.prisma.weeklyDelivery.findFirst({
+      where: {
+        userId,
+        weekStart: {
+          gte: weekStart,
+        },
+        weekEnd: {
+          lte: weekEnd,
+        },
+      },
+    });
+  }
 }

@@ -56,7 +56,17 @@ async function main() {
     },
   });
 
-  console.log('✅ Modules created:', { lagerModule, kasseModule, kokainModule, weeklyDeliveryModule, sanctionsModule });
+  const familiensammelnModule = await prisma.module.upsert({
+    where: { key: 'familiensammeln' },
+    update: {},
+    create: {
+      key: 'familiensammeln',
+      name: 'Familiensammeln',
+      enabled: true,
+    },
+  });
+
+  console.log('✅ Modules created:', { lagerModule, kasseModule, kokainModule, weeklyDeliveryModule, sanctionsModule, familiensammelnModule });
 
   // Create item categories
   const categories = [

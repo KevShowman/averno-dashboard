@@ -30,6 +30,7 @@ export default function DashboardPage() {
     { key: 'kasse', name: 'Kasse', requiresRole: null },
     { key: 'packages', name: 'Pakete', requiresRole: null },
     { key: 'weekly-delivery', name: 'Wochenabgabe', requiresRole: null },
+    { key: 'familiensammeln', name: 'Familiensammeln', requiresRole: null },
     { key: 'aufstellungen', name: 'Aufstellungen', requiresRole: null },
     { key: 'abmeldungen', name: 'Abmeldungen', requiresRole: null },
     { key: 'bloodlist', name: 'Blood List', requiresRole: null },
@@ -232,6 +233,7 @@ export default function DashboardPage() {
                     {module.key === 'abmeldungen' && <CalendarDays className="h-6 w-6 text-accent" />}
                     {module.key === 'bloodlist' && <Droplet className="h-6 w-6 text-red-500" />}
                     {module.key === 'weekly-delivery' && <Calendar className="h-6 w-6 text-accent" />}
+                    {module.key === 'familiensammeln' && <Users className="h-6 w-6 text-gold-500" />}
                     {module.key === 'sanctions' && <Scale className="h-6 w-6 text-accent" />}
                     {module.key === 'audit' && <FileText className="h-6 w-6 text-accent" />}
                     {module.key === 'lager-movements' && <Clock className="h-6 w-6 text-accent" />}
@@ -271,6 +273,11 @@ export default function DashboardPage() {
                           {' '}⏳ {stats.pendingDeposits} ausstehend
                         </span>
                       )}
+                    </>
+                  )}
+                  {module.key === 'familiensammeln' && (
+                    <>
+                      Teilnahme-Tracking für das Familiensammeln. Mindestens 3 von 6 Tagen erforderlich.
                     </>
                   )}
                   {module.key === 'weekly-delivery' && (
@@ -335,6 +342,7 @@ export default function DashboardPage() {
                     {module.key === 'abmeldungen' && `Abwesenheiten`}
                     {module.key === 'bloodlist' && `Blood Records`}
                     {module.key === 'weekly-delivery' && `Wöchentliche Abgaben`}
+                    {module.key === 'familiensammeln' && `Teilnahme-Tracking`}
                     {module.key === 'sanctions' && `Regelverstöße & Strafen`}
                     {module.key === 'audit' && `Alle Aktivitäten`}
                     {module.key === 'lager-movements' && `Wartende Genehmigungen`}

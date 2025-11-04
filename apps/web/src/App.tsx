@@ -13,6 +13,7 @@ import SettingsPage from './pages/SettingsPage'
 import AufstellungenPage from './pages/AufstellungenPage'
 import AbmeldungenPage from './pages/AbmeldungenPage'
 import BloodListPage from './pages/BloodListPage'
+import FamiliensammelnPage from './pages/FamiliensammelnPage'
 import DiscordErrorPage from './pages/DiscordErrorPage'
 import TickerPage from './pages/TickerPage'
 import WeeklyDeliveryPage from './pages/WeeklyDeliveryPage'
@@ -176,6 +177,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <BloodListPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/familiensammeln" element={
+          <ProtectedRoute>
+            <Layout>
+              <FamiliensammelnPage />
             </Layout>
           </ProtectedRoute>
         } />

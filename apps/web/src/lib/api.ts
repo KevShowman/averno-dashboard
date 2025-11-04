@@ -181,3 +181,16 @@ export const bloodListApi = {
   getById: (id: string) => api.get(`/bloodlist/${id}`).then(res => res.data),
 };
 
+// Familiensammeln API
+export const familiensammelnApi = {
+  getCurrentWeek: () => api.get('/familiensammeln/current').then(res => res.data),
+  getWeek: (id: string) => api.get(`/familiensammeln/week/${id}`).then(res => res.data),
+  getAllWeeks: (limit?: number) => api.get('/familiensammeln/weeks', { params: { limit } }).then(res => res.data),
+  getWeekStatistics: (weekId: string) => api.get(`/familiensammeln/week/${weekId}/statistics`).then(res => res.data),
+  createWeek: (data: { weekStart: string }) => api.post('/familiensammeln/week', data).then(res => res.data),
+  addParticipation: (data: { weekId: string; userId: string; date: string }) =>
+    api.post('/familiensammeln/participation', data).then(res => res.data),
+  removeParticipation: (participationId: string) =>
+    api.delete(`/familiensammeln/participation/${participationId}`).then(res => res.data),
+};
+

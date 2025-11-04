@@ -42,9 +42,10 @@ model User {
   archivesCreated               WeeklyDeliveryArchive[]   @relation("archive_created_by")
   aufstellungenCreated          Aufstellung[]             @relation("aufstellung_created_by")
   aufstellungResponses          AufstellungResponse[]     @relation("aufstellung_responses")
-  aufstellungExclusionsReceived AufstellungExclusion[]    @relation("aufstellung_exclusion_user")
-  aufstellungExclusionsCreated  AufstellungExclusion[]    @relation("aufstellung_exclusion_created_by")
-  abmeldungenCreated            Abmeldung[]               @relation("abmeldung_user")
+  aufstellungExclusionsReceived AufstellungExclusion[]       @relation("aufstellung_exclusion_user")
+  aufstellungExclusionsCreated  AufstellungExclusion[]       @relation("aufstellung_exclusion_created_by")
+  abmeldungenCreated            Abmeldung[]                  @relation("abmeldung_user")
+  familiensammelnParticipations FamiliensammelnParticipation[] @relation("familiensammeln_participations")
 
   @@map("users")
 }
@@ -378,6 +379,7 @@ enum SanctionCategory {
   CASA_OHNE_ANKUENDIGUNG
   FUNKPFLICHT_MISSACHTUNG
   FUNKDISZIPLIN_MISSACHTUNG
+  WOCHENABGABE_NICHT_ENTRICHTET // Verpflichtet zur Wochenabgabe, aber nicht abgegeben
 }
 
 enum SanctionStatus {
@@ -478,4 +480,32 @@ model BloodRecord {
 enum BloodStatus {
   ACTIVE
   BLOODOUT
+}
+
+// Familiensammeln System
+model FamiliensammelnWeek {
+  id            String                          @id @default(cuid())
+  weekStart     DateTime // Montag
+  weekEnd       DateTime // Samstag (6 Tage)
+  createdAt     DateTime                        @default(now())
+  updatedAt     DateTime                        @updatedAt
+
+  // Relations
+  participations FamiliensammelnParticipation[]
+
+  @@unique([weekStart])
+  @@map("familiensammeln_weeks")
+}
+
+model FamiliensammelnParticipation {
+  id        String               @id @default(cuid())
+  weekId    String
+  week      FamiliensammelnWeek  @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                 @relation("familiensammeln_participations", fields: [userId], references: [id])
+  date      DateTime // Datum der Teilnahme
+  createdAt DateTime             @default(now())
+
+  @@unique([weekId, userId, date]) // User kann nur 1x pro Tag teilnehmen
+  @@map("familiensammeln_participations")
 }
