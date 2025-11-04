@@ -507,7 +507,11 @@ export default function WeeklyDeliveryPage() {
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
                           {delivery.paidMoney && delivery.paidMoney > 0 && formatCurrency(delivery.paidMoney)}
-                          {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && '-'}
+                          {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && (
+                            delivery.status === 'PAID' && delivery.note 
+                              ? <span className="text-gold-400">{delivery.note}</span>
+                              : '-'
+                          )}
                         </TableCell>
                         <TableCell>{getStatusBadge(delivery)}</TableCell>
                         <TableCell>

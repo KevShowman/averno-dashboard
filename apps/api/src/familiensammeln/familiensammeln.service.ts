@@ -109,8 +109,9 @@ export class FamiliensammelnService {
             where: { id: weeklyDelivery.id },
             data: {
               status: WeeklyDeliveryStatus.PAID,
-              paidAmount: 300, // Vollständig bezahlt
-              note: `Automatisch bezahlt: ${count} Tage Familiensammeln`,
+              paidAmount: null, // Nicht über Pakete bezahlt
+              paidMoney: null, // Nicht über Geld bezahlt
+              note: `Familiensammeln (${count} Tag${count !== 1 ? 'e' : ''})`,
             },
           });
 

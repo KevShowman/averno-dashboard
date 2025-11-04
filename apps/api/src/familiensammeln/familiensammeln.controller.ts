@@ -72,7 +72,7 @@ export class FamiliensammelnController {
    * Fügt eine Teilnahme hinzu
    */
   @Post('participation')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.SICARIO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   async addParticipation(
     @Body()
     body: {
@@ -94,7 +94,7 @@ export class FamiliensammelnController {
    * Entfernt eine Teilnahme
    */
   @Delete('participation/:id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.SICARIO)
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   async removeParticipation(@Param('id') id: string) {
     return this.familiensammelnService.removeParticipation(id);
   }

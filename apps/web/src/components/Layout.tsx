@@ -49,6 +49,7 @@ const navigation = [
   { name: 'Kasse', href: '/kasse', icon: DollarSign },
   { name: 'Pakete', href: '/packages', icon: PackageOpen },
   { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
+  { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
   { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
   { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
   { name: 'Blood List', href: '/bloodlist', icon: Droplet },

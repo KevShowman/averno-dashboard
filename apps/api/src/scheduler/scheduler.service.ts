@@ -263,4 +263,41 @@ export class SchedulerService {
     this.logger.log('🔧 Manuelle Familiensammeln-Prüfung gestartet...');
     return this.handleFamiliensammelnCheck();
   }
+
+  // Familiensammeln: Wöchentlicher Reset jeden Montag um 00:01
+  @Cron('1 0 * * 1', {
+    name: 'familiensammeln-weekly-reset',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleFamiliensammelnWeeklyReset() {
+    this.logger.log('🔄 Starte Familiensammeln Wochenreset...');
+    
+    try {
+      // Erstelle die neue Woche für diese Woche (Montag-Samstag)
+      const now = new Date();
+      const monday = this.getMondayOfWeek(now);
+      
+      const newWeek = await this.familiensammelnService.getOrCreateWeek(monday);
+      
+      this.logger.log(`✅ Familiensammeln Wochenreset abgeschlossen: Neue Woche erstellt (${newWeek.weekStart.toISOString().split('T')[0]} - ${newWeek.weekEnd.toISOString().split('T')[0]})`);
+    } catch (error) {
+      this.logger.error('❌ Fehler beim Familiensammeln Wochenreset:', error);
+    }
+  }
+
+  // Hilfsmethode: Berechne Montag der Woche
+  private getMondayOfWeek(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Montag
+    const monday = new Date(d.setDate(diff));
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  }
+
+  // Manueller Test des Familiensammeln Wochenresets (für Entwicklung)
+  async manualFamiliensammelnWeeklyReset() {
+    this.logger.log('🔧 Manueller Familiensammeln Wochenreset gestartet...');
+    return this.handleFamiliensammelnWeeklyReset();
+  }
 }
