@@ -234,14 +234,13 @@ export class SchedulerService {
           
           // Wenn Wochenabgabe nicht bezahlt wurde -> Sanktion
           if (weeklyDelivery && weeklyDelivery.status !== 'PAID') {
-            await this.sanctionsService.createSanction({
-              userId: stat.user.id,
-              category: 'WOCHENABGABE_NICHT_ENTRICHTET',
-              level: 1,
-              description: `Weniger als 3 Tage beim Familiensammeln teilgenommen (${stat.participationCount} Tag(e)) und Wochenabgabe nicht bezahlt`,
-              amount: 50000, // 50k Schwarzgeld Strafe
-              createdById: 'system',
-            });
+            await this.sanctionsService.createSanction(
+              stat.user.id,
+              'WOCHENABGABE_NICHT_ENTRICHTET' as any,
+              1,
+              `Weniger als 3 Tage beim Familiensammeln teilgenommen (${stat.participationCount} Tag(e)) und Wochenabgabe nicht bezahlt`,
+              'system',
+            );
             
             totalSanctioned++;
             this.logger.log(`⚖️ Sanktion erstellt für ${stat.user.username}: ${stat.participationCount} Tag(e) Familiensammeln, Wochenabgabe nicht bezahlt`);
