@@ -89,9 +89,9 @@ export class FamiliensammelnService {
       userParticipationCount.set(p.userId, count + 1);
     });
 
-    // Update WeeklyDelivery für User mit 3+ Teilnahmen
+    // Update WeeklyDelivery für User mit 4+ Teilnahmen
     for (const [userId, count] of userParticipationCount.entries()) {
-      if (count >= 3) {
+      if (count >= 4) {
         // Finde oder erstelle WeeklyDelivery für diesen User
         const weeklyDelivery = await this.prisma.weeklyDelivery.findFirst({
           where: {
@@ -270,15 +270,15 @@ export class FamiliensammelnService {
     // Erstelle Statistik (nur für nicht-ausgeschlossene User)
     const statistics = eligibleUsers.map((user) => {
       const participationCount = userParticipationCount.get(user.id) || 0;
-      const remainingDays = Math.max(0, 3 - participationCount);
-      const mustPayWeeklyDelivery = participationCount < 3;
+      const remainingDays = Math.max(0, 4 - participationCount);
+      const mustPayWeeklyDelivery = participationCount < 4;
 
       return {
         user,
         participationCount,
         remainingDays,
         mustPayWeeklyDelivery,
-        hasPassed: participationCount >= 3,
+        hasPassed: participationCount >= 4,
       };
     });
 

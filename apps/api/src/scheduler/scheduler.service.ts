@@ -222,8 +222,8 @@ export class SchedulerService {
       let totalSanctioned = 0;
       
       for (const stat of statistics.statistics) {
-        // Wenn User weniger als 3 Tage teilgenommen hat
-        if (stat.participationCount < 3) {
+        // Wenn User weniger als 4 Tage teilgenommen hat
+        if (stat.participationCount < 4) {
           // Prüfe ob Wochenabgabe bezahlt wurde
           const weekStart = new Date(currentWeek.weekStart);
           const weekEnd = new Date(weekStart);

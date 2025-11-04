@@ -155,7 +155,7 @@ export default function FamiliensammelnPage() {
             Familiensammeln
           </h1>
           <p className="text-gray-400 mt-1">
-            Mindestens 3 von 6 Tagen Teilnahme erforderlich
+            Mindestens 4 von 6 Tagen Teilnahme erforderlich
           </p>
         </div>
         <Button
@@ -204,7 +204,7 @@ export default function FamiliensammelnPage() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="text-sm text-gray-400">Teilnahmen</p>
-                      <p className="text-lg font-bold text-white">{stat.participationCount} / 3</p>
+                      <p className="text-lg font-bold text-white">{stat.participationCount} / 4</p>
                     </div>
 
                     {stat.hasPassed ? (
