@@ -26,6 +26,34 @@ function getCategoryDisplayName(category: string): string {
       return 'Wochenabgabe nicht bezahlt'
     case 'NICHT_BEZAHLT_48H':
       return 'Sanktion nicht bezahlt (48h)'
+    case 'RESPEKTLOS_ZIVILISTEN':
+      return 'Respektlos gegenüber Zivilisten'
+    case 'RESPEKTLOS_FAMILIE':
+      return 'Respektlos gegenüber Familie'
+    case 'TOETUNG_FAMILIENMITGLIEDER':
+      return 'Tötung von Familienmitgliedern'
+    case 'SEXUELLE_BELAESTIGUNG':
+      return 'Sexuelle Belästigung'
+    case 'UNNOETIGES_BOXEN_SCHIESSEN':
+      return 'Unnötiges Boxen/Schießen'
+    case 'MISSACHTUNG_ANWEISUNGEN':
+      return 'Missachtung von Anweisungen'
+    case 'FEHLEN_AUFSTELLUNG':
+      return 'Fehlen bei Aufstellung'
+    case 'NICHT_ANMELDEN_FUNKCHECK':
+      return 'Nicht beim Funkcheck angemeldet'
+    case 'KLEIDERORDNUNG':
+      return 'Kleiderordnung nicht eingehalten'
+    case 'MUNITIONSVERSCHWENDUNG':
+      return 'Munitionsverschwendung'
+    case 'CASA_OHNE_ANKUENDIGUNG':
+      return 'Casa ohne Ankündigung betreten'
+    case 'FUNKPFLICHT_MISSACHTUNG':
+      return 'Funkpflicht missachtet'
+    case 'FUNKDISZIPLIN_MISSACHTUNG':
+      return 'Funkdisziplin missachtet'
+    case 'WOCHENABGABE_NICHT_ENTRICHTET':
+      return 'Wochenabgabe nicht entrichtet'
     default:
       return category
   }
@@ -37,7 +65,11 @@ const getCategoryName = getCategoryDisplayName;
 interface Sanction {
   id: string
   userId: string
-  category: 'ABMELDUNG' | 'RESPEKTVERHALTEN' | 'FUNKCHECK' | 'REAKTIONSPFLICHT' | 'NICHT_BEZAHLT' | 'NICHT_BEZAHLT_48H'
+  category: 'ABMELDUNG' | 'RESPEKTVERHALTEN' | 'FUNKCHECK' | 'REAKTIONSPFLICHT' | 'NICHT_BEZAHLT' | 'NICHT_BEZAHLT_48H' |
+    'RESPEKTLOS_ZIVILISTEN' | 'RESPEKTLOS_FAMILIE' | 'TOETUNG_FAMILIENMITGLIEDER' | 'SEXUELLE_BELAESTIGUNG' |
+    'UNNOETIGES_BOXEN_SCHIESSEN' | 'MISSACHTUNG_ANWEISUNGEN' | 'FEHLEN_AUFSTELLUNG' | 'NICHT_ANMELDEN_FUNKCHECK' |
+    'KLEIDERORDNUNG' | 'MUNITIONSVERSCHWENDUNG' | 'CASA_OHNE_ANKUENDIGUNG' | 'FUNKPFLICHT_MISSACHTUNG' |
+    'FUNKDISZIPLIN_MISSACHTUNG' | 'WOCHENABGABE_NICHT_ENTRICHTET'
   level: number
   description: string
   amount?: number
