@@ -47,7 +47,6 @@ const navigation = [
   { name: 'Lager', href: '/lager', icon: Package },
   { name: 'Lagerbewegungen', href: '/lager-movements', icon: Clock },
   { name: 'Kasse', href: '/kasse', icon: DollarSign },
-  { name: 'Pakete', href: '/packages', icon: PackageOpen },
   { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
   { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
   { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },

@@ -481,7 +481,6 @@ export default function WeeklyDeliveryPage() {
                     <TableRow>
                       <TableHead>Benutzer</TableHead>
                       <TableHead>Woche</TableHead>
-                      <TableHead>Pakete</TableHead>
                       <TableHead>Bezahlt</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Aktionen</TableHead>
@@ -495,14 +494,6 @@ export default function WeeklyDeliveryPage() {
                         </TableCell>
                         <TableCell>
                           {formatDate(delivery.weekStart)} - {formatDate(delivery.weekEnd)}
-                        </TableCell>
-                        <TableCell>
-                          {delivery.packages}
-                          {delivery.packages !== 300 && (
-                            <span className="text-xs text-gray-400 ml-1">
-                              (Standard: 300)
-                            </span>
-                          )}
                         </TableCell>
                         <TableCell>
                           {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}

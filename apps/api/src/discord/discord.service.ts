@@ -134,10 +134,13 @@ export class DiscordService {
             await tx.moneyTransaction.deleteMany({ where: { createdById: user.id } });
             await tx.moneyTransaction.deleteMany({ where: { approvedById: user.id } });
             
-            // 8. Action Logs (zuletzt, da diese Audit-Trail sind)
+            // 8. Familiensammeln Participations
+            await tx.familiensammelnParticipation.deleteMany({ where: { userId: user.id } });
+            
+            // 9. Action Logs (zuletzt, da diese Audit-Trail sind)
             await tx.actionLog.deleteMany({ where: { userId: user.id } });
             
-            // 9. Jetzt den User löschen
+            // 10. Jetzt den User löschen
             await tx.user.delete({ where: { id: user.id } });
           });
           

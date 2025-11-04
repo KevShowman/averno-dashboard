@@ -28,7 +28,6 @@ export default function DashboardPage() {
     { key: 'lager', name: 'Lager', requiresRole: null },
     { key: 'lager-movements', name: 'Lagerbewegungen', requiresRole: null },
     { key: 'kasse', name: 'Kasse', requiresRole: null },
-    { key: 'packages', name: 'Pakete', requiresRole: null },
     { key: 'weekly-delivery', name: 'Wochenabgabe', requiresRole: null },
     { key: 'familiensammeln', name: 'Familiensammeln', requiresRole: null },
     { key: 'aufstellungen', name: 'Aufstellungen', requiresRole: null },
@@ -228,7 +227,6 @@ export default function DashboardPage() {
                   <div className="flex items-center space-x-3">
                     {module.key === 'lager' && <Package className="h-6 w-6 text-accent" />}
                     {module.key === 'kasse' && <DollarSign className="h-6 w-6 text-accent" />}
-                    {module.key === 'packages' && <PackageOpen className="h-6 w-6 text-accent" />}
                     {module.key === 'aufstellungen' && <CalendarCheck className="h-6 w-6 text-accent" />}
                     {module.key === 'abmeldungen' && <CalendarDays className="h-6 w-6 text-accent" />}
                     {module.key === 'bloodlist' && <Droplet className="h-6 w-6 text-red-500" />}
@@ -261,16 +259,6 @@ export default function DashboardPage() {
                       {stats.pendingTransactions > 0 && (
                         <span className="text-yellow-400 font-medium">
                           {' '}⏳ {stats.pendingTransactions} ausstehend
-                        </span>
-                      )}
-                    </>
-                  )}
-                  {module.key === 'packages' && (
-                    <>
-                      Paket-Depot-Verwaltung und Abgaben.
-                      {stats.pendingDeposits > 0 && (
-                        <span className="text-yellow-400 font-medium">
-                          {' '}⏳ {stats.pendingDeposits} ausstehend
                         </span>
                       )}
                     </>
@@ -337,7 +325,6 @@ export default function DashboardPage() {
                   <div className="text-sm text-gray-400">
                     {module.key === 'lager' && `${stats.totalItems} Artikel`}
                     {module.key === 'kasse' && `${formatCurrency(stats.currentBalance)} Saldo`}
-                    {module.key === 'packages' && `${stats.confirmedDeposits} Bestätigt`}
                     {module.key === 'aufstellungen' && `Aufstellungen & Termine`}
                     {module.key === 'abmeldungen' && `Abwesenheiten`}
                     {module.key === 'bloodlist' && `Blood Records`}
