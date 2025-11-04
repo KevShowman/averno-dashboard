@@ -216,6 +216,15 @@ export class SchedulerService {
       const currentWeek = await this.familiensammelnService.getCurrentWeek();
       const statistics = await this.familiensammelnService.getWeekStatistics(currentWeek.id);
       
+      // Hole alle User und vergleiche mit Statistik um ausgeschlossene zu zählen
+      const allUsers = await this.prisma.user.count();
+      const eligibleUsers = statistics.statistics.length;
+      const excludedUsers = allUsers - eligibleUsers;
+      
+      if (excludedUsers > 0) {
+        this.logger.log(`ℹ️  ${excludedUsers} User von Wochenabgabe ausgeschlossen (werden nicht geprüft)`);
+      }
+      
       let totalSanctioned = 0;
       
       for (const stat of statistics.statistics) {

@@ -240,6 +240,26 @@ export class FamiliensammelnService {
       },
     });
 
+    // Hole alle aktiven Exclusions für diese Woche
+    const activeExclusions = await this.prisma.weeklyDeliveryExclusion.findMany({
+      where: {
+        isActive: true,
+        startDate: { lte: week.weekEnd },
+        OR: [
+          { endDate: null },
+          { endDate: { gte: week.weekStart } },
+        ],
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const excludedUserIds = new Set(activeExclusions.map(e => e.userId));
+
+    // Filtere ausgeschlossene User aus
+    const eligibleUsers = allUsers.filter(user => !excludedUserIds.has(user.id));
+
     // Zähle Teilnahmen pro User
     const userParticipationCount = new Map<string, number>();
     week.participations.forEach((p) => {
@@ -247,8 +267,8 @@ export class FamiliensammelnService {
       userParticipationCount.set(p.userId, count + 1);
     });
 
-    // Erstelle Statistik
-    const statistics = allUsers.map((user) => {
+    // Erstelle Statistik (nur für nicht-ausgeschlossene User)
+    const statistics = eligibleUsers.map((user) => {
       const participationCount = userParticipationCount.get(user.id) || 0;
       const remainingDays = Math.max(0, 3 - participationCount);
       const mustPayWeeklyDelivery = participationCount < 3;
