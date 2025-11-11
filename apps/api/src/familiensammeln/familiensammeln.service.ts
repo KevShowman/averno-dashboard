@@ -186,6 +186,64 @@ export class FamiliensammelnService {
   }
 
   /**
+   * Aktualisiert die Tour-Anzahl für eine Teilnahme
+   */
+  async updateParticipationTourCount(participationId: string, tourCount: number) {
+    if (tourCount < 1) {
+      throw new BadRequestException('Tour-Anzahl muss mindestens 1 sein');
+    }
+
+    const participation = await this.prisma.familiensammelnParticipation.findUnique({
+      where: { id: participationId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!participation) {
+      throw new NotFoundException('Teilnahme nicht gefunden');
+    }
+
+    // Update tourCount
+    const updated = await this.prisma.familiensammelnParticipation.update({
+      where: { id: participationId },
+      data: { tourCount },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    // Update WeeklyDelivery Status (falls sich durch die Änderung etwas ändert)
+    const week = await this.prisma.familiensammelnWeek.findUnique({
+      where: { id: participation.weekId },
+    });
+
+    if (week) {
+      await this.updateWeeklyDeliveryStatus(participation.weekId, week.weekStart);
+    }
+
+    return updated;
+  }
+
+  /**
    * Entfernt eine Teilnahme
    */
   async removeParticipation(participationId: string) {

@@ -3,10 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle, Edit } from 'lucide-react';
 import { useAuthStore } from '../stores/auth';
 import { familiensammelnApi } from '../lib/api';
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker';
+import { TourCountModal } from '../components/TourCountModal';
 import { toast } from 'sonner';
 
 interface User {
@@ -22,6 +23,7 @@ interface Participation {
   id: string;
   userId: string;
   date: string;
+  tourCount: number;
   user: User;
 }
 
@@ -46,6 +48,7 @@ export default function FamiliensammelnPage() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [showUserPicker, setShowUserPicker] = useState(false);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [editingParticipation, setEditingParticipation] = useState<Participation | null>(null);
 
   const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR';
 
@@ -87,6 +90,20 @@ export default function FamiliensammelnPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Entfernen der Teilnahme');
+    },
+  });
+
+  // Mutation: Tour-Anzahl aktualisieren
+  const updateTourCountMutation = useMutation({
+    mutationFn: ({ participationId, tourCount }: { participationId: string; tourCount: number }) =>
+      familiensammelnApi.updateParticipationTourCount(participationId, tourCount),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['familiensammeln'] });
+      toast.success('Tour-Anzahl erfolgreich aktualisiert');
+      setEditingParticipation(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren der Tour-Anzahl');
     },
   });
 
@@ -275,15 +292,15 @@ export default function FamiliensammelnPage() {
                       participations.map((p) => (
                         <div
                           key={p.id}
-                          className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700"
+                          className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-gold-500/30 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 flex-1">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-600 to-gold-800 flex items-center justify-center">
                               <span className="text-white text-sm font-bold">
                                 {p.user.username.charAt(0).toUpperCase()}
                               </span>
                             </div>
-                            <div>
+                            <div className="flex-1">
                               <p className="font-medium text-white text-sm">{p.user.username}</p>
                               {p.user.icFirstName && (
                                 <p className="text-xs text-gray-400">
@@ -291,6 +308,19 @@ export default function FamiliensammelnPage() {
                                 </p>
                               )}
                             </div>
+                            {/* Tour Count Badge */}
+                            <Badge 
+                              className="bg-gold-500/20 text-gold-400 border-gold-500/30 cursor-pointer hover:bg-gold-500/30"
+                              onClick={(e) => {
+                                if (isLeadership) {
+                                  e.stopPropagation();
+                                  setEditingParticipation(p);
+                                }
+                              }}
+                            >
+                              {p.tourCount} {p.tourCount === 1 ? 'Tour' : 'Touren'}
+                              {isLeadership && <Edit className="h-3 w-3 ml-1" />}
+                            </Badge>
                           </div>
 
                           {isLeadership && (
@@ -301,7 +331,7 @@ export default function FamiliensammelnPage() {
                                 e.stopPropagation();
                                 removeParticipationMutation.mutate(p.id);
                               }}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20 ml-2"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -346,6 +376,23 @@ export default function FamiliensammelnPage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Tour Count Modal */}
+      {editingParticipation && (
+        <TourCountModal
+          isOpen={!!editingParticipation}
+          onClose={() => setEditingParticipation(null)}
+          currentTourCount={editingParticipation.tourCount}
+          userName={editingParticipation.user.username}
+          date={new Date(editingParticipation.date)}
+          onSave={(newTourCount) =>
+            updateTourCountMutation.mutateAsync({
+              participationId: editingParticipation.id,
+              tourCount: newTourCount,
+            })
+          }
+        />
       )}
     </div>
   );

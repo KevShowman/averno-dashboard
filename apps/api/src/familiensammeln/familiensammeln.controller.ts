@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Delete,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -87,6 +88,19 @@ export class FamiliensammelnController {
       body.userId,
       date,
     );
+  }
+
+  /**
+   * PATCH /familiensammeln/participation/:id/tourcount
+   * Aktualisiert die Tour-Anzahl einer Teilnahme
+   */
+  @Patch('participation/:id/tourcount')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async updateParticipationTourCount(
+    @Param('id') id: string,
+    @Body() body: { tourCount: number },
+  ) {
+    return this.familiensammelnService.updateParticipationTourCount(id, body.tourCount);
   }
 
   /**

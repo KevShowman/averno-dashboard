@@ -190,6 +190,8 @@ export const familiensammelnApi = {
   createWeek: (data: { weekStart: string }) => api.post('/familiensammeln/week', data).then(res => res.data),
   addParticipation: (data: { weekId: string; userId: string; date: string }) =>
     api.post('/familiensammeln/participation', data).then(res => res.data),
+  updateParticipationTourCount: (participationId: string, tourCount: number) =>
+    api.patch(`/familiensammeln/participation/${participationId}/tourcount`, { tourCount }).then(res => res.data),
   removeParticipation: (participationId: string) =>
     api.delete(`/familiensammeln/participation/${participationId}`).then(res => res.data),
 };

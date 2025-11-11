@@ -504,7 +504,9 @@ model FamiliensammelnParticipation {
   userId    String
   user      User                 @relation("familiensammeln_participations", fields: [userId], references: [id])
   date      DateTime // Datum der Teilnahme
+  tourCount Int                  @default(1) // Anzahl der Touren an diesem Tag
   createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
 
   @@unique([weekId, userId, date]) // User kann nur 1x pro Tag teilnehmen
   @@map("familiensammeln_participations")
