@@ -37,9 +37,31 @@ interface Week {
 interface Statistics {
   user: User;
   participationCount: number;
+  totalTours: number;
   remainingDays: number;
+  remainingTours: number;
   mustPayWeeklyDelivery: boolean;
   hasPassed: boolean;
+}
+
+interface LeaderboardEntry {
+  user: User;
+  totalDays: number;
+  totalTours: number;
+  weeksParticipated: number;
+  lastParticipation: string;
+  averageToursPerDay: string;
+}
+
+interface AllTimeStatistics {
+  leaderboard: LeaderboardEntry[];
+  totalStats: {
+    totalParticipations: number;
+    totalTours: number;
+    totalWeeks: number;
+    activeUsers: number;
+    averageToursPerParticipation: string;
+  };
 }
 
 export default function FamiliensammelnPage() {
@@ -48,6 +70,7 @@ export default function FamiliensammelnPage() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [showUserPicker, setShowUserPicker] = useState(false);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [showAllTimeStats, setShowAllTimeStats] = useState(false);
   const [editingParticipation, setEditingParticipation] = useState<Participation | null>(null);
 
   const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR';
@@ -63,6 +86,13 @@ export default function FamiliensammelnPage() {
     queryKey: ['familiensammeln', 'statistics', currentWeek?.id],
     queryFn: () => familiensammelnApi.getWeekStatistics(currentWeek!.id),
     enabled: !!currentWeek?.id && showStatistics,
+  });
+
+  // Query: Gesamtstatistik & Leaderboard
+  const { data: allTimeStats } = useQuery<AllTimeStatistics>({
+    queryKey: ['familiensammeln', 'all-time-statistics'],
+    queryFn: familiensammelnApi.getAllTimeStatistics,
+    enabled: showAllTimeStats,
   });
 
   // Mutation: Teilnahme hinzufügen
@@ -172,17 +202,33 @@ export default function FamiliensammelnPage() {
             Familiensammeln
           </h1>
           <p className="text-gray-400 mt-1">
-            Mindestens 4 von 6 Tagen Teilnahme erforderlich
+            Mindestens 4 Tage ODER 4 Touren erforderlich
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setShowStatistics(!showStatistics)}
-          className="border-gold-500/50 text-gold-400 hover:bg-gold-900/20 hover:border-gold-500"
-        >
-          <TrendingUp className="h-4 w-4 mr-2" />
-          {showStatistics ? 'Wochenansicht' : 'Statistik anzeigen'}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowStatistics(!showStatistics);
+              setShowAllTimeStats(false);
+            }}
+            className="border-gold-500/50 text-gold-400 hover:bg-gold-900/20 hover:border-gold-500"
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            {showStatistics ? 'Wochenansicht' : 'Wochenstatistik'}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowAllTimeStats(!showAllTimeStats);
+              setShowStatistics(false);
+            }}
+            className="border-green-500/50 text-green-400 hover:bg-green-900/20 hover:border-green-500"
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            {showAllTimeStats ? 'Wochenansicht' : 'Gesamtstatistik'}
+          </Button>
+        </div>
       </div>
 
       {/* Statistik-Ansicht */}
@@ -220,8 +266,13 @@ export default function FamiliensammelnPage() {
 
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-sm text-gray-400">Teilnahmen</p>
+                      <p className="text-sm text-gray-400">Tage</p>
                       <p className="text-lg font-bold text-white">{stat.participationCount} / 4</p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm text-gray-400">Touren</p>
+                      <p className="text-lg font-bold text-gold-400">{stat.totalTours}</p>
                     </div>
 
                     {stat.hasPassed ? (
@@ -232,7 +283,7 @@ export default function FamiliensammelnPage() {
                     ) : (
                       <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
                         <AlertTriangle className="h-3 w-3 mr-1" />
-                        {stat.remainingDays} Tag(e) fehlen
+                        {stat.remainingDays} Tag(e) oder {stat.remainingTours} Tour(en)
                       </Badge>
                     )}
 
@@ -249,8 +300,123 @@ export default function FamiliensammelnPage() {
         </Card>
       )}
 
+      {/* Gesamtstatistik & Leaderboard */}
+      {showAllTimeStats && allTimeStats && (
+        <div className="space-y-6">
+          {/* Gesamtstatistik Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <Card className="bg-gradient-to-br from-gold-900/50 to-gold-800/50 border-gold-500/30">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <p className="text-gold-400 text-sm font-medium">Gesamte Touren</p>
+                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.totalTours}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-green-900/50 to-green-800/50 border-green-500/30">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <p className="text-green-400 text-sm font-medium">Teilnahmen (Tage)</p>
+                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.totalParticipations}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-blue-900/50 to-blue-800/50 border-blue-500/30">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <p className="text-blue-400 text-sm font-medium">Aktive User</p>
+                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.activeUsers}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 border-purple-500/30">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <p className="text-purple-400 text-sm font-medium">Gesamt Wochen</p>
+                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.totalWeeks}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-orange-900/50 to-orange-800/50 border-orange-500/30">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <p className="text-orange-400 text-sm font-medium">Ø Touren/Tag</p>
+                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.averageToursPerParticipation}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Leaderboard */}
+          <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-gold-400">🏆 Touren-Leaderboard</CardTitle>
+              <CardDescription className="text-gray-400">
+                Die fleißigsten Familienmitglieder aller Zeiten
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {allTimeStats.leaderboard.map((entry, index) => (
+                  <div
+                    key={entry.user.id}
+                    className={`flex items-center justify-between p-4 rounded-lg border ${
+                      index === 0
+                        ? 'bg-gold-900/30 border-gold-500/50'
+                        : index === 1
+                        ? 'bg-gray-700/50 border-gray-500/50'
+                        : index === 2
+                        ? 'bg-orange-900/30 border-orange-500/50'
+                        : 'bg-gray-800/50 border-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* Platzierung */}
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-600 to-gold-800 flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                        </span>
+                      </div>
+                      {/* User Info */}
+                      <div>
+                        <p className="font-medium text-white">{entry.user.username}</p>
+                        {entry.user.icFirstName && (
+                          <p className="text-sm text-gray-400">
+                            {entry.user.icFirstName} {entry.user.icLastName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="flex items-center gap-6">
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">Touren</p>
+                        <p className="text-lg font-bold text-gold-400">{entry.totalTours}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">Tage</p>
+                        <p className="text-lg font-bold text-white">{entry.totalDays}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">Wochen</p>
+                        <p className="text-lg font-bold text-blue-400">{entry.weeksParticipated}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">Ø Touren/Tag</p>
+                        <p className="text-lg font-bold text-green-400">{entry.averageToursPerDay}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Wochenansicht */}
-      {!showStatistics && (
+      {!showStatistics && !showAllTimeStats && (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {weekDays.map((day, index) => {
             const dateKey = day.toISOString().split('T')[0];

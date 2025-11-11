@@ -58,6 +58,15 @@ export class FamiliensammelnController {
   }
 
   /**
+   * GET /familiensammeln/all-time-statistics
+   * Holt Gesamtstatistik und Leaderboard über alle Wochen
+   */
+  @Get('all-time-statistics')
+  async getAllTimeStatistics() {
+    return this.familiensammelnService.getAllTimeStatistics();
+  }
+
+  /**
    * POST /familiensammeln/week
    * Erstellt eine neue Woche (oder holt bestehende)
    */

@@ -70,7 +70,7 @@ export class FamiliensammelnService {
   }
 
   /**
-   * Aktualisiert die Wochenabgabe für User mit 3+ Teilnahmen
+   * Aktualisiert die Wochenabgabe für User mit 4+ Teilnahmen
    */
   private async updateWeeklyDeliveryStatus(weekId: string, weekStart: Date) {
     // Finde die Wochenabgabe-Woche (die passt zur Familiensammeln-Woche)
@@ -82,16 +82,20 @@ export class FamiliensammelnService {
       where: { weekId },
     });
 
-    // Zähle Teilnahmen pro User
-    const userParticipationCount = new Map<string, number>();
+    // Zähle Teilnahmen (Tage) und Touren pro User
+    const userStats = new Map<string, { days: number; tours: number }>();
     participations.forEach((p) => {
-      const count = userParticipationCount.get(p.userId) || 0;
-      userParticipationCount.set(p.userId, count + 1);
+      if (!userStats.has(p.userId)) {
+        userStats.set(p.userId, { days: 0, tours: 0 });
+      }
+      const stats = userStats.get(p.userId)!;
+      stats.days += 1;
+      stats.tours += p.tourCount || 1;
     });
 
-    // Update WeeklyDelivery für User mit 4+ Teilnahmen
-    for (const [userId, count] of userParticipationCount.entries()) {
-      if (count >= 4) {
+    // Update WeeklyDelivery für User mit 4+ Teilnahmen ODER 4+ Touren
+    for (const [userId, stats] of userStats.entries()) {
+      if (stats.days >= 4 || stats.tours >= 4) {
         // Finde oder erstelle WeeklyDelivery für diesen User
         const weeklyDelivery = await this.prisma.weeklyDelivery.findFirst({
           where: {
@@ -111,11 +115,11 @@ export class FamiliensammelnService {
               status: WeeklyDeliveryStatus.PAID,
               paidAmount: null, // Nicht über Pakete bezahlt
               paidMoney: null, // Nicht über Geld bezahlt
-              note: `Familiensammeln (${count} Tag${count !== 1 ? 'e' : ''})`,
+              note: `Familiensammeln (${stats.days} Tag${stats.days !== 1 ? 'e' : ''}, ${stats.tours} Tour${stats.tours !== 1 ? 'en' : ''})`,
             },
           });
 
-          console.log(`✅ Wochenabgabe für ${userId} automatisch bezahlt (${count} Tage Familiensammeln)`);
+          console.log(`✅ Wochenabgabe für ${userId} automatisch bezahlt (${stats.days} Tage, ${stats.tours} Touren)`);
         }
       }
     }
@@ -318,25 +322,39 @@ export class FamiliensammelnService {
     // Filtere ausgeschlossene User aus
     const eligibleUsers = allUsers.filter(user => !excludedUserIds.has(user.id));
 
-    // Zähle Teilnahmen pro User
+    // Zähle Teilnahmen (Tage) und Touren pro User
     const userParticipationCount = new Map<string, number>();
+    const userTourCount = new Map<string, number>();
+    
     week.participations.forEach((p) => {
-      const count = userParticipationCount.get(p.userId) || 0;
-      userParticipationCount.set(p.userId, count + 1);
+      // Zähle Tage
+      const dayCount = userParticipationCount.get(p.userId) || 0;
+      userParticipationCount.set(p.userId, dayCount + 1);
+      
+      // Zähle Touren (summiere tourCount)
+      const tourCount = userTourCount.get(p.userId) || 0;
+      userTourCount.set(p.userId, tourCount + (p.tourCount || 1));
     });
 
     // Erstelle Statistik (nur für nicht-ausgeschlossene User)
     const statistics = eligibleUsers.map((user) => {
       const participationCount = userParticipationCount.get(user.id) || 0;
+      const totalTours = userTourCount.get(user.id) || 0;
       const remainingDays = Math.max(0, 4 - participationCount);
-      const mustPayWeeklyDelivery = participationCount < 4;
+      const remainingTours = Math.max(0, 4 - totalTours);
+      // User muss zahlen, wenn WEDER 4+ Tage NOCH 4+ Touren erreicht
+      const mustPayWeeklyDelivery = participationCount < 4 && totalTours < 4;
+      // User hat bestanden, wenn ENTWEDER 4+ Tage ODER 4+ Touren erreicht
+      const hasPassed = participationCount >= 4 || totalTours >= 4;
 
       return {
         user,
-        participationCount,
+        participationCount, // Anzahl der Tage
+        totalTours, // Gesamtzahl der Touren
         remainingDays,
+        remainingTours,
         mustPayWeeklyDelivery,
-        hasPassed: participationCount >= 4,
+        hasPassed,
       };
     });
 
@@ -424,6 +442,95 @@ export class FamiliensammelnService {
         },
       },
     });
+  }
+
+  /**
+   * Gesamtstatistik: Leaderboard und accumulated stats über alle Wochen
+   */
+  async getAllTimeStatistics() {
+    // Hole alle Participations mit User-Daten
+    const allParticipations = await this.prisma.familiensammelnParticipation.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true,
+            role: true,
+          },
+        },
+        week: {
+          select: {
+            weekStart: true,
+            weekEnd: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Zähle pro User: Tage, Touren, Wochen
+    const userStats = new Map<string, {
+      user: any;
+      totalDays: number;
+      totalTours: number;
+      weeksParticipated: Set<string>;
+      lastParticipation: Date;
+    }>();
+
+    allParticipations.forEach((p) => {
+      if (!userStats.has(p.userId)) {
+        userStats.set(p.userId, {
+          user: p.user,
+          totalDays: 0,
+          totalTours: 0,
+          weeksParticipated: new Set(),
+          lastParticipation: p.createdAt,
+        });
+      }
+
+      const stats = userStats.get(p.userId)!;
+      stats.totalDays += 1;
+      stats.totalTours += p.tourCount || 1;
+      stats.weeksParticipated.add(p.weekId);
+      
+      // Update last participation if more recent
+      if (p.createdAt > stats.lastParticipation) {
+        stats.lastParticipation = p.createdAt;
+      }
+    });
+
+    // Konvertiere zu Array und sortiere nach Touren
+    const leaderboard = Array.from(userStats.values())
+      .map((stat) => ({
+        user: stat.user,
+        totalDays: stat.totalDays,
+        totalTours: stat.totalTours,
+        weeksParticipated: stat.weeksParticipated.size,
+        lastParticipation: stat.lastParticipation,
+        averageToursPerDay: stat.totalDays > 0 ? (stat.totalTours / stat.totalDays).toFixed(2) : '0',
+      }))
+      .sort((a, b) => b.totalTours - a.totalTours);
+
+    // Gesamtstatistik
+    const totalStats = {
+      totalParticipations: allParticipations.length,
+      totalTours: allParticipations.reduce((sum, p) => sum + (p.tourCount || 1), 0),
+      totalWeeks: await this.prisma.familiensammelnWeek.count(),
+      activeUsers: userStats.size,
+      averageToursPerParticipation: allParticipations.length > 0 
+        ? (allParticipations.reduce((sum, p) => sum + (p.tourCount || 1), 0) / allParticipations.length).toFixed(2)
+        : '0',
+    };
+
+    return {
+      leaderboard,
+      totalStats,
+    };
   }
 }
 

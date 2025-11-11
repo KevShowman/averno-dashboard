@@ -187,6 +187,7 @@ export const familiensammelnApi = {
   getWeek: (id: string) => api.get(`/familiensammeln/week/${id}`).then(res => res.data),
   getAllWeeks: (limit?: number) => api.get('/familiensammeln/weeks', { params: { limit } }).then(res => res.data),
   getWeekStatistics: (weekId: string) => api.get(`/familiensammeln/week/${weekId}/statistics`).then(res => res.data),
+  getAllTimeStatistics: () => api.get('/familiensammeln/all-time-statistics').then(res => res.data),
   createWeek: (data: { weekStart: string }) => api.post('/familiensammeln/week', data).then(res => res.data),
   addParticipation: (data: { weekId: string; userId: string; date: string }) =>
     api.post('/familiensammeln/participation', data).then(res => res.data),

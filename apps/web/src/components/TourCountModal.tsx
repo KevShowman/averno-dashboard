@@ -121,7 +121,7 @@ export function TourCountModal({
             <Button
               onClick={handleSave}
               disabled={isSaving || tourCount === currentTourCount}
-              className="flex-1 bg-gold-600 hover:bg-gold-700 text-black font-semibold disabled:bg-gray-700 disabled:text-gray-400"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold disabled:bg-gray-700 disabled:text-gray-400"
             >
               {isSaving ? 'Speichere...' : 'Speichern'}
             </Button>
