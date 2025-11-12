@@ -82,169 +82,170 @@ const LOCAL_STORAGE_KEY = 'organigram-role-assignments'
 const overviewSections: OverviewSection[] = [
   {
     id: 'patron',
-    title: 'Patrón / Jefe Supremo',
+    title: '⚜️ Patrón / Jefe Supremo',
     description:
-      'Der Patrón ist der oberste Anführer des Kartells, bündelt alle Macht und trifft jede strategische Entscheidung. Er hält die Organisation zusammen und definiert die Vision des Kartells.',
+      'La cabeza. El alma. Der Boss. Der Patrón redet selten, aber wenn er es tut, dann ist es Gesetz.',
     responsibilities: [
-      'Legt die langfristige Strategie und die Kernziele des Kartells fest.',
-      'Trifft Entscheidungen über Allianzen, territoriale Expansion und groß angelegte Operationen.',
-      'Delegiert operative Aufgaben an Consejo Central und Mano Derecha und kontrolliert deren Umsetzung.',
-      'Überwacht Finanzen, Außenbeziehungen und das gesamte Krisenmanagement.',
+      'Setzt die Richtung – visión y estrategia.',
+      'Entscheidet, wer lebt, wer fällt, wer aufsteigt.',
+      'Behält alles im Blick, mischt sich nur ein, wenn es brennt.',
     ],
     dailyDuties: [
-      'Strategische Briefings mit den Direktuntergebenen durchführen.',
-      'Große Deals, Verträge oder Allianzen persönlich genehmigen.',
-      'Disziplinarmaßnahmen und Konfliktlösungen final entscheiden.',
+      'Besprechungen mit seinen Onces, letzte Worte bei Deals.',
+      'Hört sich Berichte an und entscheidet, was passiert.',
+      'Gibt Richtung vor – sin rodeos.',
     ],
   },
   {
-    id: 'consejo-central',
-    title: 'Consejo Central (El Capitan & El Comandante)',
+    id: 'los-onces',
+    title: '⚔️ Los Onces – El Capitán & El Comandante',
     description:
-      'Der Consejo Central bildet den inneren Führungskreis unterhalb des Patrón. Er übersetzt strategische Ziele in konkrete Operationen und hält die Balance zwischen Geschäft und Sicherheit.',
+      'Die beiden Ersten unter dem Patrón. Sie sind direkt ihm unterstellt und steuern Operationen & Sicherheit.',
     responsibilities: [
-      'Setzt die Vorgaben des Patrón in operative Handlungspläne um.',
-      'Koordiniert die Abteilungen und überwacht laufende Operationen.',
-      'Meldet Fortschritte, Risiken und Auffälligkeiten direkt an den Patrón.',
+      'Operaciones & Seguridad – die beiden Säulen des Geschäfts.',
+      'Befehlsgewalt über alle Bereiche unterhalb.',
+      'Entscheidungen, die das Ganze bewegen – direkt vom Patrón abgesegnet.',
     ],
     dailyDuties: [
-      'Operative Lagebesprechungen organisieren und leiten.',
-      'Problemberichte sammeln und priorisiert an den Patrón weitergeben.',
-      'Taktische Ad-hoc-Entscheidungen treffen, wenn Situationen eskalieren.',
+      'Koordinieren ihre Bereiche, halten das System stabil.',
+      'Melden direkt an den Patrón, ohne Filter.',
+      'Greifen ein, wenn etwas aus dem Ruder läuft.',
     ],
     subSections: [
       {
-        title: 'El Capitan (Operationschef)',
-        description:
-          'Der Capitan verantwortet alle operativen Geschäftsbereiche: Produktion, Transport, Informationsbeschaffung und Finanzen.',
+        title: 'El Capitán – Operaciones',
+        description: 'Der, der die Maschine am Laufen hält.',
         responsibilities: [
-          'Koordiniert Logística, Inteligencia und Finanzströme (Consejero).',
-          'Plant Transporte, Produktion und Ressourcenverteilung.',
-          'Sichert den Informationsfluss zwischen operativen Teams und dem Consejo Central.',
+          'Gibt Aufträge an Logística, Inteligencia und Finanzleute.',
+          'Kümmert sich um Lieferketten, Cashflow und Bewegung.',
+          'Hat den Überblick über jedes laufende Geschäft.',
         ],
         dailyDuties: [
-          'Routen, Lieferungen und Produktionsketten planen.',
-          'Briefings mit Logística- und Inteligencia-Leitern durchführen.',
-          'Investitions- und Finanzentscheidungen mit Consejero abstimmen.',
+          'Checkt Routen, segnet Transporte ab.',
+          'Schiebt Projekte an – sin errores.',
+          'Berichtet direkt an den Patrón.',
         ],
       },
       {
-        title: 'El Comandante (Sicherheitschef)',
-        description:
-          'Der Comandante schützt das Kartell. Er führt Sicarios und Falken, steuert Sicherheitsoperationen und überwacht Rivalen.',
+        title: 'El Comandante – Seguridad',
+        description: 'Der Schatten. Die Waffe. Der Schutz.',
         responsibilities: [
-          'Organisiert Schutzmaßnahmen, Sicherheitspläne und bewaffnete Operationen.',
-          'Überwacht rivalisierende Gruppen, Behörden und potenzielle Bedrohungen.',
-          'Sichert die Einsatzbereitschaft der Sicarios und koordiniert die Falken.',
+          'Führt Sicarios, plant Sicherheitsmaßnahmen.',
+          'Macht Gegenspionage, sorgt für Ruhe im Territorio.',
+          'Schützt Patrón, Familia und Lieferungen.',
         ],
         dailyDuties: [
-          'Sicherheitseskorten und Gegenüberwachungen planen.',
-          'Einsatzbesprechungen mit Sicario- und Falken-Teams durchführen.',
-          'Gefahrenlagen auswerten und Risikoanalysen erstellen.',
+          'Trainiert Sicarios, analysiert Bewegungen.',
+          'Führt verdeckte Treffen – disciplina total.',
+          'Schlägt zu, wenn keiner damit rechnet.',
         ],
       },
     ],
   },
   {
     id: 'mano-derecha',
-    title: 'El Mano Derecha',
+    title: '🕴️ El Mano Derecha – Coordinador',
     description:
-      'Die rechte Hand des Patrón koordiniert Kommunikation und Umsetzung. Sie sorgt dafür, dass Befehle verstanden und effizient ausgeführt werden und vertritt den Patrón bei Bedarf.',
+      'La voz del Patrón. Er redet, wenn der Boss schweigt. Sorgt dafür, dass alle Rädchen ineinandergreifen – steht aber unter den Onces.',
     responsibilities: [
-      'Leitet Informationen und Befehle vom Patrón an den Consejo Central weiter.',
-      'Überprüft die Umsetzung und greift regulierend ein, wenn Abweichungen auftreten.',
-      'Trifft in Abwesenheit des Patrón dringende Entscheidungen im Sinne der Gesamtstrategie.',
+      'Setzt Befehle um, verteilt Infos, hält alle synchron.',
+      'Greift ein, wenn Bereiche sich überschneiden oder blockieren.',
+      'Ist die rechte Hand, nicht der zweite Boss.',
     ],
     dailyDuties: [
-      'Strategische Meetings moderieren und Ergebnisse dokumentieren.',
-      'Konflikte zwischen Abteilungen frühzeitig schlichten.',
-      'Kontrollbesuche in den einzelnen Bereichen durchführen.',
+      'Koordiniert Termine, checkt Berichte.',
+      'Spricht für den Patrón, wenn es nötig ist.',
+      'Sorgt dafür, dass Capitán & Comandante harmonieren.',
     ],
   },
   {
-    id: 'subjefes',
-    title: 'Subjefes / Capitanes (Bereichskommandanten)',
+    id: 'funciones',
+    title: '🧭 Funciones – Die Säulen',
     description:
-      'Subjefes steuern größere Aufgabenbereiche oder Regionen. Sie übersetzen die Vorgaben von Consejo Central in konkrete Aktionspläne für ihre Teams.',
+      'Logística, Inteligencia, Mediación, Sicarios – sie halten alles zusammen. Berichten an Mano Derecha.',
     responsibilities: [
-      'Koordinieren mehrere Funktionsleiter und halten deren Teams arbeitsfähig.',
-      'Planen Einsätze, stellen Ressourcen bereit und überwachen die Umsetzung.',
-      'Berichten Status, Risiken und Ergebnisse an Capitan oder Comandante.',
+      'Jeder Bereich verantwortet sein Tagesgeschäft.',
+      'Planen, führen, melden – ohne Fehler.',
+      'Halten ihre Teams einsatzbereit.',
     ],
     dailyDuties: [
-      'Einsatzbesprechungen mit Funktionsleitern führen.',
-      'Lage- und Fortschrittsberichte erstellen.',
-      'Teams bei komplexen Operationen vor Ort leiten.',
-    ],
-  },
-  {
-    id: 'funktionsleiter',
-    title: 'Funktionsleiter / Jefes de Función',
-    description:
-      'Funktionsleiter verantworten ihr Tagesgeschäft, führen ihre Teams und stehen in direktem Austausch mit dem zuständigen Subjefe oder Consejo-Mitglied.',
-    responsibilities: [
-      'Planen Aufgaben, Schichten und Ressourcen innerhalb ihres Bereichs.',
-      'Übermitteln Berichte und KPIs an die nächsthöhere Ebene.',
-      'Schulen und entwickeln die Teammitglieder.',
-    ],
-    dailyDuties: [
-      'Tägliche Briefings mit Teammitgliedern durchführen.',
-      'Operative Checklisten und Qualitätssicherung pflegen.',
-      'Zwischenfälle dokumentieren und unmittelbar melden.',
+      'Tägliche Abstimmung mit ihren Leuten.',
+      'Berichte an Mano Derecha oder direkt an die Onces.',
+      'Reagieren schnell, wenn etwas klemmt.',
     ],
     subSections: [
       {
-        title: 'Logística',
-        description: 'Transport, Lagerung und Schmuggelrouten.',
+        title: '🚚 Logística – Transporte & Nachschub',
+        description: 'Die Wege des Geldes und der Ware.',
         responsibilities: [
-          'Steuert Fahrzeug- und Kuriernetzwerk.',
-          'Überwacht Lagerbestände und Lieferzeitpläne.',
-          'Plant sichere Routen für Vorräte und Ware.',
+          'Plant Transporte, Routen und Lagerorte.',
+          'Koordiniert Fahrer, Schmuggler, Lieferanten.',
+          'Hält alles unsichtbar, schnell und sauber.',
+        ],
+        dailyDuties: [
+          'Routen prüfen, Wagen absegnen.',
+          'Backups vorbereiten – sin fallos.',
+          'Fahrer einteilen, Übergaben koordinieren.',
         ],
       },
       {
-        title: 'Inteligencia',
-        description: 'Aufklärung, Überwachung und Informationsbeschaffung.',
+        title: '🧠 Inteligencia – Aufklärung & Falcónes',
+        description: 'Die Augen und Ohren der Familia.',
         responsibilities: [
-          'Analysiert Bewegungen von Rivalen und Behörden.',
-          'Setzt Falken und Informanten gezielt ein.',
-          'Bereitet Lageberichte für Führungskräfte vor.',
+          'Beobachten Cops, Rivalen, Bewegungen.',
+          'Führen Falcónes und Technikleute.',
+          'Liefern Reports, bevor es brennt.',
+        ],
+        dailyDuties: [
+          'Daten sammeln, Beobachtungen filtern.',
+          'Warnungen rausgeben – calladitos pero peligrosos.',
+          'Observationen planen, Teams einsatzbereit halten.',
         ],
       },
       {
-        title: 'Finanzas / Consejero',
-        description: 'Finanzen, Buchhaltung und legale Deckgeschäfte.',
+        title: '🕊️ Consejero – Comunicación & Mediación',
+        description: 'Die Stimme zwischen den Stimmen.',
         responsibilities: [
-          'Überblickt Geldflüsse und Geldwäsche-Strukturen.',
-          'Betreut legale Firmen und Investitionen.',
-          'Unterstützt bei internen Personal- und Disziplinfragen.',
+          'Vermittelt zwischen Crews und Mitgliedern.',
+          'Fängt Spannungen auf, bevor sie eskalieren.',
+          'Bringt Leute an einen Tisch, wenn es kracht.',
+        ],
+        dailyDuties: [
+          'Gespräche führen, vermitteln.',
+          'Lösungen finden – la paz interna primero.',
+          'Konflikte entschärfen, bevor Blut fließt.',
         ],
       },
       {
-        title: 'Sicarios',
-        description: 'Durchsetzung, Schutz und bewaffnete Operationen.',
+        title: '🔫 Sicarios – Schutz & Durchsetzung',
+        description: 'Die Faust der Familia.',
         responsibilities: [
-          'Stellt Einsatztrupps für Schutz- und Offensivaktionen.',
-          'Bewacht sensible Orte, Lieferungen und Führungspersonen.',
-          'Koordiniert Training und Einsatzbereitschaft.',
+          'Führen Teams, schützen Transporte & Führung.',
+          'Trainieren neue Rekruten.',
+          'Halten Respekt und Ordnung durch Präsenz.',
+        ],
+        dailyDuties: [
+          'Trainings, Sicherungen, Einsätze.',
+          'Schutz planen, Präsenz zeigen – acción directa.',
+          'Neue Leute ausbilden, alte scharf halten.',
         ],
       },
     ],
   },
   {
-    id: 'operative',
-    title: 'Operative Teams / Soldados / Support',
+    id: 'soldados',
+    title: '🐍 Soldados / Falcónes / Support',
     description:
-      'Operative Teams bilden die Basis des Kartells. Sie setzen Aufträge um, melden Ergebnisse an ihren Funktionsleiter und sorgen für Präsenz auf der Straße.',
+      'Die Basis. Die Straße. Die Augen. Sie führen Aufträge aus, melden Bewegungen – trabajo constante.',
     responsibilities: [
-      'Führen Transporte, Lagerarbeiten, Aufklärung oder Schutzaufgaben aus.',
-      'Melden Beobachtungen, Risiken und Erfolge unmittelbar zurück.',
-      'Pflegen Ausrüstung und halten sich einsatzbereit.',
+      'Führen Aufträge aus, melden Bewegungen.',
+      'Beobachten Gebiete, liefern Infos an Inteligencia.',
+      'Halten Material und Tarnung sauber.',
     ],
     dailyDuties: [
-      'Lieferungen und Übergaben durchführen.',
-      'Gebiete observieren und Informationen sammeln.',
-      'Trainings- und Vorbereitungsszenarien absolvieren.',
+      'Lieferungen, Überwachungen, Übergaben.',
+      'Trabajo constante – immer bereit.',
+      'Augen offen, Ohren gespitzt, Mund zu.',
     ],
   },
 ]
@@ -253,166 +254,136 @@ const treeNodes: Record<string, TreeNode> = {
   patron: {
     id: 'patron',
     label: 'Patrón / Jefe Supremo',
-    summary: 'Oberstes Oberhaupt – Strategie, Vision und finale Entscheidungen.',
+    summary: 'La cabeza. El alma. Der Boss.',
     responsibilities: [
-      'Legt die Marschrichtung der gesamten Organisation fest.',
-      'Entscheidet über Bündnisse, Territorien und Großoperationen.',
-      'Überprüft die Arbeit der direkten Vertrauten und lenkt bei Bedarf gegen.',
+      'Setzt die Richtung – visión y estrategia.',
+      'Entscheidet, wer lebt, wer fällt, wer aufsteigt.',
+      'Behält alles im Blick, mischt sich nur ein, wenn es brennt.',
     ],
     dailyDuties: [
-      'Regelmäßige Lageberichte der Führung anfordern und bewerten.',
-      'Verhandlungen mit Partnern oder Rivalen persönlich führen.',
-      'Ressourcen freigeben oder Projekte stoppen, wenn es die Lage erfordert.',
-    ],
-  },
-  'mano-derecha': {
-    id: 'mano-derecha',
-    label: 'El Mano Derecha',
-    summary: 'Vertrauensperson des Patrón, hält alle Fäden zusammen.',
-    responsibilities: [
-      'Übersetzt Anweisungen des Patrón in klare Aufträge.',
-      'Koordiniert Termine und Informationsflüsse.',
-      'Greift ein, wenn Abteilungen aneinander vorbeiarbeiten.',
-    ],
-    dailyDuties: [
-      'Gespräche zwischen Patrón und Consejo vorbereiten und nachbereiten.',
-      'Frühzeitige Warnsignale aus den Bereichen aufnehmen.',
-      'Als Stimme des Patrón auftreten, wenn dieser nicht präsent ist.',
-    ],
-  },
-  'consejo-central': {
-    id: 'consejo-central',
-    label: 'Consejo Central',
-    summary: 'Capitan & Comandante bilden das Herz der täglichen Steuerung.',
-    responsibilities: [
-      'Setzt strategische Vorgaben in konkrete Maßnahmen um.',
-      'Priorisiert Ressourcen und Einsatzkräfte.',
-      'Hält ständigen Kontakt zu Mano Derecha und Patrón.',
-    ],
-    dailyDuties: [
-      'Lagebesprechungen leiten und Entscheidungen dokumentieren.',
-      'Unvorhergesehene Situationen sofort an den Patrón melden.',
-      'Koordination zwischen operativen und sicherheitsrelevanten Aufgaben.',
+      'Besprechungen mit seinen Onces, letzte Worte bei Deals.',
+      'Hört sich Berichte an und entscheidet, was passiert.',
+      'Gibt Richtung vor – sin rodeos.',
     ],
   },
   capitan: {
     id: 'capitan',
-    label: 'El Capitan – Operative Leitung',
-    summary: 'Lenkt alle Wirtschafts- und Informationsstränge.',
+    label: 'El Capitán – Operaciones',
+    summary: 'Der, der die Maschine am Laufen hält.',
     responsibilities: [
-      'Verteilt Aufträge an Logística, Inteligencia und Finanzkoordination.',
-      'Sichert reibungslose Lieferketten und Geldflüsse.',
-      'Berichtet unmittelbar an den Consejo Central.',
+      'Gibt Aufträge an Logística, Inteligencia und Finanzleute.',
+      'Kümmert sich um Lieferketten, Cashflow und Bewegung.',
+      'Hat den Überblick über jedes laufende Geschäft.',
     ],
     dailyDuties: [
-      'Transportrouten absegnen und Anpassungen anordnen.',
-      'Berichte der Funktionsleiter prüfen und nachhalten.',
-      'Investitionen oder neue Projekte vorbereiten.',
+      'Checkt Routen, segnet Transporte ab.',
+      'Schiebt Projekte an – sin errores.',
+      'Berichtet direkt an den Patrón.',
     ],
   },
   comandante: {
     id: 'comandante',
-    label: 'El Comandante – Sicherheit',
-    summary: 'Verantwortlich für Schutz, Gegenüberwachung und Durchsetzung.',
+    label: 'El Comandante – Seguridad',
+    summary: 'Der Schatten. Die Waffe. Der Schutz.',
     responsibilities: [
-      'Bewertet Bedrohungen und legt Gegenmaßnahmen fest.',
-      'Koordiniert Sicarios und Aufklärungseinheiten.',
-      'Garantiert Sicherheit für Operationen und Führung.',
+      'Führt Sicarios, plant Sicherheitsmaßnahmen.',
+      'Macht Gegenspionage, sorgt für Ruhe im Territorio.',
+      'Schützt Patrón, Familia und Lieferungen.',
     ],
     dailyDuties: [
-      'Sicherheitspläne mit Sicario-Führung abstimmen.',
-      'Aufklärungsberichte analysieren und Einsatzbereitschaft abfragen.',
-      'Begleitung sensibler Treffen vorbereiten.',
+      'Trainiert Sicarios, analysiert Bewegungen.',
+      'Führt verdeckte Treffen – disciplina total.',
+      'Schlägt zu, wenn keiner damit rechnet.',
     ],
   },
-  subjefes: {
-    id: 'subjefes',
-    label: 'Subjefes / Capitanes',
-    summary: 'Führen konkrete Bereiche oder Regionen im Auftrag der Leitung.',
+  'mano-derecha': {
+    id: 'mano-derecha',
+    label: 'El Mano Derecha – Coordinador',
+    summary: 'La voz del Patrón. Sorgt dafür, dass alle Rädchen ineinandergreifen.',
     responsibilities: [
-      'Übersetzen Befehle in Einsatz- und Schichtpläne.',
-      'Halten ihre Teams arbeitsfähig und diszipliniert.',
-      'Liefern verlässliche Berichte an Capitan oder Comandante.',
+      'Setzt Befehle um, verteilt Infos, hält alle synchron.',
+      'Greift ein, wenn Bereiche sich überschneiden oder blockieren.',
+      'Ist die rechte Hand, nicht der zweite Boss.',
     ],
     dailyDuties: [
-      'Besprechungen mit Funktionsleitern ansetzen.',
-      'Fortschritt, Verluste oder Auffälligkeiten melden.',
-      'Bei kritischen Operationen persönlich anwesend sein.',
+      'Koordiniert Termine, checkt Berichte.',
+      'Spricht für den Patrón, wenn es nötig ist.',
+      'Sorgt dafür, dass Capitán & Comandante harmonieren.',
     ],
   },
   'funktionsleiter-logistica': {
     id: 'funktionsleiter-logistica',
-    label: 'Funktionsleiter Logística',
-    summary: 'Plant Transporte, Lager und Nachschub.',
+    label: 'Logística – Transporte & Nachschub',
+    summary: 'Die Wege des Geldes und der Ware.',
     responsibilities: [
-      'Koordiniert Fahrzeuge, Routen und Verstecke.',
-      'Sorgt für pünktliche Lieferungen ohne Aufsehen.',
-      'Behält Material- und Lagerbestände im Blick.',
+      'Plant Transporte, Routen und Lagerorte.',
+      'Koordiniert Fahrer, Schmuggler, Lieferanten.',
+      'Hält alles unsichtbar, schnell und sauber.',
     ],
     dailyDuties: [
-      'Fahrer einteilen und Routenbriefe erstellen.',
-      'Kontrollgänge in Lagern durchführen.',
-      'Kurzfristige Ersatzrouten bereitstellen.',
+      'Routen prüfen, Wagen absegnen.',
+      'Backups vorbereiten – sin fallos.',
+      'Fahrer einteilen, Übergaben koordinieren.',
     ],
   },
   'funktionsleiter-inteligencia': {
     id: 'funktionsleiter-inteligencia',
-    label: 'Funktionsleiter Inteligencia',
-    summary: 'Sorgt für Informationen, Beobachtung und Überwachung.',
+    label: 'Inteligencia – Aufklärung & Falcónes',
+    summary: 'Die Augen und Ohren der Familia.',
     responsibilities: [
-      'Führt Falken, Informanten und technische Aufklärung.',
-      'Sichtet Bewegungen von Rivalen oder Behörden.',
-      'Bereitet Lagebilder für Führungskräfte auf.',
+      'Beobachten Cops, Rivalen, Bewegungen.',
+      'Führen Falcónes und Technikleute.',
+      'Liefern Reports, bevor es brennt.',
     ],
     dailyDuties: [
-      'Observationsteams einsatzbereit halten.',
-      'Berichte verdichten und priorisieren.',
-      'Warnungen rechtzeitig an Comandante oder Capitan geben.',
+      'Daten sammeln, Beobachtungen filtern.',
+      'Warnungen rausgeben – calladitos pero peligrosos.',
+      'Observationen planen, Teams einsatzbereit halten.',
     ],
   },
   'funktionsleiter-consejero': {
     id: 'funktionsleiter-consejero',
-    label: 'Funktionsleiter Finanzas / Consejero',
-    summary: 'Verwaltet Buchhaltung, Geldflüsse und legale Deckung.',
+    label: 'Consejero – Comunicación & Mediación',
+    summary: 'Die Stimme zwischen den Stimmen.',
     responsibilities: [
-      'Hält Übersicht über Einnahmen, Ausgaben und Waschanlagen.',
-      'Pflegt Kontakte zu Anwälten, Geschäftsführern und Vermittlern.',
-      'Unterstützt bei Personal- oder Disziplinfragen.',
+      'Vermittelt zwischen Crews und Mitgliedern.',
+      'Fängt Spannungen auf, bevor sie eskalieren.',
+      'Bringt Leute an einen Tisch, wenn es kracht.',
     ],
     dailyDuties: [
-      'Abrechnungen prüfen und Freigaben einholen.',
-      'Legale Unternehmen mit echten Zahlen versorgen.',
-      'Verhandlungen über Investitionen vorbereiten.',
+      'Gespräche führen, vermitteln.',
+      'Lösungen finden – la paz interna primero.',
+      'Konflikte entschärfen, bevor Blut fließt.',
     ],
   },
   'funktionsleiter-sicarios': {
     id: 'funktionsleiter-sicarios',
-    label: 'Funktionsleiter Sicarios',
-    summary: 'Führt Einsatzkräfte für Schutz und Durchsetzung.',
+    label: 'Sicarios – Schutz & Durchsetzung',
+    summary: 'Die Faust der Familia.',
     responsibilities: [
-      'Stellt Einsatzteams zusammen und hält sie einsatzbereit.',
-      'Schützt Lager, Lieferungen und Führungspersonen.',
-      'Koordiniert Training und Ausrüstung.',
+      'Führen Teams, schützen Transporte & Führung.',
+      'Trainieren neue Rekruten.',
+      'Halten Respekt und Ordnung durch Präsenz.',
     ],
     dailyDuties: [
-      'Schießtrainings und Einsatzübungen planen.',
-      'Begleit- und Sicherungsaufträge verteilen.',
-      'Nachbesprechungen mit Teams durchführen.',
+      'Trainings, Sicherungen, Einsätze.',
+      'Schutz planen, Präsenz zeigen – acción directa.',
+      'Neue Leute ausbilden, alte scharf halten.',
     ],
   },
   'operative-teams': {
     id: 'operative-teams',
-    label: 'Operative Teams / Soldados',
-    summary: 'Frontlinie der Organisation – führen Aufträge aus.',
+    label: 'Soldados / Falcónes / Support',
+    summary: 'Die Basis. Die Straße. Die Augen.',
     responsibilities: [
-      'Setzen Anweisungen der Funktionsleiter um.',
-      'Melden Beobachtungen und Ergebnisse direkt zurück.',
-      'Pflegen Material, Ausrüstung und Tarnidentitäten.',
+      'Führen Aufträge aus, melden Bewegungen.',
+      'Beobachten Gebiete, liefern Infos an Inteligencia.',
+      'Halten Material und Tarnung sauber.',
     ],
     dailyDuties: [
-      'Lieferfahrten, Übergaben oder Sicherungen durchführen.',
-      'Gebiete beobachten und verdächtige Bewegungen melden.',
-      'Trainings- und Vorbereitungseinheiten besuchen.',
+      'Lieferungen, Überwachungen, Übergaben.',
+      'Trabajo constante – immer bereit.',
+      'Augen offen, Ohren gespitzt, Mund zu.',
     ],
   },
 }
@@ -420,27 +391,32 @@ const treeNodes: Record<string, TreeNode> = {
 const organigramLevels: OrganigramLevel[] = [
   {
     id: 'level-1',
-    title: 'Oberste Führung',
+    title: '⚜️ Patrón',
+    description: 'Das Oberhaupt – alle Macht, alle Entscheidungen.',
     nodes: ['patron'],
   },
   {
     id: 'level-2',
-    title: 'Direkte Steuerung',
-    nodes: ['mano-derecha', 'consejo-central'],
+    title: '⚔️ Los Onces – Die Ersten unter dem Patrón',
+    description: 'Operaciones & Seguridad – direkt dem Patrón unterstellt.',
+    nodes: ['capitan', 'comandante'],
   },
   {
     id: 'level-3',
-    title: 'Bereichsleitung',
-    nodes: ['capitan', 'comandante', 'subjefes'],
+    title: '🕴️ Coordinación',
+    description: 'El Mano Derecha hält die Fäden zwischen den Onces und den Funciones.',
+    nodes: ['mano-derecha'],
   },
   {
     id: 'level-4',
-    title: 'Funktionsbereiche',
+    title: '🧭 Funciones – Die Säulen',
+    description: 'Logística, Inteligencia, Mediación, Sicarios – sie halten alles zusammen.',
     nodes: ['funktionsleiter-logistica', 'funktionsleiter-inteligencia', 'funktionsleiter-consejero', 'funktionsleiter-sicarios'],
   },
   {
     id: 'level-5',
-    title: 'Operative Kräfte',
+    title: '🐍 La Base – Soldados & Falcónes',
+    description: 'Die Front, die alles ausführt.',
     nodes: ['operative-teams'],
   },
 ]
@@ -451,67 +427,55 @@ const assignmentRoles: AssignmentRole[] = [
   {
     id: 'patron',
     label: 'Patrón / Jefe Supremo',
-    description: 'Oberste Leitfigur mit finalem Entscheidungsrecht.',
+    description: 'La cabeza. El alma. Der Boss.',
     icon: <Crown className="h-5 w-5 text-amber-400" />,
   },
   {
-    id: 'mano-derecha',
-    label: 'El Mano Derecha',
-    description: 'Vertrauensperson des Patrón, hält Abläufe zusammen.',
-    icon: <Shield className="h-5 w-5 text-cyan-400" />,
-  },
-  {
-    id: 'consejo-central',
-    label: 'Consejo Central',
-    description: 'Capitan & Comandante koordinieren tägliche Steuerung.',
-    icon: <Users className="h-5 w-5 text-purple-400" />,
-  },
-  {
     id: 'capitan',
-    label: 'El Capitan – Operative Leitung',
-    description: 'Lenkt Produktion, Transport und Informationsstränge.',
+    label: 'El Capitán – Operaciones',
+    description: 'Der, der die Maschine am Laufen hält.',
     icon: <Briefcase className="h-5 w-5 text-blue-400" />,
   },
   {
     id: 'comandante',
-    label: 'El Comandante – Sicherheit',
-    description: 'Regelt Schutz, Gegenüberwachung und Einsatzbereitschaft.',
+    label: 'El Comandante – Seguridad',
+    description: 'Der Schatten. Die Waffe. Der Schutz.',
     icon: <Shield className="h-5 w-5 text-red-400" />,
   },
   {
-    id: 'subjefes',
-    label: 'Subjefes / Capitanes',
-    description: 'Führen Bereiche oder Regionen für die Leitung.',
-    icon: <BadgeCheck className="h-5 w-5 text-green-400" />,
+    id: 'mano-derecha',
+    label: 'El Mano Derecha – Coordinador',
+    description: 'La voz del Patrón. Koordiniert zwischen den Onces.',
+    icon: <BadgeCheck className="h-5 w-5 text-cyan-400" />,
   },
   {
     id: 'funktionsleiter-logistica',
-    label: 'Funktionsleiter Logística',
-    description: 'Plant Transporte, Lager und Nachschub.',
+    label: 'Logística – Transporte & Nachschub',
+    description: 'Die Wege des Geldes und der Ware.',
     icon: <Package className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'funktionsleiter-inteligencia',
-    label: 'Funktionsleiter Inteligencia',
-    description: 'Sammelt Informationen und steuert Aufklärung.',
+    label: 'Inteligencia – Aufklärung & Falcónes',
+    description: 'Die Augen und Ohren der Familia.',
     icon: <Eye className="h-5 w-5 text-emerald-400" />,
   },
   {
     id: 'funktionsleiter-consejero',
-    label: 'Funktionsleiter Finanzas / Consejero',
-    description: 'Überwacht Geldflüsse, Buchhaltung und legale Deckung.',
+    label: 'Consejero – Comunicación & Mediación',
+    description: 'Die Stimme zwischen den Stimmen.',
     icon: <Briefcase className="h-5 w-5 text-yellow-400" />,
   },
   {
     id: 'funktionsleiter-sicarios',
-    label: 'Funktionsleiter Sicarios',
-    description: 'Führt Einsatzkräfte für Schutz und Durchsetzung.',
+    label: 'Sicarios – Schutz & Durchsetzung',
+    description: 'Die Faust der Familia.',
     icon: <Swords className="h-5 w-5 text-rose-400" />,
   },
   {
     id: 'operative-teams',
-    label: 'Operative Teams / Soldados',
-    description: 'Setzen Aufträge im Feld um und berichten zurück.',
+    label: 'Soldados / Falcónes / Support',
+    description: 'Die Basis. Die Straße. Die Augen.',
     icon: <Users className="h-5 w-5 text-slate-300" />,
   },
 ]
@@ -748,18 +712,38 @@ export default function OrganigrammPage() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-10">
-          {organigramLevels.map((level) => (
-            <section key={level.id} className="space-y-4">
-              <div>
-                <h3 className="text-xl font-semibold text-white">{level.title}</h3>
-                {level.description && <p className="text-sm text-gray-400">{level.description}</p>}
+        <CardContent className="space-y-0">
+          {organigramLevels.map((level, levelIndex) => (
+            <section key={level.id} className="relative">
+              {/* Verbindungslinie von vorheriger Ebene */}
+              {levelIndex > 0 && (
+                <div className="flex justify-center pb-4">
+                  <div className="h-8 w-0.5 bg-gradient-to-b from-amber-500/30 to-amber-500/10"></div>
+                </div>
+              )}
+              
+              <div className="space-y-4 pb-8">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-white">{level.title}</h3>
+                  {level.description && <p className="text-sm text-gray-400">{level.description}</p>}
+                </div>
+                
+                {/* Nodes mit Flexbox für zentrale Anordnung */}
+                <div className="flex flex-wrap justify-center gap-6">
+                  {level.nodes.map((nodeId) => (
+                    <div key={nodeId} className="w-full max-w-md">
+                      <OrganigramCard nodeId={nodeId} />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {level.nodes.map((nodeId) => (
-                  <OrganigramCard key={nodeId} nodeId={nodeId} />
-                ))}
-              </div>
+              
+              {/* Verbindungslinie zur nächsten Ebene */}
+              {levelIndex < organigramLevels.length - 1 && (
+                <div className="flex justify-center">
+                  <div className="h-8 w-0.5 bg-gradient-to-b from-amber-500/10 to-amber-500/30"></div>
+                </div>
+              )}
             </section>
           ))}
         </CardContent>

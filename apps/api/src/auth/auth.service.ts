@@ -9,6 +9,7 @@ export interface JwtPayload {
   sub: string;
   username: string;
   role: Role;
+  remember?: boolean;
 }
 
 export interface TokenPair {
@@ -73,18 +74,21 @@ export class AuthService {
     return user;
   }
 
-  async generateTokens(user: User): Promise<TokenPair> {
+  async generateTokens(user: User, options?: { rememberMe?: boolean }): Promise<TokenPair> {
+    const rememberMe = options?.rememberMe ?? false;
+
     const payload: JwtPayload = {
       sub: user.id,
       username: user.username,
       role: user.role,
+      remember: rememberMe || undefined,
     };
 
     const accessToken = this.jwtService.sign(payload);
-    
+
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
+      expiresIn: rememberMe ? '365d' : this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
     });
 
     return { accessToken, refreshToken };
@@ -109,7 +113,7 @@ export class AuthService {
       });
 
       const user = await this.validateJwtPayload(payload);
-      return this.generateTokens(user);
+      return this.generateTokens(user, { rememberMe: !!payload.remember });
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
