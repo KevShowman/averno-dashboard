@@ -20,7 +20,8 @@ import {
   PackageOpen,
   CalendarCheck,
   CalendarDays,
-  Droplet
+  Droplet,
+  Hierarchy
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -53,6 +54,7 @@ const navigation = [
   { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
   { name: 'Blood List', href: '/bloodlist', icon: Droplet },
   { name: 'Sanktionen', href: '/sanctions', icon: Scale },
+  { name: 'Organisation', href: '/organigramm', icon: Hierarchy },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
   { name: 'Audit-Log', href: '/audit', icon: FileText },

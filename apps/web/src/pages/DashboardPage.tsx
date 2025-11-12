@@ -34,6 +34,7 @@ export default function DashboardPage() {
     { key: 'abmeldungen', name: 'Abmeldungen', requiresRole: null },
     { key: 'bloodlist', name: 'Blood List', requiresRole: null },
     { key: 'sanctions', name: 'Sanktionen', requiresRole: null },
+    { key: 'organigramm', name: 'Organisation', requiresRole: null },
     { key: 'user-management', name: 'Benutzerverwaltung', requiresRole: 'EL_PATRON' },
     { key: 'ticker', name: 'Live-Ticker', requiresRole: null },
     { key: 'audit', name: 'Audit-Log', requiresRole: null },

@@ -27,7 +27,7 @@ interface Role {
 }
 
 interface EnhancedPeoplePickerProps {
-  onUserSelect: (user: User) => void
+  onUserSelect: (user: User | null) => void
   onRoleUpdate?: (userId: string, allRoles: string[]) => void
   selectedUser?: User | null
   showRoleManagement?: boolean
@@ -121,7 +121,7 @@ export default function EnhancedPeoplePicker({
   }
 
   const clearSelection = () => {
-    onUserSelect(null as any)
+    onUserSelect(null)
     setSearchQuery('')
     setSearchResults([])
   }

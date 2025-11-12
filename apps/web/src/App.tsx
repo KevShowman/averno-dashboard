@@ -24,6 +24,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import IcNameModal from './components/IcNameModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { useVersionCheck } from './hooks/useVersionCheck'
+import OrganigrammPage from './pages/OrganigrammPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -184,6 +185,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <FamiliensammelnPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/organigramm" element={
+          <ProtectedRoute>
+            <Layout>
+              <OrganigrammPage />
             </Layout>
           </ProtectedRoute>
         } />
