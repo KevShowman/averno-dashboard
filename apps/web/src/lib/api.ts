@@ -195,6 +195,12 @@ export const familiensammelnApi = {
     api.patch(`/familiensammeln/participation/${participationId}/tourcount`, { tourCount }).then(res => res.data),
   removeParticipation: (participationId: string) =>
     api.delete(`/familiensammeln/participation/${participationId}`).then(res => res.data),
+  // Processor (Verarbeiter) APIs
+  getProcessors: (weekId: string) => api.get(`/familiensammeln/week/${weekId}/processors`).then(res => res.data),
+  startProcessor: (weekId: string, userId: string) =>
+    api.post(`/familiensammeln/week/${weekId}/processors`, { userId }).then(res => res.data),
+  completeProcessor: (processorId: string) =>
+    api.post(`/familiensammeln/processors/${processorId}/complete`).then(res => res.data),
 };
 
 // Organigramm API

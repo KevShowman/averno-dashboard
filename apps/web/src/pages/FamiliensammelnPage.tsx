@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle, Edit } from 'lucide-react';
+import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle, Edit, Factory, Clock, Check } from 'lucide-react';
 import { useAuthStore } from '../stores/auth';
 import { familiensammelnApi } from '../lib/api';
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker';
@@ -64,6 +64,21 @@ interface AllTimeStatistics {
   };
 }
 
+interface Processor {
+  id: string;
+  weekId: string;
+  userId: string;
+  user: User;
+  startedAt: string;
+  finishesAt: string;
+  capacity: number;
+  processingRate: number;
+  status: 'PROCESSING' | 'FINISHED' | 'COMPLETED';
+  completedAt?: string;
+  completedBy?: string;
+  completedByUser?: User;
+}
+
 export default function FamiliensammelnPage() {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -72,6 +87,7 @@ export default function FamiliensammelnPage() {
   const [showStatistics, setShowStatistics] = useState(false);
   const [showAllTimeStats, setShowAllTimeStats] = useState(false);
   const [editingParticipation, setEditingParticipation] = useState<Participation | null>(null);
+  const [showProcessorPicker, setShowProcessorPicker] = useState(false);
 
   const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR';
 
@@ -93,6 +109,14 @@ export default function FamiliensammelnPage() {
     queryKey: ['familiensammeln', 'all-time-statistics'],
     queryFn: familiensammelnApi.getAllTimeStatistics,
     enabled: showAllTimeStats,
+  });
+
+  // Query: Verarbeiter
+  const { data: processors = [] } = useQuery<Processor[]>({
+    queryKey: ['familiensammeln', 'processors', currentWeek?.id],
+    queryFn: () => familiensammelnApi.getProcessors(currentWeek!.id),
+    enabled: !!currentWeek?.id,
+    refetchInterval: 10000, // Alle 10 Sekunden aktualisieren
   });
 
   // Mutation: Teilnahme hinzufügen
@@ -136,6 +160,65 @@ export default function FamiliensammelnPage() {
       toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren der Tour-Anzahl');
     },
   });
+
+  // Mutation: Verarbeiter starten
+  const startProcessorMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string }) =>
+      familiensammelnApi.startProcessor(currentWeek!.id, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['familiensammeln', 'processors'] });
+      toast.success('Verarbeiter erfolgreich gestartet');
+      setShowProcessorPicker(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Starten des Verarbeiters');
+    },
+  });
+
+  // Mutation: Verarbeiter abschließen
+  const completeProcessorMutation = useMutation({
+    mutationFn: (processorId: string) =>
+      familiensammelnApi.completeProcessor(processorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['familiensammeln', 'processors'] });
+      toast.success('Entnahme erfolgreich bestätigt');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Bestätigen der Entnahme');
+    },
+  });
+
+  // Helper: Berechnet verbleibende Zeit bis zur Fertigstellung
+  const getRemainingTime = (finishesAt: string) => {
+    const now = new Date().getTime();
+    const finish = new Date(finishesAt).getTime();
+    const remaining = finish - now;
+
+    if (remaining <= 0) return { finished: true, text: 'Fertig!', hours: 0, minutes: 0 };
+
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+
+    return {
+      finished: false,
+      text: `${hours}h ${minutes}min`,
+      hours,
+      minutes,
+    };
+  };
+
+  // Helper: Formatiert Name
+  const getDisplayName = (user: User) => {
+    if (user.icFirstName && user.icLastName) {
+      return `${user.icFirstName} ${user.icLastName}`;
+    }
+    return user.username;
+  };
+
+  const handleStartProcessor = (selectedUser: User | null) => {
+    if (!selectedUser) return;
+    startProcessorMutation.mutate({ userId: selectedUser.id });
+  };
 
   if (isLoading) {
     return (
@@ -510,6 +593,173 @@ export default function FamiliensammelnPage() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Verarbeiter Tracking */}
+      <Card className="lasanta-card mt-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Factory className="h-5 w-5 text-gold-400" />
+              <CardTitle className="text-white">Verarbeiter-Tracking</CardTitle>
+            </div>
+            {isLeadership && (
+              <Button
+                onClick={() => setShowProcessorPicker(true)}
+                className="lasanta-button-primary"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Verarbeiter starten
+              </Button>
+            )}
+          </div>
+          <CardDescription className="text-gray-400">
+            Kapazität: 3000 Stück | Verarbeitung: 10/min → ~5 Stunden
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {processors.length === 0 ? (
+            <p className="text-gray-400 text-center py-4">Keine aktiven Verarbeiter</p>
+          ) : (
+            <div className="space-y-3">
+              {processors
+                .filter(p => p.status !== 'COMPLETED')
+                .map((processor) => {
+                  const timeInfo = getRemainingTime(processor.finishesAt);
+                  const isFinished = processor.status === 'FINISHED' || timeInfo.finished;
+
+                  return (
+                    <Card
+                      key={processor.id}
+                      className={`border ${
+                        isFinished
+                          ? 'border-green-500/50 bg-green-900/10'
+                          : 'border-gray-700 bg-gray-800/50'
+                      }`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                                isFinished ? 'bg-green-500/20' : 'bg-blue-500/20'
+                              }`}
+                            >
+                              {isFinished ? (
+                                <CheckCircle className="h-5 w-5 text-green-400" />
+                              ) : (
+                                <Clock className="h-5 w-5 text-blue-400 animate-pulse" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-medium text-white">
+                                {getDisplayName(processor.user)}
+                              </p>
+                              <p className="text-sm text-gray-400">
+                                Gestartet: {new Date(processor.startedAt).toLocaleString('de-DE', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <Badge
+                                className={
+                                  isFinished
+                                    ? 'bg-green-500/20 text-green-400 border-green-500/50'
+                                    : 'bg-blue-500/20 text-blue-400 border-blue-500/50'
+                                }
+                              >
+                                {isFinished ? (
+                                  <span className="flex items-center gap-1">
+                                    <Check className="h-3 w-3" />
+                                    Fertig
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {timeInfo.text}
+                                  </span>
+                                )}
+                              </Badge>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {processor.capacity} Stück
+                              </p>
+                            </div>
+
+                            {isLeadership && isFinished && (
+                              <Button
+                                onClick={() => completeProcessorMutation.mutate(processor.id)}
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <Check className="h-4 w-4 mr-1" />
+                                Entnahme bestätigen
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        {!isFinished && (
+                          <div className="mt-3">
+                            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-1000"
+                                style={{
+                                  width: `${Math.min(
+                                    100,
+                                    ((new Date().getTime() - new Date(processor.startedAt).getTime()) /
+                                      (new Date(processor.finishesAt).getTime() -
+                                        new Date(processor.startedAt).getTime())) *
+                                      100
+                                  )}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Processor Picker Modal */}
+      {showProcessorPicker && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Verarbeiter starten</CardTitle>
+              <CardDescription className="text-gray-400">
+                Wähle ein Mitglied aus, dessen Verarbeiter voll ist
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <EnhancedPeoplePicker
+                selectedUser={null}
+                onUserSelect={handleStartProcessor}
+                placeholder="Mitglied auswählen..."
+              />
+              <Button
+                variant="outline"
+                onClick={() => setShowProcessorPicker(false)}
+                className="w-full border-gray-600 text-gray-300"
+              >
+                Abbrechen
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
 

@@ -13,7 +13,8 @@ import { FamiliensammelnService } from './familiensammeln.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Role, User } from '@prisma/client';
 
 @Controller('familiensammeln')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -120,6 +121,41 @@ export class FamiliensammelnController {
   @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
   async removeParticipation(@Param('id') id: string) {
     return this.familiensammelnService.removeParticipation(id);
+  }
+
+  /**
+   * GET /familiensammeln/week/:weekId/processors
+   * Holt alle Verarbeiter für eine Woche
+   */
+  @Get('week/:weekId/processors')
+  async getProcessors(@Param('weekId') weekId: string) {
+    return this.familiensammelnService.getProcessors(weekId);
+  }
+
+  /**
+   * POST /familiensammeln/week/:weekId/processors
+   * Startet einen neuen Verarbeiter
+   */
+  @Post('week/:weekId/processors')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async startProcessor(
+    @Param('weekId') weekId: string,
+    @Body() body: { userId: string },
+  ) {
+    return this.familiensammelnService.startProcessor(weekId, body.userId);
+  }
+
+  /**
+   * POST /familiensammeln/processors/:id/complete
+   * Bestätigt die Entnahme eines Verarbeiters
+   */
+  @Post('processors/:id/complete')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async completeProcessor(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.familiensammelnService.completeProcessor(id, user.id);
   }
 }
 

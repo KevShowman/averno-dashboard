@@ -47,6 +47,8 @@ model User {
   abmeldungenCreated            Abmeldung[]                  @relation("abmeldung_user")
   familiensammelnParticipations FamiliensammelnParticipation[] @relation("familiensammeln_participations")
   organigrammAssignments        OrganigrammAssignment[]         @relation("organigramm_assignments")
+  processors                    FamiliensammelnProcessor[]     @relation("processor_user")
+  processorsCompleted           FamiliensammelnProcessor[]     @relation("processor_completed_by")
 
   @@map("users")
 }
@@ -493,6 +495,7 @@ model FamiliensammelnWeek {
 
   // Relations
   participations FamiliensammelnParticipation[]
+  processors     FamiliensammelnProcessor[]
 
   @@unique([weekStart])
   @@map("familiensammeln_weeks")
@@ -524,4 +527,31 @@ model OrganigrammAssignment {
 
   @@unique([roleId, userId]) // Ein User kann nur einmal pro Rolle zugewiesen werden
   @@map("organigramm_assignments")
+}
+
+// Familiensammeln Verarbeiter (Processor Tracking)
+model FamiliensammelnProcessor {
+  id            String                      @id @default(cuid())
+  weekId        String
+  week          FamiliensammelnWeek         @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                        @relation("processor_user", fields: [userId], references: [id], onDelete: Cascade)
+  startedAt     DateTime                    @default(now()) // Wann wurde der Verarbeiter gestartet
+  finishesAt    DateTime                    // Wann ist der Verarbeiter fertig (startedAt + 5 Stunden)
+  capacity      Int                         @default(3000) // Kapazität des Verarbeiters
+  processingRate Int                        @default(10) // Wie viele Stück pro Minute verarbeitet werden
+  status        ProcessorStatus             @default(PROCESSING)
+  completedAt   DateTime?                   // Wann wurde die Entnahme bestätigt
+  completedBy   String?
+  completedByUser User?                     @relation("processor_completed_by", fields: [completedBy], references: [id])
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+
+  @@map("familiensammeln_processors")
+}
+
+enum ProcessorStatus {
+  PROCESSING // Verarbeiter läuft noch
+  FINISHED   // Verarbeitung abgeschlossen, bereit zur Entnahme
+  COMPLETED  // Entnahme wurde bestätigt
 }

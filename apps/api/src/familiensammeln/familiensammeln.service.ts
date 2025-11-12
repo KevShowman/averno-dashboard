@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { Prisma, WeeklyDeliveryStatus } from '@prisma/client';
+import { Prisma, WeeklyDeliveryStatus, ProcessorStatus } from '@prisma/client';
 
 @Injectable()
 export class FamiliensammelnService {
@@ -531,6 +531,183 @@ export class FamiliensammelnService {
       leaderboard,
       totalStats,
     };
+  }
+
+  /**
+   * Startet einen neuen Verarbeiter für einen User
+   * Kapazität: 3000, Verarbeitungsrate: 10/min → 300 min = 5 Stunden
+   */
+  async startProcessor(weekId: string, userId: string) {
+    // Prüfe ob Woche existiert
+    const week = await this.prisma.familiensammelnWeek.findUnique({
+      where: { id: weekId },
+    });
+
+    if (!week) {
+      throw new NotFoundException('Woche nicht gefunden');
+    }
+
+    // Prüfe ob User bereits einen aktiven Verarbeiter hat
+    const existingProcessor = await this.prisma.familiensammelnProcessor.findFirst({
+      where: {
+        weekId,
+        userId,
+        status: {
+          in: [ProcessorStatus.PROCESSING, ProcessorStatus.FINISHED],
+        },
+      },
+    });
+
+    if (existingProcessor) {
+      throw new BadRequestException('User hat bereits einen aktiven Verarbeiter');
+    }
+
+    // Berechne Endzeit: 3000 / 10 = 300 Minuten = 5 Stunden
+    const startedAt = new Date();
+    const finishesAt = new Date(startedAt.getTime() + 5 * 60 * 60 * 1000); // +5 Stunden
+
+    // Erstelle Verarbeiter
+    const processor = await this.prisma.familiensammelnProcessor.create({
+      data: {
+        weekId,
+        userId,
+        startedAt,
+        finishesAt,
+        capacity: 3000,
+        processingRate: 10,
+        status: ProcessorStatus.PROCESSING,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    return processor;
+  }
+
+  /**
+   * Holt alle Verarbeiter für eine Woche
+   */
+  async getProcessors(weekId: string) {
+    const processors = await this.prisma.familiensammelnProcessor.findMany({
+      where: { weekId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true,
+          },
+        },
+        completedByUser: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+      orderBy: { startedAt: 'desc' },
+    });
+
+    // Auto-Update Status: Wenn finishesAt < jetzt und status PROCESSING → setze auf FINISHED
+    const now = new Date();
+    const processorPromises = processors.map(async (p) => {
+      if (p.status === ProcessorStatus.PROCESSING && p.finishesAt <= now) {
+        return this.prisma.familiensammelnProcessor.update({
+          where: { id: p.id },
+          data: { status: ProcessorStatus.FINISHED },
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+                avatarUrl: true,
+              },
+            },
+            completedByUser: {
+              select: {
+                id: true,
+                username: true,
+                icFirstName: true,
+                icLastName: true,
+              },
+            },
+          },
+        });
+      }
+      return p;
+    });
+
+    return Promise.all(processorPromises);
+  }
+
+  /**
+   * Bestätigt die Entnahme eines Verarbeiters
+   */
+  async completeProcessor(processorId: string, completedBy: string) {
+    const processor = await this.prisma.familiensammelnProcessor.findUnique({
+      where: { id: processorId },
+    });
+
+    if (!processor) {
+      throw new NotFoundException('Verarbeiter nicht gefunden');
+    }
+
+    if (processor.status === ProcessorStatus.COMPLETED) {
+      throw new BadRequestException('Verarbeiter wurde bereits abgeschlossen');
+    }
+
+    // Status auf FINISHED setzen falls noch PROCESSING
+    const now = new Date();
+    let status = processor.status;
+    if (processor.finishesAt <= now || status === ProcessorStatus.PROCESSING) {
+      status = ProcessorStatus.FINISHED;
+    }
+
+    // Update zu COMPLETED
+    const updated = await this.prisma.familiensammelnProcessor.update({
+      where: { id: processorId },
+      data: {
+        status: ProcessorStatus.COMPLETED,
+        completedAt: now,
+        completedBy,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            avatarUrl: true,
+          },
+        },
+        completedByUser: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+
+    return updated;
   }
 }
 
