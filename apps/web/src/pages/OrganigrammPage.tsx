@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
-import { Badge } from '../components/ui/badge'
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker'
 import { getDisplayName } from '../lib/utils'
 import { toast } from 'sonner'

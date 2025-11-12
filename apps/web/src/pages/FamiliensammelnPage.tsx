@@ -172,8 +172,8 @@ export default function FamiliensammelnPage() {
     participationsByDate.get(dateKey)!.push(p);
   });
 
-  const handleAddParticipation = (selectedUser: User) => {
-    if (!selectedDay || !currentWeek) return;
+  const handleAddParticipation = (selectedUser: User | null) => {
+    if (!selectedUser || !selectedDay || !currentWeek) return;
 
     addParticipationMutation.mutate({
       weekId: currentWeek.id,
