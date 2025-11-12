@@ -1,17 +1,26 @@
 import { Navigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuthStore } from '../stores/auth'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Checkbox } from '../components/ui/checkbox'
 import { Skull } from 'lucide-react'
 
 export default function LoginPage() {
   const { isAuthenticated, login, isLoading } = useAuthStore()
+  const [rememberMe, setRememberMe] = useState(true)
 
   // Don't show loading here - App.tsx already handles it
   // This prevents double loading screens and potential redirect loops
 
   if (isAuthenticated) {
     return <Navigate to="/app" replace />
+  }
+
+  const handleLogin = () => {
+    // Setze ein Cookie für die rememberMe-Präferenz, das der Backend beim Callback lesen kann
+    document.cookie = `rememberMe=${rememberMe ? 'true' : 'false'}; path=/; max-age=300; SameSite=Lax`
+    login()
   }
 
   return (
@@ -29,9 +38,9 @@ export default function LoginPage() {
               Melde dich mit Discord an, um Zugang zum Kartell-Dashboard zu erhalten.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <Button
-              onClick={() => login()}
+              onClick={handleLogin}
               className="w-full lasanta-button-primary text-lg py-6"
               size="lg"
             >
@@ -40,8 +49,22 @@ export default function LoginPage() {
               </svg>
               Mit Discord anmelden
             </Button>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
+              />
+              <label
+                htmlFor="remember"
+                className="text-sm font-medium leading-none text-gray-300 cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Eingeloggt bleiben (7 Tage)
+              </label>
+            </div>
             
-            <div className="mt-6 text-center text-sm text-gray-400">
+            <div className="text-center text-sm text-gray-400">
               <p>Nur autorisierte Kartell-Mitglieder haben Zugang.</p>
               <p className="mt-2">💀 Viva La Santa 💀</p>
             </div>

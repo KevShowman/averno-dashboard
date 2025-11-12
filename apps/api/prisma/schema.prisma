@@ -46,6 +46,7 @@ model User {
   aufstellungExclusionsCreated  AufstellungExclusion[]       @relation("aufstellung_exclusion_created_by")
   abmeldungenCreated            Abmeldung[]                  @relation("abmeldung_user")
   familiensammelnParticipations FamiliensammelnParticipation[] @relation("familiensammeln_participations")
+  organigrammAssignments        OrganigrammAssignment[]         @relation("organigramm_assignments")
 
   @@map("users")
 }
@@ -510,4 +511,17 @@ model FamiliensammelnParticipation {
 
   @@unique([weekId, userId, date]) // User kann nur 1x pro Tag teilnehmen
   @@map("familiensammeln_participations")
+}
+
+// Organigramm-Rollenzuweisungen
+model OrganigrammAssignment {
+  id        String   @id @default(cuid())
+  roleId    String // z.B. "patron", "capitan", "comandante", etc.
+  userId    String
+  user      User     @relation("organigramm_assignments", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([roleId, userId]) // Ein User kann nur einmal pro Rolle zugewiesen werden
+  @@map("organigramm_assignments")
 }

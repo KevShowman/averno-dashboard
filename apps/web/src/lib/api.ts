@@ -197,3 +197,13 @@ export const familiensammelnApi = {
     api.delete(`/familiensammeln/participation/${participationId}`).then(res => res.data),
 };
 
+// Organigramm API
+export const organigrammApi = {
+  getAssignments: () => api.get('/organigramm/assignments').then(res => res.data),
+  assignUserToRole: (data: { roleId: string; userId: string }) => 
+    api.post('/organigramm/assignments', data).then(res => res.data),
+  removeUserFromRole: (roleId: string, userId: string) => 
+    api.delete(`/organigramm/assignments/${roleId}/${userId}`),
+  removeAllAssignments: () => api.delete('/organigramm/assignments'),
+};
+

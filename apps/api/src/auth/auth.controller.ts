@@ -29,21 +29,30 @@ export class AuthController {
     const user = req.user as User;
     const tokens = await this.authService.generateTokens(user);
 
+    // Check for rememberMe cookie (set by frontend before redirect)
+    const rememberMe = req.cookies?.rememberMe === 'true';
+
     // Set HTTP-only cookies
     const isProduction = process.env.NODE_ENV === 'production';
+    const accessTokenMaxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000; // 7 days or 1 hour
+    const refreshTokenMaxAge = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
+
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: isProduction, // true for HTTPS in production
       sameSite: 'lax',
-      maxAge: 60 * 60 * 1000, // 1 hour
+      maxAge: accessTokenMaxAge,
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: isProduction, // true for HTTPS in production
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: refreshTokenMaxAge,
     });
+
+    // Clear the rememberMe cookie after use
+    res.clearCookie('rememberMe');
 
     // Log the login
     await this.auditService.log({
@@ -51,7 +60,7 @@ export class AuthController {
       action: 'USER_LOGIN',
       entity: 'User',
       entityId: user.id,
-      meta: { method: 'discord' },
+      meta: { method: 'discord', rememberMe },
     });
 
     // Redirect to frontend

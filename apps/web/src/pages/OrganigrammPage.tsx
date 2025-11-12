@@ -5,6 +5,8 @@ import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker'
 import { getDisplayName, hasRole } from '../lib/utils'
 import { useAuthStore } from '../stores/auth'
 import { toast } from 'sonner'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { organigrammApi } from '../lib/api'
 import {
   BadgeCheck,
   Briefcase,
@@ -76,8 +78,6 @@ interface OrganigramLevel {
 }
 
 type RoleAssignments = Record<string, AssignedMember[]>
-
-const LOCAL_STORAGE_KEY = 'organigram-role-assignments'
 
 const overviewSections: OverviewSection[] = [
   {
@@ -482,37 +482,52 @@ const assignmentRoles: AssignmentRole[] = [
 
 export default function OrganigrammPage() {
   const { user } = useAuthStore()
-  const [assignments, setAssignments] = useState<RoleAssignments>({})
+  const queryClient = useQueryClient()
   const [expandedNodes, setExpandedNodes] = useState<string[]>(['patron'])
-  const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
   const isElPatron = hasRole(user, 'EL_PATRON')
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
+  // Lade Zuweisungen vom Server
+  const { data: assignments = {}, isLoading: isLoadingAssignments } = useQuery<RoleAssignments>({
+    queryKey: ['organigramm-assignments'],
+    queryFn: organigrammApi.getAssignments,
+    refetchInterval: 30000, // Alle 30 Sekunden aktualisieren für andere User
+  })
 
-    try {
-      const stored = window.localStorage.getItem(LOCAL_STORAGE_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored) as RoleAssignments
-        setAssignments(parsed)
-      }
-    } catch (error) {
-      console.error('Konnte gespeicherte Zuordnungen nicht laden:', error)
-    } finally {
-      setIsLoadingAssignments(false)
-    }
-  }, [])
+  // Mutation: User einer Rolle zuweisen
+  const assignMutation = useMutation({
+    mutationFn: ({ roleId, userId }: { roleId: string; userId: string }) =>
+      organigrammApi.assignUserToRole({ roleId, userId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organigramm-assignments'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Zuweisen des Benutzers')
+    },
+  })
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (isLoadingAssignments) return
+  // Mutation: User von Rolle entfernen
+  const removeMutation = useMutation({
+    mutationFn: ({ roleId, userId }: { roleId: string; userId: string }) =>
+      organigrammApi.removeUserFromRole(roleId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organigramm-assignments'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Entfernen des Benutzers')
+    },
+  })
 
-    try {
-      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(assignments))
-    } catch (error) {
-      console.error('Konnte Zuordnungen nicht speichern:', error)
-    }
-  }, [assignments, isLoadingAssignments])
+  // Mutation: Alle Zuweisungen zurücksetzen
+  const resetAllMutation = useMutation({
+    mutationFn: organigrammApi.removeAllAssignments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organigramm-assignments'] })
+      toast.success('Alle Zuordnungen wurden zurückgesetzt.')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Zurücksetzen')
+    },
+  })
 
   const assignmentValues = useMemo(() => Object.values(assignments) as AssignedMember[][], [assignments])
 
@@ -529,55 +544,35 @@ export default function OrganigrammPage() {
   const handleAssignMember = (roleId: string, user: User | null) => {
     if (!user) return
 
-    setAssignments((prev) => {
-      const existing = prev[roleId] ?? []
-      if (existing.some((member) => member.id === user.id)) {
-        toast.info(`${getDisplayName(user)} ist dieser Rolle bereits zugeordnet.`)
-        return prev
-      }
+    const existing = assignments[roleId] ?? []
+    if (existing.some((member) => member.id === user.id)) {
+      toast.info(`${getDisplayName(user)} ist dieser Rolle bereits zugeordnet.`)
+      return
+    }
 
-      const updated: RoleAssignments = {
-        ...prev,
-        [roleId]: [
-          ...existing,
-          {
-            id: user.id,
-            displayName: getDisplayName(user),
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-          },
-        ],
+    assignMutation.mutate(
+      { roleId, userId: user.id },
+      {
+        onSuccess: () => {
+          toast.success(`${getDisplayName(user)} wurde ${treeNodes[roleId]?.label ?? 'der Rolle'} zugeordnet.`)
+        },
       }
-
-      toast.success(`${getDisplayName(user)} wurde ${treeNodes[roleId]?.label ?? 'der Rolle'} zugeordnet.`)
-      return updated
-    })
+    )
   }
 
   const handleRemoveMember = (roleId: string, memberId: string) => {
-    setAssignments((prev) => {
-      const existing = prev[roleId] ?? []
-      const updatedMembers = existing.filter((member) => member.id !== memberId)
-      return {
-        ...prev,
-        [roleId]: updatedMembers,
-      }
-    })
+    removeMutation.mutate({ roleId, userId: memberId })
   }
 
   const handleClearRoleAssignments = (roleId: string) => {
-    setAssignments((prev) => ({
-      ...prev,
-      [roleId]: [],
-    }))
+    const members = assignments[roleId] ?? []
+    members.forEach((member) => {
+      removeMutation.mutate({ roleId, userId: member.id })
+    })
   }
 
   const handleResetAllAssignments = () => {
-    setAssignments({})
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem(LOCAL_STORAGE_KEY)
-    }
-    toast.success('Alle Zuordnungen wurden zurückgesetzt.')
+    resetAllMutation.mutate()
   }
 
   const toggleNode = (nodeId: string) => {

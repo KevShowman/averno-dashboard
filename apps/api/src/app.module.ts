@@ -19,6 +19,7 @@ import { AufstellungModule } from './aufstellung/aufstellung.module';
 import { AbmeldungModule } from './abmeldung/abmeldung.module';
 import { BloodListModule } from './bloodlist/bloodlist.module';
 import { FamiliensammelnModule } from './familiensammeln/familiensammeln.module';
+import { OrganigrammModule } from './organigramm/organigramm.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -51,6 +52,7 @@ import { AppService } from './app.service';
     AbmeldungModule,
     BloodListModule,
     FamiliensammelnModule,
+    OrganigrammModule,
   ],
   controllers: [AppController],
   providers: [AppService],
