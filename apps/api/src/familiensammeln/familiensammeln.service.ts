@@ -709,5 +709,24 @@ export class FamiliensammelnService {
 
     return updated;
   }
+
+  /**
+   * Löscht einen Verarbeiter
+   */
+  async deleteProcessor(processorId: string) {
+    const processor = await this.prisma.familiensammelnProcessor.findUnique({
+      where: { id: processorId },
+    });
+
+    if (!processor) {
+      throw new NotFoundException('Verarbeiter nicht gefunden');
+    }
+
+    await this.prisma.familiensammelnProcessor.delete({
+      where: { id: processorId },
+    });
+
+    return { success: true };
+  }
 }
 

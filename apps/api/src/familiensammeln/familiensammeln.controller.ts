@@ -157,5 +157,15 @@ export class FamiliensammelnController {
   ) {
     return this.familiensammelnService.completeProcessor(id, user.id);
   }
+
+  /**
+   * DELETE /familiensammeln/processors/:id
+   * Löscht einen Verarbeiter
+   */
+  @Delete('processors/:id')
+  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  async deleteProcessor(@Param('id') id: string) {
+    return this.familiensammelnService.deleteProcessor(id);
+  }
 }
 

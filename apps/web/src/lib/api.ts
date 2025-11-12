@@ -201,6 +201,8 @@ export const familiensammelnApi = {
     api.post(`/familiensammeln/week/${weekId}/processors`, { userId }).then(res => res.data),
   completeProcessor: (processorId: string) =>
     api.post(`/familiensammeln/processors/${processorId}/complete`).then(res => res.data),
+  deleteProcessor: (processorId: string) =>
+    api.delete(`/familiensammeln/processors/${processorId}`).then(res => res.data),
 };
 
 // Organigramm API

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle, Edit, Factory, Clock, Check } from 'lucide-react';
+import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle, Edit, Factory, Clock, Check, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/auth';
 import { familiensammelnApi } from '../lib/api';
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker';
@@ -185,6 +185,19 @@ export default function FamiliensammelnPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Bestätigen der Entnahme');
+    },
+  });
+
+  // Mutation: Verarbeiter löschen
+  const deleteProcessorMutation = useMutation({
+    mutationFn: (processorId: string) =>
+      familiensammelnApi.deleteProcessor(processorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['familiensammeln', 'processors'] });
+      toast.success('Verarbeiter erfolgreich gelöscht');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Löschen des Verarbeiters');
     },
   });
 
@@ -661,14 +674,15 @@ export default function FamiliensammelnPage() {
                                 Gestartet: {new Date(processor.startedAt).toLocaleString('de-DE', {
                                   day: '2-digit',
                                   month: '2-digit',
+                                  year: 'numeric',
                                   hour: '2-digit',
                                   minute: '2-digit',
-                                })}
+                                })} Uhr
                               </p>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <div className="text-right">
                               <Badge
                                 className={
@@ -694,15 +708,31 @@ export default function FamiliensammelnPage() {
                               </p>
                             </div>
 
-                            {isLeadership && isFinished && (
-                              <Button
-                                onClick={() => completeProcessorMutation.mutate(processor.id)}
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                              >
-                                <Check className="h-4 w-4 mr-1" />
-                                Entnahme bestätigen
-                              </Button>
+                            {isLeadership && (
+                              <div className="flex gap-2">
+                                {isFinished && (
+                                  <Button
+                                    onClick={() => completeProcessorMutation.mutate(processor.id)}
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                  >
+                                    <Check className="h-4 w-4 mr-1" />
+                                    Entnahme bestätigen
+                                  </Button>
+                                )}
+                                <Button
+                                  onClick={() => {
+                                    if (confirm(`Verarbeiter von ${getDisplayName(processor.user)} wirklich löschen?`)) {
+                                      deleteProcessorMutation.mutate(processor.id);
+                                    }
+                                  }}
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-red-600 text-red-400 hover:bg-red-600/20"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             )}
                           </div>
                         </div>
