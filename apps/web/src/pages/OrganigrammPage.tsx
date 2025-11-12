@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type FC, type ReactNode } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker'
-import { getDisplayName } from '../lib/utils'
+import { getDisplayName, hasRole } from '../lib/utils'
+import { useAuthStore } from '../stores/auth'
 import { toast } from 'sonner'
 import {
   BadgeCheck,
   Briefcase,
   ChevronDown,
   ChevronUp,
-  Copy,
   Crown,
   Eye,
   Loader2,
@@ -41,7 +41,7 @@ interface OverviewSubSection {
   title: string
   description: string
   responsibilities?: string[]
-  rpActivities?: string[]
+  dailyDuties?: string[]
 }
 
 interface OverviewSection {
@@ -49,7 +49,7 @@ interface OverviewSection {
   title: string
   description: string
   responsibilities: string[]
-  rpActivities: string[]
+  dailyDuties: string[]
   subSections?: OverviewSubSection[]
 }
 
@@ -58,8 +58,7 @@ interface TreeNode {
   label: string
   summary: string
   responsibilities: string[]
-  rpActivities: string[]
-  children?: string[]
+  dailyDuties: string[]
 }
 
 interface AssignmentRole {
@@ -67,6 +66,13 @@ interface AssignmentRole {
   label: string
   description: string
   icon: ReactNode
+}
+
+interface OrganigramLevel {
+  id: string
+  title: string
+  description?: string
+  nodes: string[]
 }
 
 type RoleAssignments = Record<string, AssignedMember[]>
@@ -85,7 +91,7 @@ const overviewSections: OverviewSection[] = [
       'Delegiert operative Aufgaben an Consejo Central und Mano Derecha und kontrolliert deren Umsetzung.',
       'Überwacht Finanzen, Außenbeziehungen und das gesamte Krisenmanagement.',
     ],
-    rpActivities: [
+    dailyDuties: [
       'Strategische Briefings mit den Direktuntergebenen durchführen.',
       'Große Deals, Verträge oder Allianzen persönlich genehmigen.',
       'Disziplinarmaßnahmen und Konfliktlösungen final entscheiden.',
@@ -101,7 +107,7 @@ const overviewSections: OverviewSection[] = [
       'Koordiniert die Abteilungen und überwacht laufende Operationen.',
       'Meldet Fortschritte, Risiken und Auffälligkeiten direkt an den Patrón.',
     ],
-    rpActivities: [
+    dailyDuties: [
       'Operative Lagebesprechungen organisieren und leiten.',
       'Problemberichte sammeln und priorisiert an den Patrón weitergeben.',
       'Taktische Ad-hoc-Entscheidungen treffen, wenn Situationen eskalieren.',
@@ -116,7 +122,7 @@ const overviewSections: OverviewSection[] = [
           'Plant Transporte, Produktion und Ressourcenverteilung.',
           'Sichert den Informationsfluss zwischen operativen Teams und dem Consejo Central.',
         ],
-        rpActivities: [
+        dailyDuties: [
           'Routen, Lieferungen und Produktionsketten planen.',
           'Briefings mit Logística- und Inteligencia-Leitern durchführen.',
           'Investitions- und Finanzentscheidungen mit Consejero abstimmen.',
@@ -131,7 +137,7 @@ const overviewSections: OverviewSection[] = [
           'Überwacht rivalisierende Gruppen, Behörden und potenzielle Bedrohungen.',
           'Sichert die Einsatzbereitschaft der Sicarios und koordiniert die Falken.',
         ],
-        rpActivities: [
+        dailyDuties: [
           'Sicherheitseskorten und Gegenüberwachungen planen.',
           'Einsatzbesprechungen mit Sicario- und Falken-Teams durchführen.',
           'Gefahrenlagen auswerten und Risikoanalysen erstellen.',
@@ -149,7 +155,7 @@ const overviewSections: OverviewSection[] = [
       'Überprüft die Umsetzung und greift regulierend ein, wenn Abweichungen auftreten.',
       'Trifft in Abwesenheit des Patrón dringende Entscheidungen im Sinne der Gesamtstrategie.',
     ],
-    rpActivities: [
+    dailyDuties: [
       'Strategische Meetings moderieren und Ergebnisse dokumentieren.',
       'Konflikte zwischen Abteilungen frühzeitig schlichten.',
       'Kontrollbesuche in den einzelnen Bereichen durchführen.',
@@ -165,7 +171,7 @@ const overviewSections: OverviewSection[] = [
       'Planen Einsätze, stellen Ressourcen bereit und überwachen die Umsetzung.',
       'Berichten Status, Risiken und Ergebnisse an Capitan oder Comandante.',
     ],
-    rpActivities: [
+    dailyDuties: [
       'Einsatzbesprechungen mit Funktionsleitern führen.',
       'Lage- und Fortschrittsberichte erstellen.',
       'Teams bei komplexen Operationen vor Ort leiten.',
@@ -181,7 +187,7 @@ const overviewSections: OverviewSection[] = [
       'Übermitteln Berichte und KPIs an die nächsthöhere Ebene.',
       'Schulen und entwickeln die Teammitglieder.',
     ],
-    rpActivities: [
+    dailyDuties: [
       'Tägliche Briefings mit Teammitgliedern durchführen.',
       'Operative Checklisten und Qualitätssicherung pflegen.',
       'Zwischenfälle dokumentieren und unmittelbar melden.',
@@ -235,7 +241,7 @@ const overviewSections: OverviewSection[] = [
       'Melden Beobachtungen, Risiken und Erfolge unmittelbar zurück.',
       'Pflegen Ausrüstung und halten sich einsatzbereit.',
     ],
-    rpActivities: [
+    dailyDuties: [
       'Lieferungen und Übergaben durchführen.',
       'Gebiete observieren und Informationen sammeln.',
       'Trainings- und Vorbereitungsszenarien absolvieren.',
@@ -247,308 +253,275 @@ const treeNodes: Record<string, TreeNode> = {
   patron: {
     id: 'patron',
     label: 'Patrón / Jefe Supremo',
-    summary: 'Oberster Boss, definiert Strategie und finale Entscheidungen.',
+    summary: 'Oberstes Oberhaupt – Strategie, Vision und finale Entscheidungen.',
     responsibilities: [
-      'Strategische Zielsetzung und Gesamtführung.',
-      'Genehmigung von Allianzen und Großoperationen.',
-      'Kontrolle der Direktuntergebenen und ihrer Ergebnisse.',
+      'Legt die Marschrichtung der gesamten Organisation fest.',
+      'Entscheidet über Bündnisse, Territorien und Großoperationen.',
+      'Überprüft die Arbeit der direkten Vertrauten und lenkt bei Bedarf gegen.',
     ],
-    rpActivities: [
-      'Strategische Meetings moderieren.',
-      'Schlüsselentscheidungen persönlich absegnen.',
-      'Krisen- und Diplomatiegespräche führen.',
+    dailyDuties: [
+      'Regelmäßige Lageberichte der Führung anfordern und bewerten.',
+      'Verhandlungen mit Partnern oder Rivalen persönlich führen.',
+      'Ressourcen freigeben oder Projekte stoppen, wenn es die Lage erfordert.',
     ],
-    children: ['mano-derecha', 'consejo-central'],
   },
   'mano-derecha': {
     id: 'mano-derecha',
     label: 'El Mano Derecha',
-    summary: 'Vertrauensperson und Bindeglied zwischen Patrón und Führung.',
+    summary: 'Vertrauensperson des Patrón, hält alle Fäden zusammen.',
     responsibilities: [
-      'Kommunikation unterstützen und Befehle überwachen.',
-      'Delegation und Priorisierung von Aufgaben.',
-      'Vertretung des Patrón bei Abwesenheit.',
+      'Übersetzt Anweisungen des Patrón in klare Aufträge.',
+      'Koordiniert Termine und Informationsflüsse.',
+      'Greift ein, wenn Abteilungen aneinander vorbeiarbeiten.',
     ],
-    rpActivities: [
-      'Statusrunden moderieren.',
-      'Konflikte frühzeitig schlichten.',
-      'Kontrollbesuche koordinieren.',
+    dailyDuties: [
+      'Gespräche zwischen Patrón und Consejo vorbereiten und nachbereiten.',
+      'Frühzeitige Warnsignale aus den Bereichen aufnehmen.',
+      'Als Stimme des Patrón auftreten, wenn dieser nicht präsent ist.',
     ],
   },
   'consejo-central': {
     id: 'consejo-central',
     label: 'Consejo Central',
-    summary: 'Innerer Kreis – Capitan & Comandante setzen Strategie um.',
+    summary: 'Capitan & Comandante bilden das Herz der täglichen Steuerung.',
     responsibilities: [
-      'Operative Umsetzung der Patron-Vorgaben.',
-      'Lagebeurteilung und Priorisierung.',
-      'Direkte Rückmeldungen an die Spitze.',
+      'Setzt strategische Vorgaben in konkrete Maßnahmen um.',
+      'Priorisiert Ressourcen und Einsatzkräfte.',
+      'Hält ständigen Kontakt zu Mano Derecha und Patrón.',
     ],
-    rpActivities: [
-      'Lagebesprechungen halten.',
-      'Missionen planen und freigeben.',
-      'Risiken analysieren und kommunizieren.',
+    dailyDuties: [
+      'Lagebesprechungen leiten und Entscheidungen dokumentieren.',
+      'Unvorhergesehene Situationen sofort an den Patrón melden.',
+      'Koordination zwischen operativen und sicherheitsrelevanten Aufgaben.',
     ],
-    children: ['capitan', 'comandante', 'subjefes'],
   },
   capitan: {
     id: 'capitan',
-    label: 'El Capitan (Operationschef)',
-    summary: 'Steuert Logística, Inteligencia und Finanzkoordination.',
+    label: 'El Capitan – Operative Leitung',
+    summary: 'Lenkt alle Wirtschafts- und Informationsstränge.',
     responsibilities: [
-      'Produktions- und Transportketten planen.',
-      'Informationsfluss zwischen Funktionsleitern sichern.',
-      'Finanz- und Ressourcenplanung kontrollieren.',
+      'Verteilt Aufträge an Logística, Inteligencia und Finanzkoordination.',
+      'Sichert reibungslose Lieferketten und Geldflüsse.',
+      'Berichtet unmittelbar an den Consejo Central.',
     ],
-    rpActivities: [
-      'Transportrouten abstimmen.',
-      'Operative Briefings leiten.',
-      'Investitionen freigeben.',
+    dailyDuties: [
+      'Transportrouten absegnen und Anpassungen anordnen.',
+      'Berichte der Funktionsleiter prüfen und nachhalten.',
+      'Investitionen oder neue Projekte vorbereiten.',
     ],
-    children: ['funktionsleiter-logistica', 'funktionsleiter-inteligencia', 'funktionsleiter-consejero'],
   },
   comandante: {
     id: 'comandante',
-    label: 'El Comandante (Sicherheitschef)',
-    summary: 'Verantwortlich für Sicherheit, Sicarios und Falken.',
+    label: 'El Comandante – Sicherheit',
+    summary: 'Verantwortlich für Schutz, Gegenüberwachung und Durchsetzung.',
     responsibilities: [
-      'Schutzmaßnahmen planen und durchführen.',
-      'Bedrohungen analysieren und Gegenmaßnahmen setzen.',
-      'Sicarios anleiten und einsatzfähig halten.',
+      'Bewertet Bedrohungen und legt Gegenmaßnahmen fest.',
+      'Koordiniert Sicarios und Aufklärungseinheiten.',
+      'Garantiert Sicherheit für Operationen und Führung.',
     ],
-    rpActivities: [
-      'Sicherheitsoperationen koordinieren.',
-      'Aufklärungsdaten auswerten.',
-      'Einsatzbesprechungen führen.',
+    dailyDuties: [
+      'Sicherheitspläne mit Sicario-Führung abstimmen.',
+      'Aufklärungsberichte analysieren und Einsatzbereitschaft abfragen.',
+      'Begleitung sensibler Treffen vorbereiten.',
     ],
-    children: ['funktionsleiter-sicarios'],
   },
   subjefes: {
     id: 'subjefes',
     label: 'Subjefes / Capitanes',
-    summary: 'Bereichskommandanten übersetzen Strategie in Einsatzpläne.',
+    summary: 'Führen konkrete Bereiche oder Regionen im Auftrag der Leitung.',
     responsibilities: [
-      'Mehrere Funktionsleiter koordinieren.',
-      'Ressourcen & Personal verteilen.',
-      'Berichte an Consejo Central liefern.',
+      'Übersetzen Befehle in Einsatz- und Schichtpläne.',
+      'Halten ihre Teams arbeitsfähig und diszipliniert.',
+      'Liefern verlässliche Berichte an Capitan oder Comandante.',
     ],
-    rpActivities: [
-      'Schlüsselmissionen anleiten.',
-      'Lageberichte konsolidieren.',
-      'Schicht- und Einsatzplanung erstellen.',
+    dailyDuties: [
+      'Besprechungen mit Funktionsleitern ansetzen.',
+      'Fortschritt, Verluste oder Auffälligkeiten melden.',
+      'Bei kritischen Operationen persönlich anwesend sein.',
     ],
-    children: ['funktionsleiter-logistica', 'funktionsleiter-inteligencia', 'funktionsleiter-consejero', 'funktionsleiter-sicarios'],
   },
   'funktionsleiter-logistica': {
     id: 'funktionsleiter-logistica',
-    label: 'Logística',
-    summary: 'Transport, Lager und Schmuggelrouten.',
+    label: 'Funktionsleiter Logística',
+    summary: 'Plant Transporte, Lager und Nachschub.',
     responsibilities: [
-      'Routen und Fahrer koordinieren.',
-      'Lagerbestände überwachen.',
-      'Sichere Übergaben planen.',
+      'Koordiniert Fahrzeuge, Routen und Verstecke.',
+      'Sorgt für pünktliche Lieferungen ohne Aufsehen.',
+      'Behält Material- und Lagerbestände im Blick.',
     ],
-    rpActivities: [
-      'Lieferungen organisieren.',
-      'Risikoanalysen für Transporte erstellen.',
-      'Fahrzeug- und Materialchecks durchführen.',
+    dailyDuties: [
+      'Fahrer einteilen und Routenbriefe erstellen.',
+      'Kontrollgänge in Lagern durchführen.',
+      'Kurzfristige Ersatzrouten bereitstellen.',
     ],
-    children: ['operative-teams'],
   },
   'funktionsleiter-inteligencia': {
     id: 'funktionsleiter-inteligencia',
-    label: 'Inteligencia',
-    summary: 'Aufklärung, Überwachung, Informationsbeschaffung.',
+    label: 'Funktionsleiter Inteligencia',
+    summary: 'Sorgt für Informationen, Beobachtung und Überwachung.',
     responsibilities: [
-      'Falken und Informanten führen.',
-      'Rivalen und Behörden beobachten.',
-      'Lageberichte aufbereiten.',
+      'Führt Falken, Informanten und technische Aufklärung.',
+      'Sichtet Bewegungen von Rivalen oder Behörden.',
+      'Bereitet Lagebilder für Führungskräfte auf.',
     ],
-    rpActivities: [
-      'Observationen planen.',
-      'Daten mit Capitan teilen.',
-      'Hinweise an Einsatzteams weitergeben.',
+    dailyDuties: [
+      'Observationsteams einsatzbereit halten.',
+      'Berichte verdichten und priorisieren.',
+      'Warnungen rechtzeitig an Comandante oder Capitan geben.',
     ],
-    children: ['operative-teams'],
   },
   'funktionsleiter-consejero': {
     id: 'funktionsleiter-consejero',
-    label: 'Finanzas / Consejero',
-    summary: 'Finanzen, Buchhaltung und Deckgeschäfte.',
+    label: 'Funktionsleiter Finanzas / Consejero',
+    summary: 'Verwaltet Buchhaltung, Geldflüsse und legale Deckung.',
     responsibilities: [
-      'Geldströme und Geldwäsche überwachen.',
-      'Legale Firmen koordinieren.',
-      'Disziplin- und Personalthemen begleiten.',
+      'Hält Übersicht über Einnahmen, Ausgaben und Waschanlagen.',
+      'Pflegt Kontakte zu Anwälten, Geschäftsführern und Vermittlern.',
+      'Unterstützt bei Personal- oder Disziplinfragen.',
     ],
-    rpActivities: [
-      'Kassenprüfungen durchführen.',
-      'Investitionen planen.',
-      'Berichte für Capitan erstellen.',
+    dailyDuties: [
+      'Abrechnungen prüfen und Freigaben einholen.',
+      'Legale Unternehmen mit echten Zahlen versorgen.',
+      'Verhandlungen über Investitionen vorbereiten.',
     ],
-    children: ['operative-teams'],
   },
   'funktionsleiter-sicarios': {
     id: 'funktionsleiter-sicarios',
-    label: 'Sicarios',
-    summary: 'Bewaffnete Operationen und Schutzaufträge.',
+    label: 'Funktionsleiter Sicarios',
+    summary: 'Führt Einsatzkräfte für Schutz und Durchsetzung.',
     responsibilities: [
-      'Einsatzteams vorbereiten und entsenden.',
-      'Schutz von Personen und Assets organisieren.',
-      'Trainings und Ausrüstung koordinieren.',
+      'Stellt Einsatzteams zusammen und hält sie einsatzbereit.',
+      'Schützt Lager, Lieferungen und Führungspersonen.',
+      'Koordiniert Training und Ausrüstung.',
     ],
-    rpActivities: [
-      'Sicherheitsmissionen führen.',
-      'Einsatznachbesprechungen durchführen.',
-      'Neue Rekruten ausbilden.',
+    dailyDuties: [
+      'Schießtrainings und Einsatzübungen planen.',
+      'Begleit- und Sicherungsaufträge verteilen.',
+      'Nachbesprechungen mit Teams durchführen.',
     ],
-    children: ['operative-teams'],
   },
   'operative-teams': {
     id: 'operative-teams',
-    label: 'Operative Teams / Support',
-    summary: 'Ausführende Kräfte für Transport, Schutz und Aufklärung.',
+    label: 'Operative Teams / Soldados',
+    summary: 'Frontlinie der Organisation – führen Aufträge aus.',
     responsibilities: [
-      'Aufträge des Funktionsleiters präzise ausführen.',
-      'Ergebnisse zeitnah zurückmelden.',
-      'Einsatzbereitschaft von Ausrüstung sicherstellen.',
+      'Setzen Anweisungen der Funktionsleiter um.',
+      'Melden Beobachtungen und Ergebnisse direkt zurück.',
+      'Pflegen Material, Ausrüstung und Tarnidentitäten.',
     ],
-    rpActivities: [
-      'Operative Einsätze durchführen.',
-      'Gebiete beobachten und melden.',
-      'Teamtrainings absolvieren.',
+    dailyDuties: [
+      'Lieferfahrten, Übergaben oder Sicherungen durchführen.',
+      'Gebiete beobachten und verdächtige Bewegungen melden.',
+      'Trainings- und Vorbereitungseinheiten besuchen.',
     ],
   },
 }
+
+const organigramLevels: OrganigramLevel[] = [
+  {
+    id: 'level-1',
+    title: 'Oberste Führung',
+    nodes: ['patron'],
+  },
+  {
+    id: 'level-2',
+    title: 'Direkte Steuerung',
+    nodes: ['mano-derecha', 'consejo-central'],
+  },
+  {
+    id: 'level-3',
+    title: 'Bereichsleitung',
+    nodes: ['capitan', 'comandante', 'subjefes'],
+  },
+  {
+    id: 'level-4',
+    title: 'Funktionsbereiche',
+    nodes: ['funktionsleiter-logistica', 'funktionsleiter-inteligencia', 'funktionsleiter-consejero', 'funktionsleiter-sicarios'],
+  },
+  {
+    id: 'level-5',
+    title: 'Operative Kräfte',
+    nodes: ['operative-teams'],
+  },
+]
+
+const allNodeIds = organigramLevels.flatMap((level) => level.nodes)
 
 const assignmentRoles: AssignmentRole[] = [
   {
     id: 'patron',
     label: 'Patrón / Jefe Supremo',
-    description: 'Oberste Entscheidungsgewalt und strategische Verantwortung.',
+    description: 'Oberste Leitfigur mit finalem Entscheidungsrecht.',
     icon: <Crown className="h-5 w-5 text-amber-400" />,
   },
   {
     id: 'mano-derecha',
     label: 'El Mano Derecha',
-    description: 'Vertrauter des Patrón, Kommunikation & Kontrolle.',
+    description: 'Vertrauensperson des Patrón, hält Abläufe zusammen.',
     icon: <Shield className="h-5 w-5 text-cyan-400" />,
   },
   {
     id: 'consejo-central',
     label: 'Consejo Central',
-    description: 'Leitungsebene: Capitan & Comandante.',
+    description: 'Capitan & Comandante koordinieren tägliche Steuerung.',
     icon: <Users className="h-5 w-5 text-purple-400" />,
   },
   {
     id: 'capitan',
-    label: 'El Capitan (Operationschef)',
-    description: 'Operatives Management von Produktion und Logistik.',
+    label: 'El Capitan – Operative Leitung',
+    description: 'Lenkt Produktion, Transport und Informationsstränge.',
     icon: <Briefcase className="h-5 w-5 text-blue-400" />,
   },
   {
     id: 'comandante',
-    label: 'El Comandante (Sicherheitschef)',
-    description: 'Sicherheit, Sicarios, Gegenüberwachung.',
+    label: 'El Comandante – Sicherheit',
+    description: 'Regelt Schutz, Gegenüberwachung und Einsatzbereitschaft.',
     icon: <Shield className="h-5 w-5 text-red-400" />,
   },
   {
     id: 'subjefes',
-    label: 'Subjefes / Bereichskommandanten',
-    description: 'Koordination größerer Bereiche und Teams.',
+    label: 'Subjefes / Capitanes',
+    description: 'Führen Bereiche oder Regionen für die Leitung.',
     icon: <BadgeCheck className="h-5 w-5 text-green-400" />,
   },
   {
     id: 'funktionsleiter-logistica',
     label: 'Funktionsleiter Logística',
-    description: 'Transport, Lagerung und sichere Routen.',
+    description: 'Plant Transporte, Lager und Nachschub.',
     icon: <Package className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'funktionsleiter-inteligencia',
     label: 'Funktionsleiter Inteligencia',
-    description: 'Aufklärung, Überwachung, Informationsnetzwerk.',
+    description: 'Sammelt Informationen und steuert Aufklärung.',
     icon: <Eye className="h-5 w-5 text-emerald-400" />,
   },
   {
     id: 'funktionsleiter-consejero',
     label: 'Funktionsleiter Finanzas / Consejero',
-    description: 'Finanzen, Buchhaltung, legale Deckgeschäfte.',
+    description: 'Überwacht Geldflüsse, Buchhaltung und legale Deckung.',
     icon: <Briefcase className="h-5 w-5 text-yellow-400" />,
   },
   {
     id: 'funktionsleiter-sicarios',
     label: 'Funktionsleiter Sicarios',
-    description: 'Einsatzplanung, Schutz, Durchsetzung.',
+    description: 'Führt Einsatzkräfte für Schutz und Durchsetzung.',
     icon: <Swords className="h-5 w-5 text-rose-400" />,
   },
   {
     id: 'operative-teams',
-    label: 'Operative Teams / Support',
-    description: 'Ausführende Kräfte – Soldados, Falken, Support.',
+    label: 'Operative Teams / Soldados',
+    description: 'Setzen Aufträge im Feld um und berichten zurück.',
     icon: <Users className="h-5 w-5 text-slate-300" />,
   },
 ]
 
-const organigramPrompt = {
-  task: 'Create RP-Kartell Organigramm Page',
-  description:
-    'Erstelle eine neue Seite für unsere GTA RP Kartell-Webseite. Die Seite soll das Organigramm der Kartellleitung darstellen und alle Rollen sowie deren Verantwortlichkeiten beschreiben. Die Seite soll auch eine interaktive People-Picker Funktion enthalten, um Mitglieder den entsprechenden Rollen zuzuordnen.',
-  requirements: {
-    structure: [
-      {
-        role: 'Patrón / Jefe Supremo',
-        description:
-          'Oberster Boss, trifft strategische Entscheidungen, gibt Ziele vor, kommuniziert nur mit Direktuntergebenen.',
-        people_picker: true,
-      },
-      {
-        role: 'Consejo Central',
-        description:
-          'Besteht aus El Capitan (Operations) und El Comandante (Sicherheit). Setzen strategische Befehle um und berichten an Patrón.',
-        people_picker: true,
-      },
-      {
-        role: 'El Mano Derecha',
-        description:
-          'Vertrauter des Patrón. Koordiniert Kommunikation und überprüft Befehlsumsetzung.',
-        people_picker: true,
-      },
-      {
-        role: 'Funktionsleiter',
-        description:
-          'Leiten Teams in Logística, Inteligencia, Sicarios, Finanzas. Berichten an den zuständigen Subjefe.',
-        people_picker: true,
-      },
-      {
-        role: 'Operative Teams / Support',
-        description:
-          'Führen Aufgaben aus, melden sich bei ihren Funktionsleitern.',
-        people_picker: true,
-      },
-    ],
-    visuals: {
-      organigram_type: 'tree',
-      hierarchy: 'Patrón → Consejo Central → Subjefes → Funktionsleiter → Operative',
-      style: 'klar, übersichtlich, RP-tauglich',
-      expand_collapse_nodes: true,
-    },
-    interaction: {
-      people_picker: {
-        assign_roles: true,
-        add_remove_members: true,
-        save_assignments: true,
-      },
-    },
-    output_format: 'HTML + CSS + JS',
-  },
-  notes:
-    'Die Seite soll intuitiv sein, sodass neue Mitglieder ihre Rolle erkennen und direkt zugeordnet werden können. Organigramm sollte optisch hierarchisch sein, erweiterbar und collapse-fähig.',
-} as const
-
 export default function OrganigrammPage() {
+  const { user } = useAuthStore()
   const [assignments, setAssignments] = useState<RoleAssignments>({})
-  const [expandedNodes, setExpandedNodes] = useState<string[]>(['patron', 'consejo-central', 'capitan', 'comandante'])
+  const [expandedNodes, setExpandedNodes] = useState<string[]>(['patron'])
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
+  const isElPatron = hasRole(user, 'EL_PATRON')
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -650,26 +623,16 @@ export default function OrganigrammPage() {
   }
 
   const expandAllNodes = () => {
-    setExpandedNodes(Object.keys(treeNodes))
+    setExpandedNodes(allNodeIds)
   }
 
   const collapseAllNodes = () => {
     setExpandedNodes([])
   }
 
-  const handleCopyPrompt = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(organigramPrompt, null, 2))
-      toast.success('Prompt wurde in die Zwischenablage kopiert.')
-    } catch (error) {
-      console.error(error)
-      toast.error('Kopieren nicht möglich. Bitte manuell markieren.')
-    }
-  }
-
   const assignmentsAreLoading = isLoadingAssignments
 
-  const OrganigramNode = ({ nodeId }: { nodeId: string }) => {
+  const OrganigramCard: FC<{ nodeId: string }> = ({ nodeId }) => {
     const node = treeNodes[nodeId]
     if (!node) return null
 
@@ -677,75 +640,57 @@ export default function OrganigrammPage() {
     const isExpanded = expandedNodes.includes(nodeId)
 
     return (
-      <div className="flex flex-col items-center">
-        <div className="relative w-full max-w-xs">
-          <div className="rounded-2xl border border-gray-700 bg-gray-800/70 p-4 shadow-lg backdrop-blur-sm">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="text-lg font-semibold text-white">{node.label}</h3>
-                <p className="mt-1 text-sm text-gray-400">{node.summary}</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => toggleNode(nodeId)}
-                className="text-gray-400 hover:text-white"
-                aria-label={isExpanded ? 'Details einklappen' : 'Details ausklappen'}
-              >
-                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </div>
-
-            <div className="mt-3">
-              {assignedMembers.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {assignedMembers.map((member) => (
-                    <span
-                      key={member.id}
-                      className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
-                    >
-                      {member.displayName}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs italic text-gray-500">Noch keine Mitglieder zugeordnet</p>
-              )}
-            </div>
-
-            {isExpanded && (
-              <div className="mt-4 space-y-3 text-left">
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-200">Verantwortlichkeiten</h4>
-                  <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
-                    {node.responsibilities.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-200">Typische RP-Aktivitäten</h4>
-                  <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
-                    {node.rpActivities.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
+      <div className="relative flex w-full max-w-sm flex-col rounded-2xl border border-gray-700 bg-gray-800/70 p-5 shadow-lg backdrop-blur-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-white">{node.label}</h3>
+            <p className="mt-1 text-sm text-gray-400">{node.summary}</p>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => toggleNode(nodeId)}
+            className="text-gray-400 hover:text-white"
+            aria-label={isExpanded ? 'Details einklappen' : 'Details ausklappen'}
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </div>
 
-        {node.children && node.children.length > 0 && (
-          <div className="mt-6 flex w-full flex-col items-center">
-            <div className="h-6 w-0.5 bg-gray-700" />
-            <div className="mt-6 flex flex-wrap justify-center gap-6">
-              {node.children.map((childId) => (
-                <div key={childId} className="flex flex-col items-center">
-                  <div className="mb-4 h-6 w-0.5 bg-gray-700" />
-                  <OrganigramNode nodeId={childId} />
-                </div>
+        <div className="mt-3">
+          {assignedMembers.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {assignedMembers.map((member) => (
+                <span
+                  key={member.id}
+                  className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
+                >
+                  {member.displayName}
+                </span>
               ))}
+            </div>
+          ) : (
+            <p className="text-xs italic text-gray-500">Noch keine Mitglieder zugeordnet</p>
+          )}
+        </div>
+
+        {isExpanded && (
+          <div className="mt-4 space-y-3 text-left">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-200">Verantwortlichkeiten</h4>
+              <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
+                {node.responsibilities.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-gray-200">Alltägliche Aufgaben</h4>
+              <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
+                {node.dailyDuties.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
             </div>
           </div>
         )}
@@ -788,138 +733,131 @@ export default function OrganigrammPage() {
           <div>
             <CardTitle className="flex items-center gap-2 text-white">
               <Users className="h-5 w-5" />
-              Interaktives Organigramm
+              Organigramm der Führung
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Hierarchie von Patrón bis Operative mit ein- und ausklappbaren Details.
+              Alle Ebenen von Patrón bis hin zu den operativen Kräften. Details lassen sich für jede Rolle einzeln öffnen.
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={expandAllNodes}>
-              Alles ausklappen
+              Alles öffnen
             </Button>
             <Button variant="outline" size="sm" onClick={collapseAllNodes}>
-              Alles einklappen
+              Alles schließen
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center">
-            <OrganigramNode nodeId="patron" />
-          </div>
+        <CardContent className="space-y-10">
+          {organigramLevels.map((level) => (
+            <section key={level.id} className="space-y-4">
+              <div>
+                <h3 className="text-xl font-semibold text-white">{level.title}</h3>
+                {level.description && <p className="text-sm text-gray-400">{level.description}</p>}
+              </div>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {level.nodes.map((nodeId) => (
+                  <OrganigramCard key={nodeId} nodeId={nodeId} />
+                ))}
+              </div>
+            </section>
+          ))}
         </CardContent>
       </Card>
 
-      <Card className="lasanta-card">
-        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Users className="h-5 w-5" />
-              Rollen zuweisen
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Nutze den People Picker, um Mitglieder den jeweiligen Rollen zuzuordnen. Änderungen werden automatisch lokal gespeichert.
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleResetAllAssignments}>
-              Alle Zuordnungen zurücksetzen
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {assignmentsAreLoading ? (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Lade gespeicherte Zuordnungen...
+      {isElPatron && (
+        <Card className="lasanta-card">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Users className="h-5 w-5" />
+                Rollen zuweisen
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Nutze den People Picker, um Mitglieder den jeweiligen Rollen zuzuordnen. Änderungen werden automatisch lokal gespeichert.
+              </CardDescription>
             </div>
-          ) : (
-            assignmentRoles.map((role) => {
-              const assignedMembers = assignments[role.id] ?? []
-              return (
-                <Card key={role.id} className="border border-gray-700 bg-gray-900/60">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-white">
-                      {role.icon}
-                      {role.label}
-                    </CardTitle>
-                    <CardDescription className="text-gray-400">{role.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <EnhancedPeoplePicker
-                      onUserSelect={(user) => handleAssignMember(role.id, user)}
-                      selectedUser={null}
-                      placeholder={`${role.label}: Mitglied suchen...`}
-                      className="max-w-xl"
-                    />
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleResetAllAssignments}>
+                Alle Zuordnungen zurücksetzen
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {assignmentsAreLoading ? (
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Lade gespeicherte Zuordnungen...
+              </div>
+            ) : (
+              assignmentRoles.map((role) => {
+                const assignedMembers = assignments[role.id] ?? []
+                return (
+                  <Card key={role.id} className="border border-gray-700 bg-gray-900/60">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-white">
+                        {role.icon}
+                        {role.label}
+                      </CardTitle>
+                      <CardDescription className="text-gray-400">{role.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <EnhancedPeoplePicker
+                        onUserSelect={(user) => handleAssignMember(role.id, user)}
+                        selectedUser={null}
+                        placeholder={`${role.label}: Mitglied suchen...`}
+                        className="max-w-xl"
+                      />
 
-                    {assignedMembers.length > 0 ? (
-                      <div className="space-y-3">
-                        <div className="flex flex-wrap gap-3">
-                          {assignedMembers.map((member) => (
-                            <div
-                              key={member.id}
-                              className="group flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm text-primary"
-                            >
-                              <span>{member.displayName}</span>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleRemoveMember(role.id, member.id)}
-                                className="h-6 w-6 text-primary hover:text-white"
-                                aria-label={`${member.displayName} von ${role.label} entfernen`}
+                      {assignedMembers.length > 0 ? (
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap gap-3">
+                            {assignedMembers.map((member) => (
+                              <div
+                                key={member.id}
+                                className="group flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm text-primary"
                               >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
+                                <span>{member.displayName}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleRemoveMember(role.id, member.id)}
+                                  className="h-6 w-6 text-primary hover:text-white"
+                                  aria-label={`${member.displayName} von ${role.label} entfernen`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleClearRoleAssignments(role.id)}
+                              disabled={assignedMembers.length === 0}
+                            >
+                              Rolle leeren
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleClearRoleAssignments(role.id)}
-                            disabled={assignedMembers.length === 0}
-                          >
-                            Rolle leeren
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-gray-500">Noch keine Mitglieder zugewiesen.</p>
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            })
-          )}
-        </CardContent>
-      </Card>
-
-      <Card className="lasanta-card">
-        <CardHeader>
-          <CardTitle className="text-white">Prompt für Coding-Agent</CardTitle>
-          <CardDescription className="text-gray-400">
-            Nutze diesen Prompt, um automatisiert eine Seite wie diese generieren zu lassen.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleCopyPrompt} className="flex items-center gap-2">
-              <Copy className="h-4 w-4" /> Prompt kopieren
-            </Button>
-          </div>
-          <pre className="max-h-[400px] overflow-auto rounded-xl bg-gray-900 p-4 text-xs text-gray-200">
-            {JSON.stringify(organigramPrompt, null, 2)}
-          </pre>
-        </CardContent>
-      </Card>
+                      ) : (
+                        <p className="text-xs text-gray-500">Noch keine Mitglieder zugewiesen.</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                )
+              })
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="lasanta-card">
         <CardHeader>
           <CardTitle className="text-white">Ausführliche Rollenbeschreibungen</CardTitle>
           <CardDescription className="text-gray-400">
-            Vollständige Übersicht für alle Mitglieder mit Verantwortlichkeiten und RP-Aktivitäten.
+            Vollständige Übersicht für alle Mitglieder mit Verantwortlichkeiten und alltäglichen Aufgaben.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
@@ -940,9 +878,9 @@ export default function OrganigrammPage() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Typische RP-Aktivitäten</h3>
+                  <h3 className="text-lg font-semibold text-white">Alltägliche Aufgaben</h3>
                   <ul className="mt-2 space-y-2 text-sm text-gray-300 list-disc list-inside">
-                    {section.rpActivities.map((item, index) => (
+                    {section.dailyDuties.map((item, index) => (
                       <li key={index}>{item}</li>
                     ))}
                   </ul>
@@ -965,11 +903,11 @@ export default function OrganigrammPage() {
                           </ul>
                         </div>
                       )}
-                      {sub.rpActivities && (
+                      {sub.dailyDuties && (
                         <div className="mt-3">
-                          <h5 className="text-sm font-semibold text-gray-200">RP-Aktivitäten</h5>
+                          <h5 className="text-sm font-semibold text-gray-200">Alltägliche Aufgaben</h5>
                           <ul className="mt-2 space-y-2 text-sm text-gray-300 list-disc list-inside">
-                            {sub.rpActivities.map((item, subIndex) => (
+                            {sub.dailyDuties.map((item, subIndex) => (
                               <li key={subIndex}>{item}</li>
                             ))}
                           </ul>
