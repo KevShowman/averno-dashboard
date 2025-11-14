@@ -21,7 +21,8 @@ import {
   CalendarCheck,
   CalendarDays,
   Droplet,
-  Network
+  Network,
+  Shirt
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -32,12 +33,21 @@ interface LayoutProps {
 
 const getRoleDisplayName = (role: string) => {
   switch (role) {
-    case 'EL_PATRON': return 'El Patron'
-    case 'DON': return 'Don'
-    case 'ASESOR': return 'Asesor'
-    case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
-    case 'LOGISTICA': return 'Logistica'
+    case 'EL_PATRON': return 'El Patrón'
+    case 'DON_CAPITAN': return 'Don Capitán'
+    case 'DON_COMANDANTE': return 'Don Comandante'
+    case 'EL_MANO_DERECHA': return 'Mano Derecha'
+    case 'EL_CUSTODIO': return 'El Custodio'
+    case 'EL_MENTOR': return 'El Mentor'
+    case 'EL_ENCARGADO': return 'El Encargado'
+    case 'EL_TENIENTE': return 'El Teniente'
     case 'SOLDADO': return 'Soldado'
+    case 'EL_PREFECTO': return 'El Prefecto'
+    case 'EL_CONFIDENTE': return 'El Confidente'
+    case 'EL_PROTECTOR': return 'El Protector'
+    case 'EL_NOVATO': return 'El Novato'
+    case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
+    case 'LOGISTICA': return 'Logística'
     case 'FUTURO': return 'Futuro'
     default: return role
   }
@@ -55,6 +65,8 @@ const navigation = [
   { name: 'Blood List', href: '/bloodlist', icon: Droplet },
   { name: 'Sanktionen', href: '/sanctions', icon: Scale },
   { name: 'Organisation', href: '/organigramm', icon: Network },
+  { name: 'Meine Kleidung', href: '/clothing', icon: Shirt },
+  { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
   { name: 'Audit-Log', href: '/audit', icon: FileText },
@@ -99,6 +111,11 @@ export default function Layout({ children }: LayoutProps) {
               if (item.name === 'Benutzerverwaltung' && !hasRole(user, 'EL_PATRON')) {
                 return null
               }
+              
+              // Kleidungsverwaltung nur für Leadership
+              if (item.leadershipOnly && !hasRole(user, 'EL_PATRON') && !hasRole(user, 'DON_CAPITAN') && !hasRole(user, 'DON_COMANDANTE') && !hasRole(user, 'EL_MANO_DERECHA')) {
+                return null
+              }
 
               const isActive = location.pathname === item.href
               return (
@@ -134,6 +151,11 @@ export default function Layout({ children }: LayoutProps) {
           {navigation.map((item) => {
             // Benutzerverwaltung nur für El Patron
             if (item.name === 'Benutzerverwaltung' && !hasRole(user, 'EL_PATRON')) {
+              return null
+            }
+            
+            // Kleidungsverwaltung nur für Leadership
+            if (item.leadershipOnly && !hasRole(user, 'EL_PATRON') && !hasRole(user, 'DON_CAPITAN') && !hasRole(user, 'DON_COMANDANTE') && !hasRole(user, 'EL_MANO_DERECHA')) {
               return null
             }
 

@@ -215,3 +215,12 @@ export const organigrammApi = {
   removeAllAssignments: () => api.delete('/organigramm/assignments'),
 };
 
+// Clothing API
+export const clothingApi = {
+  getAllTemplates: () => api.get('/clothing/templates').then(res => res.data),
+  getTemplate: (rankGroup: string) => api.get(`/clothing/templates/${rankGroup}`).then(res => res.data),
+  saveTemplate: (rankGroup: string, data: any) => api.post(`/clothing/templates/${rankGroup}`, data).then(res => res.data),
+  getMyClothing: () => api.get('/clothing/my-clothing').then(res => res.data),
+  saveMyClothing: (data: any) => api.put('/clothing/my-clothing', data).then(res => res.data),
+};
+

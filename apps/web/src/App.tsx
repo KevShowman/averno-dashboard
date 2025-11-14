@@ -25,6 +25,8 @@ import IcNameModal from './components/IcNameModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { useVersionCheck } from './hooks/useVersionCheck'
 import OrganigrammPage from './pages/OrganigrammPage'
+import ClothingManagementPage from './pages/ClothingManagementPage'
+import ClothingPage from './pages/ClothingPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -192,6 +194,20 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <OrganigrammPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/clothing-management" element={
+          <ProtectedRoute>
+            <Layout>
+              <ClothingManagementPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/clothing" element={
+          <ProtectedRoute>
+            <Layout>
+              <ClothingPage />
             </Layout>
           </ProtectedRoute>
         } />

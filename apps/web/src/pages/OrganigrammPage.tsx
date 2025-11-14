@@ -233,19 +233,51 @@ const overviewSections: OverviewSection[] = [
     ],
   },
   {
-    id: 'soldados',
-    title: '🐍 Soldados / Falcónes / Support',
+    id: 'ranks-7-9',
+    title: '🔹 Ränge 7-9: Oberste Soldaten',
     description:
-      'Die Basis. Die Straße. Die Augen. Sie führen Aufträge aus, melden Bewegungen – trabajo constante.',
+      'El Custodio, El Mentor, El Encargado – die erfahrensten und vertrauenswürdigsten Soldaten.',
     responsibilities: [
-      'Führen Aufträge aus, melden Bewegungen.',
-      'Beobachten Gebiete, liefern Infos an Inteligencia.',
-      'Halten Material und Tarnung sauber.',
+      'Führen kleinere Teams und mentorieren neue Mitglieder.',
+      'Überwachen kritische Operationen und Transporte.',
+      'Vertreten die Familia mit Autorität und Respekt.',
     ],
     dailyDuties: [
-      'Lieferungen, Überwachungen, Übergaben.',
-      'Trabajo constante – immer bereit.',
-      'Augen offen, Ohren gespitzt, Mund zu.',
+      'Koordinieren Einsätze, führen Trainings.',
+      'Verantworten Sicherheit und Ausführung.',
+      'Melden direkt an die Funciones.',
+    ],
+  },
+  {
+    id: 'ranks-4-6',
+    title: '🔸 Ränge 4-6: Bewährte Soldaten',
+    description:
+      'El Teniente, Soldado, El Prefecto – das Rückgrat der operativen Arbeit.',
+    responsibilities: [
+      'Führen Aufträge selbstständig aus.',
+      'Unterstützen höhere Ränge bei komplexen Operationen.',
+      'Sammeln Informationen und sichern Gebiete.',
+    ],
+    dailyDuties: [
+      'Lieferungen, Übergaben, Sicherungen.',
+      'Beobachten Gebiete, melden Auffälligkeiten.',
+      'Trabajo constante – zuverlässig und präsent.',
+    ],
+  },
+  {
+    id: 'ranks-1-3',
+    title: '🔻 Ränge 1-3: Neue Gesichter',
+    description:
+      'El Novato, El Protector, El Confidente – der Einstieg in die Familia.',
+    responsibilities: [
+      'Lernen die Abläufe und Strukturen kennen.',
+      'Unterstützen erfahrene Mitglieder bei einfachen Aufgaben.',
+      'Beweisen Loyalität und Zuverlässigkeit.',
+    ],
+    dailyDuties: [
+      'Einfache Transporte und Botengänge.',
+      'Beobachtungen und kleine Aufträge.',
+      'Augen offen, lernen, wachsen.',
     ],
   },
 ]
@@ -371,19 +403,49 @@ const treeNodes: Record<string, TreeNode> = {
       'Neue Leute ausbilden, alte scharf halten.',
     ],
   },
-  'operative-teams': {
-    id: 'operative-teams',
-    label: 'Soldados / Falcónes / Support',
-    summary: 'Die Basis. Die Straße. Die Augen.',
+  'ranks-7-9': {
+    id: 'ranks-7-9',
+    label: 'Ränge 7-9: El Custodio, El Mentor, El Encargado',
+    summary: 'Die obersten Soldaten – erfahren, vertrauenswürdig, führend.',
     responsibilities: [
-      'Führen Aufträge aus, melden Bewegungen.',
-      'Beobachten Gebiete, liefern Infos an Inteligencia.',
-      'Halten Material und Tarnung sauber.',
+      'Führen kleinere Teams und mentorieren neue Mitglieder.',
+      'Überwachen kritische Operationen und Transporte.',
+      'Vertreten die Familia mit Autorität und Respekt.',
     ],
     dailyDuties: [
-      'Lieferungen, Überwachungen, Übergaben.',
-      'Trabajo constante – immer bereit.',
-      'Augen offen, Ohren gespitzt, Mund zu.',
+      'Koordinieren Einsätze, führen Trainings.',
+      'Verantworten Sicherheit und Ausführung.',
+      'Melden direkt an die Funciones.',
+    ],
+  },
+  'ranks-4-6': {
+    id: 'ranks-4-6',
+    label: 'Ränge 4-6: El Teniente, Soldado, El Prefecto',
+    summary: 'Das Rückgrat – bewährt, zuverlässig, immer im Einsatz.',
+    responsibilities: [
+      'Führen Aufträge selbstständig aus.',
+      'Unterstützen höhere Ränge bei komplexen Operationen.',
+      'Sammeln Informationen und sichern Gebiete.',
+    ],
+    dailyDuties: [
+      'Lieferungen, Übergaben, Sicherungen.',
+      'Beobachten Gebiete, melden Auffälligkeiten.',
+      'Trabajo constante – zuverlässig und präsent.',
+    ],
+  },
+  'ranks-1-3': {
+    id: 'ranks-1-3',
+    label: 'Ränge 1-3: El Novato, El Protector, El Confidente',
+    summary: 'Der Einstieg – lernen, beweisen, wachsen.',
+    responsibilities: [
+      'Lernen die Abläufe und Strukturen kennen.',
+      'Unterstützen erfahrene Mitglieder bei einfachen Aufgaben.',
+      'Beweisen Loyalität und Zuverlässigkeit.',
+    ],
+    dailyDuties: [
+      'Einfache Transporte und Botengänge.',
+      'Beobachtungen und kleine Aufträge.',
+      'Augen offen, lernen, wachsen.',
     ],
   },
 }
@@ -415,9 +477,21 @@ const organigramLevels: OrganigramLevel[] = [
   },
   {
     id: 'level-5',
-    title: '🐍 La Base – Soldados & Falcónes',
-    description: 'Die Front, die alles ausführt.',
-    nodes: ['operative-teams'],
+    title: '🔹 Ränge 7-9 – Oberste Soldaten',
+    description: 'El Custodio, El Mentor, El Encargado – die erfahrensten Kämpfer.',
+    nodes: ['ranks-7-9'],
+  },
+  {
+    id: 'level-6',
+    title: '🔸 Ränge 4-6 – Bewährte Soldaten',
+    description: 'El Teniente, Soldado, El Prefecto – das operative Rückgrat.',
+    nodes: ['ranks-4-6'],
+  },
+  {
+    id: 'level-7',
+    title: '🔻 Ränge 1-3 – Neue Gesichter',
+    description: 'El Novato, El Protector, El Confidente – der Einstieg.',
+    nodes: ['ranks-1-3'],
   },
 ]
 
@@ -473,10 +547,22 @@ const assignmentRoles: AssignmentRole[] = [
     icon: <Swords className="h-5 w-5 text-rose-400" />,
   },
   {
-    id: 'operative-teams',
-    label: 'Soldados / Falcónes / Support',
-    description: 'Die Basis. Die Straße. Die Augen.',
-    icon: <Users className="h-5 w-5 text-slate-300" />,
+    id: 'ranks-7-9',
+    label: 'Ränge 7-9: Oberste Soldaten',
+    description: 'El Custodio, El Mentor, El Encargado',
+    icon: <Users className="h-5 w-5 text-purple-400" />,
+  },
+  {
+    id: 'ranks-4-6',
+    label: 'Ränge 4-6: Bewährte Soldaten',
+    description: 'El Teniente, Soldado, El Prefecto',
+    icon: <Users className="h-5 w-5 text-indigo-400" />,
+  },
+  {
+    id: 'ranks-1-3',
+    label: 'Ränge 1-3: Neue Gesichter',
+    description: 'El Novato, El Protector, El Confidente',
+    icon: <Users className="h-5 w-5 text-slate-400" />,
   },
 ]
 
