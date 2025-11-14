@@ -103,7 +103,7 @@ export class ClothingController {
    */
   @Get('my-clothing')
   async getMyClothing(@Request() req): Promise<any> {
-    return this.clothingService.getUserClothingFlat(req.user.userId);
+    return this.clothingService.getUserClothingFlat(req.user.id);
   }
 
   /**
@@ -121,7 +121,7 @@ export class ClothingController {
     // Nur Leaderschaft darf andere User anschauen
     if (!this.clothingService.isLeadership(req.user.role)) {
       // Normale User dürfen nur ihre eigene Kleidung sehen
-      if (userId !== req.user.userId) {
+      if (userId !== req.user.id) {
         throw new Error('Keine Berechtigung');
       }
     }
@@ -158,10 +158,10 @@ export class ClothingController {
         : undefined,
     };
     
-    await this.clothingService.updateUserClothing(req.user.userId, structuredData);
+    await this.clothingService.updateUserClothing(req.user.id, structuredData);
     
     // Gib die aktualisierten Daten im flachen Format zurück
-    return this.clothingService.getUserClothingFlat(req.user.userId);
+    return this.clothingService.getUserClothingFlat(req.user.id);
   }
 }
 
