@@ -91,7 +91,7 @@ export class UsersController {
 
   // User löschen (nur El Patron und Don als Fallback)
   @Delete(':id')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   @UseGuards(RolesGuard)
   async deleteUser(
     @Param('id') userId: string,

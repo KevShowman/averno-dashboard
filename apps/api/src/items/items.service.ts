@@ -209,8 +209,8 @@ export class ItemsService {
     // Prüfe ob User El Patron oder Don ist (für gesperrte Items)
     // JSON zu Array casten (MySQL verwendet Json statt native Arrays)
     const allRoles = Array.isArray(user.allRoles) ? user.allRoles as Role[] : [];
-    const isElPatronOrDon = user.role === Role.EL_PATRON || user.role === Role.DON ||
-                           (allRoles.includes(Role.EL_PATRON) || allRoles.includes(Role.DON));
+    const isElPatronOrDon = user.role === Role.EL_PATRON || user.role === Role.DON_CAPITAN || user.role === Role.DON_COMANDANTE ||
+                           (allRoles.includes(Role.EL_PATRON) || allRoles.includes(Role.DON_CAPITAN) || allRoles.includes(Role.DON_COMANDANTE));
 
     if (item.isLocked && !isElPatronOrDon) {
       throw new BadRequestException('Item is locked');
@@ -257,8 +257,8 @@ export class ItemsService {
     // El Patron, Don und Logistica können direkt ausführen
     // JSON zu Array casten (MySQL verwendet Json statt native Arrays)
     const userAllRoles = Array.isArray(user.allRoles) ? user.allRoles as Role[] : [];
-    const isLeadership = user.role === Role.EL_PATRON || user.role === Role.DON || user.role === Role.LOGISTICA ||
-                        (userAllRoles.includes(Role.EL_PATRON) || userAllRoles.includes(Role.DON) || userAllRoles.includes(Role.LOGISTICA));
+    const isLeadership = user.role === Role.EL_PATRON || user.role === Role.DON_CAPITAN || user.role === Role.DON_COMANDANTE || user.role === Role.LOGISTICA ||
+                        (userAllRoles.includes(Role.EL_PATRON) || userAllRoles.includes(Role.DON_CAPITAN) || userAllRoles.includes(Role.DON_COMANDANTE) || userAllRoles.includes(Role.LOGISTICA));
     
     const needsApproval = !isLeadership;
 
@@ -413,7 +413,7 @@ export class ItemsService {
             note: count.note || `Inventory count adjustment: ${difference > 0 ? '+' : ''}${difference}`,
           },
           userId,
-          Role.DON, // Assume inventory can be done by Don or higher
+          Role.DON_CAPITAN, // Assume inventory can be done by Don or higher
         );
         adjustments.push(result);
       }

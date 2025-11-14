@@ -87,13 +87,27 @@ export class UsersService {
 
     // Hauptrolle bestimmen (höchste Rolle)
     const roleHierarchy = {
-      [Role.SOLDADO]: 1,
-      [Role.SICARIO]: 2,
-      [Role.ROUTENVERWALTUNG]: 3,
-      [Role.ASESOR]: 4,
-      [Role.LOGISTICA]: 5,
-      [Role.DON]: 6,
-      [Role.EL_PATRON]: 7,
+      // Legacy-Rollen
+      [Role.FUTURO]: 0,
+      // Neue Ränge (1-9)
+      [Role.EL_NOVATO]: 1,
+      [Role.EL_PROTECTOR]: 2,
+      [Role.EL_CONFIDENTE]: 3,
+      [Role.EL_PREFECTO]: 4,
+      [Role.SOLDADO]: 5,
+      [Role.EL_TENIENTE]: 6,
+      [Role.EL_ENCARGADO]: 7,
+      [Role.EL_MENTOR]: 8,
+      [Role.EL_CUSTODIO]: 9,
+      // Legacy erweiterte Rollen
+      [Role.SICARIO]: 10,
+      [Role.ROUTENVERWALTUNG]: 11,
+      [Role.LOGISTICA]: 12,
+      // Leaderschaft
+      [Role.EL_MANO_DERECHA]: 13,
+      [Role.DON_COMANDANTE]: 14,
+      [Role.DON_CAPITAN]: 15,
+      [Role.EL_PATRON]: 16,
     };
 
     const highestRole = allRoles.reduce((highest, current) => {
@@ -161,13 +175,28 @@ export class UsersService {
   // Alle verfügbaren Rollen abrufen
   async getAvailableRoles() {
     return [
-      { key: Role.EL_PATRON, name: 'El Patrón', description: 'Höchste Autorität' },
-      { key: Role.DON, name: 'Don', description: 'Zweithöchste Autorität' },
-      { key: Role.ASESOR, name: 'Asesor', description: 'Berater und Führung' },
-      { key: Role.LOGISTICA, name: 'Logistica', description: 'Lagerverwaltung' },
-      { key: Role.ROUTENVERWALTUNG, name: 'Routenverwaltung', description: 'Route Management' },
-      { key: Role.SICARIO, name: 'Sicario', description: 'Erweiterte Berechtigungen' },
-      { key: Role.SOLDADO, name: 'Soldado', description: 'Standard Mitglied' },
+      // Leaderschaft
+      { key: Role.EL_PATRON, name: 'El Patrón', description: '👑 - Höchste Autorität' },
+      { key: Role.DON_CAPITAN, name: 'Don - El Capitán', description: '⚔️ - Don' },
+      { key: Role.DON_COMANDANTE, name: 'Don - El Comandante', description: '🛡️ - Don' },
+      { key: Role.EL_MANO_DERECHA, name: 'El Mano Derecha', description: '🤝 - Berater' },
+      // Ränge 7-9
+      { key: Role.EL_CUSTODIO, name: 'El Custodio', description: '🔒 - Rang 9 - Sicherheit' },
+      { key: Role.EL_MENTOR, name: 'El Mentor', description: '📚 - Rang 8 - Ausbilder' },
+      { key: Role.EL_ENCARGADO, name: 'El Encargado', description: '🧰 - Rang 7 - Koordinator' },
+      // Ränge 4-6
+      { key: Role.EL_TENIENTE, name: 'El Teniente', description: '⭐ - Rang 6 - Unteroffizier' },
+      { key: Role.SOLDADO, name: 'Soldado', description: '🧭 - Rang 5 - Soldat' },
+      { key: Role.EL_PREFECTO, name: 'El Prefecto', description: '🐍 - Rang 4 - Kontrolle' },
+      // Ränge 1-3
+      { key: Role.EL_CONFIDENTE, name: 'El Confidente', description: '🫢 - Rang 3 - Vertrauensperson' },
+      { key: Role.EL_PROTECTOR, name: 'El Protector', description: '🐢 - Rang 2 - Schutz' },
+      { key: Role.EL_NOVATO, name: 'El Novato', description: '🌱 - Rang 1 - Neuling' },
+      // Legacy
+      { key: Role.FUTURO, name: 'Futuro', description: 'Anwärter (Legacy)' },
+      { key: Role.SICARIO, name: 'Sicario', description: 'Erweiterte Berechtigungen (Legacy)' },
+      { key: Role.LOGISTICA, name: 'Logistica', description: 'Lagerverwaltung (Legacy)' },
+      { key: Role.ROUTENVERWALTUNG, name: 'Routenverwaltung', description: 'Route Management (Legacy)' },
     ];
   }
 
@@ -214,13 +243,28 @@ export class UsersService {
 
   private getRoleDisplayName(role: Role): string {
     switch (role) {
+      // Leaderschaft
       case Role.EL_PATRON: return 'El Patrón';
-      case Role.DON: return 'Don';
-      case Role.ASESOR: return 'Asesor';
+      case Role.DON_CAPITAN: return 'Don - El Capitán';
+      case Role.DON_COMANDANTE: return 'Don - El Comandante';
+      case Role.EL_MANO_DERECHA: return 'El Mano Derecha';
+      // Ränge 7-9
+      case Role.EL_CUSTODIO: return 'El Custodio';
+      case Role.EL_MENTOR: return 'El Mentor';
+      case Role.EL_ENCARGADO: return 'El Encargado';
+      // Ränge 4-6
+      case Role.EL_TENIENTE: return 'El Teniente';
+      case Role.SOLDADO: return 'Soldado';
+      case Role.EL_PREFECTO: return 'El Prefecto';
+      // Ränge 1-3
+      case Role.EL_CONFIDENTE: return 'El Confidente';
+      case Role.EL_PROTECTOR: return 'El Protector';
+      case Role.EL_NOVATO: return 'El Novato';
+      // Legacy
+      case Role.FUTURO: return 'Futuro';
+      case Role.SICARIO: return 'Sicario';
       case Role.ROUTENVERWALTUNG: return 'Routenverwaltung';
       case Role.LOGISTICA: return 'Logistica';
-      case Role.SICARIO: return 'Sicario';
-      case Role.SOLDADO: return 'Soldado';
       default: return role;
     }
   }

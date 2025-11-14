@@ -35,7 +35,7 @@ export class SanctionsController {
 
   // Sanktion erstellen mit automatischem Level (Leaderschaft: EL_PATRON, DON, ASESOR)
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async createSanctionWithAutoLevel(@Body() createDto: CreateSanctionWithAutoLevelDto, @Request() req) {
     return this.sanctionsService.createSanctionWithAutoLevel(
@@ -48,7 +48,7 @@ export class SanctionsController {
 
   // Sanktion erstellen mit manuellem Level (Leaderschaft: EL_PATRON, DON, ASESOR)
   @Post('manual')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async createSanction(@Body() createDto: CreateSanctionDto, @Request() req) {
     return this.sanctionsService.createSanction(
@@ -62,7 +62,7 @@ export class SanctionsController {
 
   // Sanktion als bezahlt markieren (Leaderschaft)
   @Patch(':id/pay')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async paySanction(@Param('id') id: string) {
     return this.sanctionsService.paySanction(id);
@@ -70,7 +70,7 @@ export class SanctionsController {
 
   // Sanktion entfernen (Leaderschaft)
   @Patch(':id/remove')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async removeSanction(@Param('id') id: string) {
     return this.sanctionsService.removeSanction(id);
@@ -92,7 +92,7 @@ export class SanctionsController {
 
   // Aktive Sanktionen eines Users abrufen
   @Get('user/:userId/active')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async getUserActiveSanctions(@Param('userId') userId: string) {
     return this.sanctionsService.getUserActiveSanctions(userId);
@@ -106,7 +106,7 @@ export class SanctionsController {
 
   // Abgelaufene Sanktionen bereinigen (Admin/Don)
   @Post('cleanup')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   @UseGuards(RolesGuard)
   async cleanupExpiredSanctions() {
     return this.sanctionsService.cleanupExpiredSanctions();
@@ -369,7 +369,7 @@ export class SanctionsController {
 
   // Automatische 48h-Sanktionierung
   @Post('auto-sanction-48h')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async autoSanctionUnpaidAfter48h() {
     return this.sanctionsService.autoSanctionUnpaidAfter48h();

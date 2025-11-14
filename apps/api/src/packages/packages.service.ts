@@ -823,7 +823,7 @@ export class PackagesService {
 
   canConfirmDeposit(userRole: Role): boolean {
     return userRole === Role.EL_PATRON || 
-           userRole === Role.DON || 
+           userRole === Role.DON_CAPITAN || userRole === Role.DON_COMANDANTE || 
            userRole === Role.ROUTENVERWALTUNG ||
            userRole === Role.LOGISTICA;
   }

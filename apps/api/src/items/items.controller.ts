@@ -45,7 +45,7 @@ export class ItemsController {
   }
 
   @Post('categories')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   @UseGuards(RolesGuard)
   async createCategory(
     @Body('name') name: string,
@@ -60,7 +60,7 @@ export class ItemsController {
   }
 
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async createItem(
     @Body() createItemDto: CreateItemDto,
@@ -70,7 +70,7 @@ export class ItemsController {
   }
 
   @Patch(':id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async updateItem(
     @Param('id') id: string,
@@ -81,7 +81,7 @@ export class ItemsController {
   }
 
   @Post(':id/move')
-  @Roles(Role.EL_PATRON, Role.ASESOR, Role.DON, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async moveItem(
     @Param('id') id: string,
@@ -108,7 +108,7 @@ export class ItemsController {
   }
 
   @Post('inventory/count')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   @UseGuards(RolesGuard)
   async performInventoryCount(
     @Body() counts: InventoryCountDto[],
@@ -128,7 +128,7 @@ export class ItemsController {
   }
 
   @Patch('movements/:id/approve')
-  @Roles(Role.EL_PATRON, Role.LOGISTICA, Role.DON) // Temporär: Don kann auch genehmigen
+  @Roles(Role.EL_PATRON, Role.LOGISTICA, Role.DON_CAPITAN, Role.DON_COMANDANTE) // Temporär: Don kann auch genehmigen
   @UseGuards(RolesGuard)
   async approveMovement(
     @Param('id') movementId: string,

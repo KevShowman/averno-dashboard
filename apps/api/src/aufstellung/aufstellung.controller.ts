@@ -34,7 +34,7 @@ export class AufstellungController {
 
   // Erstelle neue Aufstellung (nur El Patron, Don, Asesor)
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async createAufstellung(
     @Body() createDto: CreateAufstellungDto,
     @CurrentUser() user: User,
@@ -96,21 +96,21 @@ export class AufstellungController {
 
   // Aktive Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions/active')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async getActiveExclusions() {
     return this.aufstellungService.getActiveExclusions();
   }
 
   // Alle Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async getAllExclusions() {
     return this.aufstellungService.getAllExclusions();
   }
 
   // Exclusion erstellen (nur El Patron, Don, Asesor)
   @Post('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async createExclusion(
     @Body() createDto: CreateExclusionDto,
     @CurrentUser() user: User,
@@ -126,7 +126,7 @@ export class AufstellungController {
 
   // Exclusion deaktivieren (nur El Patron, Don)
   @Patch('exclusions/:id/deactivate')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   async deactivateExclusion(@Param('id') id: string) {
     return this.aufstellungService.deactivateExclusion(id);
   }
@@ -162,14 +162,14 @@ export class AufstellungController {
 
   // Nicht-Reagierer sanktionieren (nur El Patron, Don, Asesor)
   @Post(':id/sanction-non-responders')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async sanctionNonResponders(@Param('id') id: string) {
     return this.aufstellungService.sanctionNonResponders(id);
   }
 
   // Aufstellung löschen (nur El Patron, Don)
   @Delete(':id')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
   }

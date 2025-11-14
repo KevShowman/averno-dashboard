@@ -44,7 +44,7 @@ export class AbmeldungController {
 
   // Alle Abmeldungen abrufen (nur Leaderschaft)
   @Get()
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async getAllAbmeldungen() {
     return this.abmeldungService.getAllAbmeldungen();
   }

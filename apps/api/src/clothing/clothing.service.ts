@@ -61,7 +61,7 @@ export class ClothingService {
   };
 
   // Leaderschaft-Rollen (dürfen Kleidung bearbeiten)
-  private readonly leadershipRoles = [
+  private readonly leadershipRoles: Role[] = [
     Role.EL_PATRON,
     Role.DON_CAPITAN,
     Role.DON_COMANDANTE,

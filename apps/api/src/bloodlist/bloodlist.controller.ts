@@ -26,7 +26,7 @@ export class BloodListController {
 
   // Blood In - Nur für El Patron, Don, Asesor
   @Post('blood-in')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async bloodIn(@Body() bloodInDto: BloodInDto, @CurrentUser() user: User) {
     return this.bloodListService.bloodIn(
       bloodInDto.vorname,
@@ -39,7 +39,7 @@ export class BloodListController {
 
   // Blood Out - Nur für El Patron, Don
   @Post('blood-out')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   async bloodOut(@Body() bloodOutDto: BloodOutDto, @CurrentUser() user: User) {
     // Verwende den eingeloggten User als bloodoutDurch
     const durchUser = user.icFirstName && user.icLastName
@@ -61,7 +61,7 @@ export class BloodListController {
 
   // Blood Out Historie - Nur für Leaderschaft
   @Get('history')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async getBloodOutHistory() {
     return this.bloodListService.getBloodOutHistory();
   }

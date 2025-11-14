@@ -12,7 +12,7 @@ export class PackagesController {
   constructor(private packagesService: PackagesService) {}
 
   @Post('deposit')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async createDeposit(
     @Body('packages') packages: number,
     @Body('note') note: string,
@@ -23,14 +23,14 @@ export class PackagesController {
 
   // Prüfen ob User eine ausstehende Wochenabgabe hat
   @Get('check-weekly-delivery')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async checkPendingWeeklyDelivery(@CurrentUser() user: User) {
     return this.packagesService.checkPendingWeeklyDelivery(user.id);
   }
 
   // Package-Deposit mit Wochenabgabe-Integration erstellen
   @Post('deposit-with-weekly-delivery')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async createDepositWithWeeklyDelivery(
     @Body('packages') packages: number,
     @Body('note') note: string,
@@ -48,19 +48,19 @@ export class PackagesController {
   }
 
   @Get('deposits/pending')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getPendingDeposits() {
     return this.packagesService.getPendingDeposits();
   }
 
   @Get('deposits/confirmed')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SICARIO, Role.SOLDADO)
   async getConfirmedDeposits() {
     return this.packagesService.getConfirmedDeposits();
   }
 
   @Patch('deposit/:id/confirm')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
   async confirmDeposit(
     @Param('id') depositId: string,
     @CurrentUser() user: User,
@@ -73,7 +73,7 @@ export class PackagesController {
   }
 
   @Patch('deposit/:id/reject')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
   async rejectDeposit(
     @Param('id') depositId: string,
     @Body('reason') reason: string,
@@ -87,19 +87,19 @@ export class PackagesController {
   }
 
   @Get('summary')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getCurrentDepositSummary() {
     return this.packagesService.getCurrentDepositSummary();
   }
 
   @Get('price')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
   async getPackagePrice() {
     return { price: await this.packagesService.getPackagePrice() };
   }
 
   @Post('price')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG)
   async setPackagePrice(
     @Body('price') price: number,
     @CurrentUser() user: User,
@@ -108,7 +108,7 @@ export class PackagesController {
   }
 
   @Post('archive')
-  @Roles(Role.EL_PATRON, Role.DON)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
   async archiveCurrentDeposits(
     @Body('name') archiveName: string,
     @CurrentUser() user: User,
@@ -117,25 +117,25 @@ export class PackagesController {
   }
 
   @Get('deposits/recent')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.LOGISTICA, Role.SOLDADO)
   async getRecentDeposits() {
     return this.packagesService.getRecentDeposits();
   }
 
   @Get('archives')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
   async getArchivedHandovers() {
     return this.packagesService.getArchivedHandovers();
   }
 
   @Get('archives/:id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ASESOR, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
   async getArchiveDetails(@Param('id') archiveId: string) {
     return this.packagesService.getArchiveDetails(archiveId);
   }
 
   @Delete('deposit/:id')
-  @Roles(Role.EL_PATRON, Role.DON, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.ROUTENVERWALTUNG, Role.LOGISTICA)
   async removeDeposit(
     @Param('id') depositId: string,
     @Body('reason') reason: string,
