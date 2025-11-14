@@ -209,9 +209,9 @@ export class DiscordService {
         [Role.SOLDADO]: 1,
         [Role.SICARIO]: 2,
         [Role.ROUTENVERWALTUNG]: 3,
-        // REMOVED
+        [Role.ASESOR]: 4,
         [Role.LOGISTICA]: 5,
-        // REMOVED
+        [Role.DON]: 6,
         [Role.EL_PATRON]: 7,
       };
 
@@ -337,9 +337,9 @@ export class DiscordService {
           [Role.SOLDADO]: 1,
           [Role.SICARIO]: 2,
           [Role.ROUTENVERWALTUNG]: 3,
-          // REMOVED
+          [Role.ASESOR]: 4,
           [Role.LOGISTICA]: 5,
-          // REMOVED
+          [Role.DON]: 6,
           [Role.EL_PATRON]: 7,
         };
 
