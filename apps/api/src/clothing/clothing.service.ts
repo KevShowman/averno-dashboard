@@ -109,6 +109,75 @@ export class ClothingService {
   }
 
   /**
+   * Holt das Template für eine bestimmte Rolle
+   */
+  async getTemplateForRole(role: Role): Promise<ClothingTemplate | null> {
+    const rankGroup = this.getRankGroup(role);
+    return this.getTemplateByRankGroup(rankGroup);
+  }
+
+  /**
+   * Konvertiert ein Template in ein flaches Format für das Frontend
+   */
+  flattenTemplate(template: ClothingTemplate | null): any {
+    if (!template) {
+      return {
+        maskItem: null,
+        maskVariation: null,
+        maskCustomizable: false,
+        maskColor: null,
+        torsoItem: null,
+        torsoVariation: null,
+        torsoCustomizable: false,
+        torsoColor: null,
+        tshirtItem: null,
+        tshirtVariation: null,
+        tshirtCustomizable: false,
+        tshirtColor: null,
+        vesteItem: null,
+        vesteVariation: null,
+        vesteCustomizable: false,
+        vesteColor: null,
+        hoseItem: null,
+        hoseVariation: null,
+        hoseCustomizable: false,
+        hoseColor: null,
+        schuheItem: null,
+        schuheVariation: null,
+        schuheCustomizable: false,
+        schuheColor: null,
+      };
+    }
+
+    return {
+      maskItem: template.maske.item,
+      maskVariation: template.maske.variation,
+      maskCustomizable: template.maske.customizable,
+      maskColor: template.maske.color,
+      torsoItem: template.torso.item,
+      torsoVariation: template.torso.variation,
+      torsoCustomizable: template.torso.customizable,
+      torsoColor: template.torso.color,
+      tshirtItem: template.tshirt.item,
+      tshirtVariation: template.tshirt.variation,
+      tshirtCustomizable: template.tshirt.customizable,
+      tshirtColor: template.tshirt.color,
+      vesteItem: template.veste.item,
+      vesteVariation: template.veste.variation,
+      vesteCustomizable: template.veste.customizable,
+      vesteColor: template.veste.color,
+      hoseItem: template.hose.item,
+      hoseVariation: template.hose.variation,
+      hoseCustomizable: template.hose.customizable,
+      hoseColor: template.hose.color,
+      schuheItem: template.schuhe.item,
+      schuheVariation: template.schuhe.variation,
+      schuheCustomizable: template.schuhe.customizable,
+      schuheColor: template.schuhe.color,
+    };
+  }
+
+  /**
    * Erstellt oder aktualisiert ein Kleidungs-Template
    * Nur Leaderschaft darf diese Funktion aufrufen
    */
@@ -240,6 +309,30 @@ export class ClothingService {
       template,
       userCustomization,
       combinedClothing,
+    };
+  }
+
+  /**
+   * Holt die User-Clothing-Daten als flaches Objekt (für Frontend)
+   */
+  async getUserClothingFlat(userId: string): Promise<any> {
+    const userClothing = await this.prisma.userClothing.findUnique({
+      where: { userId },
+    });
+    
+    return userClothing || {
+      maskItem: null,
+      maskVariation: null,
+      torsoItem: null,
+      torsoVariation: null,
+      tshirtItem: null,
+      tshirtVariation: null,
+      vesteItem: null,
+      vesteVariation: null,
+      hoseItem: null,
+      hoseVariation: null,
+      schuheItem: null,
+      schuheVariation: null,
     };
   }
 
