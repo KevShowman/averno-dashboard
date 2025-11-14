@@ -274,6 +274,123 @@ export class DiscordService {
     return user.role;
   }
 
+  async syncAllUserRoles(): Promise<{ total: number; updated: number; errors: number }> {
+    try {
+      // Hole alle User
+      const users = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          discordId: true,
+          role: true,
+          allRoles: true,
+          discordRoles: true,
+        }
+      });
+
+      // Hole alle aktiven Discord-Rollen-Mappings
+      const roleMappings = await this.prisma.discordRoleMapping.findMany({
+        where: { isActive: true }
+      });
+
+      let updatedCount = 0;
+      let errorCount = 0;
+
+      for (const user of users) {
+        try {
+          // Konvertiere discordRoles zu Array (falls JSON)
+          const userDiscordRoleIds = Array.isArray(user.discordRoles) 
+            ? user.discordRoles 
+            : (typeof user.discordRoles === 'string' ? JSON.parse(user.discordRoles) : []);
+
+          if (userDiscordRoleIds.length === 0) {
+            continue;
+          }
+
+          // Finde alle System-Rollen, die der User haben sollte
+          const userRoleMappings = roleMappings.filter(mapping => 
+            userDiscordRoleIds.includes(mapping.discordRoleId)
+          );
+
+          if (userRoleMappings.length === 0) {
+            continue;
+          }
+
+          // Berechne alle System-Rollen
+          const allSystemRoles = userRoleMappings.map(m => m.systemRole);
+
+          // Finde die höchste Rolle basierend auf der Hierarchie
+          const roleHierarchy = {
+            [Role.EL_NOVATO]: 1,
+            [Role.EL_PROTECTOR]: 2,
+            [Role.EL_CONFIDENTE]: 3,
+            [Role.EL_PREFECTO]: 4,
+            [Role.SOLDADO]: 5,
+            [Role.EL_TENIENTE]: 6,
+            [Role.EL_ENCARGADO]: 7,
+            [Role.EL_MENTOR]: 8,
+            [Role.EL_CUSTODIO]: 9,
+            [Role.EL_MANO_DERECHA]: 10,
+            [Role.DON_COMANDANTE]: 11,
+            [Role.DON_CAPITAN]: 12,
+            [Role.EL_PATRON]: 13,
+            [Role.SICARIO]: 5,
+            [Role.ROUTENVERWALTUNG]: 6,
+            [Role.LOGISTICA]: 5,
+            [Role.FUTURO]: 1,
+            [Role.ADMIN]: 13,
+            [Role.QUARTIERMEISTER]: 5,
+            [Role.MITGLIED]: 2,
+            [Role.GAST]: 0,
+          };
+
+          const highestRoleMapping = userRoleMappings.reduce((highest, current) => {
+            const currentLevel = roleHierarchy[current.systemRole] || 0;
+            const highestLevel = roleHierarchy[highest.systemRole] || 0;
+            return currentLevel > highestLevel ? current : highest;
+          });
+
+          const newHighestRole = highestRoleMapping.systemRole;
+
+          // Prüfe ob sich etwas geändert hat
+          const currentAllRoles = Array.isArray(user.allRoles) 
+            ? user.allRoles 
+            : (typeof user.allRoles === 'string' ? JSON.parse(user.allRoles) : []);
+
+          const rolesChanged = user.role !== newHighestRole || 
+                              JSON.stringify(currentAllRoles.sort()) !== JSON.stringify(allSystemRoles.sort());
+
+          if (rolesChanged) {
+            // Update User
+            await this.prisma.user.update({
+              where: { id: user.id },
+              data: {
+                role: newHighestRole,
+                allRoles: allSystemRoles,
+              }
+            });
+
+            updatedCount++;
+          }
+
+        } catch (error) {
+          console.error(`Error syncing roles for ${user.username}:`, error.message);
+          errorCount++;
+        }
+      }
+
+      return {
+        total: users.length,
+        updated: updatedCount,
+        errors: errorCount,
+      };
+
+    } catch (error) {
+      console.error('Error in syncAllUserRoles:', error);
+      return { total: 0, updated: 0, errors: 1 };
+    }
+  }
+
   async updateUserDiscordRoles(userId: string, discordRoles: string[]): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },

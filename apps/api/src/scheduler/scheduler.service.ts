@@ -155,6 +155,31 @@ export class SchedulerService {
     return this.handleDiscordMemberSync();
   }
 
+  // User-Rollen-Sync - alle 5 Minuten
+  @Cron('*/5 * * * *', {
+    name: 'user-roles-sync',
+    timeZone: 'Europe/Berlin',
+  })
+  async handleUserRolesSync() {
+    this.logger.log('🔄 Starte User-Rollen-Synchronisierung...');
+    
+    try {
+      const result = await this.discordService.syncAllUserRoles();
+      
+      if (result.updated > 0) {
+        this.logger.log(`✅ User-Rollen-Sync abgeschlossen: ${result.updated} von ${result.total} User aktualisiert`);
+      }
+    } catch (error) {
+      this.logger.error('❌ Fehler beim User-Rollen-Sync:', error);
+    }
+  }
+
+  // Manueller Test der User-Rollen-Synchronisierung (für Entwicklung)
+  async manualUserRolesSync() {
+    this.logger.log('🔧 Manueller User-Rollen-Sync gestartet...');
+    return this.handleUserRolesSync();
+  }
+
   // Automatische Sanktionierung nicht-reagierender Aufstellungs-Teilnehmer
   // Läuft jede Stunde um zu prüfen ob Deadlines abgelaufen sind
   @Cron('0 * * * *', {

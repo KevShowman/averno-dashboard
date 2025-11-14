@@ -52,7 +52,7 @@ async function setupDiscordRoles() {
         name: '6 | El Teniente'
       },
       {
-        discordRoleId: '1431388062427906220', // ⚔️ - 5 | Soldado
+        discordRoleId: '1431388062427906228', // ⚔️ - 5 | Soldado
         systemRole: Role.SOLDADO,
         name: '5 | Soldado'
       },
