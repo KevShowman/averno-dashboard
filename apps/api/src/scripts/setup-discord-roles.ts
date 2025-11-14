@@ -15,12 +15,12 @@ async function setupDiscordRoles() {
       },
       {
         discordRoleId: '1431388062474309699', // Don
-        systemRole: Role.DON,
+        systemRole: Role.DON_CAPITAN,
         name: 'Don'
       },
       {
         discordRoleId: '1431388062474309698', // Asesor
-        systemRole: Role.ASESOR,
+        systemRole: Role.EL_MANO_DERECHA,
         name: 'Asesor'
       },
       {

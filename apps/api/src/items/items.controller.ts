@@ -138,7 +138,7 @@ export class ItemsController {
   }
 
   @Patch('movements/:id/reject')
-  @Roles(Role.EL_PATRON, Role.LOGISTICA, Role.DON) // Temporär: Don kann auch ablehnen
+  @Roles(Role.EL_PATRON, Role.LOGISTICA, Role.DON_CAPITAN, Role.DON_COMANDANTE) // Temporär: Don kann auch ablehnen
   @UseGuards(RolesGuard)
   async rejectMovement(
     @Param('id') movementId: string,

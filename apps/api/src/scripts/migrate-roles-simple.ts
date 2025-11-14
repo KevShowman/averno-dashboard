@@ -19,8 +19,8 @@ async function migrateRolesSimple() {
     // Migration mapping mit normalen Prisma Updates
     const migrations = [
       { from: Role.ADMIN, to: Role.EL_PATRON },
-      { from: Role.QUARTIERMEISTER, to: Role.DON },
-      { from: Role.MITGLIED, to: Role.ASESOR },
+      { from: Role.QUARTIERMEISTER, to: Role.DON_CAPITAN },
+      { from: Role.MITGLIED, to: Role.EL_MANO_DERECHA },
       { from: Role.GAST, to: Role.SOLDADO },
     ];
 
