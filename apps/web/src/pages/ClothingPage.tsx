@@ -7,7 +7,7 @@ import { Label } from '../components/ui/label'
 import { useAuthStore } from '../stores/auth'
 import { toast } from 'sonner'
 import { Loader2, Shirt, Save, Info } from 'lucide-react'
-import axios from '../lib/axios'
+import { clothingApi } from '../lib/api'
 
 interface ClothingItem {
   item: number | null
@@ -54,19 +54,13 @@ export default function ClothingPage() {
   // Load template based on user's rank
   const { data: template, isLoading: templateLoading } = useQuery({
     queryKey: ['clothing-my-template'],
-    queryFn: async () => {
-      const response = await axios.get('/clothing/templates')
-      return response.data
-    },
+    queryFn: () => clothingApi.getAllTemplates(),
   })
 
   // Load user's clothing choices
   const { data: myClothing, isLoading: clothingLoading } = useQuery({
     queryKey: ['my-clothing'],
-    queryFn: async () => {
-      const response = await axios.get('/clothing/my-clothing')
-      return response.data
-    },
+    queryFn: () => clothingApi.getMyClothing(),
   })
 
   // Update local state when data is loaded
@@ -86,7 +80,7 @@ export default function ClothingPage() {
   // Save user clothing mutation
   const saveMutation = useMutation({
     mutationFn: async (data: UserClothing) => {
-      await axios.put('/clothing/my-clothing', {
+      return clothingApi.saveMyClothing({
         maskItem: data.mask.item,
         maskVariation: data.mask.variation,
         torsoItem: data.torso.item,

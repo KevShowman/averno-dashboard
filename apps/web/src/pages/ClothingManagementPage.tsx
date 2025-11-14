@@ -8,7 +8,7 @@ import { Checkbox } from '../components/ui/checkbox'
 import { useAuthStore } from '../stores/auth'
 import { toast } from 'sonner'
 import { Loader2, Shirt, Save } from 'lucide-react'
-import axios from '../lib/axios'
+import { clothingApi } from '../lib/api'
 
 interface ClothingItem {
   item: number | null
@@ -65,10 +65,7 @@ export default function ClothingManagementPage() {
   // Load template for selected rank group
   const { data: loadedTemplate, isLoading } = useQuery({
     queryKey: ['clothing-template', selectedRankGroup],
-    queryFn: async () => {
-      const response = await axios.get(`/clothing/templates/${selectedRankGroup}`)
-      return response.data
-    },
+    queryFn: () => clothingApi.getTemplate(selectedRankGroup),
     enabled: !!selectedRankGroup,
   })
 
@@ -122,7 +119,7 @@ export default function ClothingManagementPage() {
   // Save template mutation
   const saveMutation = useMutation({
     mutationFn: async (data: ClothingTemplate) => {
-      await axios.post(`/clothing/templates/${data.rankGroup}`, {
+      return clothingApi.saveTemplate(data.rankGroup, {
         maskItem: data.mask.item,
         maskVariation: data.mask.variation,
         maskCustomizable: data.mask.customizable,
