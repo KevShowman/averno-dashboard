@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState, type FC, type ReactNode } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker'
-import { getDisplayName, hasRole } from '../lib/utils'
+import { hasRole } from '../lib/utils'
 import { useAuthStore } from '../stores/auth'
-import { toast } from 'sonner'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { organigrammApi } from '../lib/api'
 import {
   BadgeCheck,
@@ -19,7 +16,6 @@ import {
   Shield,
   Swords,
   Users,
-  X,
 } from 'lucide-react'
 
 interface User {
@@ -568,51 +564,13 @@ const assignmentRoles: AssignmentRole[] = [
 
 export default function OrganigrammPage() {
   const { user } = useAuthStore()
-  const queryClient = useQueryClient()
   const [expandedNodes, setExpandedNodes] = useState<string[]>(['patron'])
-  const isElPatron = hasRole(user, 'EL_PATRON')
 
-  // Lade Zuweisungen vom Server
+  // Lade Zuweisungen vom Server (automatisch aus Discord)
   const { data: assignments = {}, isLoading: isLoadingAssignments } = useQuery<RoleAssignments>({
     queryKey: ['organigramm-assignments'],
     queryFn: organigrammApi.getAssignments,
-    refetchInterval: 30000, // Alle 30 Sekunden aktualisieren für andere User
-  })
-
-  // Mutation: User einer Rolle zuweisen
-  const assignMutation = useMutation({
-    mutationFn: ({ roleId, userId }: { roleId: string; userId: string }) =>
-      organigrammApi.assignUserToRole({ roleId, userId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organigramm-assignments'] })
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Zuweisen des Benutzers')
-    },
-  })
-
-  // Mutation: User von Rolle entfernen
-  const removeMutation = useMutation({
-    mutationFn: ({ roleId, userId }: { roleId: string; userId: string }) =>
-      organigrammApi.removeUserFromRole(roleId, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organigramm-assignments'] })
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Entfernen des Benutzers')
-    },
-  })
-
-  // Mutation: Alle Zuweisungen zurücksetzen
-  const resetAllMutation = useMutation({
-    mutationFn: organigrammApi.removeAllAssignments,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organigramm-assignments'] })
-      toast.success('Alle Zuordnungen wurden zurückgesetzt.')
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Zurücksetzen')
-    },
+    refetchInterval: 30000, // Alle 30 Sekunden aktualisieren
   })
 
   const assignmentValues = useMemo(() => Object.values(assignments) as AssignedMember[][], [assignments])
@@ -626,40 +584,6 @@ export default function OrganigrammPage() {
     () => assignmentValues.reduce<number>((acc, members) => acc + (members.length > 0 ? 1 : 0), 0),
     [assignmentValues]
   )
-
-  const handleAssignMember = (roleId: string, user: User | null) => {
-    if (!user) return
-
-    const existing = assignments[roleId] ?? []
-    if (existing.some((member) => member.id === user.id)) {
-      toast.info(`${getDisplayName(user)} ist dieser Rolle bereits zugeordnet.`)
-      return
-    }
-
-    assignMutation.mutate(
-      { roleId, userId: user.id },
-      {
-        onSuccess: () => {
-          toast.success(`${getDisplayName(user)} wurde ${treeNodes[roleId]?.label ?? 'der Rolle'} zugeordnet.`)
-        },
-      }
-    )
-  }
-
-  const handleRemoveMember = (roleId: string, memberId: string) => {
-    removeMutation.mutate({ roleId, userId: memberId })
-  }
-
-  const handleClearRoleAssignments = (roleId: string) => {
-    const members = assignments[roleId] ?? []
-    members.forEach((member) => {
-      removeMutation.mutate({ roleId, userId: member.id })
-    })
-  }
-
-  const handleResetAllAssignments = () => {
-    resetAllMutation.mutate()
-  }
 
   const toggleNode = (nodeId: string) => {
     setExpandedNodes((prev) =>
@@ -830,31 +754,23 @@ export default function OrganigrammPage() {
         </CardContent>
       </Card>
 
-      {isElPatron && (
-        <Card className="lasanta-card">
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Users className="h-5 w-5" />
-                Rollen zuweisen
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                Nutze den People Picker, um Mitglieder den jeweiligen Rollen zuzuordnen. Änderungen werden automatisch lokal gespeichert.
-              </CardDescription>
+      <Card className="lasanta-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Users className="h-5 w-5" />
+            Rollen-Zuordnungen
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Mitglieder werden automatisch aus Discord synchronisiert. Aktualisierung alle 5 Minuten.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {isLoadingAssignments ? (
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Lade Rollen-Zuordnungen...
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleResetAllAssignments}>
-                Alle Zuordnungen zurücksetzen
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            {assignmentsAreLoading ? (
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Lade gespeicherte Zuordnungen...
-              </div>
-            ) : (
+          ) : (
               assignmentRoles.map((role) => {
                 const assignedMembers = assignments[role.id] ?? []
                 return (
@@ -864,50 +780,27 @@ export default function OrganigrammPage() {
                         {role.icon}
                         {role.label}
                       </CardTitle>
-                      <CardDescription className="text-gray-400">{role.description}</CardDescription>
+                      <CardDescription className="text-gray-400">
+                        {role.description}
+                        <span className="block mt-1 text-xs text-blue-400">
+                          Automatisch aus Discord synchronisiert
+                        </span>
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <EnhancedPeoplePicker
-                        onUserSelect={(user) => handleAssignMember(role.id, user)}
-                        selectedUser={null}
-                        placeholder={`${role.label}: Mitglied suchen...`}
-                        className="max-w-xl"
-                      />
-
                       {assignedMembers.length > 0 ? (
-                        <div className="space-y-3">
-                          <div className="flex flex-wrap gap-3">
-                            {assignedMembers.map((member) => (
-                              <div
-                                key={member.id}
-                                className="group flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm text-primary"
-                              >
-                                <span>{member.displayName}</span>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleRemoveMember(role.id, member.id)}
-                                  className="h-6 w-6 text-primary hover:text-white"
-                                  aria-label={`${member.displayName} von ${role.label} entfernen`}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex justify-end">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleClearRoleAssignments(role.id)}
-                              disabled={assignedMembers.length === 0}
+                        <div className="flex flex-wrap gap-3">
+                          {assignedMembers.map((member) => (
+                            <div
+                              key={member.id}
+                              className="flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm text-primary"
                             >
-                              Rolle leeren
-                            </Button>
-                          </div>
+                              <span>{member.displayName}</span>
+                            </div>
+                          ))}
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500">Noch keine Mitglieder zugewiesen.</p>
+                        <p className="text-xs text-gray-500">Keine Mitglieder in dieser Rolle.</p>
                       )}
                     </CardContent>
                   </Card>
@@ -916,7 +809,6 @@ export default function OrganigrammPage() {
             )}
           </CardContent>
         </Card>
-      )}
 
       <Card className="lasanta-card">
         <CardHeader>

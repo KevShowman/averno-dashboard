@@ -26,6 +26,14 @@ export class ClothingController {
   }
 
   /**
+   * Alias für my-clothing (für ClothingPage.tsx)
+   */
+  @Get('templates')
+  async getMyTemplate(@Request() req): Promise<any> {
+    return this.clothingService.getUserClothing(req.user.id);
+  }
+
+  /**
    * Holt ein Template für eine bestimmte Rang-Gruppe (mit BEIDEN Geschlechtern)
    * Nur für Leaderschaft
    */
