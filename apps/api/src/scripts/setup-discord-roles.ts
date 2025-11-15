@@ -20,7 +20,7 @@ async function setupDiscordRoles() {
         name: 'Don - El Capitán'
       },
       {
-        discordRoleId: '1431388062474309700', // ⚔️ - Don (El Comandante)
+        discordRoleId: '1438638866432135348', // 🛡️ - Don (El Comandante)
         systemRole: Role.DON_COMANDANTE,
         name: 'Don - El Comandante'
       },
@@ -36,18 +36,18 @@ async function setupDiscordRoles() {
         name: '9 | El Custodio'
       },
       {
-        discordRoleId: '1431388062427906230', // 🎓 - 8 | El Mentor
+        discordRoleId: '1438641189372035092', // 📚 - 8 | El Mentor
         systemRole: Role.EL_MENTOR,
         name: '8 | El Mentor'
       },
       {
-        discordRoleId: '1431388062427906231', // 📋 - 7 | El Encargado
+        discordRoleId: '1438641369038979295', // 🧰 - 7 | El Encargado
         systemRole: Role.EL_ENCARGADO,
         name: '7 | El Encargado'
       },
       // Ränge 4-6
       {
-        discordRoleId: '1431388062427906232', // 🛡️ - 6 | El Teniente
+        discordRoleId: '1438637584975921286', // ⭐ - 6 | El Teniente
         systemRole: Role.EL_TENIENTE,
         name: '6 | El Teniente'
       },
@@ -57,23 +57,23 @@ async function setupDiscordRoles() {
         name: '5 | Soldado'
       },
       {
-        discordRoleId: '1431388062427906233', // 📊 - 4 | El Prefecto
+        discordRoleId: '1438642330532839596', // 🐍 - 4 | El Prefecto
         systemRole: Role.EL_PREFECTO,
         name: '4 | El Prefecto'
       },
       // Ränge 1-3
       {
-        discordRoleId: '1431388062427906234', // 🔍 - 3 | El Confidente
+        discordRoleId: '1438641614481264743', // 🫢 - 3 | El Confidente
         systemRole: Role.EL_CONFIDENTE,
         name: '3 | El Confidente'
       },
       {
-        discordRoleId: '1431388062427906235', // 🛡️ - 2 | El Protector
+        discordRoleId: '1438639256275914752', // 🐢 - 2 | El Protector
         systemRole: Role.EL_PROTECTOR,
         name: '2 | El Protector'
       },
       {
-        discordRoleId: '1431388062427906236', // 🌱 - 1 | El Novato
+        discordRoleId: '1438636794181718199', // 🌱 - 1 | El Novato
         systemRole: Role.EL_NOVATO,
         name: '1 | El Novato'
       },
