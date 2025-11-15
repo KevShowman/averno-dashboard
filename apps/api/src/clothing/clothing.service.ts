@@ -6,11 +6,11 @@ export interface ClothingItem {
   itemMale: number | null;
   variationMale: number | null;
   customizableMale: boolean;
-  colorMale: number | null;
+  colorMale: string | null;
   itemFemale: number | null;
   variationFemale: number | null;
   customizableFemale: boolean;
-  colorFemale: number | null;
+  colorFemale: string | null;
 }
 
 export interface ClothingTemplate {
