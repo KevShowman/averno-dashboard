@@ -144,7 +144,21 @@ export class MemberFilesService {
               avatarUrl: true,
             },
           },
-          entries: true,
+          entries: {
+            include: {
+              createdBy: {
+                select: {
+                  id: true,
+                  username: true,
+                  icFirstName: true,
+                  icLastName: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
         },
       });
     }
