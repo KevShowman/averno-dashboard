@@ -50,6 +50,8 @@ model User {
   organigrammAssignments        OrganigrammAssignment[]         @relation("organigramm_assignments")
   processors                    FamiliensammelnProcessor[]     @relation("processor_user")
   processorsCompleted           FamiliensammelnProcessor[]     @relation("processor_completed_by")
+  memberFile                    MemberFile?                    @relation("member_files")
+  fileEntriesCreated            MemberFileEntry[]              @relation("file_entries_created")
 
   @@map("users")
 }
@@ -221,6 +223,43 @@ model Settings {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+// Aktensystem
+model MemberFile {
+  id              String            @id @default(cuid())
+  userId          String
+  user            User              @relation("member_files", fields: [userId], references: [id])
+  lastUprankDate  DateTime?         // Datum des letzten Upranks
+  isArchived      Boolean           @default(false) // Archiviert wenn Blood Out
+  archivedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  // Relations
+  entries         MemberFileEntry[]
+  
+  @@map("member_files")
+}
+
+model MemberFileEntry {
+  id          String           @id @default(cuid())
+  fileId      String
+  file        MemberFile       @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  type        FileEntryType    // POSITIVE, NEGATIVE, NEUTRAL
+  content     String           @db.Text
+  createdById String
+  createdBy   User             @relation("file_entries_created", fields: [createdById], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  @@map("member_file_entries")
+}
+
+enum FileEntryType {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
 }
 
 // Package-Deposit System (früher Kokain)

@@ -22,7 +22,9 @@ import {
   CalendarDays,
   Droplet,
   Network,
-  Shirt
+  Shirt,
+  Radio,
+  Car
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -67,6 +69,9 @@ const navigation = [
   { name: 'Organisation', href: '/organigramm', icon: Network },
   { name: 'Meine Kleidung', href: '/clothing', icon: Shirt },
   { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
+  { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
+  { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },
+  { name: 'Aktensystem', href: '/member-files', icon: FileText, leadershipOnly: true },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
   { name: 'Audit-Log', href: '/audit', icon: FileText },

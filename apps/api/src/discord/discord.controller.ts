@@ -59,7 +59,7 @@ export class DiscordController {
   }
 
   @Get('server-members')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async getServerMembers() {
     try {
       const members = await this.discordService.getMembersWithAllowedRoles();
@@ -78,7 +78,7 @@ export class DiscordController {
   }
 
   @Post('import-member')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async importMember(@Body('discordId') discordId: string) {
     try {
       const user = await this.discordService.importMemberToDatabase(discordId);
@@ -98,7 +98,7 @@ export class DiscordController {
   }
 
   @Post('sync-all-members')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async syncAllMembers() {
     try {
       const result = await this.discordService.syncAllMembersWithAllowedRoles();
@@ -114,7 +114,7 @@ export class DiscordController {
   }
 
   @Get('role-mappings')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async getRoleMappings() {
     try {
       // Rollen-Mappings aus der Datenbank abrufen
@@ -133,7 +133,7 @@ export class DiscordController {
   }
 
   @Post('sync-and-remove-inactive')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async syncUsersAndRemoveInactive() {
     return this.discordService.syncUsersAndRemoveInactive();
   }

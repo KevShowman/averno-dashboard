@@ -124,9 +124,9 @@ export class AufstellungController {
     );
   }
 
-  // Exclusion deaktivieren (nur El Patron, Don)
+  // Exclusion deaktivieren (Leaderschaft)
   @Patch('exclusions/:id/deactivate')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async deactivateExclusion(@Param('id') id: string) {
     return this.aufstellungService.deactivateExclusion(id);
   }
@@ -167,9 +167,9 @@ export class AufstellungController {
     return this.aufstellungService.sanctionNonResponders(id);
   }
 
-  // Aufstellung löschen (nur El Patron, Don)
+  // Aufstellung löschen (Leaderschaft)
   @Delete(':id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
   }

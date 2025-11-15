@@ -43,9 +43,9 @@ export class SettingsController {
     return this.settingsService.getSetting(key);
   }
 
-  // Setting erstellen oder aktualisieren (El Patron, Don)
+  // Setting erstellen oder aktualisieren (Leaderschaft)
   @Put()
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async setSetting(@Body() setSettingDto: SetSettingDto) {
     return this.settingsService.setSetting(
@@ -55,9 +55,9 @@ export class SettingsController {
     );
   }
 
-  // Setting löschen (El Patron, Don)
+  // Setting löschen (Leaderschaft)
   @Delete(':key')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async deleteSetting(@Param('key') key: string) {
     return this.settingsService.deleteSetting(key);
@@ -69,9 +69,9 @@ export class SettingsController {
     return this.settingsService.getWeeklyDeliverySettings();
   }
 
-  // Weekly Delivery Settings setzen (El Patron, Don)
+  // Weekly Delivery Settings setzen (Leaderschaft)
   @Put('weekly-delivery')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async setWeeklyDeliverySettings(@Body() settingsDto: WeeklyDeliverySettingsDto) {
     if (settingsDto.packages <= 0) {

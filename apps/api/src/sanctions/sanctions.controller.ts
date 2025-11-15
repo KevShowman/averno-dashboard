@@ -104,9 +104,9 @@ export class SanctionsController {
     return this.sanctionsService.getMySanctions(req.user.id);
   }
 
-  // Abgelaufene Sanktionen bereinigen (Admin/Don)
+  // Abgelaufene Sanktionen bereinigen (Leaderschaft)
   @Post('cleanup')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async cleanupExpiredSanctions() {
     return this.sanctionsService.cleanupExpiredSanctions();

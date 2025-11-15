@@ -27,6 +27,9 @@ import { useVersionCheck } from './hooks/useVersionCheck'
 import OrganigrammPage from './pages/OrganigrammPage'
 import ClothingManagementPage from './pages/ClothingManagementPage'
 import ClothingPage from './pages/ClothingPage'
+import CommunicationPage from './pages/CommunicationPage'
+import MemberFilesPage from './pages/MemberFilesPage'
+import VehicleTuningPage from './pages/VehicleTuningPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -208,6 +211,27 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <ClothingPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/communication" element={
+          <ProtectedRoute>
+            <Layout>
+              <CommunicationPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/member-files" element={
+          <ProtectedRoute>
+            <Layout>
+              <MemberFilesPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/vehicle-tuning" element={
+          <ProtectedRoute>
+            <Layout>
+              <VehicleTuningPage />
             </Layout>
           </ProtectedRoute>
         } />

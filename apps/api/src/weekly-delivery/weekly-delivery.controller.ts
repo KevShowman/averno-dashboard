@@ -45,9 +45,9 @@ interface PrepayWeeksDto {
 export class WeeklyDeliveryController {
   constructor(private weeklyDeliveryService: WeeklyDeliveryService) {}
 
-  // Wochenabgabe erstellen (Admin/Don)
+  // Wochenabgabe erstellen (Leaderschaft)
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   @UseGuards(RolesGuard)
   async createWeeklyDelivery(@Body() createDto: CreateWeeklyDeliveryDto, @Request() req) {
     const weekStart = new Date(createDto.weekStart);

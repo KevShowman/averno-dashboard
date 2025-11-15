@@ -21,6 +21,9 @@ import { BloodListModule } from './bloodlist/bloodlist.module';
 import { FamiliensammelnModule } from './familiensammeln/familiensammeln.module';
 import { OrganigrammModule } from './organigramm/organigramm.module';
 import { ClothingModule } from './clothing/clothing.module';
+import { CommunicationModule } from './communication/communication.module';
+import { MemberFilesModule } from './member-files/member-files.module';
+import { VehicleTuningModule } from './vehicle-tuning/vehicle-tuning.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -55,6 +58,9 @@ import { AppService } from './app.service';
     FamiliensammelnModule,
     OrganigrammModule,
     ClothingModule,
+    CommunicationModule,
+    MemberFilesModule,
+    VehicleTuningModule,
   ],
   controllers: [AppController],
   providers: [AppService],

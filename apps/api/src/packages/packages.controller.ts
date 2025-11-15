@@ -108,7 +108,7 @@ export class PackagesController {
   }
 
   @Post('archive')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async archiveCurrentDeposits(
     @Body('name') archiveName: string,
     @CurrentUser() user: User,

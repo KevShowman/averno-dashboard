@@ -37,9 +37,9 @@ export class BloodListController {
     );
   }
 
-  // Blood Out - Nur für El Patron, Don
+  // Blood Out - Leaderschaft
   @Post('blood-out')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async bloodOut(@Body() bloodOutDto: BloodOutDto, @CurrentUser() user: User) {
     // Verwende den eingeloggten User als bloodoutDurch
     const durchUser = user.icFirstName && user.icLastName
