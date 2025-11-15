@@ -543,6 +543,24 @@ const assignmentRoles: AssignmentRole[] = [
     icon: <Swords className="h-5 w-5 text-rose-400" />,
   },
   {
+    id: 'funktionsleiter-rutas',
+    label: 'Rutas – Routenverwaltung',
+    description: 'Die Logistik und Routen.',
+    icon: <Package className="h-5 w-5 text-amber-400" />,
+  },
+  {
+    id: 'funktionsleiter-formacion',
+    label: 'Formación – Ausbildung',
+    description: 'Training und Entwicklung.',
+    icon: <Shield className="h-5 w-5 text-blue-400" />,
+  },
+  {
+    id: 'funktionsleiter-contacto',
+    label: 'Contacto – Kontaktperson',
+    description: 'Externe Kommunikation.',
+    icon: <BadgeCheck className="h-5 w-5 text-purple-400" />,
+  },
+  {
     id: 'ranks-7-9',
     label: 'Ränge 7-9: Oberste Soldaten',
     description: 'El Custodio, El Mentor, El Encargado',

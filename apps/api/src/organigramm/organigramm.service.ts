@@ -21,32 +21,32 @@ export class OrganigrammService {
     [Role.EL_MANO_DERECHA]: 'mano-derecha',
     
     // Funktionsrollen
-    [Role.CONSEJERO]: 'consejero',
-    [Role.RUTAS]: 'rutas',
-    [Role.LOGISTICA]: 'logistica',
-    [Role.INTELIGENCIA]: 'inteligencia',
-    [Role.FORMACION]: 'formacion',
-    [Role.SICARIO]: 'sicario',
-    [Role.CONTACTO]: 'contacto',
+    [Role.CONSEJERO]: 'funktionsleiter-consejero',
+    [Role.RUTAS]: 'funktionsleiter-rutas',
+    [Role.LOGISTICA]: 'funktionsleiter-logistica',
+    [Role.INTELIGENCIA]: 'funktionsleiter-inteligencia',
+    [Role.FORMACION]: 'funktionsleiter-formacion',
+    [Role.SICARIO]: 'funktionsleiter-sicarios',
+    [Role.CONTACTO]: 'funktionsleiter-contacto',
     
     // Normale Ränge
-    [Role.EL_CUSTODIO]: 'range-7-9',
-    [Role.EL_MENTOR]: 'range-7-9',
-    [Role.EL_ENCARGADO]: 'range-7-9',
-    [Role.EL_TENIENTE]: 'range-4-6',
-    [Role.SOLDADO]: 'range-4-6',
-    [Role.EL_PREFECTO]: 'range-4-6',
-    [Role.EL_CONFIDENTE]: 'range-1-3',
-    [Role.EL_PROTECTOR]: 'range-1-3',
-    [Role.EL_NOVATO]: 'range-1-3',
+    [Role.EL_CUSTODIO]: 'ranks-7-9',
+    [Role.EL_MENTOR]: 'ranks-7-9',
+    [Role.EL_ENCARGADO]: 'ranks-7-9',
+    [Role.EL_TENIENTE]: 'ranks-4-6',
+    [Role.SOLDADO]: 'ranks-4-6',
+    [Role.EL_PREFECTO]: 'ranks-4-6',
+    [Role.EL_CONFIDENTE]: 'ranks-1-3',
+    [Role.EL_PROTECTOR]: 'ranks-1-3',
+    [Role.EL_NOVATO]: 'ranks-1-3',
     
     // Legacy
-    [Role.ROUTENVERWALTUNG]: 'rutas',
-    [Role.FUTURO]: 'range-1-3',
+    [Role.ROUTENVERWALTUNG]: 'funktionsleiter-rutas',
+    [Role.FUTURO]: 'ranks-1-3',
     [Role.ADMIN]: 'patron',
-    [Role.QUARTIERMEISTER]: 'logistica',
-    [Role.MITGLIED]: 'range-1-3',
-    [Role.GAST]: 'range-1-3',
+    [Role.QUARTIERMEISTER]: 'funktionsleiter-logistica',
+    [Role.MITGLIED]: 'ranks-1-3',
+    [Role.GAST]: 'ranks-1-3',
   };
 
   constructor(private prisma: PrismaService) {}
