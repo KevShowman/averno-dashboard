@@ -134,7 +134,7 @@ export default function BloodListPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Skull className="h-8 w-8 text-red-500" />
+            <Skull className="h-8 w-8 text-primary" />
             Blood List
           </h1>
           <p className="text-gray-400 mt-1">
@@ -177,14 +177,14 @@ export default function BloodListPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-red-900/20 to-red-800/20 border-red-500/30">
+          <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 border-primary/30">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Aktive Mitglieder</p>
                   <p className="text-3xl font-bold text-white">{stats.totalActive}</p>
                 </div>
-                <User className="h-12 w-12 text-red-400 opacity-50" />
+                <User className="h-12 w-12 text-primary opacity-50" />
               </div>
             </CardContent>
           </Card>
@@ -236,12 +236,12 @@ export default function BloodListPage() {
                 {activeMembers.map((member: BloodRecord) => (
                   <div
                     key={member.id}
-                    className="p-4 bg-gradient-to-r from-red-900/10 to-red-800/5 border border-red-500/20 rounded-lg hover:border-red-500/40 transition-all"
+                    className="p-4 bg-gradient-to-r from-yellow-900/10 to-yellow-800/5 border border-primary/20 rounded-lg hover:border-primary/40 transition-all"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <User className="h-5 w-5 text-red-400" />
+                          <User className="h-5 w-5 text-primary" />
                           <h3 className="text-xl font-bold text-white">
                             {member.vorname} {member.nachname}
                           </h3>
@@ -261,7 +261,7 @@ export default function BloodListPage() {
                           </div>
                         </div>
                         <div className="mt-2 text-sm text-gray-400">
-                          Blood In durch: <span className="text-red-300">{member.bloodinDurch}</span>
+                          Blood In durch: <span className="text-primary">{member.bloodinDurch}</span>
                         </div>
                       </div>
                     </div>
@@ -314,16 +314,16 @@ export default function BloodListPage() {
                           </div>
                         </div>
                         {record.bloodoutGrund && (
-                          <div className="flex items-start gap-2 text-sm bg-red-900/10 border border-red-500/20 p-3 rounded">
-                            <AlertTriangle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
+                          <div className="flex items-start gap-2 text-sm bg-orange-900/10 border border-orange-500/20 p-3 rounded">
+                            <AlertTriangle className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
                             <div>
-                              <span className="text-red-300 font-medium">Grund: </span>
+                              <span className="text-orange-300 font-medium">Grund: </span>
                               <span className="text-gray-300">{record.bloodoutGrund}</span>
                             </div>
                           </div>
                         )}
                         <div className="mt-2 text-sm text-gray-400">
-                          Blood Out durch: <span className="text-red-300">{record.bloodoutDurch}</span>
+                          Blood Out durch: <span className="text-orange-300">{record.bloodoutDurch}</span>
                         </div>
                       </div>
                     </div>
@@ -341,7 +341,7 @@ export default function BloodListPage() {
           <Card className="w-full max-w-md lasanta-card">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Skull className="h-6 w-6 text-red-500" />
+                <Skull className="h-6 w-6 text-primary" />
                 Blood In - Neues Mitglied
               </CardTitle>
               <CardDescription>
@@ -355,7 +355,7 @@ export default function BloodListPage() {
                   <Input
                     value={bloodInData.vorname}
                     onChange={(e) => setBloodInData({ ...bloodInData, vorname: e.target.value })}
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 text-white"
+                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
                     required
                   />
                 </div>
@@ -364,7 +364,7 @@ export default function BloodListPage() {
                   <Input
                     value={bloodInData.nachname}
                     onChange={(e) => setBloodInData({ ...bloodInData, nachname: e.target.value })}
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 text-white"
+                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
                     required
                   />
                 </div>
@@ -374,7 +374,7 @@ export default function BloodListPage() {
                     type="number"
                     value={bloodInData.telefon}
                     onChange={(e) => setBloodInData({ ...bloodInData, telefon: e.target.value })}
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 text-white"
+                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
                     required
                   />
                 </div>
@@ -383,7 +383,7 @@ export default function BloodListPage() {
                   <Input
                     value={bloodInData.steam}
                     onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })}
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 text-white"
+                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
                     required
                   />
                 </div>
@@ -392,7 +392,7 @@ export default function BloodListPage() {
                   <Input
                     value={bloodInData.bloodinDurch}
                     onChange={(e) => setBloodInData({ ...bloodInData, bloodinDurch: e.target.value })}
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 text-white"
+                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
                     placeholder="Name des Berechtigten"
                     required
                   />
@@ -430,10 +430,10 @@ export default function BloodListPage() {
           <Card className="w-full max-w-md lasanta-card">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <UserX className="h-6 w-6 text-red-500" />
+                <UserX className="h-6 w-6 text-orange-500" />
                 Blood Out - Mitglied entfernen
               </CardTitle>
-              <CardDescription className="text-red-400">
+              <CardDescription className="text-orange-400">
                 ⚠️ Diese Aktion kann nicht rückgängig gemacht werden
               </CardDescription>
             </CardHeader>
@@ -447,7 +447,7 @@ export default function BloodListPage() {
                     value={bloodOutData.identifier}
                     onChange={(e) => setBloodOutData({ ...bloodOutData, identifier: e.target.value })}
                     placeholder="z.B. 12345678 oder Max Mustermann"
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 text-white"
+                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">

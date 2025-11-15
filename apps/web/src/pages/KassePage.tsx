@@ -308,13 +308,13 @@ export default function KassePage() {
                     {
                       label: 'Saldo',
                       data: chartData.map(item => item.balance),
-                      borderColor: 'rgb(106, 31, 43)', // Lasanta rot
-                      backgroundColor: 'rgba(106, 31, 43, 0.1)',
+                      borderColor: 'rgb(212, 175, 55)', // Lasanta gold
+                      backgroundColor: 'rgba(212, 175, 55, 0.1)',
                       borderWidth: 3,
                       fill: true,
                       tension: 0.4,
-                      pointBackgroundColor: 'rgb(106, 31, 43)',
-                      pointBorderColor: 'rgb(176, 141, 87)', // Lasanta gold
+                      pointBackgroundColor: 'rgb(212, 175, 55)',
+                      pointBorderColor: 'rgb(255, 215, 0)', // Helles gold
                       pointBorderWidth: 2,
                       pointRadius: 5,
                       pointHoverRadius: 7,
@@ -333,7 +333,7 @@ export default function KassePage() {
                       backgroundColor: 'rgb(31, 41, 55)',
                       titleColor: 'rgb(249, 250, 251)',
                       bodyColor: 'rgb(249, 250, 251)',
-                      borderColor: 'rgb(106, 31, 43)',
+                      borderColor: 'rgb(212, 175, 55)',
                       borderWidth: 2,
                       cornerRadius: 12,
                       displayColors: false,
@@ -359,7 +359,7 @@ export default function KassePage() {
                   scales: {
                     x: {
                       grid: {
-                        color: 'rgba(106, 31, 43, 0.2)',
+                        color: 'rgba(212, 175, 55, 0.2)',
                       },
                       ticks: {
                         color: 'rgb(156, 163, 175)',
@@ -371,7 +371,7 @@ export default function KassePage() {
                     },
                     y: {
                       grid: {
-                        color: 'rgba(106, 31, 43, 0.2)',
+                        color: 'rgba(212, 175, 55, 0.2)',
                       },
                       ticks: {
                         color: 'rgb(156, 163, 175)',
