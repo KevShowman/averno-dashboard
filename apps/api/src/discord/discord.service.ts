@@ -298,10 +298,13 @@ export class DiscordService {
 
       for (const user of users) {
         try {
-          // Konvertiere discordRoles zu Array (falls JSON)
-          const userDiscordRoleIds = Array.isArray(user.discordRoles) 
-            ? user.discordRoles 
-            : (typeof user.discordRoles === 'string' ? JSON.parse(user.discordRoles) : []);
+          // Überspringe User ohne Discord-ID
+          if (!user.discordId) {
+            continue;
+          }
+
+          // WICHTIG: Hole Discord-Rollen DIREKT von Discord API (nicht aus DB!)
+          const userDiscordRoleIds = await this.getUserRoles(user.discordId);
 
           if (userDiscordRoleIds.length === 0) {
             continue;
@@ -357,16 +360,24 @@ export class DiscordService {
             ? user.allRoles 
             : (typeof user.allRoles === 'string' ? JSON.parse(user.allRoles) : []);
 
+          // Prüfe ob sich die System-Rollen geändert haben
           const rolesChanged = user.role !== newHighestRole || 
                               JSON.stringify(currentAllRoles.sort()) !== JSON.stringify(allSystemRoles.sort());
 
-          if (rolesChanged) {
-            // Update User
+          // Prüfe ob sich die Discord-Rollen geändert haben
+          const oldDiscordRoles = Array.isArray(user.discordRoles)
+            ? user.discordRoles
+            : (typeof user.discordRoles === 'string' ? JSON.parse(user.discordRoles) : []);
+          const discordRolesChanged = JSON.stringify(oldDiscordRoles.sort()) !== JSON.stringify(userDiscordRoleIds.sort());
+
+          if (rolesChanged || discordRolesChanged) {
+            // Update User (inklusive Discord-Rollen aus API)
             await this.prisma.user.update({
               where: { id: user.id },
               data: {
                 role: newHighestRole,
                 allRoles: allSystemRoles,
+                discordRoles: userDiscordRoleIds, // Speichere die frisch geholten Rollen
               }
             });
 

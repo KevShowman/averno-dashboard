@@ -2,6 +2,10 @@
 -- Zuerst alle alten/falschen Rollen deaktivieren
 UPDATE discord_role_mappings SET isActive = 0 WHERE isActive = 1;
 
+-- Deaktiviere die Base Member Role (1431388062427906220) permanent
+-- Diese Rolle haben ALLE Member, daher darf sie NICHT für die Rollen-Zuordnung verwendet werden
+UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062427906220';
+
 -- Dann die KORREKTEN Rollen hinzufügen/aktualisieren
 
 -- LEADERSCHAFT
