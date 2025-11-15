@@ -228,7 +228,7 @@ model Settings {
 // Aktensystem
 model MemberFile {
   id              String            @id @default(cuid())
-  userId          String
+  userId          String            @unique
   user            User              @relation("member_files", fields: [userId], references: [id])
   lastUprankDate  DateTime?         // Datum des letzten Upranks
   isArchived      Boolean           @default(false) // Archiviert wenn Blood Out
