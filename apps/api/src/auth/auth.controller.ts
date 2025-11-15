@@ -129,6 +129,7 @@ export class AuthController {
       avatarUrl: user.avatarUrl,
       email: user.email,
       role: user.role,
+      gender: user.gender,
       createdAt: user.createdAt,
     };
   }

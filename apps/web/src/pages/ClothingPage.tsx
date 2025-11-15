@@ -1,8 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Button } from '../components/ui/button'
 import { useAuthStore } from '../stores/auth'
-import { Loader2, Shirt, Info } from 'lucide-react'
+import { Loader2, Shirt, Info, User, Users } from 'lucide-react'
 import { clothingApi } from '../lib/api'
+import { api } from '../lib/api'
+import { toast } from 'sonner'
 
 interface ClothingDisplay {
   part: string
@@ -10,17 +14,47 @@ interface ClothingDisplay {
   item: number | null
   variation: number | null
   customizable: boolean
-  color: number | null
+  color: string | null
 }
 
 export default function ClothingPage() {
   const { user } = useAuthStore()
+  const queryClient = useQueryClient()
+  const [selectedGender, setSelectedGender] = useState<'MALE' | 'FEMALE'>('MALE')
+
+  // Set initial gender from user data
+  useEffect(() => {
+    if (user?.gender) {
+      setSelectedGender(user.gender as 'MALE' | 'FEMALE')
+    }
+  }, [user])
 
   // Load template based on user's rank
-  const { data: template, isLoading: templateLoading } = useQuery({
+  const { data: template, isLoading: templateLoading, refetch } = useQuery({
     queryKey: ['clothing-my-template'],
     queryFn: () => clothingApi.getAllTemplates(),
   })
+
+  // Mutation to update gender
+  const updateGenderMutation = useMutation({
+    mutationFn: async (gender: 'MALE' | 'FEMALE') => {
+      return api.patch('/users/gender', { gender })
+    },
+    onSuccess: () => {
+      toast.success('Geschlecht erfolgreich aktualisiert!')
+      // Refetch user data and clothing template
+      queryClient.invalidateQueries({ queryKey: ['auth'] })
+      refetch()
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Geschlechts')
+    },
+  })
+
+  const handleGenderChange = (gender: 'MALE' | 'FEMALE') => {
+    setSelectedGender(gender)
+    updateGenderMutation.mutate(gender)
+  }
 
   const clothingParts: ClothingDisplay[] = [
     {
@@ -80,9 +114,51 @@ export default function ClothingPage() {
       <header className="space-y-2">
         <h1 className="text-3xl font-bold text-white">Meine Kleidung</h1>
         <p className="text-gray-400">
-          Hier sehen Sie Ihre Kleidung basierend auf Ihrem Rang.
+          Hier sehen Sie Ihre Kleidung basierend auf Ihrem Rang und Geschlecht.
         </p>
       </header>
+
+      {/* Gender Selector - Prominent Display */}
+      <Card className="lasanta-card border-primary/50">
+        <CardHeader>
+          <CardTitle className="text-white">Geschlecht festlegen</CardTitle>
+          <CardDescription className="text-gray-400">
+            Wählen Sie Ihr Geschlecht aus, um die passende Kleidung anzuzeigen.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4 justify-center">
+            <Button
+              variant={selectedGender === 'MALE' ? 'default' : 'outline'}
+              onClick={() => handleGenderChange('MALE')}
+              disabled={updateGenderMutation.isPending}
+              className="flex-1 max-w-xs h-16 text-lg"
+              size="lg"
+            >
+              {updateGenderMutation.isPending && selectedGender === 'MALE' ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                <User className="mr-2 h-5 w-5" />
+              )}
+              Männlich
+            </Button>
+            <Button
+              variant={selectedGender === 'FEMALE' ? 'default' : 'outline'}
+              onClick={() => handleGenderChange('FEMALE')}
+              disabled={updateGenderMutation.isPending}
+              className="flex-1 max-w-xs h-16 text-lg"
+              size="lg"
+            >
+              {updateGenderMutation.isPending && selectedGender === 'FEMALE' ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                <Users className="mr-2 h-5 w-5" />
+              )}
+              Weiblich
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {isLoading ? (
         <Card className="lasanta-card">
@@ -95,7 +171,7 @@ export default function ClothingPage() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Shirt className="h-5 w-5" />
-              Ihre Kleidungsvorlage
+              Ihre Kleidungsvorlage ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
             </CardTitle>
             <CardDescription className="text-gray-400">
               Basierend auf Ihrem Rang ({user?.role})
@@ -178,4 +254,3 @@ export default function ClothingPage() {
     </div>
   )
 }
-

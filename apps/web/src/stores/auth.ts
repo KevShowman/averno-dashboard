@@ -11,6 +11,7 @@ export interface User {
   email?: string
   role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO'
   allRoles?: ('EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO')[]
+  gender?: 'MALE' | 'FEMALE'
   createdAt: string
 }
 

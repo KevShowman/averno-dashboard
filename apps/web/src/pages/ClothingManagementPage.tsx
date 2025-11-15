@@ -283,7 +283,7 @@ export default function ClothingManagementPage() {
                 key={group.id}
                 variant={selectedRankGroup === group.id ? 'default' : 'outline'}
                 onClick={() => setSelectedRankGroup(group.id)}
-                className="justify-start"
+                className={`justify-start ${selectedRankGroup === group.id ? 'text-white' : ''}`}
               >
                 <Shirt className="mr-2 h-4 w-4" />
                 {group.label}
@@ -306,7 +306,7 @@ export default function ClothingManagementPage() {
             <Button
               variant={selectedGender === 'MALE' ? 'default' : 'outline'}
               onClick={() => setSelectedGender('MALE')}
-              className="flex-1"
+              className={`flex-1 ${selectedGender === 'MALE' ? 'text-white' : ''}`}
             >
               <User className="mr-2 h-4 w-4" />
               Männlich
@@ -314,7 +314,7 @@ export default function ClothingManagementPage() {
             <Button
               variant={selectedGender === 'FEMALE' ? 'default' : 'outline'}
               onClick={() => setSelectedGender('FEMALE')}
-              className="flex-1"
+              className={`flex-1 ${selectedGender === 'FEMALE' ? 'text-white' : ''}`}
             >
               <Users className="mr-2 h-4 w-4" />
               Weiblich
@@ -449,7 +449,7 @@ export default function ClothingManagementPage() {
               <Button
                 onClick={handleSave}
                 disabled={saveMutation.isPending}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 text-white"
               >
                 {saveMutation.isPending ? (
                   <>
