@@ -2,13 +2,12 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Body,
   Param,
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { ClothingService, ClothingTemplate, UserClothingData } from './clothing.service';
+import { ClothingService, ClothingTemplate } from './clothing.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('clothing')
@@ -17,18 +16,17 @@ export class ClothingController {
   constructor(private clothingService: ClothingService) {}
 
   /**
-   * Holt das Kleidungs-Template für den eigenen Rang
+   * Holt das Kleidungs-Template für den eigenen Rang und Geschlecht
    * Für alle Benutzer
    */
-  @Get('templates')
-  async getMyTemplate(@Request() req): Promise<any> {
-    // Gibt das Template für den Rang des Users zurück (flaches Format)
-    const template = await this.clothingService.getTemplateForRole(req.user.role);
-    return this.clothingService.flattenTemplate(template);
+  @Get('my-clothing')
+  async getMyClothing(@Request() req): Promise<any> {
+    // Gibt das geschlechts-spezifische Template für den User zurück
+    return this.clothingService.getUserClothing(req.user.id);
   }
 
   /**
-   * Holt ein Template für eine bestimmte Rang-Gruppe
+   * Holt ein Template für eine bestimmte Rang-Gruppe (mit BEIDEN Geschlechtern)
    * Nur für Leaderschaft
    */
   @Get('templates/:rankGroup')
@@ -57,111 +55,68 @@ export class ClothingController {
     // Konvertiere flaches Format vom Frontend zu verschachteltem Format
     const structuredData: Partial<ClothingTemplate> = {
       maske: {
-        item: data.maskItem ?? null,
-        variation: data.maskVariation ?? null,
-        customizable: data.maskCustomizable ?? false,
-        color: data.maskColor ?? null,
+        itemMale: data.maskItemMale ?? null,
+        variationMale: data.maskVariationMale ?? null,
+        customizableMale: data.maskCustomizableMale ?? false,
+        colorMale: data.maskColorMale ?? null,
+        itemFemale: data.maskItemFemale ?? null,
+        variationFemale: data.maskVariationFemale ?? null,
+        customizableFemale: data.maskCustomizableFemale ?? false,
+        colorFemale: data.maskColorFemale ?? null,
       },
       torso: {
-        item: data.torsoItem ?? null,
-        variation: data.torsoVariation ?? null,
-        customizable: data.torsoCustomizable ?? false,
-        color: data.torsoColor ?? null,
+        itemMale: data.torsoItemMale ?? null,
+        variationMale: data.torsoVariationMale ?? null,
+        customizableMale: data.torsoCustomizableMale ?? false,
+        colorMale: data.torsoColorMale ?? null,
+        itemFemale: data.torsoItemFemale ?? null,
+        variationFemale: data.torsoVariationFemale ?? null,
+        customizableFemale: data.torsoCustomizableFemale ?? false,
+        colorFemale: data.torsoColorFemale ?? null,
       },
       tshirt: {
-        item: data.tshirtItem ?? null,
-        variation: data.tshirtVariation ?? null,
-        customizable: data.tshirtCustomizable ?? false,
-        color: data.tshirtColor ?? null,
+        itemMale: data.tshirtItemMale ?? null,
+        variationMale: data.tshirtVariationMale ?? null,
+        customizableMale: data.tshirtCustomizableMale ?? false,
+        colorMale: data.tshirtColorMale ?? null,
+        itemFemale: data.tshirtItemFemale ?? null,
+        variationFemale: data.tshirtVariationFemale ?? null,
+        customizableFemale: data.tshirtCustomizableFemale ?? false,
+        colorFemale: data.tshirtColorFemale ?? null,
       },
       veste: {
-        item: data.vesteItem ?? null,
-        variation: data.vesteVariation ?? null,
-        customizable: data.vesteCustomizable ?? false,
-        color: data.vesteColor ?? null,
+        itemMale: data.vesteItemMale ?? null,
+        variationMale: data.vesteVariationMale ?? null,
+        customizableMale: data.vesteCustomizableMale ?? false,
+        colorMale: data.vesteColorMale ?? null,
+        itemFemale: data.vesteItemFemale ?? null,
+        variationFemale: data.vesteVariationFemale ?? null,
+        customizableFemale: data.vesteCustomizableFemale ?? false,
+        colorFemale: data.vesteColorFemale ?? null,
       },
       hose: {
-        item: data.hoseItem ?? null,
-        variation: data.hoseVariation ?? null,
-        customizable: data.hoseCustomizable ?? false,
-        color: data.hoseColor ?? null,
+        itemMale: data.hoseItemMale ?? null,
+        variationMale: data.hoseVariationMale ?? null,
+        customizableMale: data.hoseCustomizableMale ?? false,
+        colorMale: data.hoseColorMale ?? null,
+        itemFemale: data.hoseItemFemale ?? null,
+        variationFemale: data.hoseVariationFemale ?? null,
+        customizableFemale: data.hoseCustomizableFemale ?? false,
+        colorFemale: data.hoseColorFemale ?? null,
       },
       schuhe: {
-        item: data.schuheItem ?? null,
-        variation: data.schuheVariation ?? null,
-        customizable: data.schuheCustomizable ?? false,
-        color: data.schuheColor ?? null,
+        itemMale: data.schuheItemMale ?? null,
+        variationMale: data.schuheVariationMale ?? null,
+        customizableMale: data.schuheCustomizableMale ?? false,
+        colorMale: data.schuheColorMale ?? null,
+        itemFemale: data.schuheItemFemale ?? null,
+        variationFemale: data.schuheVariationFemale ?? null,
+        customizableFemale: data.schuheCustomizableFemale ?? false,
+        colorFemale: data.schuheColorFemale ?? null,
       },
     };
     
     const result = await this.clothingService.upsertTemplate(req.user.role, rankGroup, structuredData);
     return this.clothingService.flattenTemplate(result);
   }
-
-  /**
-   * Holt die Kleidung für den aktuellen User
-   */
-  @Get('my-clothing')
-  async getMyClothing(@Request() req): Promise<any> {
-    return this.clothingService.getUserClothingFlat(req.user.id);
-  }
-
-  /**
-   * Holt die Kleidung für einen bestimmten User (nur Leaderschaft)
-   */
-  @Get('user/:userId')
-  async getUserClothing(
-    @Request() req,
-    @Param('userId') userId: string
-  ): Promise<{
-    template: ClothingTemplate | null;
-    userCustomization: UserClothingData | null;
-    combinedClothing: any;
-  }> {
-    // Nur Leaderschaft darf andere User anschauen
-    if (!this.clothingService.isLeadership(req.user.role)) {
-      // Normale User dürfen nur ihre eigene Kleidung sehen
-      if (userId !== req.user.id) {
-        throw new Error('Keine Berechtigung');
-      }
-    }
-    return this.clothingService.getUserClothing(userId);
-  }
-
-  /**
-   * Aktualisiert die individuelle Kleidung des aktuellen Users
-   */
-  @Put('my-clothing')
-  async updateMyClothing(
-    @Request() req,
-    @Body() data: any
-  ): Promise<any> {
-    // Konvertiere flaches Format vom Frontend zu verschachteltem Format
-    const structuredData: UserClothingData = {
-      maske: (data.maskItem !== undefined && data.maskVariation !== undefined)
-        ? { item: data.maskItem, variation: data.maskVariation }
-        : undefined,
-      torso: (data.torsoItem !== undefined && data.torsoVariation !== undefined)
-        ? { item: data.torsoItem, variation: data.torsoVariation }
-        : undefined,
-      tshirt: (data.tshirtItem !== undefined && data.tshirtVariation !== undefined)
-        ? { item: data.tshirtItem, variation: data.tshirtVariation }
-        : undefined,
-      veste: (data.vesteItem !== undefined && data.vesteVariation !== undefined)
-        ? { item: data.vesteItem, variation: data.vesteVariation }
-        : undefined,
-      hose: (data.hoseItem !== undefined && data.hoseVariation !== undefined)
-        ? { item: data.hoseItem, variation: data.hoseVariation }
-        : undefined,
-      schuhe: (data.schuheItem !== undefined && data.schuheVariation !== undefined)
-        ? { item: data.schuheItem, variation: data.schuheVariation }
-        : undefined,
-    };
-    
-    await this.clothingService.updateUserClothing(req.user.id, structuredData);
-    
-    // Gib die aktualisierten Daten im flachen Format zurück
-    return this.clothingService.getUserClothingFlat(req.user.id);
-  }
 }
-

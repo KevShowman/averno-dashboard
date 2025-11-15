@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { Role } from '@prisma/client';
+import { Role, Gender } from '@prisma/client';
 
 export interface ClothingItem {
-  item: number | null;
-  variation: number | null;
-  customizable: boolean;
-  color: number | null;
+  itemMale: number | null;
+  variationMale: number | null;
+  customizableMale: boolean;
+  colorMale: number | null;
+  itemFemale: number | null;
+  variationFemale: number | null;
+  customizableFemale: boolean;
+  colorFemale: number | null;
 }
 
 export interface ClothingTemplate {
@@ -17,15 +21,6 @@ export interface ClothingTemplate {
   veste: ClothingItem;
   hose: ClothingItem;
   schuhe: ClothingItem;
-}
-
-export interface UserClothingData {
-  maske?: { item: number; variation: number };
-  torso?: { item: number; variation: number };
-  tshirt?: { item: number; variation: number };
-  veste?: { item: number; variation: number };
-  hose?: { item: number; variation: number };
-  schuhe?: { item: number; variation: number };
 }
 
 @Injectable()
@@ -118,8 +113,119 @@ export class ClothingService {
 
   /**
    * Konvertiert ein Template in ein flaches Format für das Frontend
+   * Beinhaltet BEIDE Geschlechter
    */
   flattenTemplate(template: ClothingTemplate | null): any {
+    if (!template) {
+      return {
+        maskItemMale: null,
+        maskVariationMale: null,
+        maskCustomizableMale: false,
+        maskColorMale: null,
+        maskItemFemale: null,
+        maskVariationFemale: null,
+        maskCustomizableFemale: false,
+        maskColorFemale: null,
+        torsoItemMale: null,
+        torsoVariationMale: null,
+        torsoCustomizableMale: false,
+        torsoColorMale: null,
+        torsoItemFemale: null,
+        torsoVariationFemale: null,
+        torsoCustomizableFemale: false,
+        torsoColorFemale: null,
+        tshirtItemMale: null,
+        tshirtVariationMale: null,
+        tshirtCustomizableMale: false,
+        tshirtColorMale: null,
+        tshirtItemFemale: null,
+        tshirtVariationFemale: null,
+        tshirtCustomizableFemale: false,
+        tshirtColorFemale: null,
+        vesteItemMale: null,
+        vesteVariationMale: null,
+        vesteCustomizableMale: false,
+        vesteColorMale: null,
+        vesteItemFemale: null,
+        vesteVariationFemale: null,
+        vesteCustomizableFemale: false,
+        vesteColorFemale: null,
+        hoseItemMale: null,
+        hoseVariationMale: null,
+        hoseCustomizableMale: false,
+        hoseColorMale: null,
+        hoseItemFemale: null,
+        hoseVariationFemale: null,
+        hoseCustomizableFemale: false,
+        hoseColorFemale: null,
+        schuheItemMale: null,
+        schuheVariationMale: null,
+        schuheCustomizableMale: false,
+        schuheColorMale: null,
+        schuheItemFemale: null,
+        schuheVariationFemale: null,
+        schuheCustomizableFemale: false,
+        schuheColorFemale: null,
+      };
+    }
+
+    return {
+      maskItemMale: template.maske.itemMale,
+      maskVariationMale: template.maske.variationMale,
+      maskCustomizableMale: template.maske.customizableMale,
+      maskColorMale: template.maske.colorMale,
+      maskItemFemale: template.maske.itemFemale,
+      maskVariationFemale: template.maske.variationFemale,
+      maskCustomizableFemale: template.maske.customizableFemale,
+      maskColorFemale: template.maske.colorFemale,
+      torsoItemMale: template.torso.itemMale,
+      torsoVariationMale: template.torso.variationMale,
+      torsoCustomizableMale: template.torso.customizableMale,
+      torsoColorMale: template.torso.colorMale,
+      torsoItemFemale: template.torso.itemFemale,
+      torsoVariationFemale: template.torso.variationFemale,
+      torsoCustomizableFemale: template.torso.customizableFemale,
+      torsoColorFemale: template.torso.colorFemale,
+      tshirtItemMale: template.tshirt.itemMale,
+      tshirtVariationMale: template.tshirt.variationMale,
+      tshirtCustomizableMale: template.tshirt.customizableMale,
+      tshirtColorMale: template.tshirt.colorMale,
+      tshirtItemFemale: template.tshirt.itemFemale,
+      tshirtVariationFemale: template.tshirt.variationFemale,
+      tshirtCustomizableFemale: template.tshirt.customizableFemale,
+      tshirtColorFemale: template.tshirt.colorFemale,
+      vesteItemMale: template.veste.itemMale,
+      vesteVariationMale: template.veste.variationMale,
+      vesteCustomizableMale: template.veste.customizableMale,
+      vesteColorMale: template.veste.colorMale,
+      vesteItemFemale: template.veste.itemFemale,
+      vesteVariationFemale: template.veste.variationFemale,
+      vesteCustomizableFemale: template.veste.customizableFemale,
+      vesteColorFemale: template.veste.colorFemale,
+      hoseItemMale: template.hose.itemMale,
+      hoseVariationMale: template.hose.variationMale,
+      hoseCustomizableMale: template.hose.customizableMale,
+      hoseColorMale: template.hose.colorMale,
+      hoseItemFemale: template.hose.itemFemale,
+      hoseVariationFemale: template.hose.variationFemale,
+      hoseCustomizableFemale: template.hose.customizableFemale,
+      hoseColorFemale: template.hose.colorFemale,
+      schuheItemMale: template.schuhe.itemMale,
+      schuheVariationMale: template.schuhe.variationMale,
+      schuheCustomizableMale: template.schuhe.customizableMale,
+      schuheColorMale: template.schuhe.colorMale,
+      schuheItemFemale: template.schuhe.itemFemale,
+      schuheVariationFemale: template.schuhe.variationFemale,
+      schuheCustomizableFemale: template.schuhe.customizableFemale,
+      schuheColorFemale: template.schuhe.colorFemale,
+    };
+  }
+
+  /**
+   * Konvertiert ein Template in ein geschlechts-spezifisches flaches Format
+   * (nur für EIN Geschlecht)
+   */
+  flattenTemplateForGender(template: ClothingTemplate | null, gender: Gender): any {
     if (!template) {
       return {
         maskItem: null,
@@ -149,31 +255,33 @@ export class ClothingService {
       };
     }
 
+    const isMale = gender === Gender.MALE;
+
     return {
-      maskItem: template.maske.item,
-      maskVariation: template.maske.variation,
-      maskCustomizable: template.maske.customizable,
-      maskColor: template.maske.color,
-      torsoItem: template.torso.item,
-      torsoVariation: template.torso.variation,
-      torsoCustomizable: template.torso.customizable,
-      torsoColor: template.torso.color,
-      tshirtItem: template.tshirt.item,
-      tshirtVariation: template.tshirt.variation,
-      tshirtCustomizable: template.tshirt.customizable,
-      tshirtColor: template.tshirt.color,
-      vesteItem: template.veste.item,
-      vesteVariation: template.veste.variation,
-      vesteCustomizable: template.veste.customizable,
-      vesteColor: template.veste.color,
-      hoseItem: template.hose.item,
-      hoseVariation: template.hose.variation,
-      hoseCustomizable: template.hose.customizable,
-      hoseColor: template.hose.color,
-      schuheItem: template.schuhe.item,
-      schuheVariation: template.schuhe.variation,
-      schuheCustomizable: template.schuhe.customizable,
-      schuheColor: template.schuhe.color,
+      maskItem: isMale ? template.maske.itemMale : template.maske.itemFemale,
+      maskVariation: isMale ? template.maske.variationMale : template.maske.variationFemale,
+      maskCustomizable: isMale ? template.maske.customizableMale : template.maske.customizableFemale,
+      maskColor: isMale ? template.maske.colorMale : template.maske.colorFemale,
+      torsoItem: isMale ? template.torso.itemMale : template.torso.itemFemale,
+      torsoVariation: isMale ? template.torso.variationMale : template.torso.variationFemale,
+      torsoCustomizable: isMale ? template.torso.customizableMale : template.torso.customizableFemale,
+      torsoColor: isMale ? template.torso.colorMale : template.torso.colorFemale,
+      tshirtItem: isMale ? template.tshirt.itemMale : template.tshirt.itemFemale,
+      tshirtVariation: isMale ? template.tshirt.variationMale : template.tshirt.variationFemale,
+      tshirtCustomizable: isMale ? template.tshirt.customizableMale : template.tshirt.customizableFemale,
+      tshirtColor: isMale ? template.tshirt.colorMale : template.tshirt.colorFemale,
+      vesteItem: isMale ? template.veste.itemMale : template.veste.itemFemale,
+      vesteVariation: isMale ? template.veste.variationMale : template.veste.variationFemale,
+      vesteCustomizable: isMale ? template.veste.customizableMale : template.veste.customizableFemale,
+      vesteColor: isMale ? template.veste.colorMale : template.veste.colorFemale,
+      hoseItem: isMale ? template.hose.itemMale : template.hose.itemFemale,
+      hoseVariation: isMale ? template.hose.variationMale : template.hose.variationFemale,
+      hoseCustomizable: isMale ? template.hose.customizableMale : template.hose.customizableFemale,
+      hoseColor: isMale ? template.hose.colorMale : template.hose.colorFemale,
+      schuheItem: isMale ? template.schuhe.itemMale : template.schuhe.itemFemale,
+      schuheVariation: isMale ? template.schuhe.variationMale : template.schuhe.variationFemale,
+      schuheCustomizable: isMale ? template.schuhe.customizableMale : template.schuhe.customizableFemale,
+      schuheColor: isMale ? template.schuhe.colorMale : template.schuhe.colorFemale,
     };
   }
 
@@ -193,57 +301,105 @@ export class ClothingService {
     const template = await this.prisma.rankClothingTemplate.upsert({
       where: { rankGroup },
       update: {
-        maskItem: data.maske?.item,
-        maskVariation: data.maske?.variation,
-        maskCustomizable: data.maske?.customizable ?? false,
-        maskColor: data.maske?.color,
-        torsoItem: data.torso?.item,
-        torsoVariation: data.torso?.variation,
-        torsoCustomizable: data.torso?.customizable ?? false,
-        torsoColor: data.torso?.color,
-        tshirtItem: data.tshirt?.item,
-        tshirtVariation: data.tshirt?.variation,
-        tshirtCustomizable: data.tshirt?.customizable ?? false,
-        tshirtColor: data.tshirt?.color,
-        vesteItem: data.veste?.item,
-        vesteVariation: data.veste?.variation,
-        vesteCustomizable: data.veste?.customizable ?? false,
-        vesteColor: data.veste?.color,
-        hoseItem: data.hose?.item,
-        hoseVariation: data.hose?.variation,
-        hoseCustomizable: data.hose?.customizable ?? false,
-        hoseColor: data.hose?.color,
-        schuheItem: data.schuhe?.item,
-        schuheVariation: data.schuhe?.variation,
-        schuheCustomizable: data.schuhe?.customizable ?? false,
-        schuheColor: data.schuhe?.color,
+        maskItemMale: data.maske?.itemMale,
+        maskVariationMale: data.maske?.variationMale,
+        maskCustomizableMale: data.maske?.customizableMale ?? false,
+        maskColorMale: data.maske?.colorMale,
+        maskItemFemale: data.maske?.itemFemale,
+        maskVariationFemale: data.maske?.variationFemale,
+        maskCustomizableFemale: data.maske?.customizableFemale ?? false,
+        maskColorFemale: data.maske?.colorFemale,
+        torsoItemMale: data.torso?.itemMale,
+        torsoVariationMale: data.torso?.variationMale,
+        torsoCustomizableMale: data.torso?.customizableMale ?? false,
+        torsoColorMale: data.torso?.colorMale,
+        torsoItemFemale: data.torso?.itemFemale,
+        torsoVariationFemale: data.torso?.variationFemale,
+        torsoCustomizableFemale: data.torso?.customizableFemale ?? false,
+        torsoColorFemale: data.torso?.colorFemale,
+        tshirtItemMale: data.tshirt?.itemMale,
+        tshirtVariationMale: data.tshirt?.variationMale,
+        tshirtCustomizableMale: data.tshirt?.customizableMale ?? false,
+        tshirtColorMale: data.tshirt?.colorMale,
+        tshirtItemFemale: data.tshirt?.itemFemale,
+        tshirtVariationFemale: data.tshirt?.variationFemale,
+        tshirtCustomizableFemale: data.tshirt?.customizableFemale ?? false,
+        tshirtColorFemale: data.tshirt?.colorFemale,
+        vesteItemMale: data.veste?.itemMale,
+        vesteVariationMale: data.veste?.variationMale,
+        vesteCustomizableMale: data.veste?.customizableMale ?? false,
+        vesteColorMale: data.veste?.colorMale,
+        vesteItemFemale: data.veste?.itemFemale,
+        vesteVariationFemale: data.veste?.variationFemale,
+        vesteCustomizableFemale: data.veste?.customizableFemale ?? false,
+        vesteColorFemale: data.veste?.colorFemale,
+        hoseItemMale: data.hose?.itemMale,
+        hoseVariationMale: data.hose?.variationMale,
+        hoseCustomizableMale: data.hose?.customizableMale ?? false,
+        hoseColorMale: data.hose?.colorMale,
+        hoseItemFemale: data.hose?.itemFemale,
+        hoseVariationFemale: data.hose?.variationFemale,
+        hoseCustomizableFemale: data.hose?.customizableFemale ?? false,
+        hoseColorFemale: data.hose?.colorFemale,
+        schuheItemMale: data.schuhe?.itemMale,
+        schuheVariationMale: data.schuhe?.variationMale,
+        schuheCustomizableMale: data.schuhe?.customizableMale ?? false,
+        schuheColorMale: data.schuhe?.colorMale,
+        schuheItemFemale: data.schuhe?.itemFemale,
+        schuheVariationFemale: data.schuhe?.variationFemale,
+        schuheCustomizableFemale: data.schuhe?.customizableFemale ?? false,
+        schuheColorFemale: data.schuhe?.colorFemale,
       },
       create: {
         rankGroup,
-        maskItem: data.maske?.item,
-        maskVariation: data.maske?.variation,
-        maskCustomizable: data.maske?.customizable ?? false,
-        maskColor: data.maske?.color,
-        torsoItem: data.torso?.item,
-        torsoVariation: data.torso?.variation,
-        torsoCustomizable: data.torso?.customizable ?? false,
-        torsoColor: data.torso?.color,
-        tshirtItem: data.tshirt?.item,
-        tshirtVariation: data.tshirt?.variation,
-        tshirtCustomizable: data.tshirt?.customizable ?? false,
-        tshirtColor: data.tshirt?.color,
-        vesteItem: data.veste?.item,
-        vesteVariation: data.veste?.variation,
-        vesteCustomizable: data.veste?.customizable ?? false,
-        vesteColor: data.veste?.color,
-        hoseItem: data.hose?.item,
-        hoseVariation: data.hose?.variation,
-        hoseCustomizable: data.hose?.customizable ?? false,
-        hoseColor: data.hose?.color,
-        schuheItem: data.schuhe?.item,
-        schuheVariation: data.schuhe?.variation,
-        schuheCustomizable: data.schuhe?.customizable ?? false,
-        schuheColor: data.schuhe?.color,
+        maskItemMale: data.maske?.itemMale,
+        maskVariationMale: data.maske?.variationMale,
+        maskCustomizableMale: data.maske?.customizableMale ?? false,
+        maskColorMale: data.maske?.colorMale,
+        maskItemFemale: data.maske?.itemFemale,
+        maskVariationFemale: data.maske?.variationFemale,
+        maskCustomizableFemale: data.maske?.customizableFemale ?? false,
+        maskColorFemale: data.maske?.colorFemale,
+        torsoItemMale: data.torso?.itemMale,
+        torsoVariationMale: data.torso?.variationMale,
+        torsoCustomizableMale: data.torso?.customizableMale ?? false,
+        torsoColorMale: data.torso?.colorMale,
+        torsoItemFemale: data.torso?.itemFemale,
+        torsoVariationFemale: data.torso?.variationFemale,
+        torsoCustomizableFemale: data.torso?.customizableFemale ?? false,
+        torsoColorFemale: data.torso?.colorFemale,
+        tshirtItemMale: data.tshirt?.itemMale,
+        tshirtVariationMale: data.tshirt?.variationMale,
+        tshirtCustomizableMale: data.tshirt?.customizableMale ?? false,
+        tshirtColorMale: data.tshirt?.colorMale,
+        tshirtItemFemale: data.tshirt?.itemFemale,
+        tshirtVariationFemale: data.tshirt?.variationFemale,
+        tshirtCustomizableFemale: data.tshirt?.customizableFemale ?? false,
+        tshirtColorFemale: data.tshirt?.colorFemale,
+        vesteItemMale: data.veste?.itemMale,
+        vesteVariationMale: data.veste?.variationMale,
+        vesteCustomizableMale: data.veste?.customizableMale ?? false,
+        vesteColorMale: data.veste?.colorMale,
+        vesteItemFemale: data.veste?.itemFemale,
+        vesteVariationFemale: data.veste?.variationFemale,
+        vesteCustomizableFemale: data.veste?.customizableFemale ?? false,
+        vesteColorFemale: data.veste?.colorFemale,
+        hoseItemMale: data.hose?.itemMale,
+        hoseVariationMale: data.hose?.variationMale,
+        hoseCustomizableMale: data.hose?.customizableMale ?? false,
+        hoseColorMale: data.hose?.colorMale,
+        hoseItemFemale: data.hose?.itemFemale,
+        hoseVariationFemale: data.hose?.variationFemale,
+        hoseCustomizableFemale: data.hose?.customizableFemale ?? false,
+        hoseColorFemale: data.hose?.colorFemale,
+        schuheItemMale: data.schuhe?.itemMale,
+        schuheVariationMale: data.schuhe?.variationMale,
+        schuheCustomizableMale: data.schuhe?.customizableMale ?? false,
+        schuheColorMale: data.schuhe?.colorMale,
+        schuheItemFemale: data.schuhe?.itemFemale,
+        schuheVariationFemale: data.schuhe?.variationFemale,
+        schuheCustomizableFemale: data.schuhe?.customizableFemale ?? false,
+        schuheColorFemale: data.schuhe?.colorFemale,
       },
     });
 
@@ -251,17 +407,13 @@ export class ClothingService {
   }
 
   /**
-   * Holt die Kleidung für einen User basierend auf seinem Rang
+   * Holt die Kleidung für einen User basierend auf Rang + Geschlecht
    */
-  async getUserClothing(userId: string): Promise<{
-    template: ClothingTemplate | null;
-    userCustomization: UserClothingData | null;
-    combinedClothing: any;
-  }> {
-    // User und dessen Rolle holen
+  async getUserClothing(userId: string): Promise<any> {
+    // User, Rolle und Geschlecht holen
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true },
+      select: { role: true, gender: true },
     });
 
     if (!user) {
@@ -274,232 +426,8 @@ export class ClothingService {
     // Template für die Rang-Gruppe holen
     const template = await this.getTemplateByRankGroup(rankGroup);
 
-    // User-spezifische Kleidung holen (falls vorhanden)
-    const userClothing = await this.prisma.userClothing.findUnique({
-      where: { userId },
-    });
-
-    const userCustomization = userClothing
-      ? {
-          maske: userClothing.maskItem && userClothing.maskVariation
-            ? { item: userClothing.maskItem, variation: userClothing.maskVariation }
-            : undefined,
-          torso: userClothing.torsoItem && userClothing.torsoVariation
-            ? { item: userClothing.torsoItem, variation: userClothing.torsoVariation }
-            : undefined,
-          tshirt: userClothing.tshirtItem && userClothing.tshirtVariation
-            ? { item: userClothing.tshirtItem, variation: userClothing.tshirtVariation }
-            : undefined,
-          veste: userClothing.vesteItem && userClothing.vesteVariation
-            ? { item: userClothing.vesteItem, variation: userClothing.vesteVariation }
-            : undefined,
-          hose: userClothing.hoseItem && userClothing.hoseVariation
-            ? { item: userClothing.hoseItem, variation: userClothing.hoseVariation }
-            : undefined,
-          schuhe: userClothing.schuheItem && userClothing.schuheVariation
-            ? { item: userClothing.schuheItem, variation: userClothing.schuheVariation }
-            : undefined,
-        }
-      : null;
-
-    // Kombiniere Template und User-Customization
-    const combinedClothing = this.combineClothing(template, userCustomization);
-
-    return {
-      template,
-      userCustomization,
-      combinedClothing,
-    };
-  }
-
-  /**
-   * Holt die User-Clothing-Daten als flaches Objekt (für Frontend)
-   */
-  async getUserClothingFlat(userId: string): Promise<any> {
-    const userClothing = await this.prisma.userClothing.findUnique({
-      where: { userId },
-    });
-    
-    return userClothing || {
-      maskItem: null,
-      maskVariation: null,
-      torsoItem: null,
-      torsoVariation: null,
-      tshirtItem: null,
-      tshirtVariation: null,
-      vesteItem: null,
-      vesteVariation: null,
-      hoseItem: null,
-      hoseVariation: null,
-      schuheItem: null,
-      schuheVariation: null,
-    };
-  }
-
-  /**
-   * Aktualisiert die individuelle Kleidung eines Users
-   * Nur customizable Teile dürfen geändert werden
-   */
-  async updateUserClothing(
-    userId: string,
-    data: UserClothingData
-  ): Promise<UserClothingData> {
-    // User und Rolle holen
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
-    });
-
-    if (!user) {
-      throw new NotFoundException('Benutzer nicht gefunden');
-    }
-
-    // Rang-Gruppe und Template holen
-    const rankGroup = this.getRankGroup(user.role);
-    const template = await this.getTemplateByRankGroup(rankGroup);
-
-    if (!template) {
-      throw new NotFoundException('Kein Kleidungs-Template für diese Rang-Gruppe gefunden');
-    }
-
-    // Prüfe, welche Teile customizable sind
-    const updates: any = {};
-
-    if (data.maske && template.maske.customizable) {
-      updates.maskItem = data.maske.item;
-      updates.maskVariation = data.maske.variation;
-    }
-
-    if (data.torso && template.torso.customizable) {
-      updates.torsoItem = data.torso.item;
-      updates.torsoVariation = data.torso.variation;
-    }
-
-    if (data.tshirt && template.tshirt.customizable) {
-      updates.tshirtItem = data.tshirt.item;
-      updates.tshirtVariation = data.tshirt.variation;
-    }
-
-    if (data.veste && template.veste.customizable) {
-      updates.vesteItem = data.veste.item;
-      updates.vesteVariation = data.veste.variation;
-    }
-
-    if (data.hose && template.hose.customizable) {
-      updates.hoseItem = data.hose.item;
-      updates.hoseVariation = data.hose.variation;
-    }
-
-    if (data.schuhe && template.schuhe.customizable) {
-      updates.schuheItem = data.schuhe.item;
-      updates.schuheVariation = data.schuhe.variation;
-    }
-
-    // Aktualisiere User-Kleidung
-    const userClothing = await this.prisma.userClothing.upsert({
-      where: { userId },
-      update: updates,
-      create: {
-        userId,
-        ...updates,
-      },
-    });
-
-    return {
-      maske: userClothing.maskItem && userClothing.maskVariation
-        ? { item: userClothing.maskItem, variation: userClothing.maskVariation }
-        : undefined,
-      torso: userClothing.torsoItem && userClothing.torsoVariation
-        ? { item: userClothing.torsoItem, variation: userClothing.torsoVariation }
-        : undefined,
-      tshirt: userClothing.tshirtItem && userClothing.tshirtVariation
-        ? { item: userClothing.tshirtItem, variation: userClothing.tshirtVariation }
-        : undefined,
-      veste: userClothing.vesteItem && userClothing.vesteVariation
-        ? { item: userClothing.vesteItem, variation: userClothing.vesteVariation }
-        : undefined,
-      hose: userClothing.hoseItem && userClothing.hoseVariation
-        ? { item: userClothing.hoseItem, variation: userClothing.hoseVariation }
-        : undefined,
-      schuhe: userClothing.schuheItem && userClothing.schuheVariation
-        ? { item: userClothing.schuheItem, variation: userClothing.schuheVariation }
-        : undefined,
-    };
-  }
-
-  /**
-   * Kombiniert Template und User-Customization
-   */
-  private combineClothing(
-    template: ClothingTemplate | null,
-    userCustomization: UserClothingData | null
-  ): any {
-    if (!template) {
-      return null;
-    }
-
-    return {
-      maske: {
-        item: template.maske.customizable && userCustomization?.maske
-          ? userCustomization.maske.item
-          : template.maske.item,
-        variation: template.maske.customizable && userCustomization?.maske
-          ? userCustomization.maske.variation
-          : template.maske.variation,
-        color: template.maske.color,
-        customizable: template.maske.customizable,
-      },
-      torso: {
-        item: template.torso.customizable && userCustomization?.torso
-          ? userCustomization.torso.item
-          : template.torso.item,
-        variation: template.torso.customizable && userCustomization?.torso
-          ? userCustomization.torso.variation
-          : template.torso.variation,
-        color: template.torso.color,
-        customizable: template.torso.customizable,
-      },
-      tshirt: {
-        item: template.tshirt.customizable && userCustomization?.tshirt
-          ? userCustomization.tshirt.item
-          : template.tshirt.item,
-        variation: template.tshirt.customizable && userCustomization?.tshirt
-          ? userCustomization.tshirt.variation
-          : template.tshirt.variation,
-        color: template.tshirt.color,
-        customizable: template.tshirt.customizable,
-      },
-      veste: {
-        item: template.veste.customizable && userCustomization?.veste
-          ? userCustomization.veste.item
-          : template.veste.item,
-        variation: template.veste.customizable && userCustomization?.veste
-          ? userCustomization.veste.variation
-          : template.veste.variation,
-        color: template.veste.color,
-        customizable: template.veste.customizable,
-      },
-      hose: {
-        item: template.hose.customizable && userCustomization?.hose
-          ? userCustomization.hose.item
-          : template.hose.item,
-        variation: template.hose.customizable && userCustomization?.hose
-          ? userCustomization.hose.variation
-          : template.hose.variation,
-        color: template.hose.color,
-        customizable: template.hose.customizable,
-      },
-      schuhe: {
-        item: template.schuhe.customizable && userCustomization?.schuhe
-          ? userCustomization.schuhe.item
-          : template.schuhe.item,
-        variation: template.schuhe.customizable && userCustomization?.schuhe
-          ? userCustomization.schuhe.variation
-          : template.schuhe.variation,
-        color: template.schuhe.color,
-        customizable: template.schuhe.customizable,
-      },
-    };
+    // Geschlecht-spezifisches Template zurückgeben
+    return this.flattenTemplateForGender(template, user.gender || Gender.MALE);
   }
 
   /**
@@ -509,42 +437,65 @@ export class ClothingService {
     return {
       rankGroup: template.rankGroup,
       maske: {
-        item: template.maskItem,
-        variation: template.maskVariation,
-        customizable: template.maskCustomizable,
-        color: template.maskColor,
+        itemMale: template.maskItemMale,
+        variationMale: template.maskVariationMale,
+        customizableMale: template.maskCustomizableMale,
+        colorMale: template.maskColorMale,
+        itemFemale: template.maskItemFemale,
+        variationFemale: template.maskVariationFemale,
+        customizableFemale: template.maskCustomizableFemale,
+        colorFemale: template.maskColorFemale,
       },
       torso: {
-        item: template.torsoItem,
-        variation: template.torsoVariation,
-        customizable: template.torsoCustomizable,
-        color: template.torsoColor,
+        itemMale: template.torsoItemMale,
+        variationMale: template.torsoVariationMale,
+        customizableMale: template.torsoCustomizableMale,
+        colorMale: template.torsoColorMale,
+        itemFemale: template.torsoItemFemale,
+        variationFemale: template.torsoVariationFemale,
+        customizableFemale: template.torsoCustomizableFemale,
+        colorFemale: template.torsoColorFemale,
       },
       tshirt: {
-        item: template.tshirtItem,
-        variation: template.tshirtVariation,
-        customizable: template.tshirtCustomizable,
-        color: template.tshirtColor,
+        itemMale: template.tshirtItemMale,
+        variationMale: template.tshirtVariationMale,
+        customizableMale: template.tshirtCustomizableMale,
+        colorMale: template.tshirtColorMale,
+        itemFemale: template.tshirtItemFemale,
+        variationFemale: template.tshirtVariationFemale,
+        customizableFemale: template.tshirtCustomizableFemale,
+        colorFemale: template.tshirtColorFemale,
       },
       veste: {
-        item: template.vesteItem,
-        variation: template.vesteVariation,
-        customizable: template.vesteCustomizable,
-        color: template.vesteColor,
+        itemMale: template.vesteItemMale,
+        variationMale: template.vesteVariationMale,
+        customizableMale: template.vesteCustomizableMale,
+        colorMale: template.vesteColorMale,
+        itemFemale: template.vesteItemFemale,
+        variationFemale: template.vesteVariationFemale,
+        customizableFemale: template.vesteCustomizableFemale,
+        colorFemale: template.vesteColorFemale,
       },
       hose: {
-        item: template.hoseItem,
-        variation: template.hoseVariation,
-        customizable: template.hoseCustomizable,
-        color: template.hoseColor,
+        itemMale: template.hoseItemMale,
+        variationMale: template.hoseVariationMale,
+        customizableMale: template.hoseCustomizableMale,
+        colorMale: template.hoseColorMale,
+        itemFemale: template.hoseItemFemale,
+        variationFemale: template.hoseVariationFemale,
+        customizableFemale: template.hoseCustomizableFemale,
+        colorFemale: template.hoseColorFemale,
       },
       schuhe: {
-        item: template.schuheItem,
-        variation: template.schuheVariation,
-        customizable: template.schuheCustomizable,
-        color: template.schuheColor,
+        itemMale: template.schuheItemMale,
+        variationMale: template.schuheVariationMale,
+        customizableMale: template.schuheCustomizableMale,
+        colorMale: template.schuheColorMale,
+        itemFemale: template.schuheItemFemale,
+        variationFemale: template.schuheVariationFemale,
+        customizableFemale: template.schuheCustomizableFemale,
+        colorFemale: template.schuheColorFemale,
       },
     };
   }
 }
-

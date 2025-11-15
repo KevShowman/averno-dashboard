@@ -25,6 +25,10 @@ interface UpdateIcNameDto {
   icLastName: string;
 }
 
+interface UpdateGenderDto {
+  gender: 'MALE' | 'FEMALE';
+}
+
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
@@ -71,6 +75,15 @@ export class UsersController {
       updateDto.icFirstName,
       updateDto.icLastName
     );
+  }
+
+  // Geschlecht aktualisieren (eigener User oder Leadership)
+  @Patch('gender')
+  async updateGender(
+    @Body() updateDto: UpdateGenderDto,
+    @Request() req
+  ) {
+    return this.usersService.updateGender(req.user.id, updateDto.gender);
   }
 
   // User-Rollen aktualisieren (nur El Patron)

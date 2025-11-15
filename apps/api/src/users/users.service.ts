@@ -282,6 +282,26 @@ export class UsersService {
         username: true,
         icFirstName: true,
         icLastName: true,
+        gender: true,
+        role: true,
+        allRoles: true,
+      },
+    });
+  }
+
+  // Geschlecht aktualisieren
+  async updateGender(userId: string, gender: 'MALE' | 'FEMALE') {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        gender,
+      },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        gender: true,
         role: true,
         allRoles: true,
       },

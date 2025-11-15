@@ -273,12 +273,12 @@ export default function ClothingManagementPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`${part.id}-color`} className="text-gray-300">
-                        Farbvorgabe
+                        Farbvorgabe (nur bei "Anpassbar")
                       </Label>
                       <Input
                         id={`${part.id}-color`}
                         type="number"
-                        placeholder="z.B. 0"
+                        placeholder="z.B. 0 für schwarz"
                         value={partData.color ?? ''}
                         onChange={(e) =>
                           updateClothingPart(
@@ -310,9 +310,9 @@ export default function ClothingManagementPage() {
                     </div>
                   </div>
                   {partData.customizable && (
-                    <p className="text-sm text-yellow-400">
-                      ⚠️ Benutzer können dieses Teil selbst wählen, aber die Farbvorgabe wird
-                      angewendet.
+                    <p className="text-sm text-blue-400">
+                      ℹ️ Bei "Anpassbar" wird KEINE Item/Variation vorgegeben. Benutzer können das Teil
+                      frei wählen in der vorgegebenen Farbe.
                     </p>
                   )}
                 </div>

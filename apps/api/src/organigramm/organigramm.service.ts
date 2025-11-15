@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { Role } from '@prisma/client';
 
 export interface RoleAssignmentDto {
   roleId: string;
@@ -11,116 +12,98 @@ export interface RoleAssignmentDto {
 
 @Injectable()
 export class OrganigrammService {
+  // Mapping von System-Rollen zu Organigramm-Kategorien
+  private readonly roleMapping: Record<Role, string> = {
+    // Leaderschaft
+    [Role.EL_PATRON]: 'patron',
+    [Role.DON_CAPITAN]: 'capitan',
+    [Role.DON_COMANDANTE]: 'comandante',
+    [Role.EL_MANO_DERECHA]: 'mano-derecha',
+    
+    // Funktionsrollen
+    [Role.CONSEJERO]: 'consejero',
+    [Role.RUTAS]: 'rutas',
+    [Role.LOGISTICA]: 'logistica',
+    [Role.INTELIGENCIA]: 'inteligencia',
+    [Role.FORMACION]: 'formacion',
+    [Role.SICARIO]: 'sicario',
+    [Role.CONTACTO]: 'contacto',
+    
+    // Normale Ränge
+    [Role.EL_CUSTODIO]: 'range-7-9',
+    [Role.EL_MENTOR]: 'range-7-9',
+    [Role.EL_ENCARGADO]: 'range-7-9',
+    [Role.EL_TENIENTE]: 'range-4-6',
+    [Role.SOLDADO]: 'range-4-6',
+    [Role.EL_PREFECTO]: 'range-4-6',
+    [Role.EL_CONFIDENTE]: 'range-1-3',
+    [Role.EL_PROTECTOR]: 'range-1-3',
+    [Role.EL_NOVATO]: 'range-1-3',
+    
+    // Legacy
+    [Role.ROUTENVERWALTUNG]: 'rutas',
+    [Role.FUTURO]: 'range-1-3',
+    [Role.ADMIN]: 'patron',
+    [Role.QUARTIERMEISTER]: 'logistica',
+    [Role.MITGLIED]: 'range-1-3',
+    [Role.GAST]: 'range-1-3',
+  };
+
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Gibt alle Rollen-Zuordnungen basierend auf user.allRoles automatisch zurück
+   */
   async getAllAssignments(): Promise<Record<string, RoleAssignmentDto[]>> {
-    const assignments = await this.prisma.organigrammAssignment.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-            avatarUrl: true,
-          },
-        },
-      },
-    });
-
-    // Gruppiere nach roleId
-    const grouped: Record<string, RoleAssignmentDto[]> = {};
-    for (const assignment of assignments) {
-      if (!grouped[assignment.roleId]) {
-        grouped[assignment.roleId] = [];
-      }
-      grouped[assignment.roleId].push({
-        roleId: assignment.roleId,
-        userId: assignment.user.id,
-        username: assignment.user.username,
-        displayName:
-          assignment.user.icFirstName && assignment.user.icLastName
-            ? `${assignment.user.icFirstName} ${assignment.user.icLastName}`
-            : assignment.user.username,
-        avatarUrl: assignment.user.avatarUrl || undefined,
-      });
-    }
-
-    return grouped;
-  }
-
-  async assignUserToRole(roleId: string, userId: string): Promise<RoleAssignmentDto> {
-    // Prüfe ob User existiert
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    // Hole alle User mit ihren Rollen
+    const users = await this.prisma.user.findMany({
       select: {
         id: true,
         username: true,
         icFirstName: true,
         icLastName: true,
         avatarUrl: true,
+        role: true,
+        allRoles: true,
       },
     });
 
-    if (!user) {
-      throw new NotFoundException('Benutzer nicht gefunden');
-    }
+    // Gruppiere nach roleId (Organigramm-Kategorien)
+    const grouped: Record<string, RoleAssignmentDto[]> = {};
 
-    // Prüfe ob bereits zugewiesen
-    const existing = await this.prisma.organigrammAssignment.findUnique({
-      where: {
-        roleId_userId: {
-          roleId,
-          userId,
-        },
-      },
-    });
+    for (const user of users) {
+      // Alle Rollen des Users (allRoles oder fallback auf role)
+      const allRoles = Array.isArray(user.allRoles) ? (user.allRoles as Role[]) : [];
+      const userRoles = allRoles.length > 0 ? allRoles : [user.role];
 
-    if (existing) {
-      // Bereits zugewiesen, gib die Daten zurück
-      return {
-        roleId,
-        userId: user.id,
-        username: user.username,
-        displayName:
-          user.icFirstName && user.icLastName
-            ? `${user.icFirstName} ${user.icLastName}`
-            : user.username,
-        avatarUrl: user.avatarUrl || undefined,
-      };
-    }
-
-    // Erstelle neue Zuweisung
-    await this.prisma.organigrammAssignment.create({
-      data: {
-        roleId,
-        userId,
-      },
-    });
-
-    return {
-      roleId,
-      userId: user.id,
-      username: user.username,
-      displayName:
+      const displayName =
         user.icFirstName && user.icLastName
           ? `${user.icFirstName} ${user.icLastName}`
-          : user.username,
-      avatarUrl: user.avatarUrl || undefined,
-    };
-  }
+          : user.username;
 
-  async removeUserFromRole(roleId: string, userId: string): Promise<void> {
-    await this.prisma.organigrammAssignment.deleteMany({
-      where: {
-        roleId,
-        userId,
-      },
-    });
-  }
+      // Für jede Rolle des Users, füge ihn zur entsprechenden Organigramm-Kategorie hinzu
+      userRoles.forEach((role) => {
+        const organigrammCategory = this.roleMapping[role as Role];
+        if (organigrammCategory) {
+          if (!grouped[organigrammCategory]) {
+            grouped[organigrammCategory] = [];
+          }
 
-  async removeAllAssignments(): Promise<void> {
-    await this.prisma.organigrammAssignment.deleteMany();
+          // Prüfe ob User bereits in dieser Kategorie ist (avoid duplicates)
+          const exists = grouped[organigrammCategory].some((m) => m.userId === user.id);
+          if (!exists) {
+            grouped[organigrammCategory].push({
+              roleId: organigrammCategory,
+              userId: user.id,
+              username: user.username,
+              displayName,
+              avatarUrl: user.avatarUrl || undefined,
+            });
+          }
+        }
+      });
+    }
+
+    return grouped;
   }
 }
-

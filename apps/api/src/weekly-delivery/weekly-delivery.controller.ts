@@ -182,14 +182,14 @@ export class WeeklyDeliveryController {
 
   // Archivierte Wochen abrufen
   @Get('archives')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.SOLDADO)
   async getArchives() {
     return this.weeklyDeliveryService.getArchives();
   }
 
   // Archiv-Details abrufen
   @Get('archives/:id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.SICARIO, Role.SOLDADO)
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.SOLDADO)
   async getArchiveDetails(@Param('id') archiveId: string) {
     return this.weeklyDeliveryService.getArchiveDetails(archiveId);
   }

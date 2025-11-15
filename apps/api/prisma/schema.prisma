@@ -18,6 +18,7 @@ model User {
   icLastName   String? // IC Nachname
   avatarUrl    String?
   email        String?
+  gender       Gender?  @default(MALE) // Geschlecht für Kleidungszuweisung
   role         Role     @default(SOLDADO)
   allRoles     Json     @default("[]") // Alle System-Rollen des Users (JSON array)
   discordRoles Json     @default("[]") // Discord Rollen-IDs (JSON array)
@@ -74,10 +75,16 @@ enum Role {
   EL_CONFIDENTE // 🫢 - Rang 3 - Vertrauensperson der Führung
   EL_PROTECTOR // 🐢 - Rang 2 - Schutz der Führung
   EL_NOVATO // 🌱 - Rang 1 - Neuling / Probezeit
-  // Legacy Rollen
-  ROUTENVERWALTUNG // Kann Kokain-Deposits bestätigen
-  LOGISTICA // Kann Lagerbewegungen bestätigen
-  SICARIO // Erweiterte Berechtigungen
+  // Funktionsrollen (zusätzliche Rollen neben Rang)
+  CONSEJERO // 🧘 - Consejero/a (Berater)
+  RUTAS // 🚛 - Rutas (Routenverwaltung)
+  LOGISTICA // 📦 - Logística (Lagerverwaltung)
+  INTELIGENCIA // 🧠 - Inteligencia (Nachrichtendienst)
+  FORMACION // 🎓 - Formación (Ausbildung)
+  SICARIO // 🔫 - Sicario (Spezialkräfte)
+  CONTACTO // 📞 - Contacto (Kontaktperson)
+  // Legacy Rollen (deprecated)
+  ROUTENVERWALTUNG // Alte Routenverwaltung
   FUTURO // Anwärter, niedrigste Rolle, nur lesen
 }
 
@@ -567,47 +574,88 @@ enum ProcessorStatus {
   COMPLETED  // Entnahme wurde bestätigt
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 // Kleidungsmanagement-System
 // Rang-Gruppen für Kleidung: 1-3, 4-6, 7-9, plus individuelle Leaderschaft-Ränge
 model RankClothingTemplate {
   id               String   @id @default(cuid())
   rankGroup        String // "1-3", "4-6", "7-9", "EL_PATRON", "DON_CAPITAN", "DON_COMANDANTE", "EL_MANO_DERECHA"
   
-  // Maske
-  maskItem         Int?
-  maskVariation    Int?
-  maskCustomizable Boolean  @default(false) // Kann vom User selbst gewählt werden
-  maskColor        Int? // Farbvorgabe (wenn customizable = true)
+  // Maske (Männer)
+  maskItemMale         Int?
+  maskVariationMale    Int?
+  maskCustomizableMale Boolean  @default(false) // Kann vom User selbst gewählt werden
+  maskColorMale        Int? // Farbvorgabe (wenn customizable = true)
   
-  // Torso
-  torsoItem        Int?
-  torsoVariation   Int?
-  torsoCustomizable Boolean  @default(false)
-  torsoColor       Int?
+  // Maske (Frauen)
+  maskItemFemale         Int?
+  maskVariationFemale    Int?
+  maskCustomizableFemale Boolean  @default(false)
+  maskColorFemale        Int?
   
-  // T-Shirt
-  tshirtItem       Int?
-  tshirtVariation  Int?
-  tshirtCustomizable Boolean  @default(false)
-  tshirtColor      Int?
+  // Torso (Männer)
+  torsoItemMale         Int?
+  torsoVariationMale    Int?
+  torsoCustomizableMale Boolean  @default(false)
+  torsoColorMale        Int?
   
-  // Weste
-  vesteItem        Int?
-  vesteVariation   Int?
-  vesteCustomizable Boolean  @default(false)
-  vesteColor       Int?
+  // Torso (Frauen)
+  torsoItemFemale         Int?
+  torsoVariationFemale    Int?
+  torsoCustomizableFemale Boolean  @default(false)
+  torsoColorFemale        Int?
   
-  // Hose
-  hoseItem         Int?
-  hoseVariation    Int?
-  hoseCustomizable Boolean  @default(false)
-  hoseColor        Int?
+  // T-Shirt (Männer)
+  tshirtItemMale         Int?
+  tshirtVariationMale    Int?
+  tshirtCustomizableMale Boolean  @default(false)
+  tshirtColorMale        Int?
   
-  // Schuhe
-  schuheItem       Int?
-  schuheVariation  Int?
-  schuheCustomizable Boolean  @default(false)
-  schuheColor      Int?
+  // T-Shirt (Frauen)
+  tshirtItemFemale         Int?
+  tshirtVariationFemale    Int?
+  tshirtCustomizableFemale Boolean  @default(false)
+  tshirtColorFemale        Int?
+  
+  // Weste (Männer)
+  vesteItemMale         Int?
+  vesteVariationMale    Int?
+  vesteCustomizableMale Boolean  @default(false)
+  vesteColorMale        Int?
+  
+  // Weste (Frauen)
+  vesteItemFemale         Int?
+  vesteVariationFemale    Int?
+  vesteCustomizableFemale Boolean  @default(false)
+  vesteColorFemale        Int?
+  
+  // Hose (Männer)
+  hoseItemMale         Int?
+  hoseVariationMale    Int?
+  hoseCustomizableMale Boolean  @default(false)
+  hoseColorMale        Int?
+  
+  // Hose (Frauen)
+  hoseItemFemale         Int?
+  hoseVariationFemale    Int?
+  hoseCustomizableFemale Boolean  @default(false)
+  hoseColorFemale        Int?
+  
+  // Schuhe (Männer)
+  schuheItemMale         Int?
+  schuheVariationMale    Int?
+  schuheCustomizableMale Boolean  @default(false)
+  schuheColorMale        Int?
+  
+  // Schuhe (Frauen)
+  schuheItemFemale         Int?
+  schuheVariationFemale    Int?
+  schuheCustomizableFemale Boolean  @default(false)
+  schuheColorFemale        Int?
   
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -616,32 +664,4 @@ model RankClothingTemplate {
   @@map("rank_clothing_templates")
 }
 
-// Individuelle Kleidungsoptionen für User (falls customizable = true)
-model UserClothing {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  
-  // Nur die Teile, die der User selbst wählen darf
-  maskItem        Int?
-  maskVariation   Int?
-  
-  torsoItem       Int?
-  torsoVariation  Int?
-  
-  tshirtItem      Int?
-  tshirtVariation Int?
-  
-  vesteItem       Int?
-  vesteVariation  Int?
-  
-  hoseItem        Int?
-  hoseVariation   Int?
-  
-  schuheItem      Int?
-  schuheVariation Int?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@map("user_clothing")
-}
+// Discord Role Mappings
