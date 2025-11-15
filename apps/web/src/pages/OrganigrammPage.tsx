@@ -778,62 +778,6 @@ export default function OrganigrammPage() {
 
       <Card className="lasanta-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
-            <Users className="h-5 w-5" />
-            Rollen-Zuordnungen
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            Mitglieder werden automatisch aus Discord synchronisiert. Aktualisierung alle 5 Minuten.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {isLoadingAssignments ? (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Lade Rollen-Zuordnungen...
-            </div>
-          ) : (
-              assignmentRoles.map((role) => {
-                const assignedMembers = assignments[role.id] ?? []
-                return (
-                  <Card key={role.id} className="border border-gray-700 bg-gray-900/60">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-white">
-                        {role.icon}
-                        {role.label}
-                      </CardTitle>
-                      <CardDescription className="text-gray-400">
-                        {role.description}
-                        <span className="block mt-1 text-xs text-blue-400">
-                          Automatisch aus Discord synchronisiert
-                        </span>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {assignedMembers.length > 0 ? (
-                        <div className="flex flex-wrap gap-3">
-                          {assignedMembers.map((member) => (
-                            <div
-                              key={member.id}
-                              className="flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm text-primary"
-                            >
-                              <span>{member.displayName}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-gray-500">Keine Mitglieder in dieser Rolle.</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                )
-              })
-            )}
-          </CardContent>
-        </Card>
-
-      <Card className="lasanta-card">
-        <CardHeader>
           <CardTitle className="text-white">Ausführliche Rollenbeschreibungen</CardTitle>
           <CardDescription className="text-gray-400">
             Vollständige Übersicht für alle Mitglieder mit Verantwortlichkeiten und alltäglichen Aufgaben.

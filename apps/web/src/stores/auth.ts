@@ -40,7 +40,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: (redirectUrl = '/app') => {
     // Store the redirect URL for after login
     localStorage.setItem('redirectUrl', redirectUrl)
-    window.location.href = `/api/auth/discord`
+    
+    // Get rememberMe preference from localStorage
+    const rememberMe = localStorage.getItem('rememberMe') === 'true'
+    
+    // Pass rememberMe as state parameter to Discord OAuth
+    const state = rememberMe ? 'remember_me' : 'no_remember'
+    window.location.href = `/api/auth/discord?state=${state}`
   },
 
   logout: async () => {

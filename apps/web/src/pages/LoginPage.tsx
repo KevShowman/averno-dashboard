@@ -18,8 +18,8 @@ export default function LoginPage() {
   }
 
   const handleLogin = () => {
-    // Setze ein Cookie für die rememberMe-Präferenz, das der Backend beim Callback lesen kann
-    document.cookie = `rememberMe=${rememberMe ? 'true' : 'false'}; path=/; max-age=300; SameSite=Lax`
+    // Speichere rememberMe Präferenz im localStorage
+    localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false')
     login()
   }
 
@@ -50,18 +50,21 @@ export default function LoginPage() {
               Mit Discord anmelden
             </Button>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="remember"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked === true)}
-              />
-              <label
-                htmlFor="remember"
-                className="text-sm font-medium leading-none text-gray-300 cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Eingeloggt bleiben (7 Tage)
-              </label>
+            <div className="flex items-center justify-center">
+              <div className="flex items-center space-x-3 px-4 py-3 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-primary/50 transition-colors">
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                />
+                <label
+                  htmlFor="remember"
+                  className="text-sm font-medium leading-none text-gray-200 cursor-pointer select-none"
+                >
+                  Eingeloggt bleiben (7 Tage)
+                </label>
+              </div>
             </div>
             
             <div className="text-center text-sm text-gray-400">

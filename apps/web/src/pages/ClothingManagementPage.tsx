@@ -7,24 +7,26 @@ import { Label } from '../components/ui/label'
 import { Checkbox } from '../components/ui/checkbox'
 import { useAuthStore } from '../stores/auth'
 import { toast } from 'sonner'
-import { Loader2, Shirt, Save } from 'lucide-react'
+import { Loader2, Shirt, Save, User, Users } from 'lucide-react'
 import { clothingApi } from '../lib/api'
 
-interface ClothingItem {
+type Gender = 'MALE' | 'FEMALE'
+
+interface ClothingItemData {
   item: number | null
   variation: number | null
   customizable: boolean
-  color: number | null
+  color: string | null
 }
 
 interface ClothingTemplate {
   rankGroup: string
-  mask: ClothingItem
-  torso: ClothingItem
-  tshirt: ClothingItem
-  vest: ClothingItem
-  pants: ClothingItem
-  shoes: ClothingItem
+  mask: { male: ClothingItemData; female: ClothingItemData }
+  torso: { male: ClothingItemData; female: ClothingItemData }
+  tshirt: { male: ClothingItemData; female: ClothingItemData }
+  vest: { male: ClothingItemData; female: ClothingItemData }
+  pants: { male: ClothingItemData; female: ClothingItemData }
+  shoes: { male: ClothingItemData; female: ClothingItemData }
 }
 
 const rankGroups = [
@@ -46,20 +48,28 @@ const clothingParts = [
   { id: 'shoes', label: 'Schuhe' },
 ]
 
+const emptyItem = (): ClothingItemData => ({
+  item: null,
+  variation: null,
+  customizable: false,
+  color: null,
+})
+
 const emptyTemplate = (): ClothingTemplate => ({
   rankGroup: '',
-  mask: { item: null, variation: null, customizable: false, color: null },
-  torso: { item: null, variation: null, customizable: false, color: null },
-  tshirt: { item: null, variation: null, customizable: false, color: null },
-  vest: { item: null, variation: null, customizable: false, color: null },
-  pants: { item: null, variation: null, customizable: false, color: null },
-  shoes: { item: null, variation: null, customizable: false, color: null },
+  mask: { male: emptyItem(), female: emptyItem() },
+  torso: { male: emptyItem(), female: emptyItem() },
+  tshirt: { male: emptyItem(), female: emptyItem() },
+  vest: { male: emptyItem(), female: emptyItem() },
+  pants: { male: emptyItem(), female: emptyItem() },
+  shoes: { male: emptyItem(), female: emptyItem() },
 })
 
 export default function ClothingManagementPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
   const [selectedRankGroup, setSelectedRankGroup] = useState<string>('1-3')
+  const [selectedGender, setSelectedGender] = useState<Gender>('MALE')
   const [template, setTemplate] = useState<ClothingTemplate>(emptyTemplate())
 
   // Load template for selected rank group
@@ -75,40 +85,88 @@ export default function ClothingManagementPage() {
       setTemplate({
         rankGroup: selectedRankGroup,
         mask: {
-          item: loadedTemplate.maskItem,
-          variation: loadedTemplate.maskVariation,
-          customizable: loadedTemplate.maskCustomizable,
-          color: loadedTemplate.maskColor,
+          male: {
+            item: loadedTemplate.maskItemMale,
+            variation: loadedTemplate.maskVariationMale,
+            customizable: loadedTemplate.maskCustomizableMale,
+            color: loadedTemplate.maskColorMale,
+          },
+          female: {
+            item: loadedTemplate.maskItemFemale,
+            variation: loadedTemplate.maskVariationFemale,
+            customizable: loadedTemplate.maskCustomizableFemale,
+            color: loadedTemplate.maskColorFemale,
+          },
         },
         torso: {
-          item: loadedTemplate.torsoItem,
-          variation: loadedTemplate.torsoVariation,
-          customizable: loadedTemplate.torsoCustomizable,
-          color: loadedTemplate.torsoColor,
+          male: {
+            item: loadedTemplate.torsoItemMale,
+            variation: loadedTemplate.torsoVariationMale,
+            customizable: loadedTemplate.torsoCustomizableMale,
+            color: loadedTemplate.torsoColorMale,
+          },
+          female: {
+            item: loadedTemplate.torsoItemFemale,
+            variation: loadedTemplate.torsoVariationFemale,
+            customizable: loadedTemplate.torsoCustomizableFemale,
+            color: loadedTemplate.torsoColorFemale,
+          },
         },
         tshirt: {
-          item: loadedTemplate.tshirtItem,
-          variation: loadedTemplate.tshirtVariation,
-          customizable: loadedTemplate.tshirtCustomizable,
-          color: loadedTemplate.tshirtColor,
+          male: {
+            item: loadedTemplate.tshirtItemMale,
+            variation: loadedTemplate.tshirtVariationMale,
+            customizable: loadedTemplate.tshirtCustomizableMale,
+            color: loadedTemplate.tshirtColorMale,
+          },
+          female: {
+            item: loadedTemplate.tshirtItemFemale,
+            variation: loadedTemplate.tshirtVariationFemale,
+            customizable: loadedTemplate.tshirtCustomizableFemale,
+            color: loadedTemplate.tshirtColorFemale,
+          },
         },
         vest: {
-          item: loadedTemplate.vesteItem,
-          variation: loadedTemplate.vesteVariation,
-          customizable: loadedTemplate.vesteCustomizable,
-          color: loadedTemplate.vesteColor,
+          male: {
+            item: loadedTemplate.vesteItemMale,
+            variation: loadedTemplate.vesteVariationMale,
+            customizable: loadedTemplate.vesteCustomizableMale,
+            color: loadedTemplate.vesteColorMale,
+          },
+          female: {
+            item: loadedTemplate.vesteItemFemale,
+            variation: loadedTemplate.vesteVariationFemale,
+            customizable: loadedTemplate.vesteCustomizableFemale,
+            color: loadedTemplate.vesteColorFemale,
+          },
         },
         pants: {
-          item: loadedTemplate.hoseItem,
-          variation: loadedTemplate.hoseVariation,
-          customizable: loadedTemplate.hoseCustomizable,
-          color: loadedTemplate.hoseColor,
+          male: {
+            item: loadedTemplate.hoseItemMale,
+            variation: loadedTemplate.hoseVariationMale,
+            customizable: loadedTemplate.hoseCustomizableMale,
+            color: loadedTemplate.hoseColorMale,
+          },
+          female: {
+            item: loadedTemplate.hoseItemFemale,
+            variation: loadedTemplate.hoseVariationFemale,
+            customizable: loadedTemplate.hoseCustomizableFemale,
+            color: loadedTemplate.hoseColorFemale,
+          },
         },
         shoes: {
-          item: loadedTemplate.schuheItem,
-          variation: loadedTemplate.schuheVariation,
-          customizable: loadedTemplate.schuheCustomizable,
-          color: loadedTemplate.schuheColor,
+          male: {
+            item: loadedTemplate.schuheItemMale,
+            variation: loadedTemplate.schuheVariationMale,
+            customizable: loadedTemplate.schuheCustomizableMale,
+            color: loadedTemplate.schuheColorMale,
+          },
+          female: {
+            item: loadedTemplate.schuheItemFemale,
+            variation: loadedTemplate.schuheVariationFemale,
+            customizable: loadedTemplate.schuheCustomizableFemale,
+            color: loadedTemplate.schuheColorFemale,
+          },
         },
       })
     } else {
@@ -120,30 +178,54 @@ export default function ClothingManagementPage() {
   const saveMutation = useMutation({
     mutationFn: async (data: ClothingTemplate) => {
       return clothingApi.saveTemplate(data.rankGroup, {
-        maskItem: data.mask.item,
-        maskVariation: data.mask.variation,
-        maskCustomizable: data.mask.customizable,
-        maskColor: data.mask.color,
-        torsoItem: data.torso.item,
-        torsoVariation: data.torso.variation,
-        torsoCustomizable: data.torso.customizable,
-        torsoColor: data.torso.color,
-        tshirtItem: data.tshirt.item,
-        tshirtVariation: data.tshirt.variation,
-        tshirtCustomizable: data.tshirt.customizable,
-        tshirtColor: data.tshirt.color,
-        vesteItem: data.vest.item,
-        vesteVariation: data.vest.variation,
-        vesteCustomizable: data.vest.customizable,
-        vesteColor: data.vest.color,
-        hoseItem: data.pants.item,
-        hoseVariation: data.pants.variation,
-        hoseCustomizable: data.pants.customizable,
-        hoseColor: data.pants.color,
-        schuheItem: data.shoes.item,
-        schuheVariation: data.shoes.variation,
-        schuheCustomizable: data.shoes.customizable,
-        schuheColor: data.shoes.color,
+        maskItemMale: data.mask.male.item,
+        maskVariationMale: data.mask.male.variation,
+        maskCustomizableMale: data.mask.male.customizable,
+        maskColorMale: data.mask.male.color,
+        maskItemFemale: data.mask.female.item,
+        maskVariationFemale: data.mask.female.variation,
+        maskCustomizableFemale: data.mask.female.customizable,
+        maskColorFemale: data.mask.female.color,
+        torsoItemMale: data.torso.male.item,
+        torsoVariationMale: data.torso.male.variation,
+        torsoCustomizableMale: data.torso.male.customizable,
+        torsoColorMale: data.torso.male.color,
+        torsoItemFemale: data.torso.female.item,
+        torsoVariationFemale: data.torso.female.variation,
+        torsoCustomizableFemale: data.torso.female.customizable,
+        torsoColorFemale: data.torso.female.color,
+        tshirtItemMale: data.tshirt.male.item,
+        tshirtVariationMale: data.tshirt.male.variation,
+        tshirtCustomizableMale: data.tshirt.male.customizable,
+        tshirtColorMale: data.tshirt.male.color,
+        tshirtItemFemale: data.tshirt.female.item,
+        tshirtVariationFemale: data.tshirt.female.variation,
+        tshirtCustomizableFemale: data.tshirt.female.customizable,
+        tshirtColorFemale: data.tshirt.female.color,
+        vesteItemMale: data.vest.male.item,
+        vesteVariationMale: data.vest.male.variation,
+        vesteCustomizableMale: data.vest.male.customizable,
+        vesteColorMale: data.vest.male.color,
+        vesteItemFemale: data.vest.female.item,
+        vesteVariationFemale: data.vest.female.variation,
+        vesteCustomizableFemale: data.vest.female.customizable,
+        vesteColorFemale: data.vest.female.color,
+        hoseItemMale: data.pants.male.item,
+        hoseVariationMale: data.pants.male.variation,
+        hoseCustomizableMale: data.pants.male.customizable,
+        hoseColorMale: data.pants.male.color,
+        hoseItemFemale: data.pants.female.item,
+        hoseVariationFemale: data.pants.female.variation,
+        hoseCustomizableFemale: data.pants.female.customizable,
+        hoseColorFemale: data.pants.female.color,
+        schuheItemMale: data.shoes.male.item,
+        schuheVariationMale: data.shoes.male.variation,
+        schuheCustomizableMale: data.shoes.male.customizable,
+        schuheColorMale: data.shoes.male.color,
+        schuheItemFemale: data.shoes.female.item,
+        schuheVariationFemale: data.shoes.female.variation,
+        schuheCustomizableFemale: data.shoes.female.customizable,
+        schuheColorFemale: data.shoes.female.color,
       })
     },
     onSuccess: () => {
@@ -161,14 +243,18 @@ export default function ClothingManagementPage() {
 
   const updateClothingPart = (
     part: keyof Omit<ClothingTemplate, 'rankGroup'>,
-    field: keyof ClothingItem,
+    gender: Gender,
+    field: keyof ClothingItemData,
     value: any
   ) => {
     setTemplate((prev) => ({
       ...prev,
       [part]: {
         ...prev[part],
-        [field]: value,
+        [gender.toLowerCase()]: {
+          ...prev[part][gender.toLowerCase() as 'male' | 'female'],
+          [field]: value,
+        },
       },
     }))
   }
@@ -178,7 +264,7 @@ export default function ClothingManagementPage() {
       <header className="space-y-2">
         <h1 className="text-3xl font-bold text-white">Kleidungsverwaltung</h1>
         <p className="text-gray-400">
-          Legen Sie die Kleidungsvorlagen für verschiedene Ranggruppen fest.
+          Legen Sie die Kleidungsvorlagen für verschiedene Ranggruppen und Geschlechter fest.
         </p>
       </header>
 
@@ -207,6 +293,36 @@ export default function ClothingManagementPage() {
         </CardContent>
       </Card>
 
+      {/* Gender Selector */}
+      <Card className="lasanta-card">
+        <CardHeader>
+          <CardTitle className="text-white">Geschlecht auswählen</CardTitle>
+          <CardDescription className="text-gray-400">
+            Wählen Sie das Geschlecht für die Kleidungskonfiguration.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Button
+              variant={selectedGender === 'MALE' ? 'default' : 'outline'}
+              onClick={() => setSelectedGender('MALE')}
+              className="flex-1"
+            >
+              <User className="mr-2 h-4 w-4" />
+              Männlich
+            </Button>
+            <Button
+              variant={selectedGender === 'FEMALE' ? 'default' : 'outline'}
+              onClick={() => setSelectedGender('FEMALE')}
+              className="flex-1"
+            >
+              <Users className="mr-2 h-4 w-4" />
+              Weiblich
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Clothing Configuration */}
       {isLoading ? (
         <Card className="lasanta-card">
@@ -218,7 +334,7 @@ export default function ClothingManagementPage() {
         <Card className="lasanta-card">
           <CardHeader>
             <CardTitle className="text-white">
-              Kleidung für {rankGroups.find((g) => g.id === selectedRankGroup)?.label}
+              Kleidung für {rankGroups.find((g) => g.id === selectedRankGroup)?.label} ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
             </CardTitle>
             <CardDescription className="text-gray-400">
               Legen Sie für jeden Kleidungsteil die Item-ID, Variation und ob es anpassbar ist fest.
@@ -227,7 +343,7 @@ export default function ClothingManagementPage() {
           <CardContent className="space-y-6">
             {clothingParts.map((part) => {
               const partKey = part.id as keyof Omit<ClothingTemplate, 'rankGroup'>
-              const partData = template[partKey]
+              const partData = template[partKey][selectedGender.toLowerCase() as 'male' | 'female']
 
               return (
                 <div key={part.id} className="space-y-4 border-b border-gray-700 pb-6 last:border-0">
@@ -245,10 +361,12 @@ export default function ClothingManagementPage() {
                         onChange={(e) =>
                           updateClothingPart(
                             partKey,
+                            selectedGender,
                             'item',
                             e.target.value ? parseInt(e.target.value) : null
                           )
                         }
+                        disabled={partData.customizable}
                         className="bg-gray-800 border-gray-700 text-white"
                       />
                     </div>
@@ -264,27 +382,30 @@ export default function ClothingManagementPage() {
                         onChange={(e) =>
                           updateClothingPart(
                             partKey,
+                            selectedGender,
                             'variation',
                             e.target.value ? parseInt(e.target.value) : null
                           )
                         }
+                        disabled={partData.customizable}
                         className="bg-gray-800 border-gray-700 text-white"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`${part.id}-color`} className="text-gray-300">
-                        Farbvorgabe (nur bei "Anpassbar")
+                        Farbname (nur bei "Anpassbar")
                       </Label>
                       <Input
                         id={`${part.id}-color`}
-                        type="number"
-                        placeholder="z.B. 0 für schwarz"
+                        type="text"
+                        placeholder="z.B. schwarz, rot, blau"
                         value={partData.color ?? ''}
                         onChange={(e) =>
                           updateClothingPart(
                             partKey,
+                            selectedGender,
                             'color',
-                            e.target.value ? parseInt(e.target.value) : null
+                            e.target.value || null
                           )
                         }
                         className="bg-gray-800 border-gray-700 text-white"
@@ -296,9 +417,14 @@ export default function ClothingManagementPage() {
                         <Checkbox
                           id={`${part.id}-customizable`}
                           checked={partData.customizable}
-                          onCheckedChange={(checked) =>
-                            updateClothingPart(partKey, 'customizable', checked === true)
-                          }
+                          onCheckedChange={(checked) => {
+                            updateClothingPart(partKey, selectedGender, 'customizable', checked === true)
+                            // Wenn anpassbar aktiviert wird, Item/Variation auf null setzen
+                            if (checked === true) {
+                              updateClothingPart(partKey, selectedGender, 'item', null)
+                              updateClothingPart(partKey, selectedGender, 'variation', null)
+                            }
+                          }}
                         />
                         <Label
                           htmlFor={`${part.id}-customizable`}
@@ -344,4 +470,3 @@ export default function ClothingManagementPage() {
     </div>
   )
 }
-

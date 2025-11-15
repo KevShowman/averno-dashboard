@@ -18,8 +18,8 @@ export class AuthController {
   @Get('discord')
   @UseGuards(AuthGuard('discord'))
   @UseFilters(DiscordAuthExceptionFilter)
-  async discordLogin() {
-    // This will redirect to Discord OAuth
+  async discordLogin(@Req() req: Request) {
+    // This will redirect to Discord OAuth with state parameter
   }
 
   @Get('discord/callback')
@@ -29,8 +29,8 @@ export class AuthController {
     const user = req.user as User;
     const tokens = await this.authService.generateTokens(user);
 
-    // Check for rememberMe cookie (set by frontend before redirect)
-    const rememberMe = req.cookies?.rememberMe === 'true';
+    // Check for rememberMe from request (set by discord strategy from state parameter)
+    const rememberMe = (req as any).rememberMe === true;
 
     // Set HTTP-only cookies
     const isProduction = process.env.NODE_ENV === 'production';
@@ -50,9 +50,6 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: refreshTokenMaxAge,
     });
-
-    // Clear the rememberMe cookie after use
-    res.clearCookie('rememberMe');
 
     // Log the login
     await this.auditService.log({

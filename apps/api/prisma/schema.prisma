@@ -589,73 +589,73 @@ model RankClothingTemplate {
   maskItemMale         Int?
   maskVariationMale    Int?
   maskCustomizableMale Boolean  @default(false) // Kann vom User selbst gewählt werden
-  maskColorMale        Int? // Farbvorgabe (wenn customizable = true)
+  maskColorMale        String? // Farbvorgabe (wenn customizable = true)
   
   // Maske (Frauen)
   maskItemFemale         Int?
   maskVariationFemale    Int?
   maskCustomizableFemale Boolean  @default(false)
-  maskColorFemale        Int?
+  maskColorFemale        String?
   
   // Torso (Männer)
   torsoItemMale         Int?
   torsoVariationMale    Int?
   torsoCustomizableMale Boolean  @default(false)
-  torsoColorMale        Int?
+  torsoColorMale        String?
   
   // Torso (Frauen)
   torsoItemFemale         Int?
   torsoVariationFemale    Int?
   torsoCustomizableFemale Boolean  @default(false)
-  torsoColorFemale        Int?
+  torsoColorFemale        String?
   
   // T-Shirt (Männer)
   tshirtItemMale         Int?
   tshirtVariationMale    Int?
   tshirtCustomizableMale Boolean  @default(false)
-  tshirtColorMale        Int?
+  tshirtColorMale        String?
   
   // T-Shirt (Frauen)
   tshirtItemFemale         Int?
   tshirtVariationFemale    Int?
   tshirtCustomizableFemale Boolean  @default(false)
-  tshirtColorFemale        Int?
+  tshirtColorFemale        String?
   
   // Weste (Männer)
   vesteItemMale         Int?
   vesteVariationMale    Int?
   vesteCustomizableMale Boolean  @default(false)
-  vesteColorMale        Int?
+  vesteColorMale        String?
   
   // Weste (Frauen)
   vesteItemFemale         Int?
   vesteVariationFemale    Int?
   vesteCustomizableFemale Boolean  @default(false)
-  vesteColorFemale        Int?
+  vesteColorFemale        String?
   
   // Hose (Männer)
   hoseItemMale         Int?
   hoseVariationMale    Int?
   hoseCustomizableMale Boolean  @default(false)
-  hoseColorMale        Int?
+  hoseColorMale        String?
   
   // Hose (Frauen)
   hoseItemFemale         Int?
   hoseVariationFemale    Int?
   hoseCustomizableFemale Boolean  @default(false)
-  hoseColorFemale        Int?
+  hoseColorFemale        String?
   
   // Schuhe (Männer)
   schuheItemMale         Int?
   schuheVariationMale    Int?
   schuheCustomizableMale Boolean  @default(false)
-  schuheColorMale        Int?
+  schuheColorMale        String?
   
   // Schuhe (Frauen)
   schuheItemFemale         Int?
   schuheVariationFemale    Int?
   schuheCustomizableFemale Boolean  @default(false)
-  schuheColorFemale        Int?
+  schuheColorFemale        String?
   
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
