@@ -78,7 +78,7 @@
 
 /* Custom LaSanta Calavera styles */
 .lasanta-gradient {
-  background: linear-gradient(135deg, #6A1F2B 0%, #16161A 100%);
+  background: linear-gradient(135deg, #D4AF37 0%, #16161A 100%);
 }
 
 .lasanta-card {
@@ -88,8 +88,8 @@
 }
 
 .lasanta-button-primary {
-  background: #6A1F2B;
-  @apply hover:bg-opacity-90 text-white;
+  background: #D4AF37;
+  @apply hover:bg-opacity-90 text-black font-semibold;
 }
 
 .lasanta-button-secondary {
@@ -98,12 +98,12 @@
 }
 
 .lasanta-accent {
-  color: #B08D57;
+  color: #FFD700;
 }
 
 .lasanta-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #6A1F2B #16161A;
+  scrollbar-color: #D4AF37 #16161A;
 }
 
 .lasanta-scrollbar::-webkit-scrollbar {
@@ -115,18 +115,18 @@
 }
 
 .lasanta-scrollbar::-webkit-scrollbar-thumb {
-  background: #6A1F2B;
+  background: #D4AF37;
   border-radius: 4px;
 }
 
 .lasanta-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #8B2635;
+  background: #FFD700;
 }
 
 /* Custom scrollbar for lists */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(176, 141, 87, 0.5) rgba(22, 22, 26, 0.5);
+  scrollbar-color: rgba(212, 175, 55, 0.5) rgba(22, 22, 26, 0.5);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -139,12 +139,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(176, 141, 87, 0.5);
+  background: rgba(212, 175, 55, 0.5);
   border-radius: 3px;
   transition: background 0.2s;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(176, 141, 87, 0.8);
+  background: rgba(255, 215, 0, 0.8);
 }
 

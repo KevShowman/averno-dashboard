@@ -68,8 +68,17 @@ export default function MemberFilesPage() {
   const [entryContent, setEntryContent] = useState('')
   const [uprankDate, setUprankDate] = useState('')
 
+  // Alle User abrufen (für die Liste)
+  const { data: allUsers, isLoading: usersLoading } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await api.get('/users')
+      return response.data
+    },
+  })
+
   // Alle Akten abrufen
-  const { data: files, isLoading } = useQuery<MemberFile[]>({
+  const { data: files, isLoading: filesLoading } = useQuery<MemberFile[]>({
     queryKey: ['member-files', showArchived],
     queryFn: async () => {
       const response = await api.get('/member-files', {
@@ -78,6 +87,8 @@ export default function MemberFilesPage() {
       return response.data
     },
   })
+
+  const isLoading = usersLoading || filesLoading
 
   // User mit längster Zeit ohne Uprank
   const { data: pendingUpranks } = useQuery<MemberFile[]>({
@@ -296,41 +307,44 @@ export default function MemberFilesPage() {
           <CardHeader>
             <CardTitle className="text-white">Mitglieder</CardTitle>
             <CardDescription className="text-gray-400">
-              {files?.length || 0} {showArchived ? 'archivierte' : 'aktive'} Akten
+              {allUsers?.length || 0} Mitglieder
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
-              {files?.map((file) => (
-                <div
-                  key={file.id}
-                  className={`flex items-center justify-between bg-black/40 border rounded-lg p-3 cursor-pointer hover:bg-black/60 transition-colors ${
-                    selectedUserId === file.userId ? 'border-primary' : 'border-primary/30'
-                  }`}
-                  onClick={() => setSelectedUserId(file.userId)}
-                >
-                  <div className="flex items-center gap-3">
-                    {file.user.avatarUrl ? (
-                      <img
-                        src={file.user.avatarUrl}
-                        alt={file.user.username}
-                        className="w-8 h-8 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
-                        {file.user.username[0]}
+              {allUsers?.map((user: any) => {
+                const userFile = files?.find((f) => f.userId === user.id)
+                return (
+                  <div
+                    key={user.id}
+                    className={`flex items-center justify-between bg-black/40 border rounded-lg p-3 cursor-pointer hover:bg-black/60 transition-colors ${
+                      selectedUserId === user.id ? 'border-primary' : 'border-primary/30'
+                    }`}
+                    onClick={() => setSelectedUserId(user.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
+                          {user.username[0]}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-white text-sm font-medium">{getUserDisplayName(user)}</p>
+                        <p className="text-xs text-gray-400">{userFile?.entries.length || 0} Einträge</p>
                       </div>
-                    )}
-                    <div>
-                      <p className="text-white text-sm font-medium">{getUserDisplayName(file.user)}</p>
-                      <p className="text-xs text-gray-400">{file.entries.length} Einträge</p>
                     </div>
+                    {userFile?.isArchived && (
+                      <Badge className="bg-gray-500/20 text-gray-400">Archiviert</Badge>
+                    )}
                   </div>
-                  {file.isArchived && (
-                    <Badge className="bg-gray-500/20 text-gray-400">Archiviert</Badge>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>

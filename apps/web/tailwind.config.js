@@ -23,16 +23,16 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#6A1F2B", // Bordeaux
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#D4AF37", // Gold
+          foreground: "#000000", // Schwarz für bessere Lesbarkeit
         },
         secondary: {
           DEFAULT: "#16161A", // Anthrazit
           foreground: "hsl(var(--secondary-foreground))",
         },
         accent: {
-          DEFAULT: "#B08D57", // Bronze/Gold
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#FFD700", // Helleres Gold für Akzente
+          foreground: "#000000",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",

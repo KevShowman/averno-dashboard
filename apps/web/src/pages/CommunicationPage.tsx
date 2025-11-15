@@ -105,7 +105,7 @@ export default function CommunicationPage() {
       <header>
         <h1 className="text-3xl font-bold text-white">Kommunikation</h1>
         <p className="text-gray-400">
-          Aktuelle Funk-Frequenz und DarkChat für IC-Verwendung
+          Aktuelle Funk-Frequenz und DarkChat
         </p>
       </header>
 
@@ -158,7 +158,7 @@ export default function CommunicationPage() {
             ) : (
               <div className="space-y-4">
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-6 text-center">
-                  <div className="text-4xl font-mono font-bold text-primary tracking-wider">
+                  <div className="text-4xl font-mono font-bold text-white tracking-wider">
                     {data?.funkFrequency}
                   </div>
                 </div>
@@ -221,7 +221,7 @@ export default function CommunicationPage() {
             ) : (
               <div className="space-y-4">
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-6 text-center">
-                  <div className="text-3xl font-mono font-bold text-primary break-all">
+                  <div className="text-3xl font-mono font-bold text-white break-all">
                     {data?.darkChatName}
                   </div>
                 </div>

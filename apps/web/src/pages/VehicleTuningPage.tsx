@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Car, Wrench, Palette, Lightbulb, Square, ArrowRight, ArrowDown, CreditCard } from 'lucide-react'
+import { Car, Wrench, Palette, Lightbulb, Sparkles, ArrowRight, ArrowDown, CreditCard } from 'lucide-react'
 import { Alert, AlertDescription } from '../components/ui/alert'
 
 export default function VehicleTuningPage() {
@@ -121,13 +121,13 @@ export default function VehicleTuningPage() {
               <div className="space-y-2">
                 <h3 className="text-white font-semibold text-sm">Primärlacktyp</h3>
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-3 text-center">
-                  <span className="text-primary font-mono font-bold">{data?.paint?.primaryType}</span>
+                  <span className="text-white font-mono font-bold">{data?.paint?.primaryType}</span>
                 </div>
               </div>
               <div className="space-y-2">
                 <h3 className="text-white font-semibold text-sm">Sekundärlacktyp</h3>
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-3 text-center">
-                  <span className="text-primary font-mono font-bold">{data?.paint?.secondaryType}</span>
+                  <span className="text-white font-mono font-bold">{data?.paint?.secondaryType}</span>
                 </div>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function VehicleTuningPage() {
               <div className="space-y-2">
                 <h3 className="text-white font-semibold">Xenon</h3>
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-4 text-center">
-                  <span className="text-primary font-mono text-lg font-bold">{data?.lights?.xenon}</span>
+                  <span className="text-white font-mono text-lg font-bold">{data?.lights?.xenon}</span>
                 </div>
               </div>
 
@@ -170,7 +170,7 @@ export default function VehicleTuningPage() {
           <Card className="lasanta-card">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Square className="h-6 w-6 text-primary" />
+                <Sparkles className="h-6 w-6 text-primary" />
                 Extras
               </CardTitle>
             </CardHeader>
@@ -179,7 +179,7 @@ export default function VehicleTuningPage() {
               <div className="space-y-2">
                 <h3 className="text-white font-semibold">Fenstertönung</h3>
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-4 text-center">
-                  <span className="text-primary font-mono text-lg font-bold">{data?.windows}</span>
+                  <span className="text-white font-mono text-lg font-bold">{data?.windows}</span>
                 </div>
               </div>
 
@@ -190,7 +190,7 @@ export default function VehicleTuningPage() {
                   Kennzeichen Farbe
                 </h3>
                 <div className="bg-black/40 border border-primary/30 rounded-lg p-4 text-center">
-                  <span className="text-primary font-mono text-lg font-bold">{data?.licensePlate}</span>
+                  <span className="text-white font-mono text-lg font-bold">{data?.licensePlate}</span>
                 </div>
               </div>
             </CardContent>
