@@ -260,11 +260,17 @@ export class UsersService {
       case Role.EL_CONFIDENTE: return 'El Confidente';
       case Role.EL_PROTECTOR: return 'El Protector';
       case Role.EL_NOVATO: return 'El Novato';
+      // Funktionsrollen
+      case Role.CONSEJERO: return 'Consejero/a';
+      case Role.RUTAS: return 'Rutas';
+      case Role.LOGISTICA: return 'Logística';
+      case Role.INTELIGENCIA: return 'Inteligencia';
+      case Role.FORMACION: return 'Formación';
+      case Role.SICARIO: return 'Sicario';
+      case Role.CONTACTO: return 'Contacto';
       // Legacy
       case Role.FUTURO: return 'Futuro';
-      case Role.SICARIO: return 'Sicario';
       case Role.ROUTENVERWALTUNG: return 'Routenverwaltung';
-      case Role.LOGISTICA: return 'Logistica';
       default: return role;
     }
   }

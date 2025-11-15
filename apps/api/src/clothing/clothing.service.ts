@@ -44,11 +44,17 @@ export class ClothingService {
     [Role.EL_CONFIDENTE]: '1-3',
     [Role.EL_PROTECTOR]: '1-3',
     [Role.EL_NOVATO]: '1-3',
-    // Legacy (default zu 1-3)
+    // Funktionsrollen (Fallback zu 1-3, sollten aber nie verwendet werden)
+    [Role.CONSEJERO]: '1-3',
+    [Role.RUTAS]: '1-3',
+    [Role.LOGISTICA]: '1-3',
+    [Role.INTELIGENCIA]: '1-3',
+    [Role.FORMACION]: '1-3',
+    [Role.SICARIO]: '1-3',
+    [Role.CONTACTO]: '1-3',
+    // Legacy
     [Role.FUTURO]: '1-3',
-    [Role.SICARIO]: '4-6',
-    [Role.ROUTENVERWALTUNG]: '4-6',
-    [Role.LOGISTICA]: '4-6',
+    [Role.ROUTENVERWALTUNG]: '1-3',
     [Role.ADMIN]: 'EL_PATRON',
     [Role.QUARTIERMEISTER]: '4-6',
     [Role.MITGLIED]: '1-3',
@@ -408,20 +414,35 @@ export class ClothingService {
 
   /**
    * Holt die Kleidung für einen User basierend auf Rang + Geschlecht
+   * Funktionsrollen werden ignoriert - nimmt den echten Rang
    */
   async getUserClothing(userId: string): Promise<any> {
     // User, Rolle und Geschlecht holen
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true, gender: true },
+      select: { role: true, allRoles: true, gender: true },
     });
 
     if (!user) {
       throw new NotFoundException('Benutzer nicht gefunden');
     }
 
+    // Finde den RANG (nicht Funktionsrolle) aus allRoles
+    const allRoles = Array.isArray(user.allRoles) ? (user.allRoles as Role[]) : [user.role];
+    
+    // Definiere welche Rollen Ränge sind (keine Funktionsrollen)
+    const rankRoles = [
+      Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA,
+      Role.EL_CUSTODIO, Role.EL_MENTOR, Role.EL_ENCARGADO,
+      Role.EL_TENIENTE, Role.SOLDADO, Role.EL_PREFECTO,
+      Role.EL_CONFIDENTE, Role.EL_PROTECTOR, Role.EL_NOVATO,
+    ];
+    
+    // Finde den höchsten Rang des Users (Leaderschaft > hohe Ränge > niedrige Ränge)
+    const userRank = allRoles.find(r => rankRoles.includes(r as Role)) || user.role;
+
     // Rang-Gruppe ermitteln
-    const rankGroup = this.getRankGroup(user.role);
+    const rankGroup = this.getRankGroup(userRank as Role);
 
     // Template für die Rang-Gruppe holen
     const template = await this.getTemplateByRankGroup(rankGroup);
