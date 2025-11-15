@@ -230,7 +230,7 @@ export default function DashboardPage() {
                     {module.key === 'kasse' && <DollarSign className="h-6 w-6 text-accent" />}
                     {module.key === 'aufstellungen' && <CalendarCheck className="h-6 w-6 text-accent" />}
                     {module.key === 'abmeldungen' && <CalendarDays className="h-6 w-6 text-accent" />}
-                    {module.key === 'bloodlist' && <Droplet className="h-6 w-6 text-red-500" />}
+                    {module.key === 'bloodlist' && <Droplet className="h-6 w-6 text-primary" />}
                     {module.key === 'weekly-delivery' && <Calendar className="h-6 w-6 text-accent" />}
                     {module.key === 'familiensammeln' && <Users className="h-6 w-6 text-gold-500" />}
                     {module.key === 'sanctions' && <Scale className="h-6 w-6 text-accent" />}

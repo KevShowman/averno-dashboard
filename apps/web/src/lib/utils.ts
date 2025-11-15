@@ -45,17 +45,19 @@ export function formatCurrency(amount: number | string) {
 export function getRoleColor(role: string) {
   switch (role) {
     case 'EL_PATRON':
-      return 'bg-red-500/20 text-red-400 border-red-500/30'
-    case 'DON':
+      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+    case 'DON_CAPITAN':
+    case 'DON_COMANDANTE':
       return 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-    case 'ASESOR':
-      return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+    case 'EL_MANO_DERECHA':
+      return 'bg-yellow-600/20 text-yellow-500 border-yellow-600/30'
     case 'ROUTENVERWALTUNG':
+    case 'RUTAS':
       return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
     case 'LOGISTICA':
       return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
     case 'SICARIO':
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'SOLDADO':
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
     case 'FUTURO':
@@ -151,7 +153,7 @@ export function getTransactionStatusColor(status: string) {
     case 'PENDING':
       return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
     case 'REJECTED':
-      return 'bg-red-500/20 text-red-400 border-red-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     default:
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
   }

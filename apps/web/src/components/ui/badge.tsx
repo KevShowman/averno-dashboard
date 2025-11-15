@@ -19,7 +19,7 @@ const badgeVariants = cva(
         warning:
           "border-transparent bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
         danger:
-          "border-transparent bg-red-500/20 text-red-400 border-red-500/30",
+          "border-transparent bg-orange-500/20 text-orange-400 border-orange-500/30",
       },
     },
     defaultVariants: {
