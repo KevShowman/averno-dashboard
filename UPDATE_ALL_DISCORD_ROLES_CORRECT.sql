@@ -6,6 +6,13 @@ UPDATE discord_role_mappings SET isActive = 0 WHERE isActive = 1;
 -- Diese Rolle haben ALLE Member, daher darf sie NICHT für die Rollen-Zuordnung verwendet werden
 UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062427906220';
 
+-- Deaktiviere auch die Container-Rollen (nur zur Organisation, keine echten Rollen)
+UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062449139712'; -- "NORMALE ROLLEN"
+UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062427906227'; -- Unbekannte Container-Rolle
+UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062474309695'; -- "FUNKTIONSROLLEN"
+UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062109274176'; -- "BEKANNT INAKTIV"
+UPDATE discord_role_mappings SET isActive = 0 WHERE discordRoleId = '1431388062109274175'; -- Weitere unbekannte Rolle
+
 -- Dann die KORREKTEN Rollen hinzufügen/aktualisieren
 
 -- LEADERSCHAFT
