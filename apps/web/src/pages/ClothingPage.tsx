@@ -132,7 +132,7 @@ export default function ClothingPage() {
               variant={selectedGender === 'MALE' ? 'default' : 'outline'}
               onClick={() => handleGenderChange('MALE')}
               disabled={updateGenderMutation.isPending}
-              className="flex-1 max-w-xs h-16 text-lg"
+              className={`flex-1 max-w-xs h-16 text-lg ${selectedGender === 'MALE' ? 'text-white' : ''}`}
               size="lg"
             >
               {updateGenderMutation.isPending && selectedGender === 'MALE' ? (
@@ -146,7 +146,7 @@ export default function ClothingPage() {
               variant={selectedGender === 'FEMALE' ? 'default' : 'outline'}
               onClick={() => handleGenderChange('FEMALE')}
               disabled={updateGenderMutation.isPending}
-              className="flex-1 max-w-xs h-16 text-lg"
+              className={`flex-1 max-w-xs h-16 text-lg ${selectedGender === 'FEMALE' ? 'text-white' : ''}`}
               size="lg"
             >
               {updateGenderMutation.isPending && selectedGender === 'FEMALE' ? (
@@ -202,7 +202,7 @@ export default function ClothingPage() {
                       </p>
                       {part.color !== null && (
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-400">Farbvorgabe:</span>
+                          <span className="text-gray-400">Vorgaben:</span>
                           <span className="text-white font-mono bg-gray-800 px-2 py-1 rounded">
                             {part.color}
                           </span>

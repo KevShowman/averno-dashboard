@@ -84,11 +84,15 @@ export class AuthService {
       remember: rememberMe || undefined,
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    // Generate access token with appropriate expiration
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: rememberMe ? '7d' : '1h',
+    });
 
+    // Generate refresh token with appropriate expiration
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: rememberMe ? '365d' : this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
+      expiresIn: rememberMe ? '30d' : '7d',
     });
 
     return { accessToken, refreshToken };

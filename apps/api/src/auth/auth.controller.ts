@@ -27,10 +27,12 @@ export class AuthController {
   @UseFilters(DiscordAuthExceptionFilter)
   async discordCallback(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User;
-    const tokens = await this.authService.generateTokens(user);
-
+    
     // Check for rememberMe from request (set by discord strategy from state parameter)
     const rememberMe = (req as any).rememberMe === true;
+    
+    // Generate tokens with rememberMe option
+    const tokens = await this.authService.generateTokens(user, { rememberMe });
 
     // Set HTTP-only cookies
     const isProduction = process.env.NODE_ENV === 'production';
