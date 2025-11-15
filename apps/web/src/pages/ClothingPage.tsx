@@ -17,6 +17,45 @@ interface ClothingDisplay {
   color: string | null
 }
 
+// Helper function to get display name for roles
+const getRoleDisplayName = (role: string): string => {
+  const roleMap: Record<string, string> = {
+    // Leaderschaft
+    EL_PATRON: 'El Patrón',
+    DON_CAPITAN: 'Don - El Capitán',
+    DON_COMANDANTE: 'Don - El Comandante',
+    EL_MANO_DERECHA: 'El Mano Derecha',
+    // Ränge 7-9
+    EL_CUSTODIO: 'El Custodio',
+    EL_MENTOR: 'El Mentor',
+    EL_ENCARGADO: 'El Encargado',
+    // Ränge 4-6
+    EL_TENIENTE: 'El Teniente',
+    SOLDADO: 'Soldado',
+    EL_PREFECTO: 'El Prefecto',
+    // Ränge 1-3
+    EL_CONFIDENTE: 'El Confidente',
+    EL_PROTECTOR: 'El Protector',
+    EL_NOVATO: 'El Novato',
+    // Funktionsrollen
+    CONSEJERO: 'Consejero/a',
+    RUTAS: 'Rutas',
+    LOGISTICA: 'Logística',
+    INTELIGENCIA: 'Inteligencia',
+    FORMACION: 'Formación',
+    SICARIO: 'Sicario',
+    CONTACTO: 'Contacto',
+    // Legacy
+    FUTURO: 'Futuro',
+    ROUTENVERWALTUNG: 'Routenverwaltung',
+    ADMIN: 'Administrator',
+    QUARTIERMEISTER: 'Quartiermeister',
+    MITGLIED: 'Mitglied',
+    GAST: 'Gast',
+  }
+  return roleMap[role] || role
+}
+
 export default function ClothingPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
@@ -114,7 +153,7 @@ export default function ClothingPage() {
       <header className="space-y-2">
         <h1 className="text-3xl font-bold text-white">Meine Kleidung</h1>
         <p className="text-gray-400">
-          Hier sehen Sie Ihre Kleidung basierend auf Ihrem Rang und Geschlecht.
+          Hier siehst du deine Kleidung basierend auf deinem Rang und Geschlecht.
         </p>
       </header>
 
@@ -123,7 +162,7 @@ export default function ClothingPage() {
         <CardHeader>
           <CardTitle className="text-white">Geschlecht festlegen</CardTitle>
           <CardDescription className="text-gray-400">
-            Wählen Sie Ihr Geschlecht aus, um die passende Kleidung anzuzeigen.
+            Wähle dein Geschlecht aus, um die passende Kleidung anzuzeigen.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -171,10 +210,10 @@ export default function ClothingPage() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Shirt className="h-5 w-5" />
-              Ihre Kleidungsvorlage ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
+              Deine Kleidungsvorlage ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Basierend auf Ihrem Rang ({user?.role})
+              Basierend auf deinem Rang: <span className="text-primary font-semibold">{user?.role ? getRoleDisplayName(user.role) : 'Unbekannt'}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -209,7 +248,7 @@ export default function ClothingPage() {
                         </div>
                       )}
                       <p className="text-xs text-gray-400 pt-2">
-                        Sie können dieses Teil in der angegebenen Farbe frei auswählen.
+                        Du kannst dieses Teil in den angegebenen Vorgaben frei auswählen.
                       </p>
                     </div>
                   ) : (
