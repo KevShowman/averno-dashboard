@@ -633,15 +633,13 @@ export default function OrganigrammPage() {
             <h3 className="text-lg font-semibold text-white">{node.label}</h3>
             <p className="mt-1 text-sm text-gray-400">{node.summary}</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => toggleNode(nodeId)}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 hover:text-white p-2"
             aria-label={isExpanded ? 'Details einklappen' : 'Details ausklappen'}
           >
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
+          </button>
         </div>
 
         <div className="mt-3">
@@ -727,12 +725,18 @@ export default function OrganigrammPage() {
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={expandAllNodes}>
+            <button 
+              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              onClick={expandAllNodes}
+            >
               Alles öffnen
-            </Button>
-            <Button variant="outline" size="sm" onClick={collapseAllNodes}>
+            </button>
+            <button 
+              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              onClick={collapseAllNodes}
+            >
               Alles schließen
-            </Button>
+            </button>
           </div>
         </CardHeader>
         <CardContent className="space-y-0">
