@@ -414,7 +414,7 @@ export class ClothingService {
 
   /**
    * Holt die Kleidung für einen User basierend auf Rang + Geschlecht
-   * Funktionsrollen werden ignoriert - nimmt den echten Rang
+   * Funktionsrollen werden ignoriert - nimmt den HÖCHSTEN Rang
    */
   async getUserClothing(userId: string): Promise<any> {
     // User, Rolle und Geschlecht holen
@@ -430,16 +430,29 @@ export class ClothingService {
     // Finde den RANG (nicht Funktionsrolle) aus allRoles
     const allRoles = Array.isArray(user.allRoles) ? (user.allRoles as Role[]) : [user.role];
     
-    // Definiere welche Rollen Ränge sind (keine Funktionsrollen)
-    const rankRoles = [
-      Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA,
-      Role.EL_CUSTODIO, Role.EL_MENTOR, Role.EL_ENCARGADO,
-      Role.EL_TENIENTE, Role.SOLDADO, Role.EL_PREFECTO,
-      Role.EL_CONFIDENTE, Role.EL_PROTECTOR, Role.EL_NOVATO,
+    // Rang-Hierarchie (höchste zuerst)
+    const rankHierarchy = [
+      // Leaderschaft
+      Role.EL_PATRON,
+      Role.DON_CAPITAN,
+      Role.DON_COMANDANTE,
+      Role.EL_MANO_DERECHA,
+      // Ränge 7-9
+      Role.EL_CUSTODIO,
+      Role.EL_MENTOR,
+      Role.EL_ENCARGADO,
+      // Ränge 4-6
+      Role.EL_TENIENTE,
+      Role.SOLDADO,
+      Role.EL_PREFECTO,
+      // Ränge 1-3
+      Role.EL_CONFIDENTE,
+      Role.EL_PROTECTOR,
+      Role.EL_NOVATO,
     ];
     
-    // Finde den höchsten Rang des Users (Leaderschaft > hohe Ränge > niedrige Ränge)
-    const userRank = allRoles.find(r => rankRoles.includes(r as Role)) || user.role;
+    // Finde den HÖCHSTEN Rang des Users (erste Match in Hierarchie)
+    const userRank = rankHierarchy.find(r => allRoles.includes(r)) || user.role;
 
     // Rang-Gruppe ermitteln
     const rankGroup = this.getRankGroup(userRank as Role);
