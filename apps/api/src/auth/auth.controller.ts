@@ -131,6 +131,7 @@ export class AuthController {
       avatarUrl: user.avatarUrl,
       email: user.email,
       role: user.role,
+      allRoles: user.allRoles,
       gender: user.gender,
       createdAt: user.createdAt,
     };
