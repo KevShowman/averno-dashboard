@@ -236,7 +236,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/casa" element={
+        <Route path="/la-casa" element={
           <ProtectedRoute>
             <Layout>
               <CasaPage />

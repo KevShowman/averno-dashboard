@@ -8,7 +8,7 @@ import { Textarea } from '../components/ui/textarea'
 import { useAuthStore } from '../stores/auth'
 import { api } from '../lib/api'
 import { toast } from 'sonner'
-import { Home, MapPin, Loader2, Mountain, Shield, Key } from 'lucide-react'
+import { Home, MapPin, Loader2, Mountain, Shield, Key, Info } from 'lucide-react'
 import { hasRole } from '../lib/utils'
 
 interface CasaInfo {
@@ -28,6 +28,7 @@ export default function CasaPage() {
   const queryClient = useQueryClient()
   const [postalCode, setPostalCode] = useState('')
   const [additionalInfo, setAdditionalInfo] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
 
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
 
@@ -52,6 +53,7 @@ export default function CasaPage() {
     onSuccess: () => {
       toast.success('Standort erfolgreich aktualisiert')
       queryClient.invalidateQueries({ queryKey: ['casa-info'] })
+      setIsEditing(false)
     },
     onError: () => {
       toast.error('Fehler beim Aktualisieren des Standorts')
@@ -63,6 +65,12 @@ export default function CasaPage() {
       postalCode,
       additionalInfo,
     })
+  }
+
+  const handleCancel = () => {
+    setPostalCode(casaInfo?.postalCode || '')
+    setAdditionalInfo(casaInfo?.additionalInfo || '')
+    setIsEditing(false)
   }
 
   if (isLoading) {
@@ -127,19 +135,37 @@ export default function CasaPage() {
       {/* Standort */}
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <MapPin className="h-5 w-5" />
-            Standort
-          </CardTitle>
-          <CardDescription>
-            {isLeadership 
-              ? 'Lokalisierung der Casa (nur für Leadership sichtbar und editierbar)'
-              : 'Standort-Informationen'}
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <MapPin className="h-5 w-5" />
+                Standort
+              </CardTitle>
+              <CardDescription>
+                Lokalisierung der Casa
+              </CardDescription>
+            </div>
+            {isLeadership && !isEditing && (
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="outline"
+                size="sm"
+                className="text-primary border-primary hover:bg-primary/10"
+              >
+                Bearbeiten
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isLeadership ? (
+          {isLeadership && isEditing ? (
             <>
+              <div className="mb-4 p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg flex items-start gap-2">
+                <Info className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-blue-200">
+                  Diese Informationen sind für alle Mitglieder sichtbar.
+                </p>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="postalCode" className="text-white">PLZ</Label>
                 <Input
@@ -160,37 +186,59 @@ export default function CasaPage() {
                   className="bg-gray-800 border-gray-700 text-white min-h-[80px]"
                 />
               </div>
-              <Button
-                onClick={handleSaveLocation}
-                disabled={updateLocationMutation.isPending}
-                className="lasanta-button-primary w-full"
-              >
-                {updateLocationMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Wird gespeichert...
-                  </>
-                ) : (
-                  'Standort speichern'
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSaveLocation}
+                  disabled={updateLocationMutation.isPending}
+                  className="lasanta-button-primary flex-1"
+                >
+                  {updateLocationMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Wird gespeichert...
+                    </>
+                  ) : (
+                    'Speichern'
+                  )}
+                </Button>
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  disabled={updateLocationMutation.isPending}
+                  className="flex-1"
+                >
+                  Abbrechen
+                </Button>
+              </div>
             </>
           ) : (
-            <div className="space-y-2 text-white">
-              {casaInfo?.postalCode && (
-                <div>
-                  <span className="font-semibold text-primary">PLZ: </span>
-                  <span>{casaInfo.postalCode}</span>
+            <div className="space-y-4">
+              {(casaInfo?.postalCode || casaInfo?.additionalInfo) ? (
+                <>
+                  {casaInfo?.postalCode && (
+                    <div className="flex items-start gap-3 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                      <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-gray-400">Postleitzahl</p>
+                        <p className="text-lg font-semibold text-white">{casaInfo.postalCode}</p>
+                      </div>
+                    </div>
+                  )}
+                  {casaInfo?.additionalInfo && (
+                    <div className="flex items-start gap-3 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                      <Info className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-gray-400">Zusätzliche Informationen</p>
+                        <p className="text-white leading-relaxed">{casaInfo.additionalInfo}</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <MapPin className="h-12 w-12 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400 italic">Noch keine Standort-Informationen hinterlegt.</p>
                 </div>
-              )}
-              {casaInfo?.additionalInfo && (
-                <div>
-                  <span className="font-semibold text-primary">Info: </span>
-                  <span>{casaInfo.additionalInfo}</span>
-                </div>
-              )}
-              {!casaInfo?.postalCode && !casaInfo?.additionalInfo && (
-                <p className="text-gray-400 italic">Noch keine Standort-Informationen hinterlegt.</p>
               )}
             </div>
           )}

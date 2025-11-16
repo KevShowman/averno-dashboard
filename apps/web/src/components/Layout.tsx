@@ -71,7 +71,7 @@ const navigation = [
   { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
   { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
   { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },
-  { name: 'La Casa', href: '/casa', icon: Home },
+  { name: 'La Casa', href: '/la-casa', icon: Home },
   { name: 'Aktensystem', href: '/member-files', icon: FileText, leadershipOnly: true },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },
