@@ -1,0 +1,28 @@
+# La Santa Landing Page - Production
+FROM nginx:alpine
+
+# Install gzip for compression
+RUN apk add --no-cache gzip
+
+# Copy website files
+COPY index.html /usr/share/nginx/html/
+COPY styles.css /usr/share/nginx/html/
+COPY script.js /usr/share/nginx/html/
+
+# Pre-compress files for better performance
+RUN gzip -k /usr/share/nginx/html/styles.css && \
+    gzip -k /usr/share/nginx/html/script.js
+
+# Copy production nginx configuration
+COPY nginx.prod.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+# Start nginx with optimized settings
+CMD ["nginx", "-g", "daemon off;"]
+
