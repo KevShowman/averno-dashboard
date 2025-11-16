@@ -399,6 +399,51 @@ const treeNodes: Record<string, TreeNode> = {
       'Neue Leute ausbilden, alte scharf halten.',
     ],
   },
+  'funktionsleiter-rutas': {
+    id: 'funktionsleiter-rutas',
+    label: 'Rutas – Routenverwaltung & Transporte',
+    summary: 'Die Wege der Ware.',
+    responsibilities: [
+      'Hält Kontakt zu Familien und analysiert Routenpreise',
+      'Plant sichere Transportwege.',
+      'Koordiniert alle Routen und Lieferungen.',
+    ],
+    dailyDuties: [
+      'Routen planen, Lieferungen koordinieren.',
+      'Sicherheit der Transporte gewährleisten.',
+      'Optimierung der Logistik.',
+    ],
+  },
+  'funktionsleiter-formacion': {
+    id: 'funktionsleiter-formacion',
+    label: 'Formación – Ausbildung & Training',
+    summary: 'Die Schmiede der Familia.',
+    responsibilities: [
+      'Trainiert neue und bestehende Mitglieder.',
+      'Entwickelt Schulungsprogramme.',
+      'Bewertet Fortschritte und Fähigkeiten.',
+    ],
+    dailyDuties: [
+      'Trainings durchführen und planen.',
+      'Mitglieder coachen und weiterentwickeln.',
+      'Standards setzen und einhalten.',
+    ],
+  },
+  'funktionsleiter-contacto': {
+    id: 'funktionsleiter-contacto',
+    label: 'Contacto – Externe Beziehungen',
+    summary: 'Die Brücke nach außen.',
+    responsibilities: [
+      'Pflegt Kontakte zu anderen Familien.',
+      'Verhandelt Deals und Gespräche / Termine.',
+      'Repräsentiert die Familia nach außen.',
+    ],
+    dailyDuties: [
+      'Meetings mit externen Partnern.',
+      'Verhandlungen führen und dokumentieren.',
+      'Netzwerk aufbauen und pflegen.',
+    ],
+  },
   'ranks-7-9': {
     id: 'ranks-7-9',
     label: 'Ränge 7-9: El Custodio, El Mentor, El Encargado',

@@ -37,7 +37,7 @@ export default function AbmeldungenPage() {
     reason: '',
   });
 
-  const isLeadership = user && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role);
+  const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
 
   // Queries
   const { data: abmeldungen = [], isLoading } = useQuery({

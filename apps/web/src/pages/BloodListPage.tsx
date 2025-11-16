@@ -43,8 +43,8 @@ export default function BloodListPage() {
     grund: '',
   });
 
-  const isLeadership = user && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role);
-  const canBloodOut = user && ['EL_PATRON', 'DON'].includes(user.role);
+  const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
+  const canBloodOut = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
 
   // Queries
   const { data: activeMembers = [], isLoading } = useQuery({
