@@ -16,10 +16,6 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere Source Code
 COPY . .
 
-# Kopiere Default Casa-Bilder
-RUN mkdir -p uploads/casa
-COPY uploads/casa/*.png uploads/casa/ 2>/dev/null || true
-
 # Generiere Prisma Client
 RUN pnpm exec prisma generate
 
@@ -46,7 +42,9 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere built application
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/uploads ./uploads
+
+# Kopiere Default Casa-Bilder aus dem Build Context
+COPY uploads/casa/*.png ./uploads/casa/
 
 # Debug: Prüfe ob main.js existiert
 RUN echo "=== Checking copied files ===" && \
@@ -59,8 +57,11 @@ RUN chmod +x ./startup.sh
 # Generiere Prisma Client für Production (als root, damit Schreibrechte vorhanden)
 RUN pnpm exec prisma generate
 
-# Erstelle Verzeichnisse für Uploads und Logs
+# Erstelle Verzeichnisse für Uploads und Logs (falls noch nicht existieren)
 RUN mkdir -p uploads/casa logs
+
+# Setze Berechtigungen für Uploads
+RUN chmod -R 755 uploads
 
 # Setze Umgebungsvariable für OpenSSL
 ENV OPENSSL_CONF=/etc/ssl/openssl.cnf
