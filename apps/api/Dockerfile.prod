@@ -60,7 +60,7 @@ RUN chmod +x ./startup.sh
 RUN pnpm exec prisma generate
 
 # Erstelle Verzeichnisse für Uploads und Logs
-RUN mkdir -p uploads logs
+RUN mkdir -p uploads/casa logs
 
 # Setze Umgebungsvariable für OpenSSL
 ENV OPENSSL_CONF=/etc/ssl/openssl.cnf
