@@ -24,7 +24,8 @@ import {
   Network,
   Shirt,
   Radio,
-  Car
+  Car,
+  ScrollText
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -72,6 +73,7 @@ const navigation = [
   { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
   { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },
   { name: 'La Casa', href: '/la-casa', icon: Home },
+  { name: 'Botschaft', href: '/botschaft', icon: ScrollText, leadershipOnly: true },
   { name: 'Aktensystem', href: '/member-files', icon: FileText, leadershipOnly: true },
   { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
   { name: 'Live-Ticker', href: '/ticker', icon: Activity },

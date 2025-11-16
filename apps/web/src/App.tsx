@@ -31,6 +31,7 @@ import CommunicationPage from './pages/CommunicationPage'
 import MemberFilesPage from './pages/MemberFilesPage'
 import VehicleTuningPage from './pages/VehicleTuningPage'
 import CasaPage from './pages/CasaPage'
+import BotschaftPage from './pages/BotschaftPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -240,6 +241,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <CasaPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/botschaft" element={
+          <ProtectedRoute requiredRoles={['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']}>
+            <Layout>
+              <BotschaftPage />
             </Layout>
           </ProtectedRoute>
         } />
