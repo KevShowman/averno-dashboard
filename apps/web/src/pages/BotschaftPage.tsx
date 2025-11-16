@@ -1,16 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { ScrollText, Flower2, Shield, Sword, Flame, Heart } from 'lucide-react'
-import { useAuthStore } from '../stores/auth'
-import { hasRole } from '../lib/utils'
-import { Navigate } from 'react-router-dom'
 
 export default function BotschaftPage() {
-  const { user } = useAuthStore()
-  
-  // Redirect if not leadership
-  if (!hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])) {
-    return <Navigate to="/app" replace />
-  }
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
