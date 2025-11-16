@@ -6,6 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { Users, Plus, X, TrendingUp, Calendar, CheckCircle, XCircle, AlertTriangle, Edit, Factory, Clock, Check, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/auth';
 import { familiensammelnApi } from '../lib/api';
+import { hasRole } from '../lib/utils';
 import EnhancedPeoplePicker from '../components/EnhancedPeoplePicker';
 import { TourCountModal } from '../components/TourCountModal';
 import { toast } from 'sonner';

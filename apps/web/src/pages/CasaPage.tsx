@@ -283,7 +283,7 @@ export default function CasaPage() {
               {casaInfo.images.map((image) => (
                 <div key={image.id} className="relative group">
                   <img
-                    src={`${import.meta.env.VITE_API_URL}${image.url}`}
+                    src={`/api${image.url}`}
                     alt="Casa"
                     className="w-full h-64 object-cover rounded-lg border border-gray-700"
                   />

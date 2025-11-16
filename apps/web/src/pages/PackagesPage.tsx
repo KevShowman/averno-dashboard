@@ -22,7 +22,7 @@ import {
   Trash2,
   Eye
 } from 'lucide-react'
-import { formatDate, formatCurrency, getDisplayName } from '../lib/utils'
+import { formatDate, formatCurrency, getDisplayName, hasRole } from '../lib/utils'
 import { toast } from 'sonner'
 import WeeklyDeliveryPaymentModal from '../components/WeeklyDeliveryPaymentModal'
 

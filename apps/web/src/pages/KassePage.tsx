@@ -7,7 +7,7 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
 import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Plus, Minus } from 'lucide-react'
-import { formatCurrency, formatDate, getTransactionStatusColor, getDisplayName } from '../lib/utils'
+import { formatCurrency, formatDate, getTransactionStatusColor, getDisplayName, hasRole } from '../lib/utils'
 import {
   Chart as ChartJS,
   CategoryScale,

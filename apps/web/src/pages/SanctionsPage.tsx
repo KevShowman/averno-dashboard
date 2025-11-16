@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Scale, AlertTriangle, CheckCircle, Clock, X, DollarSign, User, Plus, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
+import { hasRole } from '../lib/utils'
 import CreateSanctionModal from '../components/CreateSanctionModal'
 import ResetSanctionLevelsModal from '../components/ResetSanctionLevelsModal'
 
