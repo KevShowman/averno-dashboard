@@ -120,8 +120,8 @@ export default function SanctionsPage() {
   const { user } = useAuthStore()
   
   // Check if user has leadership role
-  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR'
-  const isElPatron = user?.role === 'EL_PATRON'
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isElPatron = hasRole(user, 'EL_PATRON')
 
   // Queries
   const { data: sanctions = [], isLoading: loadingSanctions } = useQuery({

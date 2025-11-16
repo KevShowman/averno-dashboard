@@ -89,7 +89,7 @@ export default function FamiliensammelnPage() {
   const [editingParticipation, setEditingParticipation] = useState<Participation | null>(null);
   const [showProcessorPicker, setShowProcessorPicker] = useState(false);
 
-  const isLeadership = user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR';
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']);
 
   // Query: Aktuelle Woche
   const { data: currentWeek, isLoading } = useQuery<Week>({

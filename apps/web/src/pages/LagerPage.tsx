@@ -248,7 +248,7 @@ export default function LagerPage() {
                               </Button>
                             </>
                           )}
-                          {(user?.role === 'SOLDADO' || user?.role === 'FUTURO') && (
+                          {hasRole(user, ['EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO', 'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO', 'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO', 'FUTURO']) && (
                             <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
                               Nur lesen
                             </Badge>

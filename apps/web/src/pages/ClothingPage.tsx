@@ -95,56 +95,64 @@ export default function ClothingPage() {
     updateGenderMutation.mutate(gender)
   }
 
-  const clothingParts: ClothingDisplay[] = [
+  // Check if template has Sicario structure
+  const hasSicarioClothing = template && typeof template === 'object' && 'rank' in template && 'sicario' in template
+  const rankTemplate = hasSicarioClothing ? template.rank : template
+  const sicarioTemplate = hasSicarioClothing ? template.sicario : null
+
+  const createClothingParts = (data: any): ClothingDisplay[] => [
     {
       part: 'mask',
       label: 'Maske',
-      item: template?.maskItem ?? null,
-      variation: template?.maskVariation ?? null,
-      customizable: template?.maskCustomizable ?? false,
-      color: template?.maskColor ?? null,
+      item: data?.maskItem ?? null,
+      variation: data?.maskVariation ?? null,
+      customizable: data?.maskCustomizable ?? false,
+      color: data?.maskColor ?? null,
     },
     {
       part: 'torso',
       label: 'Torso',
-      item: template?.torsoItem ?? null,
-      variation: template?.torsoVariation ?? null,
-      customizable: template?.torsoCustomizable ?? false,
-      color: template?.torsoColor ?? null,
+      item: data?.torsoItem ?? null,
+      variation: data?.torsoVariation ?? null,
+      customizable: data?.torsoCustomizable ?? false,
+      color: data?.torsoColor ?? null,
     },
     {
       part: 'tshirt',
       label: 'T-Shirt',
-      item: template?.tshirtItem ?? null,
-      variation: template?.tshirtVariation ?? null,
-      customizable: template?.tshirtCustomizable ?? false,
-      color: template?.tshirtColor ?? null,
+      item: data?.tshirtItem ?? null,
+      variation: data?.tshirtVariation ?? null,
+      customizable: data?.tshirtCustomizable ?? false,
+      color: data?.tshirtColor ?? null,
     },
     {
       part: 'vest',
       label: 'Weste',
-      item: template?.vesteItem ?? null,
-      variation: template?.vesteVariation ?? null,
-      customizable: template?.vesteCustomizable ?? false,
-      color: template?.vesteColor ?? null,
+      item: data?.vesteItem ?? null,
+      variation: data?.vesteVariation ?? null,
+      customizable: data?.vesteCustomizable ?? false,
+      color: data?.vesteColor ?? null,
     },
     {
       part: 'pants',
       label: 'Hose',
-      item: template?.hoseItem ?? null,
-      variation: template?.hoseVariation ?? null,
-      customizable: template?.hoseCustomizable ?? false,
-      color: template?.hoseColor ?? null,
+      item: data?.hoseItem ?? null,
+      variation: data?.hoseVariation ?? null,
+      customizable: data?.hoseCustomizable ?? false,
+      color: data?.hoseColor ?? null,
     },
     {
       part: 'shoes',
       label: 'Schuhe',
-      item: template?.schuheItem ?? null,
-      variation: template?.schuheVariation ?? null,
-      customizable: template?.schuheCustomizable ?? false,
-      color: template?.schuheColor ?? null,
+      item: data?.schuheItem ?? null,
+      variation: data?.schuheVariation ?? null,
+      customizable: data?.schuheCustomizable ?? false,
+      color: data?.schuheColor ?? null,
     },
   ]
+
+  const rankClothingParts = createClothingParts(rankTemplate)
+  const sicarioClothingParts = sicarioTemplate ? createClothingParts(sicarioTemplate) : null
 
   const isLoading = templateLoading
 
@@ -217,7 +225,7 @@ export default function ClothingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {clothingParts.map((part) => {
+            {rankClothingParts.map((part) => {
               const isCustomizable = part.customizable
 
               return (
@@ -285,6 +293,92 @@ export default function ClothingPage() {
               <p className="text-sm text-blue-300">
                 Alle Kleidungsteile wurden von der Leitung festgelegt oder sind frei wählbar in den
                 angegebenen Farben.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Sicario Clothing Section */}
+      {sicarioClothingParts && (
+        <Card className="lasanta-card border-orange-500/50">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Shirt className="h-5 w-5 text-orange-400" />
+              Sicario Kleidung ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Als <span className="text-orange-400 font-semibold">Sicario</span> hast du zusätzlich Zugriff auf diese spezielle Kleidung.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {sicarioClothingParts.map((part) => {
+              const isCustomizable = part.customizable
+
+              return (
+                <div
+                  key={part.part}
+                  className="space-y-4 border-b border-gray-700 pb-6 last:border-0"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-white">{part.label}</h3>
+                    {isCustomizable && (
+                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                        Frei wählbar
+                      </span>
+                    )}
+                  </div>
+
+                  {isCustomizable ? (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 space-y-2">
+                      <p className="text-green-300 font-medium">
+                        Dieses Kleidungsstück ist frei wählbar!
+                      </p>
+                      {part.color !== null && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-400">Vorgaben:</span>
+                          <span className="text-white font-mono bg-gray-800 px-2 py-1 rounded">
+                            {part.color}
+                          </span>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-400 pt-2">
+                        Du kannst dieses Teil in den angegebenen Vorgaben frei auswählen.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-800/50 rounded-lg p-4 space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">Item:</span>
+                        <span className="text-white font-mono">
+                          {part.item !== null ? part.item : 'Nicht festgelegt'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">Variation:</span>
+                        <span className="text-white font-mono">
+                          {part.variation !== null ? part.variation : 'Nicht festgelegt'}
+                        </span>
+                      </div>
+                      {part.color !== null && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">Farbe:</span>
+                          <span className="text-white font-mono">{part.color}</span>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 pt-2">
+                        Diese Einstellung wurde von der Leitung festgelegt.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 text-center">
+              <Info className="h-5 w-5 text-orange-400 mx-auto mb-2" />
+              <p className="text-sm text-orange-300">
+                Du kannst zwischen deiner Rang-Kleidung und der Sicario-Kleidung wählen.
               </p>
             </div>
           </CardContent>

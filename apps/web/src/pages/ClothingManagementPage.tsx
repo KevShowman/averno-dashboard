@@ -37,6 +37,7 @@ const rankGroups = [
   { id: 'DON_CAPITAN', label: 'Don - El Capitán' },
   { id: 'DON_COMANDANTE', label: 'Don - El Comandante' },
   { id: 'EL_MANO_DERECHA', label: 'El Mano Derecha' },
+  { id: 'SICARIO', label: '🔫 Sicario (Funktionsrolle)' },
 ]
 
 const clothingParts = [

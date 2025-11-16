@@ -26,7 +26,7 @@ export default function LagerMovementsPage() {
     queryFn: () => api.get('/items/movements/pending').then(res => res.data),
   })
 
-  const canApprove = hasRole(user, ['EL_PATRON', 'LOGISTICA', 'DON']) // Temporär: Don kann auch genehmigen
+  const canApprove = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'LOGISTICA'])
   const canView = true // Alle können ausstehende Bewegungen sehen
 
   const approveMovementMutation = useMutation({

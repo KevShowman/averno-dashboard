@@ -74,9 +74,9 @@ export default function WeeklyDeliveryPage() {
   const { user } = useAuthStore()
   
   // Check if user has leadership role
-  const isLeadership = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR'])
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const isElPatron = hasRole(user, 'EL_PATRON')
-  const canPayForOthers = hasRole(user, ['EL_PATRON', 'DON'])
+  const canPayForOthers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
 
   // Queries
   const { data: currentWeekDeliveries = [], isLoading: loadingCurrentWeek } = useQuery({

@@ -44,13 +44,13 @@ export class ClothingService {
     [Role.EL_CONFIDENTE]: '1-3',
     [Role.EL_PROTECTOR]: '1-3',
     [Role.EL_NOVATO]: '1-3',
-    // Funktionsrollen (Fallback zu 1-3, sollten aber nie verwendet werden)
+    // Funktionsrollen (Fallback zu 1-3, außer Sicario hat eigene Kleidung)
     [Role.CONSEJERO]: '1-3',
     [Role.RUTAS]: '1-3',
     [Role.LOGISTICA]: '1-3',
     [Role.INTELIGENCIA]: '1-3',
     [Role.FORMACION]: '1-3',
-    [Role.SICARIO]: '1-3',
+    [Role.SICARIO]: 'SICARIO',
     [Role.CONTACTO]: '1-3',
     // Legacy
     [Role.FUTURO]: '1-3',
@@ -415,6 +415,7 @@ export class ClothingService {
   /**
    * Holt die Kleidung für einen User basierend auf Rang + Geschlecht
    * Funktionsrollen werden ignoriert - nimmt den HÖCHSTEN Rang
+   * AUSNAHME: Sicarios erhalten BEIDE Kleidungen (Sicario + Rang)
    */
   async getUserClothing(userId: string): Promise<any> {
     // User, Rolle und Geschlecht holen
@@ -429,6 +430,9 @@ export class ClothingService {
 
     // Finde den RANG (nicht Funktionsrolle) aus allRoles
     const allRoles = Array.isArray(user.allRoles) ? (user.allRoles as Role[]) : [user.role];
+    
+    // Prüfe ob User ein Sicario ist
+    const isSicario = allRoles.includes(Role.SICARIO);
     
     // Rang-Hierarchie (höchste zuerst)
     const rankHierarchy = [
@@ -459,9 +463,21 @@ export class ClothingService {
 
     // Template für die Rang-Gruppe holen
     const template = await this.getTemplateByRankGroup(rankGroup);
+    const rankClothing = this.flattenTemplateForGender(template, user.gender || Gender.MALE);
+
+    // Wenn User ein Sicario ist, hole auch die Sicario-Kleidung
+    if (isSicario) {
+      const sicarioTemplate = await this.getTemplateByRankGroup('SICARIO');
+      const sicarioClothing = this.flattenTemplateForGender(sicarioTemplate, user.gender || Gender.MALE);
+      
+      return {
+        rank: rankClothing,
+        sicario: sicarioClothing,
+      };
+    }
 
     // Geschlecht-spezifisches Template zurückgeben
-    return this.flattenTemplateForGender(template, user.gender || Gender.MALE);
+    return rankClothing;
   }
 
   /**

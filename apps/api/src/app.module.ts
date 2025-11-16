@@ -24,6 +24,7 @@ import { ClothingModule } from './clothing/clothing.module';
 import { CommunicationModule } from './communication/communication.module';
 import { MemberFilesModule } from './member-files/member-files.module';
 import { VehicleTuningModule } from './vehicle-tuning/vehicle-tuning.module';
+import { CasaModule } from './casa/casa.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -61,6 +62,7 @@ import { AppService } from './app.service';
     CommunicationModule,
     MemberFilesModule,
     VehicleTuningModule,
+    CasaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

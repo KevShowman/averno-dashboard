@@ -180,13 +180,10 @@ export default function PackagesPage() {
     },
   })
 
-  const canConfirm = user?.role === 'EL_PATRON' || user?.role === 'DON' || 
-                    user?.role === 'ASESOR'
-  const canManage = user?.role === 'EL_PATRON' || user?.role === 'DON'
-  const canManagePrice = user?.role === 'EL_PATRON' || user?.role === 'DON' || 
-                        user?.role === 'ASESOR' || user?.role === 'ROUTENVERWALTUNG'
-  const canRemove = user?.role === 'EL_PATRON' || user?.role === 'DON' ||
-                   user?.role === 'ROUTENVERWALTUNG'
+  const canConfirm = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const canManage = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const canManagePrice = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'RUTAS'])
+  const canRemove = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'RUTAS'])
 
   const handleCreateDeposit = () => {
     const packages = parseInt(depositPackages)

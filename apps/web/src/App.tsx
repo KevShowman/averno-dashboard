@@ -30,6 +30,7 @@ import ClothingPage from './pages/ClothingPage'
 import CommunicationPage from './pages/CommunicationPage'
 import MemberFilesPage from './pages/MemberFilesPage'
 import VehicleTuningPage from './pages/VehicleTuningPage'
+import CasaPage from './pages/CasaPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -232,6 +233,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <VehicleTuningPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/casa" element={
+          <ProtectedRoute>
+            <Layout>
+              <CasaPage />
             </Layout>
           </ProtectedRoute>
         } />

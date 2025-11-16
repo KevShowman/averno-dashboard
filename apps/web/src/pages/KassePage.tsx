@@ -57,7 +57,7 @@ export default function KassePage() {
     retry: 1,
   })
 
-  const canApprove = user?.role === 'EL_PATRON'
+  const canApprove = hasRole(user, 'EL_PATRON')
 
   const approveTransactionMutation = useMutation({
     mutationFn: (transactionId: string) => api.post(`/cash/transactions/${transactionId}/approve`),
@@ -139,7 +139,7 @@ export default function KassePage() {
           </p>
         </div>
         <div className="flex space-x-2">
-          {(user?.role === 'EL_PATRON' || user?.role === 'DON' || user?.role === 'ASESOR') && (
+          {hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']) && (
             <>
               <Button
                 onClick={() => {
@@ -151,7 +151,6 @@ export default function KassePage() {
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Einzahlung
-                {user?.role === 'ASESOR' && <span className="ml-1 text-xs">(Genehmigung)</span>}
               </Button>
               <Button
                 onClick={() => {
@@ -163,11 +162,10 @@ export default function KassePage() {
               >
                 <Minus className="mr-2 h-4 w-4" />
                 Auszahlung
-                {user?.role === 'ASESOR' && <span className="ml-1 text-xs">(Genehmigung)</span>}
               </Button>
             </>
           )}
-          {(user?.role === 'SOLDADO' || user?.role === 'FUTURO') && (
+          {hasRole(user, ['EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO', 'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO', 'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO', 'FUTURO']) && (
             <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
               Nur lesen
             </Badge>

@@ -468,8 +468,8 @@ const organigramLevels: OrganigramLevel[] = [
   {
     id: 'level-4',
     title: '🧭 Funciones – Die Säulen',
-    description: 'Logística, Inteligencia, Mediación, Sicarios – sie halten alles zusammen.',
-    nodes: ['funktionsleiter-logistica', 'funktionsleiter-inteligencia', 'funktionsleiter-consejero', 'funktionsleiter-sicarios'],
+    description: 'Logística, Inteligencia, Mediación, Sicarios, Rutas – sie halten alles zusammen.',
+    nodes: ['funktionsleiter-logistica', 'funktionsleiter-inteligencia', 'funktionsleiter-consejero', 'funktionsleiter-sicarios', 'funktionsleiter-rutas', 'funktionsleiter-formacion', 'funktionsleiter-contacto'],
   },
   {
     id: 'level-5',

@@ -115,6 +115,20 @@ export function hasAnyRole(user: any, requiredRoles: string[]) {
   return hasRole(user, requiredRoles)
 }
 
+// Leaderschaft-Rollen Konstante
+export const LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']
+export const TOP_LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']
+
+// Normale Ränge 1-9 (keine Leadership, keine Funktionsrollen)
+export const RANK_1_9_ROLES = [
+  // Ränge 7-9
+  'EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO',
+  // Ränge 4-6
+  'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO',
+  // Ränge 1-3
+  'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO',
+]
+
 export function hasAllRoles(user: any, requiredRoles: string[]) {
   if (!user) return false
   

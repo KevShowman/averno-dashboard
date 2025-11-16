@@ -16,6 +16,10 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere Source Code
 COPY . .
 
+# Kopiere Default Casa-Bilder
+RUN mkdir -p uploads/casa
+COPY uploads/casa/*.png uploads/casa/ 2>/dev/null || true
+
 # Generiere Prisma Client
 RUN pnpm exec prisma generate
 
@@ -42,6 +46,7 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere built application
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/uploads ./uploads
 
 # Debug: Prüfe ob main.js existiert
 RUN echo "=== Checking copied files ===" && \

@@ -52,10 +52,23 @@ export default function SettingsPage() {
   const [weeklyDeliveryMoneyPerPackage, setWeeklyDeliveryMoneyPerPackage] = useState(1000)
 
   // Permission checks
-  const canManageUsers = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
-  const canManageSettings = user?.role && ['EL_PATRON', 'DON', 'ASESOR'].includes(user.role)
-  const canManagePackagePrice = user?.role && ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG'].includes(user.role)
-  const canChangeIcName = hasRole(user, ['EL_PATRON', 'DON', 'ASESOR', 'ROUTENVERWALTUNG', 'LOGISTICA', 'SICARIO', 'SOLDADO', 'FUTURO'])
+  const canManageUsers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const canManageSettings = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const canManagePackagePrice = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'RUTAS'])
+  const canChangeIcName = hasRole(user, [
+    // Leadership
+    'EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA',
+    // Funktionsrollen
+    'RUTAS', 'LOGISTICA', 'SICARIO', 'CONSEJERO', 'INTELIGENCIA', 'FORMACION', 'CONTACTO',
+    // Ränge 7-9
+    'EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO',
+    // Ränge 4-6
+    'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO',
+    // Ränge 1-3
+    'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO',
+    // Legacy
+    'FUTURO'
+  ])
 
   // Queries
   const { data: users } = useQuery({
@@ -73,7 +86,7 @@ export default function SettingsPage() {
   const { data: weeklyDeliverySettings } = useQuery({
     queryKey: ['weekly-delivery-settings'],
     queryFn: () => api.get('/settings/weekly-delivery/values').then(res => res.data),
-    enabled: user?.role === 'EL_PATRON' || user?.role === 'DON',
+    enabled: canManageSettings,
   })
 
   // Mutations

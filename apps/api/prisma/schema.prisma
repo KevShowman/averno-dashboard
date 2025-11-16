@@ -27,27 +27,27 @@ model User {
 
   // Relations
   actions                       ActionLog[]
-  moneyTxCreated                MoneyTransaction[]        @relation("tx_created_by")
-  moneyTxApproved               MoneyTransaction[]        @relation("tx_approved_by")
-  stockMovements                StockMovement[]           @relation("movement_created_by")
-  stockMovementsApproved        StockMovement[]           @relation("movement_approved_by")
-  packageDeposits               PackageDeposit[]          @relation("deposit_created_by")
-  packageConfirmations          PackageDeposit[]          @relation("deposit_confirmed_by")
-  packageRejections             PackageDeposit[]          @relation("deposit_rejected_by")
-  weeklyDeliveries              WeeklyDelivery[]          @relation("delivery_created_by")
-  weeklyDeliveryConfirmations   WeeklyDelivery[]          @relation("delivery_confirmed_by")
-  sanctionsCreated              Sanction[]                @relation("sanction_created_by")
-  sanctionsReceived             Sanction[]                @relation("sanction_received_by")
-  exclusionsReceived            WeeklyDeliveryExclusion[] @relation("exclusion_user")
-  exclusionsCreated             WeeklyDeliveryExclusion[] @relation("exclusion_created_by")
-  archivesCreated               WeeklyDeliveryArchive[]   @relation("archive_created_by")
-  aufstellungenCreated          Aufstellung[]             @relation("aufstellung_created_by")
-  aufstellungResponses          AufstellungResponse[]     @relation("aufstellung_responses")
-  aufstellungExclusionsReceived AufstellungExclusion[]       @relation("aufstellung_exclusion_user")
-  aufstellungExclusionsCreated  AufstellungExclusion[]       @relation("aufstellung_exclusion_created_by")
-  abmeldungenCreated            Abmeldung[]                  @relation("abmeldung_user")
+  moneyTxCreated                MoneyTransaction[]             @relation("tx_created_by")
+  moneyTxApproved               MoneyTransaction[]             @relation("tx_approved_by")
+  stockMovements                StockMovement[]                @relation("movement_created_by")
+  stockMovementsApproved        StockMovement[]                @relation("movement_approved_by")
+  packageDeposits               PackageDeposit[]               @relation("deposit_created_by")
+  packageConfirmations          PackageDeposit[]               @relation("deposit_confirmed_by")
+  packageRejections             PackageDeposit[]               @relation("deposit_rejected_by")
+  weeklyDeliveries              WeeklyDelivery[]               @relation("delivery_created_by")
+  weeklyDeliveryConfirmations   WeeklyDelivery[]               @relation("delivery_confirmed_by")
+  sanctionsCreated              Sanction[]                     @relation("sanction_created_by")
+  sanctionsReceived             Sanction[]                     @relation("sanction_received_by")
+  exclusionsReceived            WeeklyDeliveryExclusion[]      @relation("exclusion_user")
+  exclusionsCreated             WeeklyDeliveryExclusion[]      @relation("exclusion_created_by")
+  archivesCreated               WeeklyDeliveryArchive[]        @relation("archive_created_by")
+  aufstellungenCreated          Aufstellung[]                  @relation("aufstellung_created_by")
+  aufstellungResponses          AufstellungResponse[]          @relation("aufstellung_responses")
+  aufstellungExclusionsReceived AufstellungExclusion[]         @relation("aufstellung_exclusion_user")
+  aufstellungExclusionsCreated  AufstellungExclusion[]         @relation("aufstellung_exclusion_created_by")
+  abmeldungenCreated            Abmeldung[]                    @relation("abmeldung_user")
   familiensammelnParticipations FamiliensammelnParticipation[] @relation("familiensammeln_participations")
-  organigrammAssignments        OrganigrammAssignment[]         @relation("organigramm_assignments")
+  organigrammAssignments        OrganigrammAssignment[]        @relation("organigramm_assignments")
   processors                    FamiliensammelnProcessor[]     @relation("processor_user")
   processorsCompleted           FamiliensammelnProcessor[]     @relation("processor_completed_by")
   memberFile                    MemberFile?                    @relation("member_files")
@@ -227,32 +227,32 @@ model Settings {
 
 // Aktensystem
 model MemberFile {
-  id              String            @id @default(cuid())
-  userId          String            @unique
-  user            User              @relation("member_files", fields: [userId], references: [id])
-  lastUprankDate  DateTime?         // Datum des letzten Upranks
-  isArchived      Boolean           @default(false) // Archiviert wenn Blood Out
-  archivedAt      DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation("member_files", fields: [userId], references: [id])
+  lastUprankDate DateTime? // Datum des letzten Upranks
+  isArchived     Boolean   @default(false) // Archiviert wenn Blood Out
+  archivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
   // Relations
-  entries         MemberFileEntry[]
-  
+  entries MemberFileEntry[]
+
   @@map("member_files")
 }
 
 model MemberFileEntry {
-  id          String           @id @default(cuid())
+  id          String        @id @default(cuid())
   fileId      String
-  file        MemberFile       @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  type        FileEntryType    // POSITIVE, NEGATIVE, NEUTRAL
-  content     String           @db.Text
+  file        MemberFile    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  type        FileEntryType // POSITIVE, NEGATIVE, NEUTRAL
+  content     String        @db.Text
   createdById String
-  createdBy   User             @relation("file_entries_created", fields: [createdById], references: [id])
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  
+  createdBy   User          @relation("file_entries_created", fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
   @@map("member_file_entries")
 }
 
@@ -260,6 +260,16 @@ enum FileEntryType {
   POSITIVE
   NEGATIVE
   NEUTRAL
+}
+
+model CasaImage {
+  id        String   @id @default(cuid())
+  filename  String
+  path      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("casa_images")
 }
 
 // Package-Deposit System (früher Kokain)
@@ -505,33 +515,33 @@ enum AufstellungResponseStatus {
 
 // Abmeldungssystem
 model Abmeldung {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  user      User      @relation("abmeldung_user", fields: [userId], references: [id])
+  user      User     @relation("abmeldung_user", fields: [userId], references: [id])
   startDate DateTime // Start der Abmeldung
   endDate   DateTime // Ende der Abmeldung
   reason    String? // Grund der Abmeldung (optional)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("abmeldungen")
 }
 
 // BloodList System - Mitgliederverwaltung
 model BloodRecord {
-  id                 String        @id @default(cuid())
-  vorname            String
-  nachname           String
-  telefon            Int
-  steam              String
-  bloodinDurch       String // Wer hat Blood In durchgeführt
-  bloodinTimestamp   DateTime      @default(now())
-  status             BloodStatus   @default(ACTIVE)
-  bloodoutTimestamp  DateTime?
-  bloodoutDurch      String?
-  bloodoutGrund      String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  id                String      @id @default(cuid())
+  vorname           String
+  nachname          String
+  telefon           Int
+  steam             String
+  bloodinDurch      String // Wer hat Blood In durchgeführt
+  bloodinTimestamp  DateTime    @default(now())
+  status            BloodStatus @default(ACTIVE)
+  bloodoutTimestamp DateTime?
+  bloodoutDurch     String?
+  bloodoutGrund     String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   @@unique([telefon, status]) // Telefon muss unique sein für ACTIVE Status
   @@map("blood_records")
@@ -544,11 +554,11 @@ enum BloodStatus {
 
 // Familiensammeln System
 model FamiliensammelnWeek {
-  id            String                          @id @default(cuid())
-  weekStart     DateTime // Montag
-  weekEnd       DateTime // Samstag (6 Tage)
-  createdAt     DateTime                        @default(now())
-  updatedAt     DateTime                        @updatedAt
+  id        String   @id @default(cuid())
+  weekStart DateTime // Montag
+  weekEnd   DateTime // Samstag (6 Tage)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   participations FamiliensammelnParticipation[]
@@ -559,15 +569,15 @@ model FamiliensammelnWeek {
 }
 
 model FamiliensammelnParticipation {
-  id        String               @id @default(cuid())
+  id        String              @id @default(cuid())
   weekId    String
-  week      FamiliensammelnWeek  @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  week      FamiliensammelnWeek @relation(fields: [weekId], references: [id], onDelete: Cascade)
   userId    String
-  user      User                 @relation("familiensammeln_participations", fields: [userId], references: [id])
+  user      User                @relation("familiensammeln_participations", fields: [userId], references: [id])
   date      DateTime // Datum der Teilnahme
-  tourCount Int                  @default(1) // Anzahl der Touren an diesem Tag
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+  tourCount Int                 @default(1) // Anzahl der Touren an diesem Tag
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
 
   @@unique([weekId, userId, date]) // User kann nur 1x pro Tag teilnehmen
   @@map("familiensammeln_participations")
@@ -588,29 +598,29 @@ model OrganigrammAssignment {
 
 // Familiensammeln Verarbeiter (Processor Tracking)
 model FamiliensammelnProcessor {
-  id            String                      @id @default(cuid())
-  weekId        String
-  week          FamiliensammelnWeek         @relation(fields: [weekId], references: [id], onDelete: Cascade)
-  userId        String
-  user          User                        @relation("processor_user", fields: [userId], references: [id], onDelete: Cascade)
-  startedAt     DateTime                    @default(now()) // Wann wurde der Verarbeiter gestartet
-  finishesAt    DateTime                    // Wann ist der Verarbeiter fertig (startedAt + 5 Stunden)
-  capacity      Int                         @default(3000) // Kapazität des Verarbeiters
-  processingRate Int                        @default(10) // Wie viele Stück pro Minute verarbeitet werden
-  status        ProcessorStatus             @default(PROCESSING)
-  completedAt   DateTime?                   // Wann wurde die Entnahme bestätigt
-  completedBy   String?
-  completedByUser User?                     @relation("processor_completed_by", fields: [completedBy], references: [id])
-  createdAt     DateTime                    @default(now())
-  updatedAt     DateTime                    @updatedAt
+  id              String              @id @default(cuid())
+  weekId          String
+  week            FamiliensammelnWeek @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User                @relation("processor_user", fields: [userId], references: [id], onDelete: Cascade)
+  startedAt       DateTime            @default(now()) // Wann wurde der Verarbeiter gestartet
+  finishesAt      DateTime // Wann ist der Verarbeiter fertig (startedAt + 5 Stunden)
+  capacity        Int                 @default(3000) // Kapazität des Verarbeiters
+  processingRate  Int                 @default(10) // Wie viele Stück pro Minute verarbeitet werden
+  status          ProcessorStatus     @default(PROCESSING)
+  completedAt     DateTime? // Wann wurde die Entnahme bestätigt
+  completedBy     String?
+  completedByUser User?               @relation("processor_completed_by", fields: [completedBy], references: [id])
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 
   @@map("familiensammeln_processors")
 }
 
 enum ProcessorStatus {
   PROCESSING // Verarbeiter läuft noch
-  FINISHED   // Verarbeitung abgeschlossen, bereit zur Entnahme
-  COMPLETED  // Entnahme wurde bestätigt
+  FINISHED // Verarbeitung abgeschlossen, bereit zur Entnahme
+  COMPLETED // Entnahme wurde bestätigt
 }
 
 enum Gender {
@@ -621,84 +631,84 @@ enum Gender {
 // Kleidungsmanagement-System
 // Rang-Gruppen für Kleidung: 1-3, 4-6, 7-9, plus individuelle Leaderschaft-Ränge
 model RankClothingTemplate {
-  id               String   @id @default(cuid())
-  rankGroup        String // "1-3", "4-6", "7-9", "EL_PATRON", "DON_CAPITAN", "DON_COMANDANTE", "EL_MANO_DERECHA"
-  
+  id        String @id @default(cuid())
+  rankGroup String // "1-3", "4-6", "7-9", "EL_PATRON", "DON_CAPITAN", "DON_COMANDANTE", "EL_MANO_DERECHA"
+
   // Maske (Männer)
   maskItemMale         Int?
   maskVariationMale    Int?
-  maskCustomizableMale Boolean  @default(false) // Kann vom User selbst gewählt werden
+  maskCustomizableMale Boolean @default(false) // Kann vom User selbst gewählt werden
   maskColorMale        String? // Farbvorgabe (wenn customizable = true)
-  
+
   // Maske (Frauen)
   maskItemFemale         Int?
   maskVariationFemale    Int?
-  maskCustomizableFemale Boolean  @default(false)
+  maskCustomizableFemale Boolean @default(false)
   maskColorFemale        String?
-  
+
   // Torso (Männer)
   torsoItemMale         Int?
   torsoVariationMale    Int?
-  torsoCustomizableMale Boolean  @default(false)
+  torsoCustomizableMale Boolean @default(false)
   torsoColorMale        String?
-  
+
   // Torso (Frauen)
   torsoItemFemale         Int?
   torsoVariationFemale    Int?
-  torsoCustomizableFemale Boolean  @default(false)
+  torsoCustomizableFemale Boolean @default(false)
   torsoColorFemale        String?
-  
+
   // T-Shirt (Männer)
   tshirtItemMale         Int?
   tshirtVariationMale    Int?
-  tshirtCustomizableMale Boolean  @default(false)
+  tshirtCustomizableMale Boolean @default(false)
   tshirtColorMale        String?
-  
+
   // T-Shirt (Frauen)
   tshirtItemFemale         Int?
   tshirtVariationFemale    Int?
-  tshirtCustomizableFemale Boolean  @default(false)
+  tshirtCustomizableFemale Boolean @default(false)
   tshirtColorFemale        String?
-  
+
   // Weste (Männer)
   vesteItemMale         Int?
   vesteVariationMale    Int?
-  vesteCustomizableMale Boolean  @default(false)
+  vesteCustomizableMale Boolean @default(false)
   vesteColorMale        String?
-  
+
   // Weste (Frauen)
   vesteItemFemale         Int?
   vesteVariationFemale    Int?
-  vesteCustomizableFemale Boolean  @default(false)
+  vesteCustomizableFemale Boolean @default(false)
   vesteColorFemale        String?
-  
+
   // Hose (Männer)
   hoseItemMale         Int?
   hoseVariationMale    Int?
-  hoseCustomizableMale Boolean  @default(false)
+  hoseCustomizableMale Boolean @default(false)
   hoseColorMale        String?
-  
+
   // Hose (Frauen)
   hoseItemFemale         Int?
   hoseVariationFemale    Int?
-  hoseCustomizableFemale Boolean  @default(false)
+  hoseCustomizableFemale Boolean @default(false)
   hoseColorFemale        String?
-  
+
   // Schuhe (Männer)
   schuheItemMale         Int?
   schuheVariationMale    Int?
-  schuheCustomizableMale Boolean  @default(false)
+  schuheCustomizableMale Boolean @default(false)
   schuheColorMale        String?
-  
+
   // Schuhe (Frauen)
   schuheItemFemale         Int?
   schuheVariationFemale    Int?
-  schuheCustomizableFemale Boolean  @default(false)
+  schuheCustomizableFemale Boolean @default(false)
   schuheColorFemale        String?
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([rankGroup])
   @@map("rank_clothing_templates")
 }
