@@ -129,11 +129,14 @@ RUN echo "=== Checking for sw.js ===" && ls -la dist/sw.js || echo "sw.js not fo
 # Production Stage mit Nginx
 FROM nginx:alpine AS production
 
+# Erstelle casa Verzeichnis
+RUN mkdir -p /usr/share/nginx/html/casa
+
 # Kopiere Built Files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Kopiere Casa-Bilder
-COPY public/casa/*.png /usr/share/nginx/html/casa/
+# Kopiere Casa-Bilder aus dem Build-Kontext
+COPY --from=base /app/public/casa/*.png /usr/share/nginx/html/casa/
 
 # Kopiere Nginx Config
 COPY nginx.conf /etc/nginx/nginx.conf
