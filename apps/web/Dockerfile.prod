@@ -16,10 +16,14 @@ RUN pnpm install --no-frozen-lockfile
 # Kopiere Source Code
 COPY . .
 
+# Kopiere Casa-Bilder falls vorhanden
+RUN mkdir -p public/casa || true
+
 # Prüfe ob Service Worker vorhanden ist
 RUN echo "=== Checking for sw.js ===" && \
     find . -name "sw.js" -type f && \
-    ls -la public/ || echo "Public directory not found"
+    ls -la public/ || echo "Public directory not found" && \
+    ls -la public/casa/ || echo "Casa directory not found"
 
 # Build Stage
 FROM base AS build
@@ -135,8 +139,8 @@ RUN mkdir -p /usr/share/nginx/html/casa
 # Kopiere Built Files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Kopiere Casa-Bilder aus dem Build-Kontext
-COPY --from=base /app/public/casa/*.png /usr/share/nginx/html/casa/
+# Kopiere Casa-Bilder direkt aus dem Build-Kontext
+COPY public/casa/ /usr/share/nginx/html/casa/
 
 # Kopiere Nginx Config
 COPY nginx.conf /etc/nginx/nginx.conf
