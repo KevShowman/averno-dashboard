@@ -1,13 +1,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { ScrollText, Rose, Shield, Sword, Flame, Heart } from 'lucide-react'
+import { ScrollText, Flower2, Shield, Sword, Flame, Heart } from 'lucide-react'
+import { useAuthStore } from '../stores/auth'
+import { hasRole } from '../lib/utils'
+import { Navigate } from 'react-router-dom'
 
 export default function BotschaftPage() {
+  const { user } = useAuthStore()
+  
+  // Redirect if not leadership
+  if (!hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])) {
+    return <Navigate to="/app" replace />
+  }
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="flex justify-center">
-          <Rose className="h-16 w-16 text-primary" />
+          <Flower2 className="h-16 w-16 text-primary" />
         </div>
         <h1 className="text-4xl font-bold text-primary">
           🌹 Ceremonia de Iniciación
@@ -33,7 +42,7 @@ export default function BotschaftPage() {
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
-            <Rose className="h-6 w-6" />
+            <Flower2 className="h-6 w-6" />
             🥀 Schritt 1: Die Vorstellung
           </CardTitle>
         </CardHeader>
@@ -100,7 +109,7 @@ export default function BotschaftPage() {
 
             <ul className="space-y-2 my-4">
               <li className="flex items-start gap-2 text-gray-300">
-                <Rose className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <Flower2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <span>Die <strong>Familie</strong> ist die Blüte – schön, stark, unser Stolz.</span>
               </li>
               <li className="flex items-start gap-2 text-gray-300">
@@ -241,7 +250,7 @@ export default function BotschaftPage() {
       <Card className="bg-gradient-to-br from-gray-900 to-primary/10 border-primary/50">
         <CardContent className="py-8">
           <div className="text-center space-y-3">
-            <Rose className="h-12 w-12 text-primary mx-auto" />
+            <Flower2 className="h-12 w-12 text-primary mx-auto" />
             <p className="text-2xl font-bold text-primary">
               🌹 LaSanta Calavera – La Hermandad es para siempre 🌹
             </p>

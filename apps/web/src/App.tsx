@@ -245,7 +245,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/botschaft" element={
-          <ProtectedRoute requiredRoles={['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']}>
+          <ProtectedRoute>
             <Layout>
               <BotschaftPage />
             </Layout>
