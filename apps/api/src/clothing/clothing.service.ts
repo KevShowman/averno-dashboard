@@ -21,6 +21,7 @@ export interface ClothingTemplate {
   veste: ClothingItem;
   hose: ClothingItem;
   schuhe: ClothingItem;
+  rucksack: ClothingItem;
 }
 
 @Injectable()
@@ -172,6 +173,14 @@ export class ClothingService {
         schuheVariationFemale: null,
         schuheCustomizableFemale: false,
         schuheColorFemale: null,
+        rucksackItemMale: null,
+        rucksackVariationMale: null,
+        rucksackCustomizableMale: false,
+        rucksackColorMale: null,
+        rucksackItemFemale: null,
+        rucksackVariationFemale: null,
+        rucksackCustomizableFemale: false,
+        rucksackColorFemale: null,
       };
     }
 
@@ -224,6 +233,14 @@ export class ClothingService {
       schuheVariationFemale: template.schuhe.variationFemale,
       schuheCustomizableFemale: template.schuhe.customizableFemale,
       schuheColorFemale: template.schuhe.colorFemale,
+      rucksackItemMale: template.rucksack.itemMale,
+      rucksackVariationMale: template.rucksack.variationMale,
+      rucksackCustomizableMale: template.rucksack.customizableMale,
+      rucksackColorMale: template.rucksack.colorMale,
+      rucksackItemFemale: template.rucksack.itemFemale,
+      rucksackVariationFemale: template.rucksack.variationFemale,
+      rucksackCustomizableFemale: template.rucksack.customizableFemale,
+      rucksackColorFemale: template.rucksack.colorFemale,
     };
   }
 
@@ -258,6 +275,10 @@ export class ClothingService {
         schuheVariation: null,
         schuheCustomizable: false,
         schuheColor: null,
+        rucksackItem: null,
+        rucksackVariation: null,
+        rucksackCustomizable: false,
+        rucksackColor: null,
       };
     }
 
@@ -288,6 +309,10 @@ export class ClothingService {
       schuheVariation: isMale ? template.schuhe.variationMale : template.schuhe.variationFemale,
       schuheCustomizable: isMale ? template.schuhe.customizableMale : template.schuhe.customizableFemale,
       schuheColor: isMale ? template.schuhe.colorMale : template.schuhe.colorFemale,
+      rucksackItem: isMale ? template.rucksack.itemMale : template.rucksack.itemFemale,
+      rucksackVariation: isMale ? template.rucksack.variationMale : template.rucksack.variationFemale,
+      rucksackCustomizable: isMale ? template.rucksack.customizableMale : template.rucksack.customizableFemale,
+      rucksackColor: isMale ? template.rucksack.colorMale : template.rucksack.colorFemale,
     };
   }
 
@@ -355,6 +380,14 @@ export class ClothingService {
         schuheVariationFemale: data.schuhe?.variationFemale,
         schuheCustomizableFemale: data.schuhe?.customizableFemale ?? false,
         schuheColorFemale: data.schuhe?.colorFemale,
+        rucksackItemMale: data.rucksack?.itemMale,
+        rucksackVariationMale: data.rucksack?.variationMale,
+        rucksackCustomizableMale: data.rucksack?.customizableMale ?? false,
+        rucksackColorMale: data.rucksack?.colorMale,
+        rucksackItemFemale: data.rucksack?.itemFemale,
+        rucksackVariationFemale: data.rucksack?.variationFemale,
+        rucksackCustomizableFemale: data.rucksack?.customizableFemale ?? false,
+        rucksackColorFemale: data.rucksack?.colorFemale,
       },
       create: {
         rankGroup,
@@ -406,6 +439,14 @@ export class ClothingService {
         schuheVariationFemale: data.schuhe?.variationFemale,
         schuheCustomizableFemale: data.schuhe?.customizableFemale ?? false,
         schuheColorFemale: data.schuhe?.colorFemale,
+        rucksackItemMale: data.rucksack?.itemMale,
+        rucksackVariationMale: data.rucksack?.variationMale,
+        rucksackCustomizableMale: data.rucksack?.customizableMale ?? false,
+        rucksackColorMale: data.rucksack?.colorMale,
+        rucksackItemFemale: data.rucksack?.itemFemale,
+        rucksackVariationFemale: data.rucksack?.variationFemale,
+        rucksackCustomizableFemale: data.rucksack?.customizableFemale ?? false,
+        rucksackColorFemale: data.rucksack?.colorFemale,
       },
     });
 
@@ -545,6 +586,16 @@ export class ClothingService {
         variationFemale: template.schuheVariationFemale,
         customizableFemale: template.schuheCustomizableFemale,
         colorFemale: template.schuheColorFemale,
+      },
+      rucksack: {
+        itemMale: template.rucksackItemMale,
+        variationMale: template.rucksackVariationMale,
+        customizableMale: template.rucksackCustomizableMale,
+        colorMale: template.rucksackColorMale,
+        itemFemale: template.rucksackItemFemale,
+        variationFemale: template.rucksackVariationFemale,
+        customizableFemale: template.rucksackCustomizableFemale,
+        colorFemale: template.rucksackColorFemale,
       },
     };
   }

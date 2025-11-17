@@ -122,6 +122,16 @@ export class ClothingController {
         customizableFemale: data.schuheCustomizableFemale ?? false,
         colorFemale: data.schuheColorFemale ?? null,
       },
+      rucksack: {
+        itemMale: data.rucksackItemMale ?? null,
+        variationMale: data.rucksackVariationMale ?? null,
+        customizableMale: data.rucksackCustomizableMale ?? false,
+        colorMale: data.rucksackColorMale ?? null,
+        itemFemale: data.rucksackItemFemale ?? null,
+        variationFemale: data.rucksackVariationFemale ?? null,
+        customizableFemale: data.rucksackCustomizableFemale ?? false,
+        colorFemale: data.rucksackColorFemale ?? null,
+      },
     };
     
     const result = await this.clothingService.upsertTemplate(req.user.role, rankGroup, structuredData);
