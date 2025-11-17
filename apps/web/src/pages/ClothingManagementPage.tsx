@@ -27,6 +27,7 @@ interface ClothingTemplate {
   vest: { male: ClothingItemData; female: ClothingItemData }
   pants: { male: ClothingItemData; female: ClothingItemData }
   shoes: { male: ClothingItemData; female: ClothingItemData }
+  backpack: { male: ClothingItemData; female: ClothingItemData }
 }
 
 const rankGroups = [
@@ -47,6 +48,7 @@ const clothingParts = [
   { id: 'vest', label: 'Weste' },
   { id: 'pants', label: 'Hose' },
   { id: 'shoes', label: 'Schuhe' },
+  { id: 'backpack', label: 'Rucksack' },
 ]
 
 const emptyItem = (): ClothingItemData => ({
@@ -64,6 +66,7 @@ const emptyTemplate = (): ClothingTemplate => ({
   vest: { male: emptyItem(), female: emptyItem() },
   pants: { male: emptyItem(), female: emptyItem() },
   shoes: { male: emptyItem(), female: emptyItem() },
+  backpack: { male: emptyItem(), female: emptyItem() },
 })
 
 export default function ClothingManagementPage() {
@@ -169,6 +172,20 @@ export default function ClothingManagementPage() {
             color: loadedTemplate.schuheColorFemale,
           },
         },
+        backpack: {
+          male: {
+            item: loadedTemplate.rucksackItemMale,
+            variation: loadedTemplate.rucksackVariationMale,
+            customizable: loadedTemplate.rucksackCustomizableMale,
+            color: loadedTemplate.rucksackColorMale,
+          },
+          female: {
+            item: loadedTemplate.rucksackItemFemale,
+            variation: loadedTemplate.rucksackVariationFemale,
+            customizable: loadedTemplate.rucksackCustomizableFemale,
+            color: loadedTemplate.rucksackColorFemale,
+          },
+        },
       })
     } else {
       setTemplate({ ...emptyTemplate(), rankGroup: selectedRankGroup })
@@ -227,6 +244,14 @@ export default function ClothingManagementPage() {
         schuheVariationFemale: data.shoes.female.variation,
         schuheCustomizableFemale: data.shoes.female.customizable,
         schuheColorFemale: data.shoes.female.color,
+        rucksackItemMale: data.backpack.male.item,
+        rucksackVariationMale: data.backpack.male.variation,
+        rucksackCustomizableMale: data.backpack.male.customizable,
+        rucksackColorMale: data.backpack.male.color,
+        rucksackItemFemale: data.backpack.female.item,
+        rucksackVariationFemale: data.backpack.female.variation,
+        rucksackCustomizableFemale: data.backpack.female.customizable,
+        rucksackColorFemale: data.backpack.female.color,
       })
     },
     onSuccess: () => {

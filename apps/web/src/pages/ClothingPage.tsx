@@ -149,6 +149,14 @@ export default function ClothingPage() {
       customizable: data?.schuheCustomizable ?? false,
       color: data?.schuheColor ?? null,
     },
+    {
+      part: 'backpack',
+      label: 'Rucksack',
+      item: data?.rucksackItem ?? null,
+      variation: data?.rucksackVariation ?? null,
+      customizable: data?.rucksackCustomizable ?? false,
+      color: data?.rucksackColor ?? null,
+    },
   ]
 
   const rankClothingParts = createClothingParts(rankTemplate)
