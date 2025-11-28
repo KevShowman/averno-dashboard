@@ -116,6 +116,7 @@ export class DiscordService {
             await tx.weeklyDeliveryExclusion.deleteMany({ where: { createdById: user.id } });
             await tx.weeklyDeliveryArchive.deleteMany({ where: { archivedById: user.id } });
             await tx.weeklyDelivery.deleteMany({ where: { userId: user.id } });
+            await tx.weeklyDelivery.deleteMany({ where: { confirmedById: user.id } });
             
             // 4. Sanctions
             await tx.sanction.deleteMany({ where: { userId: user.id } });
@@ -134,13 +135,22 @@ export class DiscordService {
             await tx.moneyTransaction.deleteMany({ where: { createdById: user.id } });
             await tx.moneyTransaction.deleteMany({ where: { approvedById: user.id } });
             
-            // 8. Familiensammeln Participations
+            // 8. Familiensammeln (Participations und Processors)
             await tx.familiensammelnParticipation.deleteMany({ where: { userId: user.id } });
+            await tx.familiensammelnProcessor.deleteMany({ where: { userId: user.id } });
+            await tx.familiensammelnProcessor.deleteMany({ where: { completedBy: user.id } });
             
-            // 9. Action Logs (zuletzt, da diese Audit-Trail sind)
+            // 9. Organigramm Assignments
+            await tx.organigrammAssignment.deleteMany({ where: { userId: user.id } });
+            
+            // 10. Member Files (Entries zuerst, dann File selbst)
+            await tx.memberFileEntry.deleteMany({ where: { createdById: user.id } });
+            await tx.memberFile.deleteMany({ where: { userId: user.id } });
+            
+            // 11. Action Logs (zuletzt, da diese Audit-Trail sind)
             await tx.actionLog.deleteMany({ where: { userId: user.id } });
             
-            // 10. Jetzt den User löschen
+            // 12. Jetzt den User löschen
             await tx.user.delete({ where: { id: user.id } });
           });
           
