@@ -28,6 +28,10 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     environment:
       DATABASE_URL: "postgresql://lasanta:password@db:5432/lasanta_db?schema=public"
       NODE_ENV: development
