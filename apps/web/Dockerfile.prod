@@ -139,8 +139,8 @@ RUN mkdir -p /usr/share/nginx/html/casa
 # Kopiere Built Files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Kopiere Logo explizit (falls nicht von Vite kopiert)
-COPY --from=build /app/public/logo.png /usr/share/nginx/html/logo.png
+# Kopiere Logo direkt aus dem Build-Kontext
+COPY public/logo.png /usr/share/nginx/html/logo.png
 
 # Kopiere Casa-Bilder direkt aus dem Build-Kontext
 COPY assets/casa/ /usr/share/nginx/html/casa/
