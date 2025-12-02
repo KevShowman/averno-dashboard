@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
+import { Checkbox } from '../components/ui/checkbox'
 import { 
   Shield, 
   Save, 
@@ -15,7 +16,8 @@ import {
   Skull,
   Hash,
   AlertTriangle,
-  Car
+  Car,
+  UserPlus
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
 import { api, packagesApi, discordApi, settingsApi } from '../lib/api'
@@ -62,7 +64,11 @@ export default function SettingsPage() {
   // Xiao Motors settings states
   const [xiaoMotorsCodewort, setXiaoMotorsCodewort] = useState('')
 
+  // Blood In Discord Roles state (nur El Patron)
+  const [bloodInRoleIds, setBloodInRoleIds] = useState<string[]>([])
+
   // Permission checks
+  const isPatron = user?.role === 'EL_PATRON'
   const canManageUsers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const canManageSettings = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const canManagePackagePrice = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'RUTAS'])
@@ -116,6 +122,19 @@ export default function SettingsPage() {
     queryKey: ['xiao-motors-settings'],
     queryFn: () => settingsApi.getXiaoMotorsSettings().then(res => res.data),
     enabled: canManageSettings,
+  })
+
+  // Discord Rollen für Blood In Auswahl (nur El Patron)
+  const { data: discordRoles, isLoading: loadingRoles } = useQuery({
+    queryKey: ['discord-roles'],
+    queryFn: () => discordApi.getRoles(),
+    enabled: isPatron,
+  })
+
+  const { data: bloodInRolesSettings } = useQuery({
+    queryKey: ['bloodin-roles-settings'],
+    queryFn: () => settingsApi.getBloodInDiscordRoles(),
+    enabled: isPatron,
   })
 
   // Mutations
@@ -206,6 +225,17 @@ export default function SettingsPage() {
     },
   })
 
+  const saveBloodInRolesMutation = useMutation({
+    mutationFn: (roleIds: string[]) => settingsApi.setBloodInDiscordRoles(roleIds),
+    onSuccess: () => {
+      toast.success('Blood In Discord Rollen gespeichert')
+      queryClient.invalidateQueries({ queryKey: ['bloodin-roles-settings'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Speichern der Rollen')
+    },
+  })
+
   // Set initial values
   useEffect(() => {
     if (user?.icFirstName) setIcFirstName(user.icFirstName)
@@ -242,6 +272,12 @@ export default function SettingsPage() {
     }
   }, [xiaoMotorsSettings])
 
+  useEffect(() => {
+    if (bloodInRolesSettings?.roleIds) {
+      setBloodInRoleIds(bloodInRolesSettings.roleIds)
+    }
+  }, [bloodInRolesSettings])
+
   const handleUpdateIcName = () => {
     if (icFirstName.trim() && icLastName.trim()) {
       updateIcNameMutation.mutate({
@@ -275,6 +311,20 @@ export default function SettingsPage() {
     } else {
       toast.error('Bitte beide Channels auswählen')
     }
+  }
+
+  const handleToggleBloodInRole = (roleId: string) => {
+    setBloodInRoleIds(prev => {
+      if (prev.includes(roleId)) {
+        return prev.filter(id => id !== roleId)
+      } else {
+        return [...prev, roleId]
+      }
+    })
+  }
+
+  const handleSaveBloodInRoles = () => {
+    saveBloodInRolesMutation.mutate(bloodInRoleIds)
   }
 
   const handleSaveXiaoMotorsSettings = () => {
@@ -534,6 +584,96 @@ export default function SettingsPage() {
                 >
                   <Save className="h-4 w-4" />
                   {saveBloodListSettingsMutation.isPending ? 'Speichern...' : 'Channel-Einstellungen speichern'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Blood In Discord Rollen - NUR für El Patron */}
+      {isPatron && (
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <UserPlus className="mr-2 h-5 w-5 text-green-500" />
+              Blood In Discord Rollen
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Diese Discord Rollen werden automatisch bei einem Blood In zugewiesen (nur El Patrón)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {loadingRoles ? (
+                <div className="text-gray-400 text-sm">Lade Discord Rollen...</div>
+              ) : discordRoles?.roles?.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-80 overflow-y-auto p-2">
+                  {discordRoles.roles.map((role: { id: string; name: string; color: number }) => {
+                    const isSelected = bloodInRoleIds.includes(role.id)
+                    const roleColor = role.color > 0 ? `#${role.color.toString(16).padStart(6, '0')}` : '#99AAB5'
+                    
+                    return (
+                      <div
+                        key={role.id}
+                        onClick={() => handleToggleBloodInRole(role.id)}
+                        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                          isSelected 
+                            ? 'bg-green-900/30 border-green-500/50' 
+                            : 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
+                        }`}
+                      >
+                        <Checkbox 
+                          checked={isSelected} 
+                          onCheckedChange={() => handleToggleBloodInRole(role.id)}
+                          className="border-gray-500"
+                        />
+                        <div 
+                          className="w-3 h-3 rounded-full flex-shrink-0" 
+                          style={{ backgroundColor: roleColor }}
+                        />
+                        <span className="text-sm text-white truncate">{role.name}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-gray-400 text-sm">Keine Discord Rollen gefunden</div>
+              )}
+
+              {bloodInRoleIds.length > 0 && (
+                <div className="p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                  <p className="text-green-400 text-sm mb-2">
+                    <strong>{bloodInRoleIds.length}</strong> Rolle(n) ausgewählt:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {bloodInRoleIds.map(roleId => {
+                      const role = discordRoles?.roles?.find((r: any) => r.id === roleId)
+                      if (!role) return null
+                      const roleColor = role.color > 0 ? `#${role.color.toString(16).padStart(6, '0')}` : '#99AAB5'
+                      return (
+                        <Badge 
+                          key={roleId} 
+                          variant="outline" 
+                          className="border-green-500/50"
+                          style={{ color: roleColor }}
+                        >
+                          {role.name}
+                        </Badge>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSaveBloodInRoles}
+                  disabled={saveBloodInRolesMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {saveBloodInRolesMutation.isPending ? 'Speichern...' : 'Rollen speichern'}
                 </Button>
               </div>
             </div>

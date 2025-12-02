@@ -1033,6 +1033,86 @@ export class DiscordService {
     }
   }
 
+  // Discord Rolle zu einem User hinzufügen
+  async addRoleToUser(discordId: string, roleId: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}/roles/${roleId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Hinzufügen der Rolle ${roleId} zu User ${discordId}: ${response.status}`);
+        return false;
+      }
+
+      console.log(`Rolle ${roleId} zu User ${discordId} hinzugefügt`);
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen der Discord Rolle:', error);
+      return false;
+    }
+  }
+
+  // Mehrere Discord Rollen zu einem User hinzufügen
+  async addRolesToUser(discordId: string, roleIds: string[]): Promise<{ success: number; failed: number }> {
+    let success = 0;
+    let failed = 0;
+
+    for (const roleId of roleIds) {
+      const added = await this.addRoleToUser(discordId, roleId);
+      if (added) {
+        success++;
+      } else {
+        failed++;
+      }
+    }
+
+    return { success, failed };
+  }
+
+  // Alle Discord Rollen des Servers abrufen
+  async getServerRoles(): Promise<Array<{ id: string; name: string; color: number; position: number }>> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/roles`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Abrufen der Rollen: ${response.status}`);
+        return [];
+      }
+
+      const roles = await response.json();
+      
+      // Sortiere nach Position (höhere = wichtiger)
+      return roles
+        .filter((r: any) => r.name !== '@everyone')
+        .map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          color: r.color,
+          position: r.position,
+        }))
+        .sort((a: any, b: any) => b.position - a.position);
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Server-Rollen:', error);
+      return [];
+    }
+  }
+
   // Synchronisiert User mit Discord und entfernt User die nicht mehr im Server sind
   async syncUsersAndRemoveInactive() {
     try {

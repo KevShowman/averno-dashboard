@@ -52,6 +52,8 @@ model User {
   processorsCompleted           FamiliensammelnProcessor[]     @relation("processor_completed_by")
   memberFile                    MemberFile?                    @relation("member_files")
   fileEntriesCreated            MemberFileEntry[]              @relation("file_entries_created")
+  sicarioAufstellungenCreated   SicarioAufstellung[]           @relation("sicario_aufstellung_created_by")
+  sicarioAufstellungResponses   SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
 
   @@map("users")
 }
@@ -723,6 +725,38 @@ model RankClothingTemplate {
 
   @@unique([rankGroup])
   @@map("rank_clothing_templates")
+}
+
+// Sicario Aufstellungssystem
+model SicarioAufstellung {
+  id          String   @id @default(cuid())
+  createdById String
+  createdBy   User     @relation("sicario_aufstellung_created_by", fields: [createdById], references: [id])
+  date        DateTime // Datum und Uhrzeit der Aufstellung
+  reason      String // Grund/Art des Einsatzes
+  location    String? // Treffpunkt
+  deadline    DateTime // Deadline für Reaktionen (= date)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  responses SicarioAufstellungResponse[]
+
+  @@map("sicario_aufstellungen")
+}
+
+model SicarioAufstellungResponse {
+  id            String                    @id @default(cuid())
+  aufstellungId String
+  aufstellung   SicarioAufstellung        @relation(fields: [aufstellungId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                      @relation("sicario_aufstellung_responses", fields: [userId], references: [id], onDelete: Cascade)
+  status        AufstellungResponseStatus // Wiederverwende den existierenden Enum
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  @@unique([aufstellungId, userId])
+  @@map("sicario_aufstellung_responses")
 }
 
 // Discord Role Mappings

@@ -96,6 +96,25 @@ export class BloodListService {
     };
   }
 
+  // Discord Rollen nach Blood In zuweisen
+  private async assignBloodInDiscordRoles(discordId: string): Promise<{ success: number; failed: number }> {
+    try {
+      const roleIds = await this.settingsService.getBloodInDiscordRoles();
+      
+      if (!roleIds || roleIds.length === 0) {
+        console.log('Keine Blood In Discord Rollen konfiguriert');
+        return { success: 0, failed: 0 };
+      }
+
+      const result = await this.discordService.addRolesToUser(discordId, roleIds);
+      console.log(`Blood In Discord Rollen zugewiesen: ${result.success} erfolgreich, ${result.failed} fehlgeschlagen`);
+      return result;
+    } catch (error) {
+      console.error('Fehler beim Zuweisen der Blood In Discord Rollen:', error);
+      return { success: 0, failed: 0 };
+    }
+  }
+
   // Discord Blood In Ankündigung
   private async sendBloodInAnnouncement(
     vorname: string,
@@ -678,10 +697,14 @@ export class BloodListService {
     // Discord Ankündigung senden
     await this.sendBloodInAnnouncement(vorname, nachname, bloodinDurch, settings.bloodInChannelId);
 
+    // Discord Rollen zuweisen
+    const rolesResult = await this.assignBloodInDiscordRoles(discordId);
+
     return {
       success: true,
       message: `${vorname} ${nachname} wurde erfolgreich mit Discord User verknüpft`,
       data: bloodRecord,
+      discordRolesAssigned: rolesResult.success,
     };
   }
 

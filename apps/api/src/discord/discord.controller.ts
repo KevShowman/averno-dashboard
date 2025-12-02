@@ -157,4 +157,24 @@ export class DiscordController {
       };
     }
   }
+
+  // Alle Discord Rollen des Servers abrufen (für Blood In Rollen Auswahl)
+  @Get('roles')
+  @Roles(Role.EL_PATRON)
+  async getServerRoles() {
+    try {
+      const roles = await this.discordService.getServerRoles();
+      return {
+        message: 'Discord Rollen erfolgreich abgerufen',
+        count: roles.length,
+        roles,
+      };
+    } catch (error) {
+      return {
+        error: 'Fehler beim Abrufen der Discord Rollen',
+        message: error.message,
+        roles: [],
+      };
+    }
+  }
 }

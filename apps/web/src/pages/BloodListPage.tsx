@@ -78,6 +78,12 @@ export default function BloodListPage() {
   });
 
   const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
+  // Leaderschaft + Formación können Blood Ins machen und Unassigned Users sehen
+  const canBloodIn = user && (
+    ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'FORMACION'].includes(user.role) ||
+    (user.allRoles && user.allRoles.includes('FORMACION'))
+  );
+  // NUR Leaderschaft kann Blood Outs machen (NICHT Formación!)
   const canBloodOut = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
 
   // Queries
@@ -107,13 +113,13 @@ export default function BloodListPage() {
   const { data: unassignedData, isLoading: loadingUnassigned } = useQuery({
     queryKey: ['bloodlist', 'unassigned'],
     queryFn: () => bloodListApi.getUnassignedDiscordUsers(),
-    enabled: !!isLeadership && viewMode === 'unassigned',
+    enabled: !!canBloodIn && viewMode === 'unassigned',
   });
 
   const { data: ghostData, isLoading: loadingGhost } = useQuery({
     queryKey: ['bloodlist', 'ghost'],
     queryFn: () => bloodListApi.getGhostUsers(),
-    enabled: !!isLeadership && viewMode === 'ghost',
+    enabled: !!isLeadership && viewMode === 'ghost', // Ghost nur für Leaderschaft
   });
 
   // Mutations
@@ -246,20 +252,22 @@ export default function BloodListPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Warning wenn Channels nicht konfiguriert */}
-      {isLeadership && !isConfigured && (
+      {canBloodIn && !isConfigured && (
         <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg flex items-start gap-3">
           <AlertTriangle className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-yellow-400 font-semibold">Blood List Channels nicht konfiguriert</p>
             <p className="text-yellow-200/70 text-sm mt-1">
-              Blood In und Blood Out sind deaktiviert. Bitte konfiguriere zuerst die Discord-Channels in den Einstellungen.
+              Blood In {canBloodOut && 'und Blood Out '} {canBloodOut ? 'sind' : 'ist'} deaktiviert. Bitte wende dich an die Leaderschaft.
             </p>
-            <Link to="/settings">
-              <Button variant="outline" className="mt-3 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10">
-                <Settings className="mr-2 h-4 w-4" />
-                Zu den Einstellungen
-              </Button>
-            </Link>
+            {isLeadership && (
+              <Link to="/settings">
+                <Button variant="outline" className="mt-3 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Zu den Einstellungen
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -276,18 +284,16 @@ export default function BloodListPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          {isLeadership && (
-            <>
-              <Button
-                onClick={() => setShowBloodInModal(true)}
-                disabled={!isConfigured}
-                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                title={!isConfigured ? 'Channels müssen zuerst in den Einstellungen konfiguriert werden' : undefined}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Blood In
-              </Button>
-            </>
+          {canBloodIn && (
+            <Button
+              onClick={() => setShowBloodInModal(true)}
+              disabled={!isConfigured}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={!isConfigured ? 'Channels müssen zuerst in den Einstellungen konfiguriert werden' : undefined}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Blood In
+            </Button>
           )}
           {canBloodOut && (
             <Button
@@ -304,8 +310,8 @@ export default function BloodListPage() {
         </div>
       </div>
 
-      {/* View Tabs */}
-      {isLeadership && (
+      {/* View Tabs - Formación kann nur Active + Unassigned sehen, Leaderschaft alle */}
+      {canBloodIn && (
         <div className="flex gap-2 flex-wrap">
           <Button
             onClick={() => setViewMode('active')}
@@ -315,14 +321,16 @@ export default function BloodListPage() {
             <User className="mr-2 h-4 w-4" />
             Aktive Mitglieder
           </Button>
-          <Button
-            onClick={() => setViewMode('history')}
-            variant={viewMode === 'history' ? 'default' : 'outline'}
-            className={viewMode === 'history' ? '' : 'border-gray-600'}
-          >
-            <History className="mr-2 h-4 w-4" />
-            Blood Out Historie
-          </Button>
+          {isLeadership && (
+            <Button
+              onClick={() => setViewMode('history')}
+              variant={viewMode === 'history' ? 'default' : 'outline'}
+              className={viewMode === 'history' ? '' : 'border-gray-600'}
+            >
+              <History className="mr-2 h-4 w-4" />
+              Blood Out Historie
+            </Button>
+          )}
           <Button
             onClick={() => setViewMode('unassigned')}
             variant={viewMode === 'unassigned' ? 'default' : 'outline'}
@@ -331,14 +339,16 @@ export default function BloodListPage() {
             <Users className="mr-2 h-4 w-4" />
             Unverknüpfte Discord User
           </Button>
-          <Button
-            onClick={() => setViewMode('ghost')}
-            variant={viewMode === 'ghost' ? 'default' : 'outline'}
-            className={viewMode === 'ghost' ? '' : 'border-gray-600'}
-          >
-            <Ghost className="mr-2 h-4 w-4" />
-            Ghost Users
-          </Button>
+          {isLeadership && (
+            <Button
+              onClick={() => setViewMode('ghost')}
+              variant={viewMode === 'ghost' ? 'default' : 'outline'}
+              className={viewMode === 'ghost' ? '' : 'border-gray-600'}
+            >
+              <Ghost className="mr-2 h-4 w-4" />
+              Ghost Users
+            </Button>
+          )}
         </div>
       )}
 
@@ -653,90 +663,158 @@ export default function BloodListPage() {
 
       {/* Blood In Modal */}
       {showBloodInModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md lasanta-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Skull className="h-6 w-6 text-primary" />
-                Blood In - Neues Mitglied
-              </CardTitle>
-              <CardDescription>
-                Neues Familienmitglied aufnehmen
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleBloodInSubmit} className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Vorname</label>
-                  <Input
-                    value={bloodInData.vorname}
-                    onChange={(e) => setBloodInData({ ...bloodInData, vorname: e.target.value })}
-                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Nachname</label>
-                  <Input
-                    value={bloodInData.nachname}
-                    onChange={(e) => setBloodInData({ ...bloodInData, nachname: e.target.value })}
-                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Telefonnummer</label>
-                  <Input
-                    type="number"
-                    value={bloodInData.telefon}
-                    onChange={(e) => setBloodInData({ ...bloodInData, telefon: e.target.value })}
-                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Steam ID</label>
-                  <Input
-                    value={bloodInData.steam}
-                    onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })}
-                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Blood In durchgeführt von</label>
-                  <Input
-                    value={bloodInData.bloodinDurch}
-                    onChange={(e) => setBloodInData({ ...bloodInData, bloodinDurch: e.target.value })}
-                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
-                    placeholder="Name des Berechtigten"
-                    required
-                  />
-                </div>
-                <div className="flex space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowBloodInModal(false);
-                      setBloodInData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
-                    }}
-                    className="flex-1"
-                    disabled={bloodInMutation.isPending}
-                  >
-                    Abbrechen
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
-                    disabled={bloodInMutation.isPending}
-                  >
-                    {bloodInMutation.isPending ? 'Wird erstellt...' : 'Blood In'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 via-primary/20 to-red-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-red-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-900/50 via-red-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-red-600 to-red-700 rounded-xl shadow-lg shadow-red-500/30">
+                      <Skull className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Blood In
+                      </CardTitle>
+                      <CardDescription className="text-red-200/70 mt-1">
+                        Willkommen in der Familie
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </div>
+
+              <CardContent className="pt-2 pb-6">
+                <form onSubmit={handleBloodInSubmit} className="space-y-5">
+                  {/* Name Felder in einer Reihe */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <User className="h-4 w-4 text-red-400" />
+                        Vorname
+                      </label>
+                      <Input
+                        value={bloodInData.vorname}
+                        onChange={(e) => setBloodInData({ ...bloodInData, vorname: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
+                        placeholder="z.B. Carlos"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <User className="h-4 w-4 text-red-400" />
+                        Nachname
+                      </label>
+                      <Input
+                        value={bloodInData.nachname}
+                        onChange={(e) => setBloodInData({ ...bloodInData, nachname: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
+                        placeholder="z.B. Martinez"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Telefon und Steam */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-red-400" />
+                        Telefonnummer
+                      </label>
+                      <Input
+                        type="number"
+                        value={bloodInData.telefon}
+                        onChange={(e) => setBloodInData({ ...bloodInData, telefon: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="555-1234"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <Gamepad2 className="h-4 w-4 text-red-400" />
+                        Steam ID
+                      </label>
+                      <Input
+                        value={bloodInData.steam}
+                        onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
+                        placeholder="steam:xxxx"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-700/50" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">
+                        Aufnahme durch
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Blood In Durch */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <Skull className="h-4 w-4 text-red-400" />
+                      Durchgeführt von
+                    </label>
+                    <Input
+                      value={bloodInData.bloodinDurch}
+                      onChange={(e) => setBloodInData({ ...bloodInData, bloodinDurch: e.target.value })}
+                      className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
+                      placeholder="Name des Verantwortlichen"
+                      required
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowBloodInModal(false);
+                        setBloodInData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
+                      }}
+                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                      disabled={bloodInMutation.isPending}
+                    >
+                      Abbrechen
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-lg shadow-red-500/25 transition-all duration-200 hover:shadow-red-500/40"
+                      disabled={bloodInMutation.isPending}
+                    >
+                      {bloodInMutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Wird aufgenommen...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Plus className="h-5 w-5" />
+                          Blood In
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 

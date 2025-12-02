@@ -130,4 +130,18 @@ export class SettingsController {
       settingsDto.bloodOutChannelId
     );
   }
+
+  // Blood In Discord Rollen abrufen (nur Patron)
+  @Get('bloodlist/roles')
+  async getBloodInDiscordRoles() {
+    return { roleIds: await this.settingsService.getBloodInDiscordRoles() };
+  }
+
+  // Blood In Discord Rollen setzen (NUR El Patron)
+  @Put('bloodlist/roles')
+  @Roles(Role.EL_PATRON)
+  @UseGuards(RolesGuard)
+  async setBloodInDiscordRoles(@Body() body: { roleIds: string[] }) {
+    return this.settingsService.setBloodInDiscordRoles(body.roleIds);
+  }
 }

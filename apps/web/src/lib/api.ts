@@ -92,6 +92,9 @@ export const settingsApi = {
   // Blood List Settings
   getBloodListSettings: () => api.get('/settings/bloodlist/values'),
   setBloodListSettings: (data: { bloodInChannelId: string; bloodOutChannelId: string }) => api.put('/settings/bloodlist', data),
+  // Blood In Discord Rollen (nur El Patron)
+  getBloodInDiscordRoles: () => api.get('/settings/bloodlist/roles').then(res => res.data),
+  setBloodInDiscordRoles: (roleIds: string[]) => api.put('/settings/bloodlist/roles', { roleIds }).then(res => res.data),
 }
 
 // Users API
@@ -137,6 +140,7 @@ export const discordApi = {
   getUserRole: (discordId: string) => api.get(`/discord/user-role/${discordId}`),
   syncAndRemoveInactive: () => api.post('/discord/sync-and-remove-inactive'),
   getChannels: () => api.get('/discord/channels'),
+  getRoles: () => api.get('/discord/roles').then(res => res.data),
 }
 
 // Aufstellung API
@@ -235,5 +239,20 @@ export const clothingApi = {
   saveTemplate: (rankGroup: string, data: any) => api.post(`/clothing/templates/${rankGroup}`, data).then(res => res.data),
   getMyClothing: () => api.get('/clothing/my-clothing').then(res => res.data),
   saveMyClothing: (data: any) => api.put('/clothing/my-clothing', data).then(res => res.data),
+};
+
+// Sicario API
+export const sicarioApi = {
+  checkAccess: () => api.get('/sicario/access').then(res => res.data),
+  getTeam: () => api.get('/sicario/team').then(res => res.data),
+  getAllAufstellungen: () => api.get('/sicario/aufstellungen').then(res => res.data),
+  getUpcomingAufstellungen: () => api.get('/sicario/aufstellungen/upcoming').then(res => res.data),
+  getMyPendingAufstellungen: () => api.get('/sicario/aufstellungen/my-pending').then(res => res.data),
+  getAufstellungById: (id: string) => api.get(`/sicario/aufstellung/${id}`).then(res => res.data),
+  createAufstellung: (data: { date: string; time: string; reason: string; location?: string }) =>
+    api.post('/sicario/aufstellung', data).then(res => res.data),
+  respondToAufstellung: (id: string, status: 'COMING' | 'NOT_COMING' | 'UNSURE') =>
+    api.post(`/sicario/aufstellung/${id}/respond`, { status }).then(res => res.data),
+  deleteAufstellung: (id: string) => api.delete(`/sicario/aufstellung/${id}`).then(res => res.data),
 };
 

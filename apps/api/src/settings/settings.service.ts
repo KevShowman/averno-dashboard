@@ -118,6 +118,33 @@ export class SettingsService {
     };
   }
 
+  // Blood In Discord Rollen Settings (nur El Patron)
+  async getBloodInDiscordRoles(): Promise<string[]> {
+    const roles = await this.getSetting('bloodlist_blood_in_discord_roles');
+    if (!roles) return [];
+    
+    // Falls es ein String ist, parsen
+    if (typeof roles === 'string') {
+      try {
+        return JSON.parse(roles);
+      } catch {
+        return [];
+      }
+    }
+    
+    // Falls es bereits ein Array ist
+    if (Array.isArray(roles)) {
+      return roles;
+    }
+    
+    return [];
+  }
+
+  async setBloodInDiscordRoles(roleIds: string[]) {
+    await this.setSetting('bloodlist_blood_in_discord_roles', roleIds, 'json');
+    return { roleIds };
+  }
+
   // Helper methods
   private parseSettingValue(value: any, type: string) {
     switch (type) {

@@ -25,7 +25,8 @@ import {
   Shirt,
   Radio,
   Car,
-  ScrollText
+  ScrollText,
+  Crosshair
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -64,6 +65,7 @@ const navigation = [
   { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
   { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
   { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
+  { name: 'Sicario Division', href: '/sicario', icon: Crosshair, sicarioOnly: true },
   { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
   { name: 'Blood List', href: '/bloodlist', icon: Droplet },
   { name: 'Sanktionen', href: '/sanctions', icon: Scale },
@@ -125,6 +127,15 @@ export default function Layout({ children }: LayoutProps) {
                 return null
               }
 
+              // Sicario Division nur für Sicarios und Leadership
+              if ((item as any).sicarioOnly) {
+                const isLeadership = hasRole(user, 'EL_PATRON') || hasRole(user, 'DON_CAPITAN') || hasRole(user, 'DON_COMANDANTE') || hasRole(user, 'EL_MANO_DERECHA')
+                const isSicario = hasRole(user, 'SICARIO')
+                if (!isLeadership && !isSicario) {
+                  return null
+                }
+              }
+
               const isActive = location.pathname === item.href
               return (
                 <Link
@@ -165,6 +176,15 @@ export default function Layout({ children }: LayoutProps) {
             // Kleidungsverwaltung nur für Leadership
             if (item.leadershipOnly && !hasRole(user, 'EL_PATRON') && !hasRole(user, 'DON_CAPITAN') && !hasRole(user, 'DON_COMANDANTE') && !hasRole(user, 'EL_MANO_DERECHA')) {
               return null
+            }
+
+            // Sicario Division nur für Sicarios und Leadership
+            if ((item as any).sicarioOnly) {
+              const isLeadership = hasRole(user, 'EL_PATRON') || hasRole(user, 'DON_CAPITAN') || hasRole(user, 'DON_COMANDANTE') || hasRole(user, 'EL_MANO_DERECHA')
+              const isSicario = hasRole(user, 'SICARIO')
+              if (!isLeadership && !isSicario) {
+                return null
+              }
             }
 
             const isActive = location.pathname === item.href
