@@ -299,7 +299,6 @@ export default function AbmeldungenPage() {
     <div className="space-y-6">
       {/* Modern Header */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-900/40 via-teal-900/30 to-emerald-900/40 border border-cyan-500/30">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"30\" height=\"30\" viewBox=\"0 0 30 30\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z\" fill=\"rgba(6,182,212,0.07)\"%2F%3E%3C%2Fsvg%3E')] opacity-60" />
         <div className="relative px-6 py-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center gap-4">

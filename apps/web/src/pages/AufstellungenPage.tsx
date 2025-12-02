@@ -252,7 +252,6 @@ export default function AufstellungenPage() {
     <div className="space-y-6">
       {/* Modern Header */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/40 via-yellow-900/30 to-orange-900/40 border border-amber-500/30">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"30\" height=\"30\" viewBox=\"0 0 30 30\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z\" fill=\"rgba(251,191,36,0.07)\"%2F%3E%3C%2Fsvg%3E')] opacity-60" />
         <div className="relative px-6 py-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -349,7 +348,6 @@ export default function AufstellungenPage() {
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 via-orange-500/30 to-red-500/30 blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />
           <Card className="relative bg-gradient-to-br from-yellow-900/40 via-orange-900/30 to-red-900/40 border-2 border-yellow-500/50 shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M0 0h20v20H0z\" fill=\"rgba(251,191,36,0.03)\"%2F%3E%3C%2Fsvg%3E')]" />
             <CardHeader className="relative pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center text-yellow-400 text-2xl">
