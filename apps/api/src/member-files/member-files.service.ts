@@ -45,11 +45,8 @@ export class MemberFilesService {
   }
 
   async getUsersPendingUprank() {
-    // Hole ALLE aktiven User aus der Datenbank
+    // Hole ALLE User aus der Datenbank
     const allUsers = await this.prisma.user.findMany({
-      where: {
-        isActive: true,
-      },
       select: {
         id: true,
         username: true,
