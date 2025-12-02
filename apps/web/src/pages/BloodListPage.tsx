@@ -80,8 +80,8 @@ export default function BloodListPage() {
   const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
   // Leaderschaft + Formación können Blood Ins machen und Unassigned Users sehen
   const canBloodIn = user && (
-    ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'FORMACION'].includes(user.role) ||
-    (user.allRoles && user.allRoles.includes('FORMACION'))
+    ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'FORMACION'].includes(user.role as string) ||
+    (user.allRoles && (user.allRoles as string[]).includes('FORMACION'))
   );
   // NUR Leaderschaft kann Blood Outs machen (NICHT Formación!)
   const canBloodOut = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
