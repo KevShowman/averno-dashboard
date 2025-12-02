@@ -634,8 +634,8 @@ export class BloodListService {
       throw new NotFoundException('Discord User nicht im Server gefunden');
     }
 
-    // Prüfen ob bereits ein Blood Record existiert
-    const existingRecord = await this.prisma.bloodRecord.findFirst({
+    // Prüfen ob bereits ein Blood Record mit diesem Namen existiert
+    const existingRecordByName = await this.prisma.bloodRecord.findFirst({
       where: {
         vorname,
         nachname,
@@ -643,8 +643,22 @@ export class BloodListService {
       },
     });
 
-    if (existingRecord) {
+    if (existingRecordByName) {
       throw new BadRequestException(`${vorname} ${nachname} ist bereits ein aktives Mitglied`);
+    }
+
+    // Prüfen ob bereits ein Blood Record mit dieser Telefonnummer existiert
+    const existingRecordByPhone = await this.prisma.bloodRecord.findFirst({
+      where: {
+        telefon,
+        status: BloodStatus.ACTIVE,
+      },
+    });
+
+    if (existingRecordByPhone) {
+      throw new BadRequestException(
+        `Die Telefonnummer ${telefon} wird bereits von ${existingRecordByPhone.vorname} ${existingRecordByPhone.nachname} verwendet`
+      );
     }
 
     // Blood Record erstellen

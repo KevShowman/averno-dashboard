@@ -22,16 +22,12 @@ import {
   Droplet, 
   FileText, 
   Settings,
-  ChevronRight,
   Skull,
-  Target,
   Boxes,
   Wallet,
   TrendingDown,
-  Zap,
   Crown,
-  ArrowUpRight,
-  Sparkles
+  ArrowUpRight
 } from 'lucide-react'
 import { formatCurrency, hasRole } from '../lib/utils'
 
@@ -135,9 +131,6 @@ export default function DashboardPage() {
       ]
     },
   ]
-
-  // Sicario Modul nur für berechtigte User
-  const hasSicarioAccess = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'SICARIO'])
 
   const getColorClasses = (color: string) => {
     const colors: Record<string, { bg: string; text: string; border: string; glow: string }> = {
@@ -267,30 +260,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Sicario Quick Access (if has access) */}
-      {hasSicarioAccess && (
-        <Link to="/sicario" className="block">
-          <Card className="relative overflow-hidden bg-gradient-to-r from-red-900/40 via-gray-900 to-red-900/40 border-red-500/30 hover:border-red-500/50 transition-all group cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-red-500/5 group-hover:from-red-500/10 group-hover:to-red-500/10 transition-all" />
-            <CardContent className="p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-br from-red-600 to-rose-600 rounded-xl shadow-lg shadow-red-500/30">
-                  <Target className="h-7 w-7 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    Sicario Bereich
-                    <Sparkles className="h-4 w-4 text-red-400" />
-                  </h3>
-                  <p className="text-red-200/70">Geheime Einsätze und Aufträge für Sicarios</p>
-                </div>
-              </div>
-              <ChevronRight className="h-6 w-6 text-red-400 group-hover:translate-x-1 transition-transform" />
-            </CardContent>
-          </Card>
-        </Link>
-      )}
 
       {/* Module Groups */}
       {moduleGroups.map((group) => (

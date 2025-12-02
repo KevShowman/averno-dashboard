@@ -3,11 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { abmeldungApi } from '../lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
-import { CalendarDays, Plus, Trash2, Calendar, User, Clock, AlertCircle } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, Calendar, User, Clock, AlertCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '../stores/auth';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isBefore } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface Abmeldung {
   id: string;
@@ -31,11 +32,12 @@ export default function AbmeldungenPage() {
   const [isRangeMode, setIsRangeMode] = useState(true);
   
   // Form State
-  const [formData, setFormData] = useState({
-    startDate: '',
-    endDate: '',
-    reason: '',
-  });
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [reason, setReason] = useState('');
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [showStartCalendar, setShowStartCalendar] = useState(false);
+  const [showEndCalendar, setShowEndCalendar] = useState(false);
 
   const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
 
@@ -58,8 +60,7 @@ export default function AbmeldungenPage() {
       queryClient.invalidateQueries({ queryKey: ['abmeldungen'] });
       queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] });
       queryClient.invalidateQueries({ queryKey: ['aufstellung'] });
-      setShowCreateModal(false);
-      setFormData({ startDate: '', endDate: '', reason: '' });
+      handleCloseModal();
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Erstellen der Abmeldung');
@@ -80,18 +81,27 @@ export default function AbmeldungenPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.startDate) {
+    if (!startDate) {
       toast.error('Bitte Start-Datum auswählen');
       return;
     }
 
-    const endDate = isRangeMode && formData.endDate ? formData.endDate : formData.startDate;
+    const endDateValue = isRangeMode && endDate ? format(endDate, 'yyyy-MM-dd') : format(startDate, 'yyyy-MM-dd');
     
     createMutation.mutate({
-      startDate: formData.startDate,
-      endDate: endDate,
-      reason: formData.reason || undefined,
+      startDate: format(startDate, 'yyyy-MM-dd'),
+      endDate: endDateValue,
+      reason: reason || undefined,
     });
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setStartDate(null);
+    setEndDate(null);
+    setReason('');
+    setShowStartCalendar(false);
+    setShowEndCalendar(false);
   };
 
   const handleDelete = (id: string) => {
@@ -100,8 +110,7 @@ export default function AbmeldungenPage() {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    // Parse as UTC to avoid timezone shifts
+  const formatDateDisplay = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -112,35 +121,32 @@ export default function AbmeldungenPage() {
   };
 
   const formatDateRange = (start: string, end: string) => {
-    // Parse dates - extract only the date part
     const startDateStr = start.split('T')[0];
     const endDateStr = end.split('T')[0];
     
-    // Compare date strings directly
     if (startDateStr === endDateStr) {
-      return formatDate(start);
+      return formatDateDisplay(start);
     }
     
-    return `${formatDate(start)} - ${formatDate(end)}`;
+    return `${formatDateDisplay(start)} - ${formatDateDisplay(end)}`;
   };
 
   const getDaysCount = (start: string, end: string) => {
-    // Parse dates - extract only the date part and use UTC to avoid timezone shifts
     const startDateStr = start.split('T')[0];
     const endDateStr = end.split('T')[0];
     
-    const startDate = new Date(startDateStr + 'T00:00:00Z');
-    const endDate = new Date(endDateStr + 'T00:00:00Z');
+    const startDateParsed = new Date(startDateStr + 'T00:00:00Z');
+    const endDateParsed = new Date(endDateStr + 'T00:00:00Z');
     
-    const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const days = Math.floor((endDateParsed.getTime() - startDateParsed.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return days;
   };
 
   const isActive = (start: string, end: string) => {
     const now = new Date();
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    return now >= startDate && now <= endDate;
+    const startDateParsed = new Date(start);
+    const endDateParsed = new Date(end);
+    return now >= startDateParsed && now <= endDateParsed;
   };
 
   const isFuture = (start: string) => {
@@ -150,6 +156,111 @@ export default function AbmeldungenPage() {
   const canDelete = (abmeldung: Abmeldung) => {
     return isLeadership || abmeldung.userId === user?.id;
   };
+
+  // Calendar helpers
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const startDayOfWeek = monthStart.getDay();
+  const paddedDays = Array(startDayOfWeek === 0 ? 6 : startDayOfWeek - 1).fill(null).concat(daysInMonth);
+
+  const CalendarPopup = ({ 
+    selectedDate, 
+    onSelect, 
+    minDate 
+  }: { 
+    selectedDate: Date | null; 
+    onSelect: (date: Date) => void; 
+    minDate?: Date | null;
+  }) => (
+    <div className="absolute z-50 mt-2 w-full bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4">
+      {/* Month Navigation */}
+      <div className="flex items-center justify-between mb-4">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+          className="h-8 w-8 text-gray-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="text-white font-medium">
+          {format(currentMonth, 'MMMM yyyy', { locale: de })}
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+          className="h-8 w-8 text-gray-400 hover:text-white"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      {/* Weekday Headers */}
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((day) => (
+          <div key={day} className="text-center text-xs text-gray-500 py-1">
+            {day}
+          </div>
+        ))}
+      </div>
+      
+      {/* Days */}
+      <div className="grid grid-cols-7 gap-1">
+        {paddedDays.map((day, index) => {
+          if (!day) {
+            return <div key={`empty-${index}`} className="h-9" />;
+          }
+          
+          const isSelected = selectedDate && isSameDay(day, selectedDate);
+          const isCurrentMonth = isSameMonth(day, currentMonth);
+          const isCurrentDay = isToday(day);
+          const isDisabled = minDate && isBefore(day, minDate);
+          
+          return (
+            <button
+              key={day.toISOString()}
+              type="button"
+              onClick={() => !isDisabled && onSelect(day)}
+              disabled={isDisabled}
+              className={`h-9 rounded-lg text-sm font-medium transition-all ${
+                isSelected
+                  ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-lg'
+                  : isCurrentDay
+                    ? 'bg-gray-700 text-white'
+                    : isDisabled
+                      ? 'text-gray-600 cursor-not-allowed'
+                      : isCurrentMonth
+                        ? 'text-gray-300 hover:bg-gray-700'
+                        : 'text-gray-600'
+              }`}
+            >
+              {format(day, 'd')}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Today Button */}
+      <div className="mt-3 pt-3 border-t border-gray-700">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setCurrentMonth(new Date());
+            onSelect(new Date());
+          }}
+          className="w-full text-gray-400 hover:text-white text-sm"
+        >
+          Heute
+        </Button>
+      </div>
+    </div>
+  );
 
   if (isLoading) {
     return (
@@ -174,7 +285,7 @@ export default function AbmeldungenPage() {
         </div>
         <Button
           onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-gold-600 to-gold-700 hover:from-gold-700 hover:to-gold-800"
+          className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white"
         >
           <Plus className="mr-2 h-4 w-4" />
           Neue Abmeldung
@@ -359,18 +470,29 @@ export default function AbmeldungenPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-yellow-800/30 to-transparent" />
                 <CardHeader className="relative pb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
-                      <CalendarDays className="h-7 w-7 text-white" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+                        <CalendarDays className="h-7 w-7 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl font-bold text-white">
+                          Neue Abmeldung
+                        </CardTitle>
+                        <CardDescription className="text-amber-200/70 mt-1">
+                          Zeitraum der Abwesenheit eintragen
+                        </CardDescription>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-2xl font-bold text-white">
-                        Neue Abmeldung
-                      </CardTitle>
-                      <CardDescription className="text-amber-200/70 mt-1">
-                        Zeitraum der Abwesenheit eintragen
-                      </CardDescription>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCloseModal}
+                      disabled={createMutation.isPending}
+                      className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
                   </div>
                 </CardHeader>
               </div>
@@ -407,34 +529,87 @@ export default function AbmeldungenPage() {
 
                   {/* Datum Felder */}
                   <div className={`grid gap-4 ${isRangeMode ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-amber-400" />
                         {isRangeMode ? 'Von' : 'Datum'}
                       </label>
-                      <Input
-                        type="date"
-                        value={formData.startDate}
-                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 text-white h-11 [color-scheme:dark]"
-                        required
-                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowStartCalendar(!showStartCalendar);
+                          setShowEndCalendar(false);
+                        }}
+                        className="w-full h-11 px-4 bg-gray-800/50 border border-gray-700 rounded-xl text-left text-white focus:border-amber-500 focus:ring-amber-500/20 transition-all flex items-center justify-between hover:border-gray-600"
+                      >
+                        <span className={startDate ? 'text-white' : 'text-gray-500'}>
+                          {startDate 
+                            ? format(startDate, 'dd. MMMM yyyy', { locale: de })
+                            : 'Datum auswählen'
+                          }
+                        </span>
+                        <Calendar className="h-4 w-4 text-amber-400" />
+                      </button>
+                      
+                      {showStartCalendar && (
+                        <>
+                          <div 
+                            className="fixed inset-0 z-40" 
+                            onClick={() => setShowStartCalendar(false)}
+                          />
+                          <CalendarPopup 
+                            selectedDate={startDate} 
+                            onSelect={(date) => {
+                              setStartDate(date);
+                              setShowStartCalendar(false);
+                              if (endDate && date > endDate) {
+                                setEndDate(null);
+                              }
+                            }}
+                          />
+                        </>
+                      )}
                     </div>
 
                     {isRangeMode && (
-                      <div className="space-y-2">
+                      <div className="space-y-2 relative">
                         <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-amber-400" />
                           Bis
                         </label>
-                        <Input
-                          type="date"
-                          value={formData.endDate}
-                          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          min={formData.startDate}
-                          className="bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 text-white h-11 [color-scheme:dark]"
-                          required={isRangeMode}
-                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowEndCalendar(!showEndCalendar);
+                            setShowStartCalendar(false);
+                          }}
+                          className="w-full h-11 px-4 bg-gray-800/50 border border-gray-700 rounded-xl text-left text-white focus:border-amber-500 focus:ring-amber-500/20 transition-all flex items-center justify-between hover:border-gray-600"
+                        >
+                          <span className={endDate ? 'text-white' : 'text-gray-500'}>
+                            {endDate 
+                              ? format(endDate, 'dd. MMMM yyyy', { locale: de })
+                              : 'Datum auswählen'
+                            }
+                          </span>
+                          <Calendar className="h-4 w-4 text-amber-400" />
+                        </button>
+                        
+                        {showEndCalendar && (
+                          <>
+                            <div 
+                              className="fixed inset-0 z-40" 
+                              onClick={() => setShowEndCalendar(false)}
+                            />
+                            <CalendarPopup 
+                              selectedDate={endDate} 
+                              onSelect={(date) => {
+                                setEndDate(date);
+                                setShowEndCalendar(false);
+                              }}
+                              minDate={startDate}
+                            />
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -446,8 +621,8 @@ export default function AbmeldungenPage() {
                       Grund <span className="text-gray-500 font-normal">(optional)</span>
                     </label>
                     <Textarea
-                      value={formData.reason}
-                      onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
                       placeholder="z.B. Urlaub, Krankheit, private Gründe..."
                       rows={3}
                       className="!bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 resize-none text-white placeholder:text-gray-500"
@@ -459,10 +634,7 @@ export default function AbmeldungenPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        setShowCreateModal(false);
-                        setFormData({ startDate: '', endDate: '', reason: '' });
-                      }}
+                      onClick={handleCloseModal}
                       className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
                       disabled={createMutation.isPending}
                     >
@@ -470,8 +642,8 @@ export default function AbmeldungenPage() {
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-semibold shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-amber-500/40"
-                      disabled={createMutation.isPending}
+                      className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-semibold shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-amber-500/40"
+                      disabled={createMutation.isPending || !startDate || (isRangeMode && !endDate)}
                     >
                       {createMutation.isPending ? (
                         <span className="flex items-center gap-2">
@@ -495,4 +667,3 @@ export default function AbmeldungenPage() {
     </div>
   );
 }
-
