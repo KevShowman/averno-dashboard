@@ -21,6 +21,7 @@ export class BloodListService {
     telefon: number,
     steam: string,
     bloodinDurch: string,
+    performedByUserId: string,
   ) {
     // Prüfe ob Settings konfiguriert sind
     const settings = await this.settingsService.getBloodListSettings();
@@ -73,7 +74,7 @@ export class BloodListService {
 
     // Audit Log
     await this.auditService.log({
-      userId: null, // System action
+      userId: performedByUserId,
       action: 'BLOOD_IN',
       entity: 'BloodRecord',
       entityId: bloodRecord.id,
@@ -158,6 +159,7 @@ export class BloodListService {
     identifier: string, // Telefonnummer oder "Vorname Nachname"
     grund: string,
     bloodoutDurch: string,
+    performedByUserId: string,
   ) {
     // Prüfe ob Settings konfiguriert sind
     const settings = await this.settingsService.getBloodListSettings();
@@ -226,7 +228,7 @@ export class BloodListService {
 
     // Audit Log
     await this.auditService.log({
-      userId: null, // System action
+      userId: performedByUserId,
       action: 'BLOOD_OUT',
       entity: 'BloodRecord',
       entityId: updatedRecord.id,
@@ -617,6 +619,7 @@ export class BloodListService {
     telefon: number,
     steam: string,
     bloodinDurch: string,
+    performedByUserId: string,
   ) {
     // Prüfe ob Settings konfiguriert sind
     const settings = await this.settingsService.getBloodListSettings();
@@ -695,7 +698,7 @@ export class BloodListService {
 
     // Audit Log
     await this.auditService.log({
-      userId: null,
+      userId: performedByUserId,
       action: 'BLOOD_IN_LINKED',
       entity: 'BloodRecord',
       entityId: bloodRecord.id,

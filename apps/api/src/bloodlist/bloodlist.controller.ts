@@ -43,6 +43,7 @@ export class BloodListController {
       bloodInDto.telefon,
       bloodInDto.steam,
       bloodInDto.bloodinDurch,
+      user.id,
     );
   }
 
@@ -59,6 +60,7 @@ export class BloodListController {
       bloodOutDto.identifier,
       bloodOutDto.grund,
       durchUser,
+      user.id,
     );
   }
 
@@ -127,6 +129,7 @@ export class BloodListController {
       linkDto.telefon,
       linkDto.steam,
       linkDto.bloodinDurch,
+      user.id,
     );
   }
 

@@ -10,17 +10,14 @@ import {
   Package, 
   Search, 
   AlertTriangle, 
-  Plus, 
-  Minus, 
-  RotateCcw, 
   Boxes, 
   Tags, 
   CheckCircle2,
-  XCircle,
   Filter,
   ArrowDownToLine,
   ArrowUpFromLine,
-  RefreshCw
+  RefreshCw,
+  MoreHorizontal
 } from 'lucide-react'
 import { hasRole } from '../lib/utils'
 import StockMovementModal from '../components/StockMovementModal'
@@ -183,145 +180,154 @@ export default function LagerPage() {
         </CardContent>
       </Card>
 
-      {/* Items Grid */}
-      {isLoading ? (
-        <div className="flex justify-center py-16">
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-10 w-10 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
-            <p className="text-gray-400">Lade Artikel...</p>
-          </div>
-        </div>
-      ) : itemsData?.items?.length === 0 ? (
-        <Card className="bg-gray-900/50 border-gray-800">
-          <CardContent className="py-16">
-            <div className="text-center">
+      {/* Items Table */}
+      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+        <CardHeader className="border-b border-gray-800">
+          <CardTitle className="text-white">Artikel</CardTitle>
+          <CardDescription className="text-gray-400">
+            {itemsData?.items?.length || 0} von {itemsData?.pagination?.total || 0} Artikel
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex justify-center py-16">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-10 w-10 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                <p className="text-gray-400">Lade Artikel...</p>
+              </div>
+            </div>
+          ) : itemsData?.items?.length === 0 ? (
+            <div className="py-16 text-center">
               <Package className="h-16 w-16 mx-auto text-gray-600 mb-4" />
               <p className="text-gray-400 text-lg">Keine Artikel gefunden</p>
               <p className="text-gray-500 text-sm mt-1">Versuche einen anderen Suchbegriff oder Filter</p>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {itemsData?.items?.map((item: any) => (
-            <Card 
-              key={item.id} 
-              className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg ${
-                item.isCritical 
-                  ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-500/30 hover:border-red-500/50 hover:shadow-red-500/10' 
-                  : 'bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:shadow-gray-500/5'
-              }`}
-            >
-              {item.isCritical && (
-                <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl" />
-              )}
-              
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-white text-lg">{item.name}</h3>
-                    <p className="text-gray-400 text-sm">{item.category.name}</p>
-                  </div>
-                  {item.isCritical ? (
-                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
-                      <AlertTriangle className="mr-1 h-3 w-3" />
-                      Kritisch
-                    </Badge>
-                  ) : item.isLocked ? (
-                    <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                      Gesperrt
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-                      <CheckCircle2 className="mr-1 h-3 w-3" />
-                      OK
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Stock Info */}
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-gray-500 text-xs mb-1">Bestand</p>
-                    <p className="text-white font-bold text-lg">{item.currentStock}</p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-gray-500 text-xs mb-1">Verfügbar</p>
-                    <p className={`font-bold text-lg ${item.availableStock > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {item.availableStock}
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-gray-500 text-xs mb-1">Reserviert</p>
-                    <p className="text-yellow-400 font-bold text-lg">{item.reservedStock}</p>
-                  </div>
-                </div>
-
-                {/* Min Stock Warning */}
-                {item.isCritical && (
-                  <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-2 mb-4">
-                    <p className="text-red-300 text-xs flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3" />
-                      Min. Bestand: {item.minStock} — Nachbestellen!
-                    </p>
-                  </div>
-                )}
-
-                {/* Actions */}
-                {canEdit ? (
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      className="flex-1 bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-500/30"
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setMovementType('IN')
-                      }}
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Artikel</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategorie</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Bestand</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Verfügbar</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Reserviert</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                    {canEdit && (
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {itemsData?.items?.map((item: any) => (
+                    <tr 
+                      key={item.id} 
+                      className={`group transition-colors ${
+                        item.isCritical 
+                          ? 'bg-red-950/20 hover:bg-red-950/30' 
+                          : 'hover:bg-gray-800/30'
+                      }`}
                     >
-                      <ArrowDownToLine className="h-4 w-4 mr-1" />
-                      Ein
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      className="flex-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30"
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setMovementType('OUT')
-                      }}
-                    >
-                      <ArrowUpFromLine className="h-4 w-4 mr-1" />
-                      Aus
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      className="bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 border border-yellow-500/30"
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setMovementType('ADJUST')
-                      }}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
-                      Nur Leserechte
-                    </Badge>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Results Count */}
-      {itemsData?.items && itemsData.items.length > 0 && (
-        <div className="text-center text-gray-500 text-sm">
-          {itemsData.items.length} von {itemsData.pagination?.total || 0} Artikel angezeigt
-        </div>
-      )}
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            item.isCritical ? 'bg-red-500 animate-pulse' : item.availableStock > 0 ? 'bg-green-500' : 'bg-gray-500'
+                          }`} />
+                          <span className="font-medium text-white">{item.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge variant="outline" className="bg-gray-800/50 border-gray-700 text-gray-300 font-normal">
+                          {item.category.name}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className="text-white font-semibold text-lg">{item.currentStock}</span>
+                        {item.minStock > 0 && (
+                          <span className="text-gray-500 text-xs ml-1">/ min {item.minStock}</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className={`font-semibold text-lg ${
+                          item.availableStock > 0 ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {item.availableStock}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className={`font-semibold text-lg ${
+                          item.reservedStock > 0 ? 'text-yellow-400' : 'text-gray-500'
+                        }`}>
+                          {item.reservedStock}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        {item.isCritical ? (
+                          <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
+                            <AlertTriangle className="mr-1 h-3 w-3" />
+                            Kritisch
+                          </Badge>
+                        ) : item.isLocked ? (
+                          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                            Gesperrt
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                            <CheckCircle2 className="mr-1 h-3 w-3" />
+                            OK
+                          </Badge>
+                        )}
+                      </td>
+                      {canEdit && (
+                        <td className="py-4 px-6">
+                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                              onClick={() => {
+                                setSelectedItem(item)
+                                setMovementType('IN')
+                              }}
+                              title="Einlagern"
+                            >
+                              <ArrowDownToLine className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              onClick={() => {
+                                setSelectedItem(item)
+                                setMovementType('OUT')
+                              }}
+                              title="Auslagern"
+                            >
+                              <ArrowUpFromLine className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10"
+                              onClick={() => {
+                                setSelectedItem(item)
+                                setMovementType('ADJUST')
+                              }}
+                              title="Korrigieren"
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Stock Movement Modal */}
       <StockMovementModal
