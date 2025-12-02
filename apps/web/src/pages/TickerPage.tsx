@@ -20,7 +20,7 @@ import {
   Calendar,
   AlertTriangle
 } from 'lucide-react'
-import { formatDate, formatCurrency, getRoleColor, getRoleDisplayName, getMovementTypeColor, getTransactionStatusColor, getDisplayName } from '../lib/utils'
+import { formatDate, formatCurrency, getRoleColor, getRoleDisplayName, getMovementTypeColor, getDisplayName } from '../lib/utils'
 
 export default function TickerPage() {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'lager' | 'kasse' | 'packages' | 'weekly-delivery' | 'sanctions'>('all')
@@ -191,20 +191,20 @@ export default function TickerPage() {
         case 'IN': return <Plus className="h-4 w-4 text-green-400" />
         case 'OUT': return <Minus className="h-4 w-4 text-red-400" />
         case 'ADJUST': return <RotateCcw className="h-4 w-4 text-yellow-400" />
-        default: return <Package className="h-4 w-4" />
+        default: return <Package className="h-4 w-4 text-amber-400" />
       }
     } else if (type === 'kasse') {
       switch (action) {
         case 'EINZAHLUNG': return <TrendingUp className="h-4 w-4 text-green-400" />
         case 'AUSZAHLUNG': return <TrendingDown className="h-4 w-4 text-red-400" />
-        default: return <DollarSign className="h-4 w-4" />
+        default: return <DollarSign className="h-4 w-4 text-amber-400" />
       }
     } else if (type === 'packages') {
       switch (action) {
         case 'PENDING': return <Clock className="h-4 w-4 text-yellow-400" />
         case 'CONFIRMED': return <CheckCircle className="h-4 w-4 text-green-400" />
         case 'REJECTED': return <XCircle className="h-4 w-4 text-red-400" />
-        default: return <FlaskConical className="h-4 w-4" />
+        default: return <FlaskConical className="h-4 w-4 text-amber-400" />
       }
     } else if (type === 'weekly-delivery') {
       switch (action) {
@@ -216,10 +216,10 @@ export default function TickerPage() {
       switch (action) {
         case 'ACTIVE': return <AlertTriangle className="h-4 w-4 text-red-400" />
         case 'PAID': return <CheckCircle className="h-4 w-4 text-green-400" />
-        default: return <Activity className="h-4 w-4" />
+        default: return <Activity className="h-4 w-4 text-amber-400" />
       }
     }
-    return <Activity className="h-4 w-4" />
+    return <Activity className="h-4 w-4 text-amber-400" />
   }
 
   const getActionDisplay = (type: string, action: string) => {
@@ -252,14 +252,14 @@ export default function TickerPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-pink-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-transparent to-rose-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-pink-600 to-rose-600 rounded-xl shadow-lg shadow-pink-500/30">
+            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
               <Activity className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -278,8 +278,8 @@ export default function TickerPage() {
                 onClick={() => setSelectedFilter(btn.key as typeof selectedFilter)}
                 size="sm"
                 className={selectedFilter === btn.key 
-                  ? 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white border-0' 
-                  : 'border-gray-700 hover:bg-gray-800'}
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 border-0 font-medium' 
+                  : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
               >
                 <btn.icon className="mr-1.5 h-4 w-4" />
                 {btn.label}
@@ -289,54 +289,54 @@ export default function TickerPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - All Gold with subtle variations */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-pink-900/30 to-rose-900/20 border-pink-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
           <CardContent className="p-4">
-            <p className="text-pink-300/70 text-xs uppercase tracking-wider">Heute</p>
-            <p className="text-2xl font-bold text-white mt-1">{todayCount}</p>
+            <p className="text-amber-300/70 text-xs uppercase tracking-wider">Heute</p>
+            <p className="text-2xl font-bold text-amber-400 mt-1">{todayCount}</p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-4">
-            <p className="text-blue-300/70 text-xs uppercase tracking-wider">Lager</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">Lager</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'lager').length}
             </p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-4">
-            <p className="text-green-300/70 text-xs uppercase tracking-wider">Kasse</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">Kasse</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'kasse').length}
             </p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-purple-900/30 to-violet-900/20 border-purple-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-4">
-            <p className="text-purple-300/70 text-xs uppercase tracking-wider">Pakete</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">Pakete</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'packages').length}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-orange-900/30 to-amber-900/20 border-orange-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-4">
-            <p className="text-orange-300/70 text-xs uppercase tracking-wider">Wochenabgabe</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">Wochenabgabe</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'weekly-delivery').length}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-red-900/30 to-rose-900/20 border-red-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-4">
-            <p className="text-red-300/70 text-xs uppercase tracking-wider">Sanktionen</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">Sanktionen</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'sanctions').length}
             </p>
@@ -356,7 +356,7 @@ export default function TickerPage() {
           {isLoading ? (
             <div className="flex justify-center py-16">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-2 border-pink-500/30 border-t-pink-500 rounded-full animate-spin" />
+                <div className="h-8 w-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
                 <p className="text-gray-400">Lade Aktivitäten...</p>
               </div>
             </div>
@@ -382,18 +382,12 @@ export default function TickerPage() {
                   {allActivities
                     .filter(activity => selectedFilter === 'all' || activity.type === selectedFilter)
                     .map((activity) => (
-                    <tr key={activity.id} className="group hover:bg-pink-950/20 transition-colors">
+                    <tr key={activity.id} className="group hover:bg-amber-950/20 transition-colors">
                       <td className="py-4 px-6">
                         <span className="text-gray-400 text-sm">{formatDate(activity.timestamp)}</span>
                       </td>
                       <td className="py-4 px-4">
-                        <Badge variant="outline" className={
-                          activity.type === 'lager' ? 'border-blue-500/30 text-blue-400' : 
-                          activity.type === 'kasse' ? 'border-green-500/30 text-green-400' :
-                          activity.type === 'packages' ? 'border-purple-500/30 text-purple-400' :
-                          activity.type === 'weekly-delivery' ? 'border-orange-500/30 text-orange-400' :
-                          'border-red-500/30 text-red-400'
-                        }>
+                        <Badge variant="outline" className="border-amber-500/30 text-amber-400">
                           {activity.type === 'lager' ? 'Lager' : 
                            activity.type === 'kasse' ? 'Kasse' :
                            activity.type === 'packages' ? 'Pakete' :
@@ -405,7 +399,7 @@ export default function TickerPage() {
                         <div className="flex items-center gap-2">
                           {getActivityIcon(activity.type, activity.action)}
                           <Badge className={
-                            activity.isPending ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                            activity.isPending ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
                             activity.type === 'lager' ? getMovementTypeColor(activity.action) :
                             activity.type === 'packages' ? (
                               activity.action === 'CONFIRMED' ? 'bg-green-500/20 text-green-300 border-green-500/30' :

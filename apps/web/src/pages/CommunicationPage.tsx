@@ -82,7 +82,7 @@ export default function CommunicationPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
           <p className="text-gray-400">Lade Kommunikationsdaten...</p>
         </div>
       </div>
@@ -92,12 +92,12 @@ export default function CommunicationPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-cyan-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-teal-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl shadow-lg shadow-cyan-500/30">
+          <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
             <Signal className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -139,7 +139,7 @@ export default function CommunicationPage() {
                   <Button
                     onClick={handleSaveFunk}
                     disabled={updateFunkMutation.isPending}
-                    className="flex-1 h-11 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white"
+                    className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Speichern
@@ -205,7 +205,7 @@ export default function CommunicationPage() {
                   <Button
                     onClick={handleSaveDarkChat}
                     disabled={updateDarkChatMutation.isPending}
-                    className="flex-1 h-11 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white"
+                    className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Speichern

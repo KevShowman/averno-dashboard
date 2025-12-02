@@ -305,7 +305,7 @@ export default function BloodListPage() {
           <Button
             onClick={() => setViewMode('active')}
             variant={viewMode === 'active' ? 'default' : 'outline'}
-            className={viewMode === 'active' ? 'bg-red-600 hover:bg-red-700' : 'border-gray-700 hover:bg-gray-800'}
+            className={viewMode === 'active' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
           >
             <UserCheck className="mr-2 h-4 w-4" />
             Aktive
@@ -314,7 +314,7 @@ export default function BloodListPage() {
             <Button
               onClick={() => setViewMode('history')}
               variant={viewMode === 'history' ? 'default' : 'outline'}
-              className={viewMode === 'history' ? 'bg-gray-600 hover:bg-gray-700' : 'border-gray-700 hover:bg-gray-800'}
+              className={viewMode === 'history' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
             >
               <History className="mr-2 h-4 w-4" />
               Historie
@@ -323,7 +323,7 @@ export default function BloodListPage() {
           <Button
             onClick={() => setViewMode('unassigned')}
             variant={viewMode === 'unassigned' ? 'default' : 'outline'}
-            className={viewMode === 'unassigned' ? 'bg-blue-600 hover:bg-blue-700' : 'border-gray-700 hover:bg-gray-800'}
+            className={viewMode === 'unassigned' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
           >
             <Users className="mr-2 h-4 w-4" />
             Unverknüpft
@@ -332,7 +332,7 @@ export default function BloodListPage() {
             <Button
               onClick={() => setViewMode('ghost')}
               variant={viewMode === 'ghost' ? 'default' : 'outline'}
-              className={viewMode === 'ghost' ? 'bg-purple-600 hover:bg-purple-700' : 'border-gray-700 hover:bg-gray-800'}
+              className={viewMode === 'ghost' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
             >
               <Ghost className="mr-2 h-4 w-4" />
               Ghosts
@@ -344,18 +344,18 @@ export default function BloodListPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="relative overflow-hidden bg-gradient-to-br from-red-900/30 to-orange-900/20 border-red-500/30">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-red-300/70 text-sm">Aktive Mitglieder</p>
-                  <p className="text-3xl font-bold text-white">{stats.totalActive}</p>
+                  <p className="text-gray-400 text-sm">Aktive Mitglieder</p>
+                  <p className="text-3xl font-bold text-amber-400">{stats.totalActive}</p>
                 </div>
-                <UserCheck className="h-10 w-10 text-red-500/30" />
+                <UserCheck className="h-10 w-10 text-amber-500/30" />
               </div>
             </CardContent>
           </Card>
-          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
@@ -366,11 +366,11 @@ export default function BloodListPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="relative overflow-hidden bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border-amber-500/30">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-amber-300/70 text-sm">Gesamt Records</p>
+                  <p className="text-gray-400 text-sm">Gesamt Records</p>
                   <p className="text-3xl font-bold text-white">{stats.totalRecords}</p>
                 </div>
                 <TrendingUp className="h-10 w-10 text-amber-500/30" />
@@ -827,13 +827,13 @@ export default function BloodListPage() {
       {showLinkModal && selectedDiscordUser && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-cyan-500/20 to-blue-600/20 blur-xl rounded-2xl" />
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-blue-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 via-cyan-800/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
                 <CardHeader className="relative pb-4">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-lg shadow-blue-500/30">
+                    <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
                       <Link2 className="h-7 w-7 text-white" />
                     </div>
                     <div>
@@ -885,7 +885,7 @@ export default function BloodListPage() {
                   </div>
                   <div className="flex gap-3 pt-4">
                     <Button type="button" variant="outline" onClick={() => { setShowLinkModal(false); setSelectedDiscordUser(null); setLinkData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' }); }} className="flex-1 h-12 border-gray-600 hover:bg-gray-800 text-gray-300" disabled={linkDiscordUserMutation.isPending}>Abbrechen</Button>
-                    <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-blue-500/25" disabled={linkDiscordUserMutation.isPending}>
+                    <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 font-semibold shadow-lg shadow-amber-500/25" disabled={linkDiscordUserMutation.isPending}>
                       {linkDiscordUserMutation.isPending ? <span className="flex items-center gap-2"><div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Wird verknüpft...</span> : <span className="flex items-center gap-2"><Link2 className="h-5 w-5" />Blood In & Verknüpfen</span>}
                     </Button>
                   </div>

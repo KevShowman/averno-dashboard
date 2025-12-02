@@ -62,6 +62,7 @@ interface MemberFile {
   }
   entries: FileEntry[]
   daysSinceUprank?: number
+  neverUpranked?: boolean
 }
 
 export default function MemberFilesPage() {
@@ -226,7 +227,7 @@ export default function MemberFilesPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
           <p className="text-gray-400">Lade Akten...</p>
         </div>
       </div>
@@ -235,14 +236,14 @@ export default function MemberFilesPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-indigo-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 via-transparent to-violet-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl shadow-lg shadow-indigo-500/30">
+            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
               <FileText className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -255,7 +256,7 @@ export default function MemberFilesPage() {
           <Button
             onClick={() => setShowArchived(!showArchived)}
             variant="outline"
-            className="border-gray-700 hover:bg-gray-800"
+            className="border-gray-700 hover:bg-gray-800 hover:border-amber-500/50"
           >
             {showArchived ? <ArchiveRestore className="h-4 w-4 mr-2" /> : <Archive className="h-4 w-4 mr-2" />}
             {showArchived ? 'Aktive Akten' : 'Archivierte Akten'}
@@ -265,29 +266,35 @@ export default function MemberFilesPage() {
 
       {/* Uprank-Pending Liste */}
       {!showArchived && pendingUpranks && pendingUpranks.length > 0 && (
-        <Card className="relative overflow-hidden bg-gradient-to-br from-yellow-900/30 to-amber-900/20 border-yellow-500/30">
-          <CardHeader className="border-b border-yellow-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border-amber-500/30">
+          <CardHeader className="border-b border-amber-500/20">
             <CardTitle className="text-white flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-yellow-400" />
+              <AlertCircle className="h-5 w-5 text-amber-400" />
               Uprank-Kandidaten
             </CardTitle>
-            <CardDescription className="text-yellow-200/60">
-              User mit längster Zeit seit letztem Uprank
+            <CardDescription className="text-amber-200/60">
+              User sortiert nach Zeit seit letztem Uprank (nie upgerankte zuerst)
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             <div className="space-y-2">
-              {pendingUpranks.slice(0, 5).map((file) => (
+              {pendingUpranks.slice(0, 10).map((file) => (
                 <div
                   key={file.id}
-                  className="flex items-center justify-between bg-gray-800/50 border border-yellow-500/20 rounded-xl p-3 cursor-pointer hover:bg-gray-800/70 transition-colors"
+                  className={`flex items-center justify-between rounded-xl p-3 cursor-pointer transition-colors ${
+                    file.neverUpranked 
+                      ? 'bg-red-900/20 border border-red-500/30 hover:bg-red-900/30' 
+                      : 'bg-gray-800/50 border border-amber-500/20 hover:bg-gray-800/70'
+                  }`}
                   onClick={() => setSelectedUserId(file.userId)}
                 >
                   <div className="flex items-center gap-3">
                     {file.user.avatarUrl ? (
                       <img src={file.user.avatarUrl} alt={file.user.username} className="w-10 h-10 rounded-full" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                        file.neverUpranked ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
+                      }`}>
                         {file.user.username[0]}
                       </div>
                     )}
@@ -296,9 +303,15 @@ export default function MemberFilesPage() {
                       <p className="text-xs text-gray-400">{file.user.role}</p>
                     </div>
                   </div>
-                  <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                    {file.daysSinceUprank} Tage
-                  </Badge>
+                  {file.neverUpranked ? (
+                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
+                      Nie upgerankt
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+                      {file.daysSinceUprank} Tage
+                    </Badge>
+                  )}
                 </div>
               ))}
             </div>
@@ -311,7 +324,7 @@ export default function MemberFilesPage() {
         <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
           <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Users className="h-5 w-5 text-indigo-400" />
+              <Users className="h-5 w-5 text-amber-400" />
               Mitglieder
             </CardTitle>
             <CardDescription className="text-gray-400">
@@ -325,8 +338,8 @@ export default function MemberFilesPage() {
                 return (
                   <div
                     key={user.id}
-                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-indigo-950/20 transition-colors border-b border-gray-800/50 ${
-                      selectedUserId === user.id ? 'bg-indigo-950/30 border-l-2 border-l-indigo-500' : ''
+                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-amber-950/20 transition-colors border-b border-gray-800/50 ${
+                      selectedUserId === user.id ? 'bg-amber-950/30 border-l-2 border-l-amber-500' : ''
                     }`}
                     onClick={() => setSelectedUserId(user.id)}
                   >
@@ -334,7 +347,7 @@ export default function MemberFilesPage() {
                       {user.avatarUrl ? (
                         <img src={user.avatarUrl} alt={user.username} className="w-8 h-8 rounded-full" />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-sm font-bold">
+                        <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-sm font-bold">
                           {user.username[0]}
                         </div>
                       )}
@@ -363,7 +376,7 @@ export default function MemberFilesPage() {
                     {selectedFile.user.avatarUrl ? (
                       <img src={selectedFile.user.avatarUrl} alt={selectedFile.user.username} className="w-12 h-12 rounded-full" />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-lg">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-lg">
                         {selectedFile.user.username[0]}
                       </div>
                     )}
@@ -422,7 +435,7 @@ export default function MemberFilesPage() {
                   <Button 
                     size="sm"
                     onClick={() => setEntryDialogOpen(true)}
-                    className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500"
+                    className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Eintrag hinzufügen
@@ -482,19 +495,19 @@ export default function MemberFilesPage() {
       {entryDialogOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-lg relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 via-violet-500/20 to-indigo-600/20 blur-xl rounded-2xl" />
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-indigo-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/50 via-violet-800/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
                 <CardHeader className="relative pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl shadow-lg shadow-indigo-500/30">
+                      <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
                         <Plus className="h-6 w-6 text-white" />
                       </div>
                       <div>
                         <CardTitle className="text-xl font-bold text-white">Neuer Eintrag</CardTitle>
-                        <CardDescription className="text-indigo-200/70 mt-1">
+                        <CardDescription className="text-amber-200/70 mt-1">
                           Füge einen neuen Eintrag zur Akte hinzu
                         </CardDescription>
                       </div>
@@ -526,7 +539,7 @@ export default function MemberFilesPage() {
                     onChange={(e) => setEntryContent(e.target.value)}
                     placeholder="Beschreibe den Vorfall oder die Beobachtung..."
                     rows={4}
-                    className="bg-gray-800/50 border-gray-700 text-white focus:border-indigo-500"
+                    className="bg-gray-800/50 border-gray-700 text-white focus:border-amber-500"
                   />
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -540,7 +553,7 @@ export default function MemberFilesPage() {
                   <Button
                     onClick={() => addEntryMutation.mutate()}
                     disabled={!entryContent.trim() || addEntryMutation.isPending}
-                    className="flex-1 h-11 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white"
+                    className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900"
                   >
                     {addEntryMutation.isPending ? 'Wird hinzugefügt...' : 'Hinzufügen'}
                   </Button>

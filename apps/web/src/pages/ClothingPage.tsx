@@ -105,12 +105,12 @@ export default function ClothingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-rose-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 via-transparent to-pink-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-rose-600 to-pink-600 rounded-xl shadow-lg shadow-rose-500/30">
+          <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
             <Shirt className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -138,7 +138,7 @@ export default function ClothingPage() {
               disabled={updateGenderMutation.isPending}
               className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 selectedGender === 'MALE' 
-                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-lg shadow-rose-500/25' 
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
                   : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
@@ -154,7 +154,7 @@ export default function ClothingPage() {
               disabled={updateGenderMutation.isPending}
               className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-lg shadow-rose-500/25' 
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
                   : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >

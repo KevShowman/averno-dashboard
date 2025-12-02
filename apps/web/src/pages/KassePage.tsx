@@ -129,14 +129,14 @@ export default function KassePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-green-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-emerald-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl shadow-lg shadow-green-500/30">
+            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
               <Wallet className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -175,65 +175,65 @@ export default function KassePage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Gold with semantic colors */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full blur-2xl" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-green-500/30">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-green-500/20 rounded-lg">
                 <DollarSign className="h-5 w-5 text-green-400" />
               </div>
             </div>
-            <p className="text-green-300/70 text-sm">Aktueller Saldo</p>
-            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.currentBalance || 0)}</p>
+            <p className="text-gray-400 text-sm">Aktueller Saldo</p>
+            <p className="text-2xl font-bold text-green-400">{formatCurrency(summary?.currentBalance || 0)}</p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden ${(summary?.todayChange || 0) >= 0 ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/20 border-emerald-500/30' : 'bg-gradient-to-br from-red-900/30 to-orange-900/20 border-red-500/30'}`}>
-          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.todayChange || 0) >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'} rounded-full blur-2xl`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${(summary?.todayChange || 0) >= 0 ? 'border-green-500/20' : 'border-red-500/30'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.todayChange || 0) >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 ${(summary?.todayChange || 0) >= 0 ? 'bg-emerald-500/20' : 'bg-red-500/20'} rounded-lg`}>
+              <div className={`p-2 ${(summary?.todayChange || 0) >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'} rounded-lg`}>
                 {(summary?.todayChange || 0) >= 0 ? (
-                  <ArrowUpRight className="h-5 w-5 text-emerald-400" />
+                  <ArrowUpRight className="h-5 w-5 text-green-400" />
                 ) : (
                   <ArrowDownRight className="h-5 w-5 text-red-400" />
                 )}
               </div>
             </div>
-            <p className={`${(summary?.todayChange || 0) >= 0 ? 'text-emerald-300/70' : 'text-red-300/70'} text-sm`}>Heute</p>
-            <p className={`text-2xl font-bold ${(summary?.todayChange || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            <p className="text-gray-400 text-sm">Heute</p>
+            <p className={`text-2xl font-bold ${(summary?.todayChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {(summary?.todayChange || 0) >= 0 ? '+' : ''}{formatCurrency(summary?.todayChange || 0)}
             </p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden ${(summary?.weekChange || 0) >= 0 ? 'bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30' : 'bg-gradient-to-br from-orange-900/30 to-red-900/20 border-orange-500/30'}`}>
-          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.weekChange || 0) >= 0 ? 'bg-blue-500/10' : 'bg-orange-500/10'} rounded-full blur-2xl`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${(summary?.weekChange || 0) >= 0 ? 'border-amber-500/20' : 'border-red-500/30'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.weekChange || 0) >= 0 ? 'bg-amber-500/10' : 'bg-red-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 ${(summary?.weekChange || 0) >= 0 ? 'bg-blue-500/20' : 'bg-orange-500/20'} rounded-lg`}>
-                <TrendingUp className={`h-5 w-5 ${(summary?.weekChange || 0) >= 0 ? 'text-blue-400' : 'text-orange-400'}`} />
+              <div className={`p-2 ${(summary?.weekChange || 0) >= 0 ? 'bg-amber-500/20' : 'bg-red-500/20'} rounded-lg`}>
+                <TrendingUp className={`h-5 w-5 ${(summary?.weekChange || 0) >= 0 ? 'text-amber-400' : 'text-red-400'}`} />
               </div>
             </div>
-            <p className={`${(summary?.weekChange || 0) >= 0 ? 'text-blue-300/70' : 'text-orange-300/70'} text-sm`}>Diese Woche</p>
-            <p className={`text-2xl font-bold ${(summary?.weekChange || 0) >= 0 ? 'text-blue-400' : 'text-orange-400'}`}>
+            <p className="text-gray-400 text-sm">Diese Woche</p>
+            <p className={`text-2xl font-bold ${(summary?.weekChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {(summary?.weekChange || 0) >= 0 ? '+' : ''}{formatCurrency(summary?.weekChange || 0)}
             </p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden ${(summary?.pendingTransactions || 0) > 0 ? 'bg-gradient-to-br from-yellow-900/30 to-amber-900/20 border-yellow-500/30' : 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700'}`}>
-          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/10' : 'bg-gray-500/10'} rounded-full blur-2xl`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${(summary?.pendingTransactions || 0) > 0 ? 'border-yellow-500/30' : 'border-amber-500/20'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/20' : 'bg-gray-500/20'} rounded-lg`}>
-                <Clock className={`h-5 w-5 ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-gray-400'}`} />
+              <div className={`p-2 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/20' : 'bg-amber-500/20'} rounded-lg`}>
+                <Clock className={`h-5 w-5 ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-amber-400'}`} />
               </div>
             </div>
-            <p className={`${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-300/70' : 'text-gray-400'} text-sm`}>Ausstehend</p>
-            <p className={`text-2xl font-bold ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-white'}`}>
+            <p className="text-gray-400 text-sm">Ausstehend</p>
+            <p className={`text-2xl font-bold ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-amber-400'}`}>
               {summary?.pendingTransactions || 0}
             </p>
           </CardContent>
@@ -252,7 +252,7 @@ export default function KassePage() {
           {chartLoading ? (
             <div className="h-80 flex items-center justify-center text-gray-400">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
+                <div className="h-8 w-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
                 <p>Lade Chart-Daten...</p>
               </div>
             </div>
@@ -352,7 +352,7 @@ export default function KassePage() {
           {transactionsLoading ? (
             <div className="flex justify-center py-16">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
+                <div className="h-8 w-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
                 <p className="text-gray-400">Lade Transaktionen...</p>
               </div>
             </div>

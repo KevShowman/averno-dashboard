@@ -776,7 +776,7 @@ export default function OrganigrammPage() {
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-blue-500/20 rounded-lg">

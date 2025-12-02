@@ -52,14 +52,14 @@ export default function LagerPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-blue-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-lg shadow-blue-500/30">
+            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
               <Boxes className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -78,56 +78,56 @@ export default function LagerPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Gold based with semantic colors */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-full blur-2xl" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <Package className="h-5 w-5 text-blue-400" />
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <Package className="h-5 w-5 text-amber-400" />
               </div>
             </div>
-            <p className="text-blue-300/70 text-sm">Gesamte Artikel</p>
-            <p className="text-2xl font-bold text-white">{itemsData?.pagination?.total || 0}</p>
+            <p className="text-gray-400 text-sm">Gesamte Artikel</p>
+            <p className="text-2xl font-bold text-amber-400">{itemsData?.pagination?.total || 0}</p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-purple-900/30 to-violet-900/20 border-purple-500/30">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-full blur-2xl" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-500/20 rounded-lg">
-                <Tags className="h-5 w-5 text-purple-400" />
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <Tags className="h-5 w-5 text-amber-400" />
               </div>
             </div>
-            <p className="text-purple-300/70 text-sm">Kategorien</p>
+            <p className="text-gray-400 text-sm">Kategorien</p>
             <p className="text-2xl font-bold text-white">{categories?.length || 0}</p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden ${criticalCount > 0 ? 'bg-gradient-to-br from-red-900/30 to-orange-900/20 border-red-500/30' : 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700'}`}>
-          <div className={`absolute top-0 right-0 w-16 h-16 ${criticalCount > 0 ? 'bg-red-500/10' : 'bg-gray-500/10'} rounded-full blur-2xl`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${criticalCount > 0 ? 'border-red-500/30' : 'border-amber-500/20'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${criticalCount > 0 ? 'bg-red-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 ${criticalCount > 0 ? 'bg-red-500/20' : 'bg-gray-500/20'} rounded-lg`}>
+              <div className={`p-2 ${criticalCount > 0 ? 'bg-red-500/20' : 'bg-amber-500/20'} rounded-lg`}>
                 <AlertTriangle className={`h-5 w-5 ${criticalCount > 0 ? 'text-red-400' : 'text-gray-400'}`} />
               </div>
             </div>
-            <p className={`${criticalCount > 0 ? 'text-red-300/70' : 'text-gray-400'} text-sm`}>Kritisch</p>
+            <p className="text-gray-400 text-sm">Kritisch</p>
             <p className={`text-2xl font-bold ${criticalCount > 0 ? 'text-red-400' : 'text-white'}`}>{criticalCount}</p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full blur-2xl" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-green-500/20 rounded-lg">
                 <CheckCircle2 className="h-5 w-5 text-green-400" />
               </div>
             </div>
-            <p className="text-green-300/70 text-sm">Verfügbar</p>
+            <p className="text-gray-400 text-sm">Verfügbar</p>
             <p className="text-2xl font-bold text-green-400">{availableCount}</p>
           </CardContent>
         </Card>
@@ -144,7 +144,7 @@ export default function LagerPage() {
                   placeholder="Artikel suchen..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-gray-800/50 border-gray-700 focus:border-blue-500 h-11"
+                  className="pl-10 bg-gray-800/50 border-gray-700 focus:border-amber-500 h-11"
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function LagerPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 pr-4 h-11 bg-gray-800/50 border border-gray-700 rounded-lg text-white focus:border-blue-500 focus:outline-none appearance-none cursor-pointer min-w-[180px]"
+                className="pl-10 pr-4 h-11 bg-gray-800/50 border border-gray-700 rounded-lg text-white focus:border-amber-500 focus:outline-none appearance-none cursor-pointer min-w-[180px]"
               >
                 <option value="">Alle Kategorien</option>
                 {categories?.map((category: any) => (
@@ -192,7 +192,7 @@ export default function LagerPage() {
           {isLoading ? (
             <div className="flex justify-center py-16">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-10 w-10 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
                 <p className="text-gray-400">Lade Artikel...</p>
               </div>
             </div>

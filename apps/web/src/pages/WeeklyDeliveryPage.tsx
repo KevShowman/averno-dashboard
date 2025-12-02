@@ -222,7 +222,7 @@ export default function WeeklyDeliveryPage() {
     return (
       <div className="p-6 flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
           <p className="text-gray-400">Lade Wochenabgabe-Daten...</p>
         </div>
       </div>
@@ -231,20 +231,20 @@ export default function WeeklyDeliveryPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-cyan-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-teal-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl shadow-lg shadow-cyan-500/30">
+            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
               <Package className="h-8 w-8 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Wochenabgabe</h1>
               <p className="text-gray-400 mt-1">
-                300 Pakete pro Woche • Verwaltung und Tracking
+                Abgaben der Woche • Verwaltung und Tracking
               </p>
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function WeeklyDeliveryPage() {
             <Button
               variant="outline"
               onClick={() => setShowExclusions(!showExclusions)}
-              className="border-gray-700 hover:bg-gray-800"
+              className="border-gray-700 hover:bg-gray-800 hover:border-amber-500/50"
             >
               <Users className="mr-2 h-4 w-4" />
               {showExclusions ? 'Abgaben' : 'Ausschlüsse'}
@@ -261,7 +261,7 @@ export default function WeeklyDeliveryPage() {
             {isElPatron && (
               <Button
                 onClick={() => setShowCreateExclusionModal(true)}
-                className="bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-400 border border-cyan-500/30"
+                className="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30"
               >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Ausschluss
@@ -311,22 +311,22 @@ export default function WeeklyDeliveryPage() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats - Gold based with semantic colors */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="relative overflow-hidden bg-gradient-to-br from-cyan-900/30 to-teal-900/20 border-cyan-500/30">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-cyan-500/20 rounded-lg">
-                  <Package className="h-5 w-5 text-cyan-400" />
+                <div className="p-2 bg-amber-500/20 rounded-lg">
+                  <Package className="h-5 w-5 text-amber-400" />
                 </div>
               </div>
-              <p className="text-cyan-300/70 text-sm">Gesamt</p>
-              <p className="text-2xl font-bold text-white">{stats.total}</p>
+              <p className="text-gray-400 text-sm">Gesamt</p>
+              <p className="text-2xl font-bold text-amber-400">{stats.total}</p>
             </CardContent>
           </Card>
           
-          <Card className="relative overflow-hidden bg-gradient-to-br from-yellow-900/30 to-amber-900/20 border-yellow-500/30">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-yellow-500/30">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-yellow-500/20 rounded-lg">

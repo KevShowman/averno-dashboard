@@ -72,14 +72,14 @@ export default function AuditPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-violet-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-transparent to-purple-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl shadow-lg shadow-violet-500/30">
+            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
               <History className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -89,49 +89,49 @@ export default function AuditPage() {
               </p>
             </div>
           </div>
-          <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30 px-4 py-2">
+          <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 px-4 py-2">
             <Activity className="mr-2 h-4 w-4" />
             {todayCount} heute
           </Badge>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats - Gold based */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-violet-900/30 to-purple-900/20 border-violet-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-violet-500/20 rounded-lg">
-                <FileText className="h-5 w-5 text-violet-400" />
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <FileText className="h-5 w-5 text-amber-400" />
               </div>
             </div>
-            <p className="text-violet-300/70 text-sm">Gesamt Einträge</p>
-            <p className="text-2xl font-bold text-white">{auditData?.logs?.length || 0}</p>
+            <p className="text-gray-400 text-sm">Gesamt Einträge</p>
+            <p className="text-2xl font-bold text-amber-400">{auditData?.logs?.length || 0}</p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-500/20 rounded-lg">
-                <User className="h-5 w-5 text-green-400" />
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <User className="h-5 w-5 text-amber-400" />
               </div>
             </div>
-            <p className="text-green-300/70 text-sm">Aktive User</p>
+            <p className="text-gray-400 text-sm">Aktive User</p>
             <p className="text-2xl font-bold text-white">
               {new Set(auditData?.logs?.map((l: any) => l.user?.id)).size || 0}
             </p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <Database className="h-5 w-5 text-blue-400" />
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <Database className="h-5 w-5 text-amber-400" />
               </div>
             </div>
-            <p className="text-blue-300/70 text-sm">Entitäten</p>
+            <p className="text-gray-400 text-sm">Entitäten</p>
             <p className="text-2xl font-bold text-white">
               {new Set(auditData?.logs?.map((l: any) => l.entity)).size || 0}
             </p>

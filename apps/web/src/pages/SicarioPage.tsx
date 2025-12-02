@@ -291,7 +291,7 @@ export default function SicarioPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-rose-900/40 to-rose-800/20 rounded-xl p-4 border border-rose-500/20">
+            <div className="bg-gray-800/50 rounded-xl p-4 border border-red-500/20">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-rose-500/20 rounded-lg">
                   <Skull className="h-5 w-5 text-rose-400" />
