@@ -477,24 +477,14 @@ export class BloodListService {
   }
 
   // Alle Discord User holen die noch nicht in der Blood List sind
+  // Scope: Nur User OHNE Rollen (keine Bots)
   async getUnassignedDiscordUsers() {
-    // Alle Discord Member mit erlaubten Rollen holen
-    const discordMembers = await this.discordService.getMembersWithAllowedRoles();
+    // Alle Discord Member OHNE Rollen holen (potentielle Blood In Kandidaten)
+    const discordMembersNoRoles = await this.discordService.getMembersWithNoRoles();
     
     // Alle aktiven Blood Records holen
     const activeBloodRecords = await this.prisma.bloodRecord.findMany({
       where: { status: BloodStatus.ACTIVE },
-    });
-
-    // Alle registrierten DB-User holen (mit IC-Namen)
-    const dbUsers = await this.prisma.user.findMany({
-      select: {
-        id: true,
-        discordId: true,
-        username: true,
-        icFirstName: true,
-        icLastName: true,
-      },
     });
 
     // Set von Blood Record Namen (lowercase für Vergleich)
@@ -502,28 +492,11 @@ export class BloodListService {
       activeBloodRecords.map(r => `${r.vorname} ${r.nachname}`.toLowerCase().trim())
     );
 
-    // Prüfe für jeden Discord Member ob er ein Blood Record hat
-    const unassignedMembers = discordMembers.filter(member => {
-      // Finde den DB-User für diesen Discord Member
-      const dbUser = dbUsers.find(u => u.discordId === member.discordId);
-      
-      if (!dbUser) {
-        // User ist nicht mal in der DB - definitiv kein Blood Record
-        return true;
-      }
-
-      // Prüfe ob der IC-Name des Users in den Blood Records ist
-      if (dbUser.icFirstName && dbUser.icLastName) {
-        const icName = `${dbUser.icFirstName} ${dbUser.icLastName}`.toLowerCase().trim();
-        if (bloodRecordNames.has(icName)) {
-          // User hat ein Blood Record
-          return false;
-        }
-      }
-
-      // Prüfe auch ob der Discord Username in den Blood Records ist
-      const username = member.username.toLowerCase().trim();
-      if (bloodRecordNames.has(username)) {
+    // Prüfe für jeden Discord Member ohne Rollen ob er bereits ein Blood Record hat
+    const unassignedMembers = discordMembersNoRoles.filter(member => {
+      // Prüfe ob der Discord Username in den Blood Records ist
+      const username = member.username?.toLowerCase().trim();
+      if (username && bloodRecordNames.has(username)) {
         return false;
       }
 
@@ -531,25 +504,21 @@ export class BloodListService {
       return true;
     });
 
-    // Füge DB-User Infos hinzu wenn verfügbar
-    const enrichedMembers = unassignedMembers.map(member => {
-      const dbUser = dbUsers.find(u => u.discordId === member.discordId);
-      return {
-        discordId: member.discordId,
-        username: member.username,
-        avatar: member.avatar,
-        highestSystemRole: member.highestSystemRole,
-        joinedAt: member.joinedAt,
-        // Zusätzliche Infos vom DB-User wenn vorhanden
-        icFirstName: dbUser?.icFirstName || null,
-        icLastName: dbUser?.icLastName || null,
-        isInDatabase: !!dbUser,
-      };
-    });
+    // Formatiere für Frontend
+    const enrichedMembers = unassignedMembers.map(member => ({
+      discordId: member.discordId,
+      username: member.username,
+      avatar: member.avatar,
+      highestSystemRole: null, // Hat keine Rollen
+      joinedAt: member.joinedAt,
+      icFirstName: null,
+      icLastName: null,
+      isInDatabase: false,
+    }));
 
     return {
       unassignedDiscordUsers: enrichedMembers,
-      totalDiscordMembers: discordMembers.length,
+      totalDiscordMembers: discordMembersNoRoles.length,
       totalUnassigned: enrichedMembers.length,
       totalBloodRecords: activeBloodRecords.length,
     };

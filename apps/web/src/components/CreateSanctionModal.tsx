@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Scale, X, AlertTriangle, Search, User } from 'lucide-react'
-import { weeklyDeliveryApi, usersApi } from '../lib/api'
+import { Badge } from './ui/badge'
+import { Scale, X, AlertTriangle, Search, User, Gavel, FileText, ChevronRight, DollarSign, Skull } from 'lucide-react'
+import { usersApi } from '../lib/api'
 import { getDisplayName } from '../lib/utils'
 
 interface CreateSanctionModalProps {
@@ -336,179 +337,246 @@ export default function CreateSanctionModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-2xl lasanta-card max-h-[90vh] overflow-y-auto">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Scale className="h-5 w-5" />
-                Neue Sanktion erstellen
-              </CardTitle>
-              <CardDescription>
-                Erstelle eine neue Sanktion für einen Regelverstoß
-              </CardDescription>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="w-full max-w-2xl relative">
+        {/* Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-orange-500/20 to-amber-600/20 blur-xl rounded-2xl" />
         
-        <CardContent className="space-y-6">
-          {/* User Selection */}
-          <div>
-            <label className="text-white block text-sm font-medium mb-2">
-              Benutzer auswählen
-            </label>
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Benutzername oder IC-Name eingeben..."
-                  value={searchUser}
-                  onChange={(e) => setSearchUser(e.target.value)}
-                  className="pl-10"
+        <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+          {/* Header mit Gradient */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-orange-800/30 to-transparent" />
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl shadow-lg shadow-amber-500/30">
+                    <Scale className="h-7 w-7 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold text-white">
+                      Neue Sanktion
+                    </CardTitle>
+                    <CardDescription className="text-amber-200/70 mt-1">
+                      Regelverstoß dokumentieren
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
                   disabled={isLoading}
-                />
+                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
               </div>
+            </CardHeader>
+          </div>
+          
+          <CardContent className="pt-2 pb-6 space-y-6">
+            {/* User Selection */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <User className="h-4 w-4 text-amber-400" />
+                Benutzer auswählen
+              </label>
               
-              {searchResults.length > 0 && (
-                <div className="max-h-40 overflow-y-auto border border-gray-600 rounded-lg bg-gray-800">
-                  {searchResults.map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => handleUserSelect(user)}
-                      className="w-full text-left p-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0"
-                    >
-                      <div className="text-white font-medium">{getDisplayName(user)}</div>
-                      <div className="text-gray-400 text-sm">
-                        {user.icFirstName && user.icLastName 
-                          ? `${user.icFirstName} ${user.icLastName}`
+              {!selectedUser ? (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Name eingeben..."
+                      value={searchUser}
+                      onChange={(e) => setSearchUser(e.target.value)}
+                      className="pl-10 bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 text-white h-11"
+                      disabled={isLoading}
+                    />
+                  </div>
+                  
+                  {searchResults.length > 0 && (
+                    <div className="max-h-48 overflow-y-auto border border-gray-700 rounded-xl bg-gray-800/80 backdrop-blur-sm divide-y divide-gray-700/50">
+                      {searchResults.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => handleUserSelect(user)}
+                          className="w-full text-left p-3 hover:bg-amber-500/10 transition-colors flex items-center gap-3"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                            <User className="h-5 w-5 text-amber-400" />
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">{getDisplayName(user)}</div>
+                            <div className="text-gray-400 text-sm">
+                              {user.icFirstName && user.icLastName 
+                                ? `${user.icFirstName} ${user.icLastName}`
+                                : 'Kein IC-Name'
+                              }
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-gray-500 ml-auto" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {isSearching && (
+                    <div className="flex items-center gap-2 text-gray-400 text-sm p-2">
+                      <div className="h-4 w-4 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+                      Suche...
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/20 border border-green-500/30 p-4 rounded-xl">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-green-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-semibold text-lg">{selectedUser.username}</div>
+                      <div className="text-green-300/80 text-sm">
+                        {selectedUser.icFirstName && selectedUser.icLastName 
+                          ? `${selectedUser.icFirstName} ${selectedUser.icLastName}`
                           : 'Kein IC-Name verfügbar'
                         }
                       </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedUser(null)}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="relative py-1">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700/50" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">
+                  Verstoß
+                </span>
+              </div>
+            </div>
+
+            {/* Category Selection */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <Gavel className="h-4 w-4 text-amber-400" />
+                Sanktionskategorie
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
+                {SANCTION_CATEGORIES.map((cat) => {
+                  const isSelected = selectedCategory === cat.key
+                  const hasBloodOut = cat.penalties.some(p => p.penalty === 'Blood Out')
+                  
+                  return (
+                    <button
+                      key={cat.key}
+                      onClick={() => setSelectedCategory(cat.key)}
+                      disabled={isLoading}
+                      className={`text-left p-3 rounded-xl border transition-all duration-200 ${
+                        isSelected
+                          ? 'bg-amber-500/20 border-amber-500/50 shadow-lg shadow-amber-500/10'
+                          : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600 hover:bg-gray-800/50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className={`font-medium text-sm ${isSelected ? 'text-amber-300' : 'text-white'}`}>
+                            {cat.name}
+                          </div>
+                          <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{cat.description}</div>
+                        </div>
+                        {hasBloodOut && (
+                          <Skull className="h-4 w-4 text-red-400 flex-shrink-0" />
+                        )}
+                      </div>
                     </button>
-                  ))}
-                </div>
-              )}
-              
-              {isSearching && (
-                <div className="text-gray-400 text-sm">Suche...</div>
-              )}
-              
-              {selectedUser && (
-                <div className="bg-green-900/20 border border-green-500/20 p-3 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <User className="h-4 w-4 text-green-400" />
-                    <span className="text-green-300 font-medium">Ausgewählter Benutzer:</span>
-                  </div>
-                  <div className="text-white text-lg">{selectedUser.username}</div>
-                  <div className="text-green-200 text-sm">
-                    {selectedUser.icFirstName && selectedUser.icLastName 
-                      ? `${selectedUser.icFirstName} ${selectedUser.icLastName}`
-                      : 'Kein IC-Name verfügbar'
-                    }
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedUser(null)}
-                    className="mt-2 text-red-400 hover:text-red-300"
-                  >
-                    Auswahl entfernen
-                  </Button>
-                </div>
-              )}
+                  )
+                })}
+              </div>
             </div>
-          </div>
 
-          {/* Category Selection */}
-          <div>
-            <label className="text-white block text-sm font-medium mb-2">
-              Sanktionskategorie
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {SANCTION_CATEGORIES.map((cat) => (
-                <Button
-                  key={cat.key}
-                  variant={selectedCategory === cat.key ? 'default' : 'outline'}
-                  onClick={() => {
-                    setSelectedCategory(cat.key)
-                  }}
-                  disabled={isLoading}
-                  className="text-left justify-start h-auto p-3"
-                >
+            {/* Auto Level Info */}
+            {category && (
+              <div className="bg-gradient-to-r from-blue-900/30 to-indigo-900/20 border border-blue-500/30 p-4 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <div className="font-medium">{cat.name}</div>
-                    <div className="text-xs opacity-75">{cat.description}</div>
+                    <div className="text-blue-300 font-medium text-sm mb-2">Automatische Level-Berechnung</div>
+                    <div className="flex flex-wrap gap-2">
+                      {category.penalties.map((p) => (
+                        <Badge 
+                          key={p.level} 
+                          variant="outline" 
+                          className={`text-xs ${p.penalty === 'Blood Out' ? 'border-red-500/50 text-red-300' : 'border-blue-500/30 text-blue-200'}`}
+                        >
+                          L{p.level}: {p.amount ? `${(p.amount / 1000).toFixed(0)}k` : ''} {p.penalty || ''}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </Button>
-              ))}
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-amber-400" />
+                Beschreibung des Verstoßes
+              </label>
+              <textarea
+                className="w-full p-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 resize-none transition-all"
+                rows={3}
+                placeholder="Was genau ist passiert..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
-          </div>
 
-          {/* Auto Level Info */}
-          {category && (
-            <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-blue-400" />
-                <span className="text-blue-300 font-medium">Automatische Level-Berechnung:</span>
-              </div>
-              <div className="text-white text-sm">
-                Das Level wird automatisch basierend auf vorherigen Sanktionen derselben Kategorie 
-                innerhalb der letzten 4 Wochen berechnet.
-              </div>
-              <div className="text-blue-200 text-xs mt-1">
-                • Erste Sanktion: Level 1
-                <br />
-                • Wiederholung: Nächstes Level (max. Level 4)
-                <br />
-                • Nach 4 Wochen ohne Verstoß: Zurücksetzung auf Level 1
-              </div>
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                disabled={isLoading}
+                className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+              >
+                Abbrechen
+              </Button>
+              <Button
+                onClick={handleCreate}
+                disabled={isLoading || !selectedUser || !selectedCategory || !description.trim()}
+                className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-semibold shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Erstelle...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Scale className="h-5 w-5" />
+                    Sanktion erstellen
+                  </span>
+                )}
+              </Button>
             </div>
-          )}
-
-          {/* Description */}
-          <div>
-            <label className="text-white block text-sm font-medium mb-2">
-              Beschreibung des Verstoßes
-            </label>
-            <textarea
-              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-              placeholder="Beschreibe den Regelverstoß..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-2 pt-4">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              disabled={isLoading}
-              className="flex-1"
-            >
-              Abbrechen
-            </Button>
-            <Button
-              onClick={handleCreate}
-              disabled={isLoading || !selectedUser || !selectedCategory || !description.trim()}
-              className="flex-1"
-            >
-              {isLoading ? 'Erstelle...' : 'Sanktion erstellen'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

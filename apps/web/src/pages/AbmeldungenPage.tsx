@@ -349,110 +349,147 @@ export default function AbmeldungenPage() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md lasanta-card">
-            <CardHeader>
-              <CardTitle className="text-white">Neue Abmeldung</CardTitle>
-              <CardDescription>
-                Melde dich für einen Tag oder einen Zeitraum ab
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Mode Toggle */}
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => setIsRangeMode(false)}
-                    className={!isRangeMode 
-                      ? 'bg-gradient-to-r from-gold-600 to-gold-700 text-white hover:from-gold-700 hover:to-gold-800' 
-                      : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700 hover:text-white'}
-                  >
-                    Einzelner Tag
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => setIsRangeMode(true)}
-                    className={isRangeMode 
-                      ? 'bg-gradient-to-r from-gold-600 to-gold-700 text-white hover:from-gold-700 hover:to-gold-800' 
-                      : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700 hover:text-white'}
-                  >
-                    Zeitraum
-                  </Button>
-                </div>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-md relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-yellow-500/20 to-amber-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-yellow-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+                      <CalendarDays className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Neue Abmeldung
+                      </CardTitle>
+                      <CardDescription className="text-amber-200/70 mt-1">
+                        Zeitraum der Abwesenheit eintragen
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </div>
 
-                {/* Start Date */}
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">
-                    {isRangeMode ? 'Start-Datum' : 'Datum'}
-                  </label>
-                  <Input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="!bg-gray-800 border-gold-500/30 focus:border-gold-500 text-white [color-scheme:dark]"
-                    required
-                  />
-                </div>
+              <CardContent className="pt-2 pb-6">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Mode Toggle */}
+                  <div className="flex gap-2 p-1 bg-gray-800/50 rounded-xl">
+                    <button
+                      type="button"
+                      onClick={() => setIsRangeMode(false)}
+                      className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                        !isRangeMode 
+                          ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-lg' 
+                          : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                      }`}
+                    >
+                      <Calendar className="h-4 w-4" />
+                      Einzelner Tag
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsRangeMode(true)}
+                      className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                        isRangeMode 
+                          ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-lg' 
+                          : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                      }`}
+                    >
+                      <CalendarDays className="h-4 w-4" />
+                      Zeitraum
+                    </button>
+                  </div>
 
-                {/* End Date (nur im Range Mode) */}
-                {isRangeMode && (
-                  <div>
-                    <label className="text-sm text-gray-400 mb-2 block">
-                      End-Datum
+                  {/* Datum Felder */}
+                  <div className={`grid gap-4 ${isRangeMode ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-amber-400" />
+                        {isRangeMode ? 'Von' : 'Datum'}
+                      </label>
+                      <Input
+                        type="date"
+                        value={formData.startDate}
+                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 text-white h-11 [color-scheme:dark]"
+                        required
+                      />
+                    </div>
+
+                    {isRangeMode && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-amber-400" />
+                          Bis
+                        </label>
+                        <Input
+                          type="date"
+                          value={formData.endDate}
+                          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                          min={formData.startDate}
+                          className="bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 text-white h-11 [color-scheme:dark]"
+                          required={isRangeMode}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reason */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-amber-400" />
+                      Grund <span className="text-gray-500 font-normal">(optional)</span>
                     </label>
-                    <Input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      min={formData.startDate}
-                      className="!bg-gray-800 border-gold-500/30 focus:border-gold-500 text-white [color-scheme:dark]"
-                      required={isRangeMode}
+                    <Textarea
+                      value={formData.reason}
+                      onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                      placeholder="z.B. Urlaub, Krankheit, private Gründe..."
+                      rows={3}
+                      className="!bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 resize-none text-white placeholder:text-gray-500"
                     />
                   </div>
-                )}
 
-                {/* Reason */}
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">
-                    Grund (optional)
-                  </label>
-                  <Textarea
-                    value={formData.reason}
-                    onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                    placeholder="z.B. Urlaub, Krankheit, private Gründe..."
-                    rows={3}
-                    className="!bg-gray-800 border-gold-500/30 focus:border-gold-500 resize-none text-white placeholder:text-gray-500 [color-scheme:dark]"
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="flex space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowCreateModal(false);
-                      setFormData({ startDate: '', endDate: '', reason: '' });
-                    }}
-                    className="flex-1"
-                    disabled={createMutation.isPending}
-                  >
-                    Abbrechen
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-gradient-to-r from-gold-600 to-gold-700 hover:from-gold-700 hover:to-gold-800"
-                    disabled={createMutation.isPending}
-                  >
-                    {createMutation.isPending ? 'Erstelle...' : 'Erstellen'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowCreateModal(false);
+                        setFormData({ startDate: '', endDate: '', reason: '' });
+                      }}
+                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                      disabled={createMutation.isPending}
+                    >
+                      Abbrechen
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-semibold shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-amber-500/40"
+                      disabled={createMutation.isPending}
+                    >
+                      {createMutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Erstelle...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Plus className="h-5 w-5" />
+                          Abmeldung erstellen
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
     </div>

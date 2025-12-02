@@ -464,6 +464,36 @@ export class DiscordService {
     }
   }
 
+  // Mitglieder OHNE Rollen holen (potentielle Blood In Kandidaten)
+  async getMembersWithNoRoles(): Promise<any[]> {
+    try {
+      const allMembers = await this.getAllServerMembers();
+      
+      // Filtere: Keine Rollen (oder nur @everyone) UND kein Bot
+      const membersWithNoRoles = allMembers.filter(member => {
+        // Bots ausschließen
+        if (member.user?.bot) return false;
+        
+        // Prüfen ob User keine Rollen hat (roles Array ist leer)
+        // Discord gibt @everyone nicht im roles Array zurück
+        const hasNoRoles = !member.roles || member.roles.length === 0;
+        
+        return hasNoRoles;
+      });
+
+      return membersWithNoRoles.map(member => ({
+        discordId: member.user.id,
+        username: member.nick || member.user.global_name || member.user.username,
+        discriminator: member.user.discriminator,
+        avatar: member.user.avatar,
+        joinedAt: member.joined_at,
+      }));
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Mitglieder ohne Rollen:', error);
+      return [];
+    }
+  }
+
   async getMembersWithAllowedRoles(): Promise<any[]> {
     try {
       const allMembers = await this.getAllServerMembers();

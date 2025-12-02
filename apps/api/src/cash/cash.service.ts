@@ -322,7 +322,6 @@ export class CashService {
 
     switch (range) {
       case 'today':
-        // Start of today
         startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         groupBy = 'hour';
         break;
@@ -339,7 +338,6 @@ export class CashService {
         groupBy = 'month';
         break;
       case 'all':
-        // Get first transaction date
         const firstTransaction = await this.prisma.moneyTransaction.findFirst({
           where: { status: TransactionStatus.APPROVED },
           orderBy: { createdAt: 'asc' },
@@ -349,6 +347,7 @@ export class CashService {
         break;
     }
 
+    // Alle Transaktionen im Zeitraum holen
     const transactions = await this.prisma.moneyTransaction.findMany({
       where: {
         status: TransactionStatus.APPROVED,
@@ -357,51 +356,47 @@ export class CashService {
       orderBy: { createdAt: 'asc' },
     });
 
-    // Group transactions by date and calculate running balance
-    const chartData: Array<{ date: string; balance: number; income: number; expenses: number }> = [];
-    let runningBalance = 0;
-
-    // First, get the balance up to the start date
+    // Balance VOR dem Startzeitpunkt berechnen
     const previousTransactions = await this.prisma.moneyTransaction.findMany({
       where: {
         status: TransactionStatus.APPROVED,
         createdAt: { lt: startDate },
       },
+      orderBy: { createdAt: 'asc' },
     });
 
+    let initialBalance = 0;
     for (const tx of previousTransactions) {
       switch (tx.kind) {
         case MoneyKind.EINZAHLUNG:
-          runningBalance += tx.amount;
+          initialBalance += tx.amount;
           break;
         case MoneyKind.AUSZAHLUNG:
-          runningBalance -= tx.amount;
+          initialBalance -= tx.amount;
           break;
         case MoneyKind.KORREKTUR:
-          runningBalance = tx.amount;
+          initialBalance = tx.amount;
           break;
       }
     }
 
-    // Group by hour/day/month
-    const grouped = new Map<string, { income: number; expenses: number }>();
+    // Gruppiere nach Datum und speichere income/expenses UND Korrekturen separat
+    const grouped = new Map<string, { income: number; expenses: number; corrections: number[] }>();
     
     for (const tx of transactions) {
       let dateKey: string;
       
       if (groupBy === 'hour') {
-        // Format as YYYY-MM-DDTHH:00
         const date = new Date(tx.createdAt);
         dateKey = `${date.toISOString().split('T')[0]}T${String(date.getHours()).padStart(2, '0')}:00`;
       } else if (groupBy === 'day') {
         dateKey = tx.createdAt.toISOString().split('T')[0];
       } else {
-        // month
         dateKey = tx.createdAt.toISOString().substring(0, 7);
       }
 
       if (!grouped.has(dateKey)) {
-        grouped.set(dateKey, { income: 0, expenses: 0 });
+        grouped.set(dateKey, { income: 0, expenses: 0, corrections: [] });
       }
 
       const group = grouped.get(dateKey)!;
@@ -409,20 +404,33 @@ export class CashService {
       switch (tx.kind) {
         case MoneyKind.EINZAHLUNG:
           group.income += tx.amount;
-          runningBalance += tx.amount;
           break;
         case MoneyKind.AUSZAHLUNG:
           group.expenses += tx.amount;
-          runningBalance -= tx.amount;
           break;
         case MoneyKind.KORREKTUR:
-          runningBalance = tx.amount;
+          // Korrekturen setzen den absoluten Wert - speichere alle
+          group.corrections.push(tx.amount);
           break;
       }
     }
 
-    // Convert to array and sort
-    for (const [date, data] of Array.from(grouped.entries()).sort()) {
+    // Sortiere die Daten und berechne kumulativen Balance für jeden Punkt
+    const sortedDates = Array.from(grouped.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+    const chartData: Array<{ date: string; balance: number; income: number; expenses: number }> = [];
+    
+    let runningBalance = initialBalance;
+    
+    for (const [date, data] of sortedDates) {
+      // Wenn Korrekturen vorhanden, die letzte Korrektur des Tages als Balance nehmen
+      if (data.corrections.length > 0) {
+        runningBalance = data.corrections[data.corrections.length - 1];
+      }
+      
+      // Dann normale Transaktionen anwenden
+      runningBalance += data.income;
+      runningBalance -= data.expenses;
+      
       chartData.push({
         date,
         balance: runningBalance,

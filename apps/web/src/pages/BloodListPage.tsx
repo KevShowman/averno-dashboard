@@ -820,159 +820,271 @@ export default function BloodListPage() {
 
       {/* Blood Out Modal */}
       {showBloodOutModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md lasanta-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <UserX className="h-6 w-6 text-orange-500" />
-                Blood Out - Mitglied entfernen
-              </CardTitle>
-              <CardDescription className="text-orange-400">
-                ⚠️ Diese Aktion kann nicht rückgängig gemacht werden
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleBloodOutSubmit} className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">
-                    Telefonnummer oder vollständiger Name
-                  </label>
-                  <Input
-                    value={bloodOutData.identifier}
-                    onChange={(e) => setBloodOutData({ ...bloodOutData, identifier: e.target.value })}
-                    placeholder="z.B. 12345678 oder Max Mustermann"
-                    className="!bg-gray-800 border-primary/30 focus:border-primary text-white"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Entweder Telefonnummer oder "Vorname Nachname"
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Grund</label>
-                  <Textarea
-                    value={bloodOutData.grund}
-                    onChange={(e) => setBloodOutData({ ...bloodOutData, grund: e.target.value })}
-                    placeholder="z.B. Familienentscheidung, schwerwiegende Fehler..."
-                    rows={4}
-                    className="!bg-gray-800 border-red-500/30 focus:border-red-500 resize-none text-white placeholder:text-gray-500"
-                    required
-                  />
-                </div>
-                <div className="flex space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowBloodOutModal(false);
-                      setBloodOutData({ identifier: '', grund: '' });
-                    }}
-                    className="flex-1"
-                    disabled={bloodOutMutation.isPending}
-                  >
-                    Abbrechen
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    className="flex-1"
-                    disabled={bloodOutMutation.isPending}
-                  >
-                    {bloodOutMutation.isPending ? 'Wird entfernt...' : 'Blood Out'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-red-500/20 to-orange-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-900/50 via-red-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl shadow-lg shadow-orange-500/30">
+                      <UserX className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Blood Out
+                      </CardTitle>
+                      <CardDescription className="text-orange-200/70 mt-1">
+                        ⚠️ Diese Aktion ist unwiderruflich
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </div>
+
+              <CardContent className="pt-2 pb-6">
+                <form onSubmit={handleBloodOutSubmit} className="space-y-5">
+                  {/* Warning Banner */}
+                  <div className="bg-red-900/30 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-red-300 font-medium">User wird vom Discord gekickt</p>
+                      <p className="text-red-200/70 mt-1">Eine Ankündigung wird im Blood Out Channel gepostet.</p>
+                    </div>
+                  </div>
+
+                  {/* Identifier */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <User className="h-4 w-4 text-orange-400" />
+                      Mitglied identifizieren
+                    </label>
+                    <Input
+                      value={bloodOutData.identifier}
+                      onChange={(e) => setBloodOutData({ ...bloodOutData, identifier: e.target.value })}
+                      placeholder="Telefonnummer oder 'Vorname Nachname'"
+                      className="bg-gray-800/50 border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 text-white placeholder:text-gray-500 h-11"
+                      required
+                    />
+                    <p className="text-xs text-gray-500">
+                      z.B. <span className="text-gray-400">12345678</span> oder <span className="text-gray-400">Max Mustermann</span>
+                    </p>
+                  </div>
+
+                  {/* Grund */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <Skull className="h-4 w-4 text-orange-400" />
+                      Grund für Blood Out
+                    </label>
+                    <Textarea
+                      value={bloodOutData.grund}
+                      onChange={(e) => setBloodOutData({ ...bloodOutData, grund: e.target.value })}
+                      placeholder="Warum wird das Mitglied entfernt..."
+                      rows={4}
+                      className="!bg-gray-800/50 border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 resize-none text-white placeholder:text-gray-500"
+                      required
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowBloodOutModal(false);
+                        setBloodOutData({ identifier: '', grund: '' });
+                      }}
+                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                      disabled={bloodOutMutation.isPending}
+                    >
+                      Abbrechen
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-semibold shadow-lg shadow-red-500/25 transition-all duration-200 hover:shadow-red-500/40"
+                      disabled={bloodOutMutation.isPending}
+                    >
+                      {bloodOutMutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Wird entfernt...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <UserX className="h-5 w-5" />
+                          Blood Out
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
       {/* Link Discord User Modal */}
       {showLinkModal && selectedDiscordUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md lasanta-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Link2 className="h-6 w-6 text-blue-500" />
-                Blood In - Discord User verknüpfen
-              </CardTitle>
-              <CardDescription>
-                Blood In für: <span className="text-blue-400">{selectedDiscordUser.username}</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleLinkSubmit} className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Vorname (IC)</label>
-                  <Input
-                    value={linkData.vorname}
-                    onChange={(e) => setLinkData({ ...linkData, vorname: e.target.value })}
-                    className="!bg-gray-800 border-blue-500/30 focus:border-blue-500 text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Nachname (IC)</label>
-                  <Input
-                    value={linkData.nachname}
-                    onChange={(e) => setLinkData({ ...linkData, nachname: e.target.value })}
-                    className="!bg-gray-800 border-blue-500/30 focus:border-blue-500 text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Telefonnummer</label>
-                  <Input
-                    type="number"
-                    value={linkData.telefon}
-                    onChange={(e) => setLinkData({ ...linkData, telefon: e.target.value })}
-                    className="!bg-gray-800 border-blue-500/30 focus:border-blue-500 text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Steam ID</label>
-                  <Input
-                    value={linkData.steam}
-                    onChange={(e) => setLinkData({ ...linkData, steam: e.target.value })}
-                    className="!bg-gray-800 border-blue-500/30 focus:border-blue-500 text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Blood In durchgeführt von</label>
-                  <Input
-                    value={linkData.bloodinDurch}
-                    onChange={(e) => setLinkData({ ...linkData, bloodinDurch: e.target.value })}
-                    className="!bg-gray-800 border-blue-500/30 focus:border-blue-500 text-white"
-                    required
-                  />
-                </div>
-                <div className="flex space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowLinkModal(false);
-                      setSelectedDiscordUser(null);
-                      setLinkData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
-                    }}
-                    className="flex-1"
-                    disabled={linkDiscordUserMutation.isPending}
-                  >
-                    Abbrechen
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    disabled={linkDiscordUserMutation.isPending}
-                  >
-                    {linkDiscordUserMutation.isPending ? 'Wird verknüpft...' : 'Blood In & Verknüpfen'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-cyan-500/20 to-blue-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-blue-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 via-cyan-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-lg shadow-blue-500/30">
+                      <Link2 className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Blood In & Verknüpfen
+                      </CardTitle>
+                      <CardDescription className="text-blue-200/70 mt-1">
+                        Discord User: <span className="text-blue-300 font-medium">{selectedDiscordUser.username}</span>
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </div>
+
+              <CardContent className="pt-2 pb-6">
+                <form onSubmit={handleLinkSubmit} className="space-y-5">
+                  {/* Name Felder in einer Reihe */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <User className="h-4 w-4 text-blue-400" />
+                        Vorname (IC)
+                      </label>
+                      <Input
+                        value={linkData.vorname}
+                        onChange={(e) => setLinkData({ ...linkData, vorname: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
+                        placeholder="z.B. Carlos"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <User className="h-4 w-4 text-blue-400" />
+                        Nachname (IC)
+                      </label>
+                      <Input
+                        value={linkData.nachname}
+                        onChange={(e) => setLinkData({ ...linkData, nachname: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
+                        placeholder="z.B. Martinez"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Telefon und Steam */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-blue-400" />
+                        Telefonnummer
+                      </label>
+                      <Input
+                        type="number"
+                        value={linkData.telefon}
+                        onChange={(e) => setLinkData({ ...linkData, telefon: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="555-1234"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <Gamepad2 className="h-4 w-4 text-blue-400" />
+                        Steam ID
+                      </label>
+                      <Input
+                        value={linkData.steam}
+                        onChange={(e) => setLinkData({ ...linkData, steam: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
+                        placeholder="steam:xxxx"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-700/50" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">
+                        Aufnahme durch
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Blood In Durch */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <Skull className="h-4 w-4 text-blue-400" />
+                      Durchgeführt von
+                    </label>
+                    <Input
+                      value={linkData.bloodinDurch}
+                      onChange={(e) => setLinkData({ ...linkData, bloodinDurch: e.target.value })}
+                      className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
+                      placeholder="Name des Verantwortlichen"
+                      required
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowLinkModal(false);
+                        setSelectedDiscordUser(null);
+                        setLinkData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
+                      }}
+                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                      disabled={linkDiscordUserMutation.isPending}
+                    >
+                      Abbrechen
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/40"
+                      disabled={linkDiscordUserMutation.isPending}
+                    >
+                      {linkDiscordUserMutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Wird verknüpft...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Link2 className="h-5 w-5" />
+                          Blood In & Verknüpfen
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
     </div>

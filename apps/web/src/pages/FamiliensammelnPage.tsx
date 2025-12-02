@@ -768,60 +768,111 @@ export default function FamiliensammelnPage() {
 
       {/* Processor Picker Modal */}
       {showProcessorPicker && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Verarbeiter starten</CardTitle>
-              <CardDescription className="text-gray-400">
-                Wähle ein Mitglied aus, dessen Verarbeiter voll ist
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <EnhancedPeoplePicker
-                selectedUser={null}
-                onUserSelect={handleStartProcessor}
-                placeholder="Mitglied auswählen..."
-              />
-              <Button
-                variant="outline"
-                onClick={() => setShowProcessorPicker(false)}
-                className="w-full border-gray-600 text-gray-300"
-              >
-                Abbrechen
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-500/20 to-emerald-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-emerald-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/50 via-teal-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/30">
+                      <Factory className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Verarbeiter starten
+                      </CardTitle>
+                      <CardDescription className="text-emerald-200/70 mt-1">
+                        Wähle ein Mitglied aus
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </div>
+
+              <CardContent className="pt-2 pb-6 space-y-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Users className="h-4 w-4 text-emerald-400" />
+                    Mitglied auswählen
+                  </label>
+                  <EnhancedPeoplePicker
+                    selectedUser={null}
+                    onUserSelect={handleStartProcessor}
+                    placeholder="Name eingeben..."
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowProcessorPicker(false)}
+                  className="w-full h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                >
+                  Abbrechen
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
       {/* User Picker Modal */}
       {showUserPicker && selectedDay && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Teilnehmer hinzufügen</CardTitle>
-              <CardDescription className="text-gray-400">
-                Für {formatDate(selectedDay)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <EnhancedPeoplePicker
-                selectedUser={null}
-                onUserSelect={handleAddParticipation}
-                placeholder="User auswählen..."
-              />
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowUserPicker(false);
-                  setSelectedDay(null);
-                }}
-                className="w-full border-gray-600 text-gray-300"
-              >
-                Abbrechen
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-indigo-500/20 to-blue-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-blue-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 via-indigo-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/30">
+                      <Plus className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Teilnehmer hinzufügen
+                      </CardTitle>
+                      <CardDescription className="text-blue-200/70 mt-1 flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(selectedDay)}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </div>
+
+              <CardContent className="pt-2 pb-6 space-y-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue-400" />
+                    Mitglied auswählen
+                  </label>
+                  <EnhancedPeoplePicker
+                    selectedUser={null}
+                    onUserSelect={handleAddParticipation}
+                    placeholder="Name eingeben..."
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowUserPicker(false);
+                    setSelectedDay(null);
+                  }}
+                  className="w-full h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                >
+                  Abbrechen
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 

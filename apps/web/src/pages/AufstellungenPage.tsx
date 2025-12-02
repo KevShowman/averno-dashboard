@@ -3,8 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { aufstellungApi } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Textarea } from '../components/ui/textarea'
 import { Badge } from '../components/ui/badge'
 import { toast } from 'sonner'
 import {
@@ -25,9 +23,13 @@ import {
   Shield,
   UserPlus,
   RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  History,
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
 import CreateExclusionModal from '../components/CreateExclusionModal'
+import CreateAufstellungModal from '../components/CreateAufstellungModal'
 
 interface Aufstellung {
   id: string
@@ -70,15 +72,11 @@ export default function AufstellungenPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
 
-  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [showExclusions, setShowExclusions] = useState(false)
   const [showCreateExclusionModal, setShowCreateExclusionModal] = useState(false)
   const [selectedAufstellung, setSelectedAufstellung] = useState<string | null>(null)
-  const [createData, setCreateData] = useState({
-    date: '',
-    time: '',
-    reason: '',
-  })
+  const [showOlderAufstellungen, setShowOlderAufstellungen] = useState(false)
 
   // Rechte prüfen
   const canManageAufstellungen = user?.role && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role)
@@ -120,8 +118,7 @@ export default function AufstellungenPage() {
       toast.success('Aufstellung wurde erstellt und Discord-Benachrichtigung versendet')
       queryClient.invalidateQueries({ queryKey: ['aufstellungen'] })
       queryClient.invalidateQueries({ queryKey: ['aufstellungen-my-pending'] })
-      setShowCreateForm(false)
-      setCreateData({ date: '', time: '', reason: '' })
+      setShowCreateModal(false)
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Erstellen der Aufstellung')
@@ -199,12 +196,8 @@ export default function AufstellungenPage() {
     },
   })
 
-  const handleCreate = () => {
-    if (!createData.date || !createData.time || !createData.reason) {
-      toast.error('Bitte fülle alle Felder aus')
-      return
-    }
-    createMutation.mutate(createData)
+  const handleCreate = (data: { date: string; time: string; reason: string }) => {
+    createMutation.mutate(data)
   }
 
   const formatDateTime = (dateStr: string) => {
@@ -343,99 +336,27 @@ export default function AufstellungenPage() {
         </div>
       )}
 
-      {/* Create Form */}
+      {/* Create Aufstellung Button */}
       {canManageAufstellungen && (
-        <Card className="bg-gradient-to-br from-dark-800/80 to-dark-900/80 border-gold-500/30 shadow-xl">
-          <CardHeader className="border-b border-gold-500/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold-500/20 rounded-lg">
-                  <Plus className="h-5 w-5 text-gold-500" />
-                </div>
-                <CardTitle className="text-white text-xl">Neue Aufstellung erstellen</CardTitle>
-              </div>
-              <Button
-                variant={showCreateForm ? "outline" : "default"}
-                size="sm"
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className={showCreateForm ? "border-red-500/50 text-red-400 hover:bg-red-900/20 hover:border-red-500" : "bg-gold-600 hover:bg-gold-700 text-white"}
-              >
-                {showCreateForm ? (
-                  <>
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Abbrechen
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Erstellen
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardHeader>
-          {showCreateForm && (
-            <CardContent className="pt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gold-500" />
-                    Datum
-                  </label>
-                  <Input
-                    type="date"
-                    value={createData.date}
-                    onChange={(e) => setCreateData({ ...createData, date: e.target.value })}
-                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white [color-scheme:dark]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gold-500" />
-                    Uhrzeit
-                  </label>
-                  <Input
-                    type="time"
-                    value={createData.time}
-                    onChange={(e) => setCreateData({ ...createData, time: e.target.value })}
-                    className="bg-dark-700 border-gold-500/30 focus:border-gold-500 text-white [color-scheme:dark]"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-gold-500" />
-                  Grund / Ort
-                </label>
-                <Textarea
-                  value={createData.reason}
-                  onChange={(e) => setCreateData({ ...createData, reason: e.target.value })}
-                  placeholder="z.B. Casa Meeting, Routenplanung, Geschäftsabwicklung..."
-                  rows={4}
-                  className="!bg-gray-800 border-gold-500/30 focus:border-gold-500 resize-none text-white placeholder:text-gray-500 [color-scheme:dark]"
-                />
-              </div>
-              <Button
-                onClick={handleCreate}
-                disabled={createMutation.isPending}
-                className="w-full bg-gradient-to-r from-gold-600 to-gold-700 hover:from-gold-700 hover:to-gold-800 text-white font-semibold py-6 text-lg shadow-lg"
-              >
-                {createMutation.isPending ? (
-                  <>
-                    <Clock className="mr-2 h-5 w-5 animate-spin" />
-                    Wird erstellt...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Aufstellung erstellen & Discord benachrichtigen
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          )}
-        </Card>
+        <div className="flex justify-end">
+          <Button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-gradient-to-r from-gold-600 to-amber-600 hover:from-gold-500 hover:to-amber-500 text-white font-semibold px-6 py-5 text-base shadow-lg shadow-gold-500/25 hover:shadow-gold-500/40 transition-all"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Neue Aufstellung erstellen
+          </Button>
+        </div>
       )}
+
+      {/* Create Aufstellung Modal */}
+      <CreateAufstellungModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={handleCreate}
+        isLoading={createMutation.isPending}
+        variant="normal"
+      />
 
       {/* Liste der Aufstellungen */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -444,14 +365,16 @@ export default function AufstellungenPage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
               <Users className="h-6 w-6 text-gold-500" />
-              Alle Aufstellungen
+              Aufstellungen
             </h2>
             <Badge variant="outline" className="text-sm px-3 py-1">
               {aufstellungen?.length || 0} Gesamt
             </Badge>
           </div>
           {aufstellungen && aufstellungen.length > 0 ? (
-            aufstellungen.map((auf: Aufstellung) => {
+            <>
+            {/* Neueste 3 Aufstellungen */}
+            {aufstellungen.slice(0, 3).map((auf: Aufstellung) => {
               const { date, time } = formatDateTime(auf.date)
               const myResponse = getMyResponse(auf)
               const deadlinePassed = isDeadlinePassed(auf.deadline)
@@ -563,7 +486,139 @@ export default function AufstellungenPage() {
                   </CardContent>
                 </Card>
               )
-            })
+            })}
+
+            {/* Ältere Aufstellungen Toggle */}
+            {aufstellungen.length > 3 && (
+              <div className="space-y-3">
+                <button
+                  onClick={() => setShowOlderAufstellungen(!showOlderAufstellungen)}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-800/50 hover:bg-gray-800/70 border border-gray-700 hover:border-gray-600 rounded-xl text-gray-300 hover:text-white transition-all"
+                >
+                  <History className="h-4 w-4 text-gold-400" />
+                  <span className="text-sm font-medium">
+                    {showOlderAufstellungen ? 'Ältere verstecken' : `${aufstellungen.length - 3} ältere Aufstellungen anzeigen`}
+                  </span>
+                  {showOlderAufstellungen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </button>
+
+                {/* Ältere Aufstellungen Liste */}
+                {showOlderAufstellungen && aufstellungen.slice(3).map((auf: Aufstellung) => {
+                  const { date, time } = formatDateTime(auf.date)
+                  const myResponse = getMyResponse(auf)
+                  const deadlinePassed = isDeadlinePassed(auf.deadline)
+                  const isSelected = selectedAufstellung === auf.id
+
+                  return (
+                    <Card
+                      key={auf.id}
+                      className={`group relative overflow-hidden cursor-pointer transition-all duration-300 ${
+                        isSelected 
+                          ? 'bg-gradient-to-br from-gold-900/40 to-gold-800/40 border-gold-500 shadow-lg scale-[1.02]' 
+                          : 'bg-dark-800/60 border-gold-500/20 hover:border-gold-500/50 hover:shadow-md'
+                      }`}
+                      onClick={() => setSelectedAufstellung(auf.id)}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-gold-500/0 via-gold-500/5 to-gold-500/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      
+                      <CardHeader className="relative pb-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 flex-1">
+                            <div className={`p-2 rounded-lg ${isSelected ? 'bg-gold-500/30' : 'bg-gold-500/20'}`}>
+                              <MapPin className="h-5 w-5 text-gold-400" />
+                            </div>
+                            <div className="flex-1">
+                              <CardTitle className={`text-lg mb-1 transition-colors ${isSelected ? 'text-gold-300' : 'text-white group-hover:text-gold-300'}`}>
+                                {auf.reason}
+                              </CardTitle>
+                              <CardDescription className="text-sm flex items-center gap-1">
+                                <Users className="h-3 w-3" />
+                                {getDisplayName(auf.createdBy)}
+                              </CardDescription>
+                            </div>
+                          </div>
+                          {deadlinePassed && (
+                            <Badge variant="destructive" className="text-xs shrink-0">
+                              Abgelaufen
+                            </Badge>
+                          )}
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="relative space-y-3">
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="flex items-center gap-1.5 text-gray-300">
+                            <Calendar className="h-4 w-4 text-gold-400" />
+                            {date}
+                          </span>
+                          <span className="flex items-center gap-1.5 text-gray-300">
+                            <Clock className="h-4 w-4 text-gold-400" />
+                            {time} Uhr
+                          </span>
+                        </div>
+
+                        {myResponse ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400">Deine Antwort:</span>
+                            {myResponse.status === 'COMING' && (
+                              <Badge className="bg-green-900/40 text-green-300 border-green-500/50">
+                                <CheckCircle2 className="mr-1 h-3 w-3" />
+                                Komme
+                              </Badge>
+                            )}
+                            {myResponse.status === 'NOT_COMING' && (
+                              <Badge className="bg-red-900/40 text-red-300 border-red-500/50">
+                                <XCircle className="mr-1 h-3 w-3" />
+                                Komme nicht
+                              </Badge>
+                            )}
+                            {myResponse.status === 'UNSURE' && (
+                              <Badge className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50">
+                                <HelpCircle className="mr-1 h-3 w-3" />
+                                Unsicher
+                              </Badge>
+                            )}
+                          </div>
+                        ) : (
+                          !deadlinePassed && (
+                            <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50 animate-pulse">
+                              <AlertTriangle className="mr-1 h-3 w-3" />
+                              Noch nicht reagiert
+                            </Badge>
+                          )
+                        )}
+
+                        <div className="flex items-center gap-5 pt-2 border-t border-gold-500/20">
+                          <div className="flex items-center gap-1.5 text-sm font-medium">
+                            <div className="p-1 bg-green-900/30 rounded">
+                              <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
+                            </div>
+                            <span className="text-green-400">{auf.responses.filter(r => r.status === 'COMING').length}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-medium">
+                            <div className="p-1 bg-red-900/30 rounded">
+                              <XCircle className="h-3.5 w-3.5 text-red-400" />
+                            </div>
+                            <span className="text-red-400">{auf.responses.filter(r => r.status === 'NOT_COMING').length}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-medium">
+                            <div className="p-1 bg-yellow-900/30 rounded">
+                              <HelpCircle className="h-3.5 w-3.5 text-yellow-400" />
+                            </div>
+                            <span className="text-yellow-400">{auf.responses.filter(r => r.status === 'UNSURE').length}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
+            </>
           ) : (
             <Card className="bg-dark-800/40 border-gold-500/20">
               <CardContent className="py-12 text-center">

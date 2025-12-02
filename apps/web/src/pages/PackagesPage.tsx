@@ -711,94 +711,176 @@ export default function PackagesPage() {
 
       {/* Deposit Modal */}
       {showDepositModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md lasanta-card">
-            <CardHeader>
-              <CardTitle className="text-white">Paket-Deposit anfragen</CardTitle>
-              <CardDescription className="text-gray-400">
-                Gib die Anzahl der Pakete an, die du abgeben möchtest
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-400">Anzahl Pakete</label>
-                <Input
-                  type="number"
-                  value={depositPackages}
-                  onChange={(e) => setDepositPackages(e.target.value)}
-                  placeholder="z.B. 10"
-                  className="mt-1"
-                />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-md relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-emerald-500/20 to-green-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-green-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-900/50 via-emerald-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl shadow-lg shadow-green-500/30">
+                      <Package className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Paket-Deposit
+                      </CardTitle>
+                      <CardDescription className="text-green-200/70 mt-1">
+                        Pakete zur Abgabe anmelden
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
               </div>
-              <div>
-                <label className="text-sm text-gray-400">Notiz (optional)</label>
-                <Textarea
-                  value={depositNote}
-                  onChange={(e) => setDepositNote(e.target.value)}
-                  placeholder="Zusätzliche Informationen..."
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex space-x-2 pt-4">
-                <Button
-                  onClick={handleCreateDeposit}
-                  disabled={createDepositMutation.isPending}
-                  className="flex-1 lasanta-button-primary"
-                >
-                  Anfrage erstellen
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDepositModal(false)}
-                  className="flex-1"
-                >
-                  Abbrechen
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
+              <CardContent className="pt-2 pb-6 space-y-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Package className="h-4 w-4 text-green-400" />
+                    Anzahl Pakete
+                  </label>
+                  <Input
+                    type="number"
+                    value={depositPackages}
+                    onChange={(e) => setDepositPackages(e.target.value)}
+                    placeholder="z.B. 10"
+                    className="bg-gray-800/50 border-gray-700 focus:border-green-500 focus:ring-green-500/20 text-white h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-green-400" />
+                    Notiz <span className="text-gray-500 font-normal">(optional)</span>
+                  </label>
+                  <Textarea
+                    value={depositNote}
+                    onChange={(e) => setDepositNote(e.target.value)}
+                    placeholder="Zusätzliche Informationen..."
+                    className="!bg-gray-800/50 border-gray-700 focus:border-green-500 focus:ring-green-500/20 resize-none text-white placeholder:text-gray-500"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDepositModal(false)}
+                    className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button
+                    onClick={handleCreateDeposit}
+                    disabled={createDepositMutation.isPending}
+                    className="flex-1 h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold shadow-lg shadow-green-500/25 transition-all duration-200 hover:shadow-green-500/40"
+                  >
+                    {createDepositMutation.isPending ? (
+                      <span className="flex items-center gap-2">
+                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Erstelle...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Plus className="h-5 w-5" />
+                        Anfrage erstellen
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
       {/* Price Modal */}
       {showPriceModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md lasanta-card">
-            <CardHeader>
-              <CardTitle className="text-white">Paket-Preis ändern</CardTitle>
-              <CardDescription className="text-gray-400">
-                Aktueller Preis: {formatCurrency(priceData?.price || 0)} pro Paket
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-400">Neuer Preis pro Paket</label>
-                <Input
-                  type="number"
-                  value={newPrice}
-                  onChange={(e) => setNewPrice(e.target.value)}
-                  placeholder="z.B. 1500"
-                  className="mt-1"
-                />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-md relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-yellow-500/20 to-amber-600/20 blur-xl rounded-2xl" />
+            
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
+              {/* Header mit Gradient */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-yellow-800/30 to-transparent" />
+                <CardHeader className="relative pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+                      <DollarSign className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        Paket-Preis ändern
+                      </CardTitle>
+                      <CardDescription className="text-amber-200/70 mt-1">
+                        Aktuell: {formatCurrency(priceData?.price || 0)} pro Paket
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
               </div>
-              <div className="flex space-x-2 pt-4">
-                <Button
-                  onClick={handleUpdatePrice}
-                  disabled={updatePriceMutation.isPending}
-                  className="flex-1 lasanta-button-primary"
-                >
-                  Preis aktualisieren
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPriceModal(false)}
-                  className="flex-1"
-                >
-                  Abbrechen
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
+              <CardContent className="pt-2 pb-6 space-y-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-amber-400" />
+                    Neuer Preis pro Paket
+                  </label>
+                  <Input
+                    type="number"
+                    value={newPrice}
+                    onChange={(e) => setNewPrice(e.target.value)}
+                    placeholder="z.B. 1500"
+                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500 focus:ring-amber-500/20 text-white h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                
+                {/* Info */}
+                <div className="bg-gradient-to-r from-amber-900/30 to-yellow-900/20 border border-amber-500/30 p-4 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-amber-300 font-medium mb-1">Hinweis</p>
+                      <p className="text-amber-200/70">
+                        Der neue Preis gilt für alle zukünftigen Transaktionen.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPriceModal(false)}
+                    className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button
+                    onClick={handleUpdatePrice}
+                    disabled={updatePriceMutation.isPending}
+                    className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-semibold shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-amber-500/40"
+                  >
+                    {updatePriceMutation.isPending ? (
+                      <span className="flex items-center gap-2">
+                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Aktualisiere...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Settings className="h-5 w-5" />
+                        Preis aktualisieren
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
