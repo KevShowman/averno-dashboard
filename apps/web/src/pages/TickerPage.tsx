@@ -4,8 +4,22 @@ import { api } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Activity, Package, DollarSign, TrendingUp, TrendingDown, RotateCcw, Plus, Minus, Filter, FlaskConical, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { 
+  Activity, 
+  Package, 
+  DollarSign, 
+  TrendingUp, 
+  TrendingDown, 
+  RotateCcw, 
+  Plus, 
+  Minus, 
+  FlaskConical, 
+  Clock, 
+  CheckCircle, 
+  XCircle,
+  Calendar,
+  AlertTriangle
+} from 'lucide-react'
 import { formatDate, formatCurrency, getRoleColor, getRoleDisplayName, getMovementTypeColor, getTransactionStatusColor, getDisplayName } from '../lib/utils'
 
 export default function TickerPage() {
@@ -46,7 +60,6 @@ export default function TickerPage() {
 
   if (stockMovements?.movements) {
     stockMovements.movements.forEach((movement: any) => {
-      // Nur APPROVED Bewegungen im Ticker anzeigen
       if (movement.status === 'APPROVED') {
         allActivities.push({
           id: `stock-${movement.id}`,
@@ -58,11 +71,9 @@ export default function TickerPage() {
             itemName: movement.item?.name || 'Unbekannter Artikel',
             quantity: movement.quantity,
             note: movement.note,
-            reference: movement.reference,
           }
         })
       } else if (movement.status === 'PENDING') {
-        // Pending Bewegungen als "angefragt" anzeigen
         allActivities.push({
           id: `stock-pending-${movement.id}`,
           type: 'lager',
@@ -74,7 +85,6 @@ export default function TickerPage() {
             itemName: movement.item?.name || 'Unbekannter Artikel',
             quantity: movement.quantity,
             note: movement.note,
-            reference: movement.reference,
           }
         })
       }
@@ -83,7 +93,6 @@ export default function TickerPage() {
 
   if (cashTransactions?.transactions) {
     cashTransactions.transactions.forEach((transaction: any) => {
-      // Nur APPROVED Transaktionen im Ticker anzeigen
       if (transaction.status === 'APPROVED') {
         allActivities.push({
           id: `cash-${transaction.id}`,
@@ -96,11 +105,9 @@ export default function TickerPage() {
             category: transaction.category,
             note: transaction.note,
             status: transaction.status,
-            reference: transaction.reference,
           }
         })
       } else if (transaction.status === 'PENDING') {
-        // Pending Transaktionen als "angefragt" anzeigen
         allActivities.push({
           id: `cash-pending-${transaction.id}`,
           type: 'kasse',
@@ -113,7 +120,6 @@ export default function TickerPage() {
             category: transaction.category,
             note: transaction.note,
             status: transaction.status,
-            reference: transaction.reference,
           }
         })
       }
@@ -122,55 +128,20 @@ export default function TickerPage() {
 
   if (packageDeposits?.deposits) {
     packageDeposits.deposits.forEach((deposit: any) => {
-      // Alle Deposit-Status anzeigen (CONFIRMED, PENDING, REJECTED)
-      if (deposit.status === 'CONFIRMED') {
-        allActivities.push({
-          id: `kokain-${deposit.id}`,
-          type: 'packages',
-          timestamp: deposit.confirmedAt || deposit.createdAt,
-          user: deposit.user,
-          action: deposit.status,
-          details: {
-            packages: deposit.packages,
-            note: deposit.note,
-            status: deposit.status,
-            confirmedBy: deposit.confirmedBy,
-            confirmedAt: deposit.confirmedAt,
-          }
-        })
-      } else if (deposit.status === 'PENDING') {
-        // Pending Deposits als "angefragt" anzeigen
-        allActivities.push({
-          id: `kokain-pending-${deposit.id}`,
-          type: 'packages',
-          timestamp: deposit.createdAt,
-          user: deposit.user,
-          action: deposit.status,
-          isPending: true,
-          details: {
-            packages: deposit.packages,
-            note: deposit.note,
-            status: deposit.status,
-          }
-        })
-      } else if (deposit.status === 'REJECTED') {
-        // Rejected Deposits anzeigen
-        allActivities.push({
-          id: `kokain-rejected-${deposit.id}`,
-          type: 'packages',
-          timestamp: deposit.rejectedAt || deposit.createdAt,
-          user: deposit.user,
-          action: deposit.status,
-          details: {
-            packages: deposit.packages,
-            note: deposit.note,
-            status: deposit.status,
-            rejectedBy: deposit.rejectedBy,
-            rejectedAt: deposit.rejectedAt,
-            rejectionReason: deposit.rejectionReason,
-          }
-        })
-      }
+      allActivities.push({
+        id: `kokain-${deposit.id}`,
+        type: 'packages',
+        timestamp: deposit.confirmedAt || deposit.createdAt,
+        user: deposit.user,
+        action: deposit.status,
+        isPending: deposit.status === 'PENDING',
+        details: {
+          packages: deposit.packages,
+          note: deposit.note,
+          status: deposit.status,
+          confirmedBy: deposit.confirmedBy,
+        }
+      })
     })
   }
 
@@ -184,13 +155,8 @@ export default function TickerPage() {
         action: delivery.status,
         details: {
           packages: delivery.packages,
-          paidAmount: delivery.paidAmount,
           paidMoney: delivery.paidMoney,
           status: delivery.status,
-          weekStart: delivery.weekStart,
-          weekEnd: delivery.weekEnd,
-          confirmedBy: delivery.confirmedBy,
-          confirmedAt: delivery.confirmedAt,
         }
       })
     })
@@ -211,7 +177,6 @@ export default function TickerPage() {
           penalty: sanction.penalty,
           description: sanction.description,
           status: sanction.status,
-          createdBy: sanction.createdBy,
         }
       })
     })
@@ -226,16 +191,12 @@ export default function TickerPage() {
         case 'IN': return <Plus className="h-4 w-4 text-green-400" />
         case 'OUT': return <Minus className="h-4 w-4 text-red-400" />
         case 'ADJUST': return <RotateCcw className="h-4 w-4 text-yellow-400" />
-        case 'RESERVE': return <Package className="h-4 w-4 text-blue-400" />
-        case 'RELEASE': return <Package className="h-4 w-4 text-purple-400" />
         default: return <Package className="h-4 w-4" />
       }
     } else if (type === 'kasse') {
       switch (action) {
         case 'EINZAHLUNG': return <TrendingUp className="h-4 w-4 text-green-400" />
         case 'AUSZAHLUNG': return <TrendingDown className="h-4 w-4 text-red-400" />
-        case 'TRANSFER': return <DollarSign className="h-4 w-4 text-blue-400" />
-        case 'KORREKTUR': return <RotateCcw className="h-4 w-4 text-yellow-400" />
         default: return <DollarSign className="h-4 w-4" />
       }
     } else if (type === 'packages') {
@@ -247,336 +208,248 @@ export default function TickerPage() {
       }
     } else if (type === 'weekly-delivery') {
       switch (action) {
-        case 'PENDING': return <Clock className="h-4 w-4 text-yellow-400" />
         case 'PAID': return <CheckCircle className="h-4 w-4 text-green-400" />
-        case 'CONFIRMED': return <CheckCircle className="h-4 w-4 text-blue-400" />
         case 'OVERDUE': return <XCircle className="h-4 w-4 text-red-400" />
-        case 'PARTIALLY_PAID': return <Clock className="h-4 w-4 text-orange-400" />
-        default: return <Package className="h-4 w-4" />
+        default: return <Calendar className="h-4 w-4 text-yellow-400" />
       }
     } else if (type === 'sanctions') {
       switch (action) {
-        case 'ACTIVE': return <XCircle className="h-4 w-4 text-red-400" />
+        case 'ACTIVE': return <AlertTriangle className="h-4 w-4 text-red-400" />
         case 'PAID': return <CheckCircle className="h-4 w-4 text-green-400" />
-        case 'EXPIRED': return <Clock className="h-4 w-4 text-gray-400" />
-        case 'CANCELLED': return <XCircle className="h-4 w-4 text-yellow-400" />
         default: return <Activity className="h-4 w-4" />
       }
-    } else {
-      return <Activity className="h-4 w-4" />
     }
+    return <Activity className="h-4 w-4" />
   }
 
   const getActionDisplay = (type: string, action: string) => {
     if (type === 'lager') {
-      const actionMap: Record<string, string> = {
-        'IN': 'Einlagerung',
-        'OUT': 'Auslagerung',
-        'ADJUST': 'Bestandskorrektur',
-        'RESERVE': 'Reservierung',
-        'RELEASE': 'Reservierung aufgehoben',
-      }
-      return actionMap[action] || action
+      return { IN: 'Einlagerung', OUT: 'Auslagerung', ADJUST: 'Korrektur' }[action] || action
     } else if (type === 'kasse') {
-      const actionMap: Record<string, string> = {
-        'EINZAHLUNG': 'Einzahlung',
-        'AUSZAHLUNG': 'Auszahlung',
-        'TRANSFER': 'Transfer',
-        'KORREKTUR': 'Korrektur',
-      }
-      return actionMap[action] || action
+      return { EINZAHLUNG: 'Einzahlung', AUSZAHLUNG: 'Auszahlung' }[action] || action
     } else if (type === 'packages') {
-      const actionMap: Record<string, string> = {
-        'PENDING': 'Deposit angefragt',
-        'CONFIRMED': 'Deposit bestätigt',
-        'REJECTED': 'Deposit abgelehnt',
-      }
-      return actionMap[action] || action
+      return { PENDING: 'Deposit angefragt', CONFIRMED: 'Deposit bestätigt', REJECTED: 'Deposit abgelehnt' }[action] || action
     } else if (type === 'weekly-delivery') {
-      const actionMap: Record<string, string> = {
-        'PENDING': 'Wochenabgabe erstellt',
-        'PAID': 'Wochenabgabe bezahlt',
-        'CONFIRMED': 'Wochenabgabe bestätigt',
-        'OVERDUE': 'Wochenabgabe überfällig',
-        'PARTIALLY_PAID': 'Wochenabgabe teilweise bezahlt',
-      }
-      return actionMap[action] || action
+      return { PENDING: 'Erstellt', PAID: 'Bezahlt', CONFIRMED: 'Bestätigt', OVERDUE: 'Überfällig' }[action] || action
     } else if (type === 'sanctions') {
-      const actionMap: Record<string, string> = {
-        'ACTIVE': 'Sanktion erstellt',
-        'PAID': 'Sanktion bezahlt',
-        'EXPIRED': 'Sanktion abgelaufen',
-        'CANCELLED': 'Sanktion storniert',
-      }
-      return actionMap[action] || action
-    } else {
-      return action
+      return { ACTIVE: 'Sanktion erstellt', PAID: 'Sanktion bezahlt' }[action] || action
     }
+    return action
   }
 
   const isLoading = stockLoading || cashLoading || packagesLoading || weeklyLoading || sanctionsLoading
 
+  const todayCount = allActivities.filter(a => new Date(a.timestamp).toDateString() === new Date().toDateString()).length
+
+  const filterButtons = [
+    { key: 'all', label: 'Alle', icon: Activity },
+    { key: 'lager', label: 'Lager', icon: Package },
+    { key: 'kasse', label: 'Kasse', icon: DollarSign },
+    { key: 'packages', label: 'Pakete', icon: FlaskConical },
+    { key: 'weekly-delivery', label: 'Wochenabgabe', icon: Calendar },
+    { key: 'sanctions', label: 'Sanktionen', icon: AlertTriangle },
+  ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white flex items-center">
-            <Activity className="mr-3 h-8 w-8 text-accent" />
-            Live-Ticker
-          </h1>
-          <p className="text-gray-400 mt-2">
-            Alle Lager- und Kassenbewegungen in Echtzeit
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button
-            variant={selectedFilter === 'all' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('all')}
-            size="sm"
-          >
-            <Activity className="mr-2 h-4 w-4" />
-            Alle
-          </Button>
-          <Button
-            variant={selectedFilter === 'lager' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('lager')}
-            size="sm"
-          >
-            <Package className="mr-2 h-4 w-4" />
-            Lager
-          </Button>
-          <Button
-            variant={selectedFilter === 'kasse' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('kasse')}
-            size="sm"
-          >
-            <DollarSign className="mr-2 h-4 w-4" />
-            Kasse
-          </Button>
-          <Button
-            variant={selectedFilter === 'packages' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('packages')}
-            size="sm"
-          >
-            <Package className="mr-2 h-4 w-4" />
-            Pakete
-          </Button>
-          <Button
-            variant={selectedFilter === 'weekly-delivery' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('weekly-delivery')}
-            size="sm"
-          >
-            <Package className="mr-2 h-4 w-4" />
-            Wochenabgabe
-          </Button>
-          <Button
-            variant={selectedFilter === 'sanctions' ? "default" : "outline"}
-            onClick={() => setSelectedFilter('sanctions')}
-            size="sm"
-          >
-            <Activity className="mr-2 h-4 w-4" />
-            Sanktionen
-          </Button>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-pink-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-transparent to-rose-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-pink-600 to-rose-600 rounded-xl shadow-lg shadow-pink-500/30">
+              <Activity className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Live-Ticker</h1>
+              <p className="text-gray-400 mt-1">
+                Alle Aktivitäten in Echtzeit
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {filterButtons.map((btn) => (
+              <Button
+                key={btn.key}
+                variant={selectedFilter === btn.key ? 'default' : 'outline'}
+                onClick={() => setSelectedFilter(btn.key as typeof selectedFilter)}
+                size="sm"
+                className={selectedFilter === btn.key 
+                  ? 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white border-0' 
+                  : 'border-gray-700 hover:bg-gray-800'}
+              >
+                <btn.icon className="mr-1.5 h-4 w-4" />
+                {btn.label}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Aktivitäten heute</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {allActivities.filter(activity => {
-                const today = new Date().toDateString()
-                return new Date(activity.timestamp).toDateString() === today
-              }).length}
-            </div>
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-pink-900/30 to-rose-900/20 border-pink-500/30">
+          <CardContent className="p-4">
+            <p className="text-pink-300/70 text-xs uppercase tracking-wider">Heute</p>
+            <p className="text-2xl font-bold text-white mt-1">{todayCount}</p>
           </CardContent>
         </Card>
         
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Lagerbewegungen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-400">
-              {allActivities.filter(activity => activity.type === 'lager').length}
-            </div>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30">
+          <CardContent className="p-4">
+            <p className="text-blue-300/70 text-xs uppercase tracking-wider">Lager</p>
+            <p className="text-2xl font-bold text-white mt-1">
+              {allActivities.filter(a => a.type === 'lager').length}
+            </p>
           </CardContent>
         </Card>
         
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Geldtransaktionen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-400">
-              {allActivities.filter(activity => activity.type === 'kasse').length}
-            </div>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+          <CardContent className="p-4">
+            <p className="text-green-300/70 text-xs uppercase tracking-wider">Kasse</p>
+            <p className="text-2xl font-bold text-white mt-1">
+              {allActivities.filter(a => a.type === 'kasse').length}
+            </p>
           </CardContent>
         </Card>
         
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Paket-Deposits</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-400">
-              {allActivities.filter(activity => activity.type === 'packages').length}
-            </div>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-purple-900/30 to-violet-900/20 border-purple-500/30">
+          <CardContent className="p-4">
+            <p className="text-purple-300/70 text-xs uppercase tracking-wider">Pakete</p>
+            <p className="text-2xl font-bold text-white mt-1">
+              {allActivities.filter(a => a.type === 'packages').length}
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Wochenabgaben</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-400">
-              {allActivities.filter(activity => activity.type === 'weekly-delivery').length}
-            </div>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-orange-900/30 to-amber-900/20 border-orange-500/30">
+          <CardContent className="p-4">
+            <p className="text-orange-300/70 text-xs uppercase tracking-wider">Wochenabgabe</p>
+            <p className="text-2xl font-bold text-white mt-1">
+              {allActivities.filter(a => a.type === 'weekly-delivery').length}
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Sanktionen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-400">
-              {allActivities.filter(activity => activity.type === 'sanctions').length}
-            </div>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-red-900/30 to-rose-900/20 border-red-500/30">
+          <CardContent className="p-4">
+            <p className="text-red-300/70 text-xs uppercase tracking-wider">Sanktionen</p>
+            <p className="text-2xl font-bold text-white mt-1">
+              {allActivities.filter(a => a.type === 'sanctions').length}
+            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Activities Feed */}
-      <Card className="lasanta-card">
-        <CardHeader>
+      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+        <CardHeader className="border-b border-gray-800">
           <CardTitle className="text-white">Aktivitäts-Feed</CardTitle>
           <CardDescription className="text-gray-400">
-            Die letzten {allActivities.length} Aktivitäten
+            {allActivities.filter(a => selectedFilter === 'all' || a.type === selectedFilter).length} Aktivitäten
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="flex justify-center py-16">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 border-2 border-pink-500/30 border-t-pink-500 rounded-full animate-spin" />
+                <p className="text-gray-400">Lade Aktivitäten...</p>
+              </div>
+            </div>
+          ) : allActivities.length === 0 ? (
+            <div className="py-16 text-center">
+              <Activity className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+              <p className="text-gray-400">Keine Aktivitäten gefunden</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-gray-400">Zeit</TableHead>
-                    <TableHead className="text-gray-400">Typ</TableHead>
-                    <TableHead className="text-gray-400">Aktion</TableHead>
-                    <TableHead className="text-gray-400">Benutzer</TableHead>
-                    <TableHead className="text-gray-400">Details</TableHead>
-                    <TableHead className="text-gray-400">Notiz</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Zeit</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Typ</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Benutzer</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Details</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Notiz</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
                   {allActivities
                     .filter(activity => selectedFilter === 'all' || activity.type === selectedFilter)
                     .map((activity) => (
-                    <TableRow key={activity.id} className="hover:bg-gray-800/50">
-                      <TableCell className="text-gray-300">
-                        {formatDate(activity.timestamp)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={
-                          activity.type === 'lager' ? 'outline' : 
-                          activity.type === 'kasse' ? 'secondary' :
-                          activity.type === 'packages' ? 'destructive' :
-                          activity.type === 'weekly-delivery' ? 'default' :
-                          activity.type === 'sanctions' ? 'destructive' : 'secondary'
+                    <tr key={activity.id} className="group hover:bg-pink-950/20 transition-colors">
+                      <td className="py-4 px-6">
+                        <span className="text-gray-400 text-sm">{formatDate(activity.timestamp)}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge variant="outline" className={
+                          activity.type === 'lager' ? 'border-blue-500/30 text-blue-400' : 
+                          activity.type === 'kasse' ? 'border-green-500/30 text-green-400' :
+                          activity.type === 'packages' ? 'border-purple-500/30 text-purple-400' :
+                          activity.type === 'weekly-delivery' ? 'border-orange-500/30 text-orange-400' :
+                          'border-red-500/30 text-red-400'
                         }>
                           {activity.type === 'lager' ? 'Lager' : 
                            activity.type === 'kasse' ? 'Kasse' :
                            activity.type === 'packages' ? 'Pakete' :
                            activity.type === 'weekly-delivery' ? 'Wochenabgabe' :
-                           activity.type === 'sanctions' ? 'Sanktionen' : 'Unbekannt'}
+                           'Sanktionen'}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
                           {getActivityIcon(activity.type, activity.action)}
                           <Badge className={
-                            activity.isPending
-                              ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-                              : activity.type === 'lager' 
-                                ? getMovementTypeColor(activity.action)
-                                : activity.type === 'packages'
-                                  ? activity.action === 'CONFIRMED' 
-                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                    : activity.action === 'REJECTED'
-                                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                                      : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                                  : activity.details.status 
-                                    ? getTransactionStatusColor(activity.details.status)
-                                    : 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                            activity.isPending ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                            activity.type === 'lager' ? getMovementTypeColor(activity.action) :
+                            activity.type === 'packages' ? (
+                              activity.action === 'CONFIRMED' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
+                              activity.action === 'REJECTED' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
+                              'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                            ) :
+                            'bg-gray-500/20 text-gray-300 border-gray-500/30'
                           }>
                             {activity.isPending ? '[ANGEFRAGT] ' : ''}{getActionDisplay(activity.type, activity.action)}
                           </Badge>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-white">{getDisplayName(activity.user)}</span>
-                          <Badge className={getRoleColor(activity.user.role)}>
-                            {getRoleDisplayName(activity.user.role)}
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm">{getDisplayName(activity.user)}</span>
+                          <Badge className={getRoleColor(activity.user?.role)} variant="outline">
+                            {getRoleDisplayName(activity.user?.role)}
                           </Badge>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-gray-300">
+                      </td>
+                      <td className="py-4 px-4">
                         {activity.type === 'lager' ? (
                           <div>
-                            <div className="font-medium">{activity.details.itemName}</div>
-                            <div className="text-sm text-gray-400">
-                              Menge: {activity.details.quantity}
-                            </div>
+                            <div className="text-white font-medium">{activity.details.itemName}</div>
+                            <div className="text-sm text-gray-400">Menge: {activity.details.quantity}</div>
                           </div>
                         ) : activity.type === 'packages' ? (
+                          <div className="text-white font-medium">{activity.details.packages} Pakete</div>
+                        ) : activity.type === 'sanctions' ? (
                           <div>
-                            <div className="font-medium">
-                              {activity.details.packages} Pakete
-                            </div>
-                            {activity.details.confirmedBy && (
-                              <div className="text-sm text-gray-400">
-                                Bestätigt von: {getDisplayName(activity.details.confirmedBy)}
-                              </div>
-                            )}
+                            <div className="text-white font-medium">Level {activity.details.level}</div>
+                            <div className="text-sm text-gray-400">{activity.details.amount?.toLocaleString('de-DE')} Schwarzgeld</div>
                           </div>
                         ) : (
-                          <div>
-                            <div className="font-medium">
-                              {formatCurrency(activity.details.amount)}
-                            </div>
-                            {activity.details.category && (
-                              <div className="text-sm text-gray-400">
-                                {activity.details.category}
-                              </div>
-                            )}
-                          </div>
+                          <div className="text-white font-medium">{formatCurrency(activity.details.amount)}</div>
                         )}
-                      </TableCell>
-                      <TableCell className="text-gray-300 max-w-xs truncate">
-                        {activity.details.note || '-'}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                      <td className="py-4 px-4 max-w-xs">
+                        <span className="text-gray-400 text-sm truncate block">{activity.details.note || '-'}</span>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-              
-              {allActivities.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
-                  Keine Aktivitäten gefunden
-                </div>
-              )}
+                </tbody>
+              </table>
             </div>
           )}
         </CardContent>

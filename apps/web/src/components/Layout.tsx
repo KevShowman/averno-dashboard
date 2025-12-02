@@ -17,7 +17,6 @@ import {
   Calendar,
   Scale,
   Users,
-  PackageOpen,
   CalendarCheck,
   CalendarDays,
   Droplet,
@@ -26,7 +25,14 @@ import {
   Radio,
   Car,
   ScrollText,
-  Crosshair
+  Crosshair,
+  ChevronDown,
+  LayoutDashboard,
+  Warehouse,
+  Wallet,
+  Shield,
+  Building,
+  Cog
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -36,256 +42,392 @@ interface LayoutProps {
 }
 
 const getRoleDisplayName = (role: string) => {
-  switch (role) {
-    case 'EL_PATRON': return 'El Patrón'
-    case 'DON_CAPITAN': return 'Don Capitán'
-    case 'DON_COMANDANTE': return 'Don Comandante'
-    case 'EL_MANO_DERECHA': return 'Mano Derecha'
-    case 'EL_CUSTODIO': return 'El Custodio'
-    case 'EL_MENTOR': return 'El Mentor'
-    case 'EL_ENCARGADO': return 'El Encargado'
-    case 'EL_TENIENTE': return 'El Teniente'
-    case 'SOLDADO': return 'Soldado'
-    case 'EL_PREFECTO': return 'El Prefecto'
-    case 'EL_CONFIDENTE': return 'El Confidente'
-    case 'EL_PROTECTOR': return 'El Protector'
-    case 'EL_NOVATO': return 'El Novato'
-    case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
-    case 'LOGISTICA': return 'Logística'
-    case 'FUTURO': return 'Futuro'
-    default: return role
+  const roleMap: Record<string, string> = {
+    'EL_PATRON': 'El Patrón',
+    'DON_CAPITAN': 'Don Capitán',
+    'DON_COMANDANTE': 'Don Comandante',
+    'EL_MANO_DERECHA': 'Mano Derecha',
+    'EL_CUSTODIO': 'El Custodio',
+    'EL_MENTOR': 'El Mentor',
+    'EL_ENCARGADO': 'El Encargado',
+    'EL_TENIENTE': 'El Teniente',
+    'SOLDADO': 'Soldado',
+    'EL_PREFECTO': 'El Prefecto',
+    'EL_CONFIDENTE': 'El Confidente',
+    'EL_PROTECTOR': 'El Protector',
+    'EL_NOVATO': 'El Novato',
+    'ROUTENVERWALTUNG': 'Routenverwaltung',
+    'LOGISTICA': 'Logística',
+    'SICARIO': 'Sicario',
+    'FUTURO': 'Futuro',
   }
+  return roleMap[role] || role
 }
 
-const navigation = [
-  { name: 'Dashboard', href: '/app', icon: Home },
-  { name: 'Lager', href: '/lager', icon: Package },
-  { name: 'Lagerbewegungen', href: '/lager-movements', icon: Clock },
-  { name: 'Kasse', href: '/kasse', icon: DollarSign },
-  { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
-  { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
-  { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
-  { name: 'Sicario Division', href: '/sicario', icon: Crosshair, sicarioOnly: true },
-  { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
-  { name: 'Blood List', href: '/bloodlist', icon: Droplet },
-  { name: 'Sanktionen', href: '/sanctions', icon: Scale },
-  { name: 'Organisation', href: '/organigramm', icon: Network },
-  { name: 'Meine Kleidung', href: '/clothing', icon: Shirt },
-  { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
-  { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
-  { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },
-  { name: 'La Casa', href: '/la-casa', icon: Home },
-  { name: 'Botschaft', href: '/botschaft', icon: ScrollText },
-  { name: 'Aktensystem', href: '/member-files', icon: FileText, leadershipOnly: true },
-  { name: 'Benutzerverwaltung', href: '/user-management', icon: Users },
-  { name: 'Live-Ticker', href: '/ticker', icon: Activity },
-  { name: 'Audit-Log', href: '/audit', icon: FileText },
-  { name: 'Einstellungen', href: '/settings', icon: Settings },
+const getRoleBadgeColor = (role: string) => {
+  if (['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(role)) {
+    return 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+  }
+  if (role === 'SICARIO') {
+    return 'bg-red-500/20 text-red-300 border-red-500/30'
+  }
+  return 'bg-gray-500/20 text-gray-300 border-gray-500/30'
+}
+
+interface NavItem {
+  name: string
+  href: string
+  icon: any
+  leadershipOnly?: boolean
+  sicarioOnly?: boolean
+  patronOnly?: boolean
+}
+
+interface NavGroup {
+  name: string
+  icon: any
+  items: NavItem[]
+  defaultOpen?: boolean
+}
+
+const navGroups: NavGroup[] = [
+  {
+    name: 'Übersicht',
+    icon: LayoutDashboard,
+    defaultOpen: true,
+    items: [
+      { name: 'Dashboard', href: '/app', icon: Home },
+      { name: 'Live-Ticker', href: '/ticker', icon: Activity },
+    ]
+  },
+  {
+    name: 'Finanzen & Lager',
+    icon: Warehouse,
+    defaultOpen: true,
+    items: [
+      { name: 'Lager', href: '/lager', icon: Package },
+      { name: 'Lagerbewegungen', href: '/lager-movements', icon: Clock },
+      { name: 'Kasse', href: '/kasse', icon: DollarSign },
+    ]
+  },
+  {
+    name: 'Familie',
+    icon: Users,
+    defaultOpen: true,
+    items: [
+      { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
+      { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
+      { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
+      { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
+    ]
+  },
+  {
+    name: 'Sicario Division',
+    icon: Crosshair,
+    items: [
+      { name: 'Sicario Bereich', href: '/sicario', icon: Crosshair, sicarioOnly: true },
+    ]
+  },
+  {
+    name: 'Mitglieder',
+    icon: Shield,
+    items: [
+      { name: 'Blood List', href: '/bloodlist', icon: Droplet },
+      { name: 'Sanktionen', href: '/sanctions', icon: Scale },
+      { name: 'Organisation', href: '/organigramm', icon: Network },
+      { name: 'Aktensystem', href: '/member-files', icon: FileText, leadershipOnly: true },
+      { name: 'Benutzerverwaltung', href: '/user-management', icon: Users, patronOnly: true },
+    ]
+  },
+  {
+    name: 'Ausstattung',
+    icon: Shirt,
+    items: [
+      { name: 'Meine Kleidung', href: '/clothing', icon: Shirt },
+      { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
+      { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },
+    ]
+  },
+  {
+    name: 'Kommunikation',
+    icon: Radio,
+    items: [
+      { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
+      { name: 'Botschaft', href: '/botschaft', icon: ScrollText },
+    ]
+  },
+  {
+    name: 'Sonstiges',
+    icon: Building,
+    items: [
+      { name: 'La Casa', href: '/la-casa', icon: Home },
+    ]
+  },
+  {
+    name: 'System',
+    icon: Cog,
+    items: [
+      { name: 'Audit-Log', href: '/audit', icon: FileText },
+      { name: 'Einstellungen', href: '/settings', icon: Settings },
+    ]
+  },
 ]
+
+function NavGroupComponent({ 
+  group, 
+  user, 
+  isActive, 
+  onLinkClick 
+}: { 
+  group: NavGroup
+  user: any
+  isActive: (href: string) => boolean
+  onLinkClick?: () => void
+}) {
+  const [isOpen, setIsOpen] = useState(group.defaultOpen ?? false)
+  
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isSicario = hasRole(user, 'SICARIO')
+  const isPatron = hasRole(user, 'EL_PATRON')
+
+  // Filter items based on permissions
+  const visibleItems = group.items.filter(item => {
+    if (item.patronOnly && !isPatron) return false
+    if (item.leadershipOnly && !isLeadership) return false
+    if (item.sicarioOnly && !isLeadership && !isSicario) return false
+    return true
+  })
+
+  // Don't render empty groups
+  if (visibleItems.length === 0) return null
+
+  // Check if any item in group is active
+  const hasActiveItem = visibleItems.some(item => isActive(item.href))
+
+  return (
+    <div className="mb-1">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
+          hasActiveItem
+            ? "bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-300"
+            : "text-gray-400 hover:text-white hover:bg-white/5"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <group.icon className={cn(
+            "h-4 w-4",
+            hasActiveItem ? "text-amber-400" : "text-gray-500"
+          )} />
+          <span>{group.name}</span>
+        </div>
+        <ChevronDown className={cn(
+          "h-4 w-4 transition-transform duration-200",
+          isOpen ? "rotate-180" : ""
+        )} />
+      </button>
+      
+      <div className={cn(
+        "overflow-hidden transition-all duration-200",
+        isOpen ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
+      )}>
+        <div className="pl-3 space-y-0.5">
+          {visibleItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              onClick={onLinkClick}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200",
+                isActive(item.href)
+                  ? "bg-gradient-to-r from-amber-600/90 to-orange-600/90 text-white shadow-lg shadow-amber-500/20"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <item.icon className={cn(
+                "h-4 w-4",
+                isActive(item.href) ? "text-white" : "text-gray-500"
+              )} />
+              <span>{item.name}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const { user, logout, isAuthenticated } = useAuthStore()
 
+  const isActive = (href: string) => location.pathname === href
+
   // Don't render navigation if not authenticated
   if (!isAuthenticated) {
     return <div className="min-h-screen bg-gray-900">{children}</div>
   }
 
-  return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Mobile sidebar */}
-      <div className={cn(
-        "fixed inset-0 z-50 lg:hidden",
-        sidebarOpen ? "block" : "hidden"
-      )}>
-        <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed left-0 top-0 h-full w-64 bg-gray-800 shadow-xl">
-          <div className="flex h-16 items-center justify-between px-4">
-            <div className="flex items-center space-x-2">
-              <Skull className="h-8 w-8 text-primary" />
-              <span className="text-lg font-bold text-white">LaSanta Calavera</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="h-6 w-6 text-white" />
-            </Button>
-          </div>
-          <nav className="mt-8 px-4">
-            {navigation.map((item) => {
-              // Benutzerverwaltung nur für El Patron
-              if (item.name === 'Benutzerverwaltung' && !hasRole(user, 'EL_PATRON')) {
-                return null
-              }
-              
-              // Kleidungsverwaltung nur für Leadership
-              if (item.leadershipOnly && !hasRole(user, 'EL_PATRON') && !hasRole(user, 'DON_CAPITAN') && !hasRole(user, 'DON_COMANDANTE') && !hasRole(user, 'EL_MANO_DERECHA')) {
-                return null
-              }
-
-              // Sicario Division nur für Sicarios und Leadership
-              if ((item as any).sicarioOnly) {
-                const isLeadership = hasRole(user, 'EL_PATRON') || hasRole(user, 'DON_CAPITAN') || hasRole(user, 'DON_COMANDANTE') || hasRole(user, 'EL_MANO_DERECHA')
-                const isSicario = hasRole(user, 'SICARIO')
-                if (!isLeadership && !isSicario) {
-                  return null
-                }
-              }
-
-              const isActive = location.pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={cn(
-                    "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  )}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.name}</span>
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
-      </div>
-
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-64 lg:bg-gray-800">
-        <div className="flex h-16 items-center px-4">
-          <div className="flex items-center space-x-2">
-            <Skull className="h-8 w-8 text-primary" />
-            <span className="text-lg font-bold text-white">LaSanta Calavera</span>
-          </div>
-        </div>
-        <nav className="mt-8 px-4">
-          {navigation.map((item) => {
-            // Benutzerverwaltung nur für El Patron
-            if (item.name === 'Benutzerverwaltung' && !hasRole(user, 'EL_PATRON')) {
-              return null
-            }
-            
-            // Kleidungsverwaltung nur für Leadership
-            if (item.leadershipOnly && !hasRole(user, 'EL_PATRON') && !hasRole(user, 'DON_CAPITAN') && !hasRole(user, 'DON_COMANDANTE') && !hasRole(user, 'EL_MANO_DERECHA')) {
-              return null
-            }
-
-            // Sicario Division nur für Sicarios und Leadership
-            if ((item as any).sicarioOnly) {
-              const isLeadership = hasRole(user, 'EL_PATRON') || hasRole(user, 'DON_CAPITAN') || hasRole(user, 'DON_COMANDANTE') || hasRole(user, 'EL_MANO_DERECHA')
-              const isSicario = hasRole(user, 'SICARIO')
-              if (!isLeadership && !isSicario) {
-                return null
-              }
-            }
-
-            const isActive = location.pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-primary text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.name}</span>
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* User info at bottom */}
-        {user && (
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <div className="flex items-center space-x-3 rounded-lg bg-gray-700 p-3">
-              {user.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={getDisplayName(user)}
-                  className="h-8 w-8 rounded-full"
-                />
-              ) : (
-                <User className="h-8 w-8 text-gray-400" />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  {getDisplayName(user)}
-                </p>
-                <div className="text-xs text-gray-400 truncate">
-                  {user.allRoles && user.allRoles.length > 1 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {user.allRoles.map((role, index) => (
-                        <span key={index} className="inline-block bg-gray-700 px-1 rounded text-xs">
-                          {getRoleDisplayName(role)}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <span>{getRoleDisplayName(user.role)}</span>
-                  )}
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={logout}
-                className="text-gray-400 hover:text-white"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
+  const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => (
+    <>
+      {/* Logo */}
+      <div className="p-5 border-b border-white/5">
+        <Link to="/app" className="flex items-center gap-3 group" onClick={onLinkClick}>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-red-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+            <div className="relative p-2.5 bg-gradient-to-br from-amber-500 to-red-600 rounded-xl shadow-lg">
+              <Skull className="h-7 w-7 text-white" />
             </div>
           </div>
-        )}
+          <div>
+            <h1 className="text-lg font-bold text-white tracking-tight">La Santa</h1>
+            <p className="text-xs text-amber-400/80 font-medium -mt-0.5">Calavera</p>
+          </div>
+        </Link>
       </div>
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b border-gray-700 bg-gray-800 px-4 shadow-sm lg:gap-x-6 lg:px-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-white"
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+        {navGroups.map((group) => (
+          <NavGroupComponent
+            key={group.name}
+            group={group}
+            user={user}
+            isActive={isActive}
+            onLinkClick={onLinkClick}
+          />
+        ))}
+      </nav>
 
-          <div className="flex flex-1 justify-end">
-            {user && (
-              <div className="flex items-center space-x-4 lg:hidden">
+      {/* User Info */}
+      {user && (
+        <div className="p-4 border-t border-white/5">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-red-500/10 rounded-2xl blur-xl" />
+            <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/5 p-4">
+              <div className="flex items-center gap-3">
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
                     alt={getDisplayName(user)}
-                    className="h-8 w-8 rounded-full"
+                    className="h-11 w-11 rounded-xl object-cover ring-2 ring-amber-500/30"
                   />
                 ) : (
-                  <User className="h-8 w-8 text-gray-400" />
+                  <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center ring-2 ring-amber-500/30">
+                    <User className="h-5 w-5 text-amber-400" />
+                  </div>
                 )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={logout}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">
+                    {getDisplayName(user)}
+                  </p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {user.allRoles && user.allRoles.length > 0 ? (
+                      user.allRoles.slice(0, 2).map((role: string, index: number) => (
+                        <span 
+                          key={index} 
+                          className={cn(
+                            "inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium border",
+                            getRoleBadgeColor(role)
+                          )}
+                        >
+                          {getRoleDisplayName(role)}
+                        </span>
+                      ))
+                    ) : (
+                      <span className={cn(
+                        "inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium border",
+                        getRoleBadgeColor(user.role)
+                      )}>
+                        {getRoleDisplayName(user.role)}
+                      </span>
+                    )}
+                    {user.allRoles && user.allRoles.length > 2 && (
+                      <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-700/50 text-gray-400">
+                        +{user.allRoles.length - 2}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
+              <Button
+                variant="ghost"
+                onClick={logout}
+                className="w-full mt-3 h-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl text-sm"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Abmelden
+              </Button>
+            </div>
           </div>
+        </div>
+      )}
+    </>
+  )
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      {/* Mobile sidebar backdrop */}
+      <div 
+        className={cn(
+          "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity lg:hidden",
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      {/* Mobile sidebar */}
+      <div className={cn(
+        "fixed left-0 top-0 bottom-0 z-50 w-72 transform transition-transform duration-300 ease-out lg:hidden",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5 shadow-2xl">
+          {/* Close button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(false)}
+            className="absolute right-3 top-5 text-gray-400 hover:text-white z-10"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+          
+          <SidebarContent onLinkClick={() => setSidebarOpen(false)} />
+        </div>
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-72">
+        <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5">
+          <SidebarContent />
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-72">
+        {/* Mobile top bar */}
+        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 bg-gray-900/80 backdrop-blur-xl border-b border-white/5 px-4 lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-400 hover:text-white"
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+
+          <div className="flex-1 flex justify-center">
+            <Link to="/app" className="flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-to-br from-amber-500 to-red-600 rounded-lg">
+                <Skull className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-white">La Santa Calavera</span>
+            </Link>
+          </div>
+
+          <div className="w-10" /> {/* Spacer for balance */}
         </div>
 
         {/* Page content */}

@@ -672,7 +672,7 @@ export default function OrganigrammPage() {
     const isExpanded = expandedNodes.includes(nodeId)
 
     return (
-      <div className="relative flex w-full max-w-sm flex-col rounded-2xl border border-gray-700 bg-gray-800/70 p-5 shadow-lg backdrop-blur-sm">
+      <div className="relative flex w-full max-w-sm flex-col rounded-2xl border border-amber-500/20 bg-gradient-to-br from-gray-800/90 to-gray-900/90 p-5 shadow-lg backdrop-blur-sm hover:border-amber-500/40 transition-colors">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-lg font-semibold text-white">{node.label}</h3>
@@ -680,7 +680,7 @@ export default function OrganigrammPage() {
           </div>
           <button
             onClick={() => toggleNode(nodeId)}
-            className="text-gray-400 hover:text-white p-2"
+            className="text-gray-400 hover:text-amber-400 p-2 rounded-lg hover:bg-amber-500/10 transition-colors"
             aria-label={isExpanded ? 'Details einklappen' : 'Details ausklappen'}
           >
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -693,7 +693,7 @@ export default function OrganigrammPage() {
               {assignedMembers.map((member) => (
                 <span
                   key={member.id}
-                  className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
+                  className="inline-flex items-center rounded-full bg-amber-500/20 border border-amber-500/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300"
                 >
                   {member.displayName}
                 </span>
@@ -705,9 +705,9 @@ export default function OrganigrammPage() {
         </div>
 
         {isExpanded && (
-          <div className="mt-4 space-y-3 text-left">
+          <div className="mt-4 space-y-3 text-left border-t border-gray-700/50 pt-4">
             <div>
-              <h4 className="text-sm font-semibold text-gray-200">Verantwortlichkeiten</h4>
+              <h4 className="text-sm font-semibold text-amber-300/80">Verantwortlichkeiten</h4>
               <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
                 {node.responsibilities.map((item, index) => (
                   <li key={index}>{item}</li>
@@ -715,7 +715,7 @@ export default function OrganigrammPage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-200">Alltägliche Aufgaben</h4>
+              <h4 className="text-sm font-semibold text-amber-300/80">Alltägliche Aufgaben</h4>
               <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
                 {node.dailyDuties.map((item, index) => (
                   <li key={index}>{item}</li>
@@ -730,61 +730,93 @@ export default function OrganigrammPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-white">Organigramm & Rollenübersicht</h1>
-        <p className="text-gray-400">
-          Diese Seite bündelt die Führungsstruktur des Kartells, beschreibt Verantwortlichkeiten und ermöglicht es, Mitglieder
-          interaktiven Rollen zuzuweisen.
-        </p>
-      </header>
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-yellow-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex items-center gap-4">
+          <div className="p-3 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+            <Users className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white">Organigramm & Rollenübersicht</h1>
+            <p className="text-gray-400 mt-1">
+              Führungsstruktur des Kartells mit Verantwortlichkeiten
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <Card className="lasanta-card">
-        <CardContent className="grid grid-cols-1 gap-6 p-6 md:grid-cols-3">
-          <div>
-            <p className="text-sm text-gray-400">Rollen im Organigramm</p>
-            <p className="text-3xl font-bold text-white">{assignmentRoles.length}</p>
-            <p className="text-xs text-gray-500">Hierarchiestufen von Patrón bis Operatives Team</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Aktive Zuordnungen</p>
-            <p className="text-3xl font-bold text-white">{totalAssignedMembers}</p>
-            <p className="text-xs text-gray-500">Summe aller zugewiesenen Mitglieder</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Rollen mit Besetzung</p>
-            <p className="text-3xl font-bold text-white">{rolesWithAssignments}</p>
-            <p className="text-xs text-gray-500">Von {assignmentRoles.length} Rollen aktuell belegt</p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border-amber-500/30">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <Crown className="h-5 w-5 text-amber-400" />
+              </div>
+            </div>
+            <p className="text-amber-300/70 text-sm">Rollen im Organigramm</p>
+            <p className="text-2xl font-bold text-white">{assignmentRoles.length}</p>
+            <p className="text-xs text-gray-500 mt-1">Hierarchiestufen von Patrón bis Operatives Team</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <BadgeCheck className="h-5 w-5 text-green-400" />
+              </div>
+            </div>
+            <p className="text-green-300/70 text-sm">Aktive Zuordnungen</p>
+            <p className="text-2xl font-bold text-white">{totalAssignedMembers}</p>
+            <p className="text-xs text-gray-500 mt-1">Summe aller zugewiesenen Mitglieder</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <Shield className="h-5 w-5 text-blue-400" />
+              </div>
+            </div>
+            <p className="text-blue-300/70 text-sm">Rollen mit Besetzung</p>
+            <p className="text-2xl font-bold text-white">{rolesWithAssignments}</p>
+            <p className="text-xs text-gray-500 mt-1">Von {assignmentRoles.length} Rollen aktuell belegt</p>
+          </CardContent>
+        </Card>
+      </div>
 
-      <Card className="lasanta-card">
-        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-800">
           <div>
             <CardTitle className="flex items-center gap-2 text-white">
-              <Users className="h-5 w-5" />
+              <Users className="h-5 w-5 text-amber-400" />
               Organigramm der Führung
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Alle Ebenen von Patrón bis hin zu den operativen Kräften. Details lassen sich für jede Rolle einzeln öffnen.
+              Alle Ebenen von Patrón bis hin zu den operativen Kräften
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
             <button 
-              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              className="px-4 py-2 text-sm border border-gray-700 rounded-lg hover:bg-gray-800 text-gray-300 transition-colors"
               onClick={expandAllNodes}
             >
               Alles öffnen
             </button>
             <button 
-              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              className="px-4 py-2 text-sm border border-gray-700 rounded-lg hover:bg-gray-800 text-gray-300 transition-colors"
               onClick={collapseAllNodes}
             >
               Alles schließen
             </button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-0">
+        <CardContent className="space-y-0 p-4">
           {organigramLevels.map((level, levelIndex) => (
             <section key={level.id} className="relative">
               {/* Verbindungslinie von vorheriger Ebene */}

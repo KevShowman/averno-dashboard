@@ -4,9 +4,8 @@ import { api } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
 import { useAuthStore } from '../stores/auth'
-import { Radio, MessageSquare, Pencil, Save, X } from 'lucide-react'
+import { Radio, MessageSquare, Pencil, Save, X, Signal, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function CommunicationPage() {
@@ -19,7 +18,6 @@ export default function CommunicationPage() {
 
   const isLeadership = user?.role && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role)
 
-  // Daten abrufen
   const { data, isLoading } = useQuery({
     queryKey: ['communication'],
     queryFn: async () => {
@@ -28,7 +26,6 @@ export default function CommunicationPage() {
     },
   })
 
-  // Funk aktualisieren
   const updateFunkMutation = useMutation({
     mutationFn: async (funkFrequency: string) => {
       const response = await api.put('/communication/funk', { funkFrequency })
@@ -44,7 +41,6 @@ export default function CommunicationPage() {
     },
   })
 
-  // DarkChat aktualisieren
   const updateDarkChatMutation = useMutation({
     mutationFn: async (darkChatName: string) => {
       const response = await api.put('/communication/darkchat', { darkChatName })
@@ -71,11 +67,6 @@ export default function CommunicationPage() {
     }
   }
 
-  const handleCancelFunk = () => {
-    setEditingFunk(false)
-    setFunkValue('')
-  }
-
   const handleEditDarkChat = () => {
     setDarkChatValue(data?.darkChatName || '')
     setEditingDarkChat(true)
@@ -87,68 +78,76 @@ export default function CommunicationPage() {
     }
   }
 
-  const handleCancelDarkChat = () => {
-    setEditingDarkChat(false)
-    setDarkChatValue('')
-  }
-
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center text-gray-400">Lade Kommunikationsdaten...</div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <p className="text-gray-400">Lade Kommunikationsdaten...</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold text-white">Kommunikation</h1>
-        <p className="text-gray-400">
-          Aktuelle Funk-Frequenz und DarkChat
-        </p>
-      </header>
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-cyan-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-teal-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex items-center gap-4">
+          <div className="p-3 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl shadow-lg shadow-cyan-500/30">
+            <Signal className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white">Kommunikation</h1>
+            <p className="text-gray-400 mt-1">
+              Aktuelle Funk-Frequenz und DarkChat für die Familie
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Funk-Frequenz */}
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Radio className="h-6 w-6 text-primary" />
-              Funk-Frequenz
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Verwende diese Frequenz für die Familien-Kommunikation
-            </CardDescription>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-emerald-500/30">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
+          <CardHeader className="relative">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-500/20 rounded-lg">
+                <Radio className="h-6 w-6 text-emerald-400" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Funk-Frequenz</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Für die Familien-Kommunikation
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="relative space-y-4">
             {editingFunk ? (
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="funk-frequency" className="text-gray-300">
-                    Neue Frequenz
-                  </Label>
-                  <Input
-                    id="funk-frequency"
-                    value={funkValue}
-                    onChange={(e) => setFunkValue(e.target.value)}
-                    placeholder="z.B. 00100200321"
-                    className="bg-black/40 border-primary/30 text-white"
-                  />
-                </div>
+                <Input
+                  value={funkValue}
+                  onChange={(e) => setFunkValue(e.target.value)}
+                  placeholder="z.B. 00100200321"
+                  className="bg-gray-800/50 border-gray-700 focus:border-emerald-500 text-white text-center text-2xl font-mono h-14"
+                />
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSaveFunk}
                     disabled={updateFunkMutation.isPending}
-                    className="flex-1"
+                    className="flex-1 h-11 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Speichern
                   </Button>
                   <Button
-                    onClick={handleCancelFunk}
+                    onClick={() => setEditingFunk(false)}
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 h-11 border-gray-600 hover:bg-gray-800"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Abbrechen
@@ -157,13 +156,17 @@ export default function CommunicationPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="bg-black/40 border border-primary/30 rounded-lg p-6 text-center">
+                <div className="bg-gray-800/50 border border-emerald-500/30 rounded-xl p-6 text-center">
                   <div className="text-4xl font-mono font-bold text-white tracking-wider">
                     {data?.funkFrequency}
                   </div>
                 </div>
                 {isLeadership && (
-                  <Button onClick={handleEditFunk} variant="outline" className="w-full">
+                  <Button 
+                    onClick={handleEditFunk} 
+                    variant="outline" 
+                    className="w-full h-11 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                  >
                     <Pencil className="h-4 w-4 mr-2" />
                     Frequenz ändern
                   </Button>
@@ -174,44 +177,43 @@ export default function CommunicationPage() {
         </Card>
 
         {/* DarkChat */}
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <MessageSquare className="h-6 w-6 text-primary" />
-              DarkChat
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Aktueller DarkChat-Name für verschlüsselte Kommunikation
-            </CardDescription>
+        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-purple-500/30">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" />
+          <CardHeader className="relative">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-500/20 rounded-lg">
+                <Lock className="h-6 w-6 text-purple-400" />
+              </div>
+              <div>
+                <CardTitle className="text-white">DarkChat</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Verschlüsselte Kommunikation
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="relative space-y-4">
             {editingDarkChat ? (
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="darkchat-name" className="text-gray-300">
-                    Neuer DarkChat-Name
-                  </Label>
-                  <Input
-                    id="darkchat-name"
-                    value={darkChatValue}
-                    onChange={(e) => setDarkChatValue(e.target.value)}
-                    placeholder="z.B. LsCFuT25veRDc!2§"
-                    className="bg-black/40 border-primary/30 text-white"
-                  />
-                </div>
+                <Input
+                  value={darkChatValue}
+                  onChange={(e) => setDarkChatValue(e.target.value)}
+                  placeholder="z.B. LsCFuT25veRDc!2§"
+                  className="bg-gray-800/50 border-gray-700 focus:border-purple-500 text-white text-center text-xl font-mono h-14"
+                />
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSaveDarkChat}
                     disabled={updateDarkChatMutation.isPending}
-                    className="flex-1"
+                    className="flex-1 h-11 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Speichern
                   </Button>
                   <Button
-                    onClick={handleCancelDarkChat}
+                    onClick={() => setEditingDarkChat(false)}
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 h-11 border-gray-600 hover:bg-gray-800"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Abbrechen
@@ -220,13 +222,17 @@ export default function CommunicationPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="bg-black/40 border border-primary/30 rounded-lg p-6 text-center">
+                <div className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-6 text-center">
                   <div className="text-3xl font-mono font-bold text-white break-all">
                     {data?.darkChatName}
                   </div>
                 </div>
                 {isLeadership && (
-                  <Button onClick={handleEditDarkChat} variant="outline" className="w-full">
+                  <Button 
+                    onClick={handleEditDarkChat} 
+                    variant="outline" 
+                    className="w-full h-11 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                  >
                     <Pencil className="h-4 w-4 mr-2" />
                     DarkChat ändern
                   </Button>
@@ -236,7 +242,25 @@ export default function CommunicationPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Info */}
+      <Card className="bg-gray-900/50 border-gray-800">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <MessageSquare className="h-5 w-5 text-blue-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-1">Hinweis zur Kommunikation</h3>
+              <p className="text-gray-400 text-sm">
+                Die Funk-Frequenz und der DarkChat-Name werden regelmäßig geändert. 
+                Stelle sicher, dass du immer die aktuellen Daten verwendest. 
+                Bei Fragen wende dich an die Leaderschaft.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
-

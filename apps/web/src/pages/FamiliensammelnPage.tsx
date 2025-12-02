@@ -611,160 +611,160 @@ export default function FamiliensammelnPage() {
       )}
 
       {/* Verarbeiter Tracking */}
-      <Card className="lasanta-card mt-6">
-        <CardHeader>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-teal-500/20 mt-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-transparent to-emerald-500/5" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative p-6 border-b border-teal-500/20">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Factory className="h-5 w-5 text-gold-400" />
-              <CardTitle className="text-white">Verarbeiter-Tracking</CardTitle>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl shadow-lg shadow-teal-500/30">
+                <Factory className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Verarbeiter-Tracking</h2>
+                <p className="text-teal-200/60 text-sm">
+                  Kapazität: 3000 Stück • Verarbeitung: 10/min → ~5 Stunden
+                </p>
+              </div>
             </div>
             {isLeadership && (
               <Button
                 onClick={() => setShowProcessorPicker(true)}
-                className="lasanta-button-primary"
-                size="sm"
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white shadow-lg shadow-teal-500/25"
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="h-4 w-4 mr-2" />
                 Verarbeiter starten
               </Button>
             )}
           </div>
-          <CardDescription className="text-gray-400">
-            Kapazität: 3000 Stück | Verarbeitung: 10/min → ~5 Stunden
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        </div>
+        
+        <div className="relative p-6">
           {processors.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">Keine aktiven Verarbeiter</p>
+            <div className="text-center py-8">
+              <Factory className="h-12 w-12 mx-auto text-gray-600 mb-3" />
+              <p className="text-gray-400">Keine aktiven Verarbeiter</p>
+              <p className="text-gray-500 text-sm mt-1">Starte einen Verarbeiter um die Produktion zu beginnen</p>
+            </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {processors
                 .filter(p => p.status !== 'COMPLETED')
                 .map((processor) => {
                   const timeInfo = getRemainingTime(processor.finishesAt);
                   const isFinished = processor.status === 'FINISHED' || timeInfo.finished;
+                  const progress = Math.min(100, ((new Date().getTime() - new Date(processor.startedAt).getTime()) /
+                    (new Date(processor.finishesAt).getTime() - new Date(processor.startedAt).getTime())) * 100);
 
                   return (
-                    <Card
+                    <div
                       key={processor.id}
-                      className={`border ${
+                      className={`relative overflow-hidden rounded-xl border p-4 transition-all ${
                         isFinished
-                          ? 'border-green-500/50 bg-green-900/10'
-                          : 'border-gray-700 bg-gray-800/50'
+                          ? 'border-green-500/50 bg-green-900/20'
+                          : 'border-gray-700 bg-gray-800/50 hover:border-teal-500/30'
                       }`}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                                isFinished ? 'bg-green-500/20' : 'bg-blue-500/20'
-                              }`}
-                            >
-                              {isFinished ? (
-                                <CheckCircle className="h-5 w-5 text-green-400" />
-                              ) : (
-                                <Clock className="h-5 w-5 text-blue-400 animate-pulse" />
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-medium text-white">
-                                {getDisplayName(processor.user)}
-                              </p>
-                              <p className="text-sm text-gray-400">
-                                Gestartet: {new Date(processor.startedAt).toLocaleString('de-DE', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })} Uhr
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <div className="text-right">
-                              <Badge
-                                className={
-                                  isFinished
-                                    ? 'bg-green-500/20 text-green-400 border-green-500/50'
-                                    : 'bg-blue-500/20 text-blue-400 border-blue-500/50'
-                                }
-                              >
-                                {isFinished ? (
-                                  <span className="flex items-center gap-1">
-                                    <Check className="h-3 w-3" />
-                                    Fertig
-                                  </span>
-                                ) : (
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    {timeInfo.text}
-                                  </span>
-                                )}
-                              </Badge>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {processor.capacity} Stück
-                              </p>
-                            </div>
-
-                            {isLeadership && (
-                              <div className="flex gap-2">
-                                {isFinished && (
-                                  <Button
-                                    onClick={() => completeProcessorMutation.mutate(processor.id)}
-                                    size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                  >
-                                    <Check className="h-4 w-4 mr-1" />
-                                    Entnahme bestätigen
-                                  </Button>
-                                )}
-                                <Button
-                                  onClick={() => {
-                                    if (confirm(`Verarbeiter von ${getDisplayName(processor.user)} wirklich löschen?`)) {
-                                      deleteProcessorMutation.mutate(processor.id);
-                                    }
-                                  }}
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-red-600 text-red-400 hover:bg-red-600/20"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl ${
+                            isFinished ? 'bg-green-500/20' : 'bg-teal-500/20'
+                          }`}>
+                            {isFinished ? (
+                              <CheckCircle className="h-6 w-6 text-green-400" />
+                            ) : (
+                              <>
+                                <Clock className="h-6 w-6 text-teal-400" />
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse" />
+                              </>
                             )}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white text-lg">
+                              {getDisplayName(processor.user)}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Gestartet: {new Date(processor.startedAt).toLocaleString('de-DE', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })} Uhr • {processor.capacity} Stück
+                            </p>
                           </div>
                         </div>
 
-                        {/* Progress Bar */}
-                        {!isFinished && (
-                          <div className="mt-3">
-                            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-1000"
-                                style={{
-                                  width: `${Math.min(
-                                    100,
-                                    ((new Date().getTime() - new Date(processor.startedAt).getTime()) /
-                                      (new Date(processor.finishesAt).getTime() -
-                                        new Date(processor.startedAt).getTime())) *
-                                      100
-                                  )}%`,
+                        <div className="flex items-center gap-3">
+                          <Badge className={
+                            isFinished
+                              ? 'bg-green-500/20 text-green-300 border-green-500/30 px-3 py-1'
+                              : 'bg-teal-500/20 text-teal-300 border-teal-500/30 px-3 py-1'
+                          }>
+                            {isFinished ? (
+                              <span className="flex items-center gap-1.5">
+                                <Check className="h-4 w-4" />
+                                Fertig
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1.5">
+                                <Clock className="h-4 w-4" />
+                                {timeInfo.text}
+                              </span>
+                            )}
+                          </Badge>
+
+                          {isLeadership && (
+                            <div className="flex gap-2">
+                              {isFinished && (
+                                <Button
+                                  onClick={() => completeProcessorMutation.mutate(processor.id)}
+                                  size="sm"
+                                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white"
+                                >
+                                  <Check className="h-4 w-4 mr-1" />
+                                  Entnahme bestätigen
+                                </Button>
+                              )}
+                              <Button
+                                onClick={() => {
+                                  if (confirm(`Verarbeiter von ${getDisplayName(processor.user)} wirklich löschen?`)) {
+                                    deleteProcessorMutation.mutate(processor.id);
+                                  }
                                 }}
-                              ></div>
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      {!isFinished && (
+                        <div className="mt-4">
+                          <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
+                            <span>Fortschritt</span>
+                            <span>{Math.round(progress)}%</span>
                           </div>
-                        )}
-                      </CardContent>
-                    </Card>
+                          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-1000 rounded-full"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Processor Picker Modal */}
       {showProcessorPicker && (

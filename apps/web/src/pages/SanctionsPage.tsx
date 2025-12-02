@@ -1,11 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sanctionsApi } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Scale, AlertTriangle, CheckCircle, Clock, X, DollarSign, User, Plus, RotateCcw } from 'lucide-react'
+import { 
+  Scale, 
+  AlertTriangle, 
+  CheckCircle, 
+  Clock, 
+  X, 
+  DollarSign, 
+  User, 
+  Plus, 
+  RotateCcw,
+  Gavel,
+  TrendingUp
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
 import { hasRole } from '../lib/utils'
@@ -14,63 +25,35 @@ import ResetSanctionLevelsModal from '../components/ResetSanctionLevelsModal'
 
 // Funktion für human-readable Kategorie-Namen
 function getCategoryDisplayName(category: string): string {
-  switch (category) {
-    case 'ABMELDUNG':
-      return 'Abmeldung'
-    case 'RESPEKTVERHALTEN':
-      return 'Respektverhalten'
-    case 'FUNKCHECK':
-      return 'Funkcheck'
-    case 'REAKTIONSPFLICHT':
-      return 'Reaktionspflicht'
-    case 'NICHT_BEZAHLT':
-      return 'Wochenabgabe nicht bezahlt'
-    case 'NICHT_BEZAHLT_48H':
-      return 'Sanktion nicht bezahlt (48h)'
-    case 'RESPEKTLOS_ZIVILISTEN':
-      return 'Respektlos gegenüber Zivilisten'
-    case 'RESPEKTLOS_FAMILIE':
-      return 'Respektlos gegenüber Familie'
-    case 'TOETUNG_FAMILIENMITGLIEDER':
-      return 'Tötung von Familienmitgliedern'
-    case 'SEXUELLE_BELAESTIGUNG':
-      return 'Sexuelle Belästigung'
-    case 'UNNOETIGES_BOXEN_SCHIESSEN':
-      return 'Unnötiges Boxen/Schießen'
-    case 'MISSACHTUNG_ANWEISUNGEN':
-      return 'Missachtung von Anweisungen'
-    case 'FEHLEN_AUFSTELLUNG':
-      return 'Fehlen bei Aufstellung'
-    case 'NICHT_ANMELDEN_FUNKCHECK':
-      return 'Nicht beim Funkcheck angemeldet'
-    case 'KLEIDERORDNUNG':
-      return 'Kleiderordnung nicht eingehalten'
-    case 'MUNITIONSVERSCHWENDUNG':
-      return 'Munitionsverschwendung'
-    case 'CASA_OHNE_ANKUENDIGUNG':
-      return 'Casa ohne Ankündigung betreten'
-    case 'FUNKPFLICHT_MISSACHTUNG':
-      return 'Funkpflicht missachtet'
-    case 'FUNKDISZIPLIN_MISSACHTUNG':
-      return 'Funkdisziplin missachtet'
-    case 'WOCHENABGABE_NICHT_ENTRICHTET':
-      return 'Wochenabgabe nicht entrichtet'
-    default:
-      return category
+  const categoryMap: Record<string, string> = {
+    'ABMELDUNG': 'Abmeldung',
+    'RESPEKTVERHALTEN': 'Respektverhalten',
+    'FUNKCHECK': 'Funkcheck',
+    'REAKTIONSPFLICHT': 'Reaktionspflicht',
+    'NICHT_BEZAHLT': 'Wochenabgabe nicht bezahlt',
+    'NICHT_BEZAHLT_48H': 'Sanktion nicht bezahlt (48h)',
+    'RESPEKTLOS_ZIVILISTEN': 'Respektlos gegenüber Zivilisten',
+    'RESPEKTLOS_FAMILIE': 'Respektlos gegenüber Familie',
+    'TOETUNG_FAMILIENMITGLIEDER': 'Tötung von Familienmitgliedern',
+    'SEXUELLE_BELAESTIGUNG': 'Sexuelle Belästigung',
+    'UNNOETIGES_BOXEN_SCHIESSEN': 'Unnötiges Boxen/Schießen',
+    'MISSACHTUNG_ANWEISUNGEN': 'Missachtung von Anweisungen',
+    'FEHLEN_AUFSTELLUNG': 'Fehlen bei Aufstellung',
+    'NICHT_ANMELDEN_FUNKCHECK': 'Nicht beim Funkcheck angemeldet',
+    'KLEIDERORDNUNG': 'Kleiderordnung nicht eingehalten',
+    'MUNITIONSVERSCHWENDUNG': 'Munitionsverschwendung',
+    'CASA_OHNE_ANKUENDIGUNG': 'Casa ohne Ankündigung betreten',
+    'FUNKPFLICHT_MISSACHTUNG': 'Funkpflicht missachtet',
+    'FUNKDISZIPLIN_MISSACHTUNG': 'Funkdisziplin missachtet',
+    'WOCHENABGABE_NICHT_ENTRICHTET': 'Wochenabgabe nicht entrichtet',
   }
+  return categoryMap[category] || category
 }
-
-// Alias für Kompatibilität
-const getCategoryName = getCategoryDisplayName;
 
 interface Sanction {
   id: string
   userId: string
-  category: 'ABMELDUNG' | 'RESPEKTVERHALTEN' | 'FUNKCHECK' | 'REAKTIONSPFLICHT' | 'NICHT_BEZAHLT' | 'NICHT_BEZAHLT_48H' |
-    'RESPEKTLOS_ZIVILISTEN' | 'RESPEKTLOS_FAMILIE' | 'TOETUNG_FAMILIENMITGLIEDER' | 'SEXUELLE_BELAESTIGUNG' |
-    'UNNOETIGES_BOXEN_SCHIESSEN' | 'MISSACHTUNG_ANWEISUNGEN' | 'FEHLEN_AUFSTELLUNG' | 'NICHT_ANMELDEN_FUNKCHECK' |
-    'KLEIDERORDNUNG' | 'MUNITIONSVERSCHWENDUNG' | 'CASA_OHNE_ANKUENDIGUNG' | 'FUNKPFLICHT_MISSACHTUNG' |
-    'FUNKDISZIPLIN_MISSACHTUNG' | 'WOCHENABGABE_NICHT_ENTRICHTET'
+  category: string
   level: number
   description: string
   amount?: number
@@ -120,11 +103,9 @@ export default function SanctionsPage() {
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
-  // Check if user has leadership role
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const isElPatron = hasRole(user, 'EL_PATRON')
 
-  // Queries
   const { data: sanctions = [], isLoading: loadingSanctions } = useQuery({
     queryKey: ['sanctions', 'all', selectedStatus, selectedCategory],
     queryFn: () => sanctionsApi.getSanctions({ 
@@ -149,7 +130,6 @@ export default function SanctionsPage() {
     queryFn: () => sanctionsApi.getCategories().then(res => res.data),
   })
 
-  // Mutations
   const paySanctionMutation = useMutation({
     mutationFn: (id: string) => sanctionsApi.paySanction(id),
     onSuccess: () => {
@@ -223,40 +203,29 @@ export default function SanctionsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return <Badge variant="outline" className="text-red-600 border-red-600">Aktiv</Badge>
+        return <Badge className="bg-red-500/20 text-red-300 border-red-500/30">Aktiv</Badge>
       case 'PAID':
-        return <Badge variant="outline" className="text-green-600 border-green-600">Bezahlt</Badge>
+        return <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Bezahlt</Badge>
       case 'EXPIRED':
-        return <Badge variant="outline" className="text-gray-600 border-gray-600">Abgelaufen</Badge>
+        return <Badge className="bg-gray-500/20 text-gray-300 border-gray-500/30">Abgelaufen</Badge>
       case 'CANCELLED':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">Storniert</Badge>
+        return <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">Storniert</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
   }
 
-  // getCategoryName ist bereits oben definiert - entfernt diese duplizierte Funktion
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('de-DE')
-  }
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('de-DE')
-  }
-
-  const formatUserName = (user: Sanction['user']) => {
-    if (user.icFirstName && user.icLastName) {
-      return `${user.icFirstName} ${user.icLastName}`
-    }
-    return user.username
-  }
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('de-DE')
+  const formatDateTime = (dateString: string) => new Date(dateString).toLocaleString('de-DE')
+  const formatUserName = (user: Sanction['user']) => 
+    user.icFirstName && user.icLastName ? `${user.icFirstName} ${user.icLastName}` : user.username
 
   if (loadingSanctions || loadingStats) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-400">Lade Sanktionsdaten...</div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+          <p className="text-gray-400">Lade Sanktionsdaten...</p>
         </div>
       </div>
     )
@@ -265,117 +234,126 @@ export default function SanctionsPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">⚖️ Sanktionssystem</h1>
-          <p className="text-gray-400 mt-2">
-            LaFamilia se cuida, Compadres! Verwaltung von Verstößen und Strafen
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowMySanctions(!showMySanctions)}
-            className="flex items-center gap-2"
-          >
-            <User className="h-4 w-4" />
-            {showMySanctions ? 'Alle Sanktionen' : 'Meine Sanktionen'}
-          </Button>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-red-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-rose-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-red-600 to-rose-600 rounded-xl shadow-lg shadow-red-500/30">
+              <Gavel className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Sanktionssystem</h1>
+              <p className="text-gray-400 mt-1">
+                LaFamilia se cuida, Compadres!
+              </p>
+            </div>
+          </div>
           
-          {isLeadership && (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => cleanupMutation.mutate()}
-                disabled={cleanupMutation.isPending}
-                className="flex items-center gap-2"
-              >
-                <X className="h-4 w-4" />
-                Bereinigen
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => autoSanction48hMutation.mutate()}
-                disabled={autoSanction48hMutation.isPending}
-                className="flex items-center gap-2"
-              >
-                <Clock className="h-4 w-4" />
-                48h Sanktionierung
-              </Button>
-              
-              <Button
-                variant="default"
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Sanktion erstellen
-              </Button>
-              
-              {isElPatron && (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowMySanctions(!showMySanctions)}
+              className="border-gray-700 hover:bg-gray-800"
+            >
+              <User className="h-4 w-4 mr-2" />
+              {showMySanctions ? 'Alle Sanktionen' : 'Meine Sanktionen'}
+            </Button>
+            
+            {isLeadership && (
+              <>
                 <Button
-                  variant="destructive"
-                  onClick={() => setShowResetModal(true)}
-                  className="flex items-center gap-2"
+                  variant="outline"
+                  onClick={() => cleanupMutation.mutate()}
+                  disabled={cleanupMutation.isPending}
+                  className="border-gray-700 hover:bg-gray-800"
                 >
-                  <RotateCcw className="h-4 w-4" />
-                  Level zurücksetzen
+                  <X className="h-4 w-4 mr-2" />
+                  Bereinigen
                 </Button>
-              )}
-            </>
-          )}
+                
+                <Button
+                  variant="outline"
+                  onClick={() => autoSanction48hMutation.mutate()}
+                  disabled={autoSanction48hMutation.isPending}
+                  className="border-gray-700 hover:bg-gray-800"
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  48h Sanktionierung
+                </Button>
+                
+                <Button
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Sanktion erstellen
+                </Button>
+                
+                {isElPatron && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowResetModal(true)}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Level zurücksetzen
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Scale className="h-5 w-5 text-primary" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.total}</div>
-                  <div className="text-sm text-gray-400">Gesamt</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-gray-700">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-gray-500/20 rounded-lg">
+                  <Scale className="h-5 w-5 text-gray-400" />
                 </div>
               </div>
+              <p className="text-gray-400 text-sm">Gesamt</p>
+              <p className="text-2xl font-bold text-white">{stats.total}</p>
             </CardContent>
           </Card>
           
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.active}</div>
-                  <div className="text-sm text-gray-400">Aktiv</div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-red-900/30 to-rose-900/20 border-red-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-red-500/20 rounded-lg">
+                  <AlertTriangle className="h-5 w-5 text-red-400" />
                 </div>
               </div>
+              <p className="text-red-300/70 text-sm">Aktiv</p>
+              <p className="text-2xl font-bold text-white">{stats.active}</p>
             </CardContent>
           </Card>
 
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.paid}</div>
-                  <div className="text-sm text-gray-400">Bezahlt</div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-400" />
                 </div>
               </div>
+              <p className="text-green-300/70 text-sm">Bezahlt</p>
+              <p className="text-2xl font-bold text-white">{stats.paid}</p>
             </CardContent>
           </Card>
 
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-gray-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.expired}</div>
-                  <div className="text-sm text-gray-400">Abgelaufen</div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900/30 to-gray-800/20 border-gray-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-gray-500/20 rounded-lg">
+                  <Clock className="h-5 w-5 text-gray-400" />
                 </div>
               </div>
+              <p className="text-gray-400 text-sm">Abgelaufen</p>
+              <p className="text-2xl font-bold text-white">{stats.expired}</p>
             </CardContent>
           </Card>
         </div>
@@ -383,16 +361,19 @@ export default function SanctionsPage() {
 
       {/* Category Stats */}
       {stats && stats.byCategory.length > 0 && (
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle>Sanktionen nach Kategorien</CardTitle>
+        <Card className="bg-gray-900/50 border-gray-800">
+          <CardHeader className="border-b border-gray-800">
+            <CardTitle className="text-white flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-red-400" />
+              Sanktionen nach Kategorien
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {stats.byCategory.map((stat) => (
-                <div key={stat.category} className="text-center">
+                <div key={stat.category} className="text-center p-3 bg-gray-800/50 rounded-lg">
                   <div className="text-2xl font-bold text-white">{stat._count.category}</div>
-                  <div className="text-sm text-gray-400">{getCategoryName(stat.category)}</div>
+                  <div className="text-sm text-gray-400">{getCategoryDisplayName(stat.category)}</div>
                 </div>
               ))}
             </div>
@@ -400,210 +381,174 @@ export default function SanctionsPage() {
         </Card>
       )}
 
+      {/* Filter */}
+      {!showMySanctions && (
+        <Card className="bg-gray-900/50 border-gray-800">
+          <CardContent className="p-4">
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <span className="text-gray-400 text-sm self-center mr-2">Status:</span>
+                {['', 'ACTIVE', 'PAID', 'EXPIRED'].map((status) => (
+                  <Button
+                    key={status}
+                    variant={selectedStatus === status ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedStatus(status)}
+                    className={selectedStatus === status 
+                      ? 'bg-red-600 hover:bg-red-700 text-white' 
+                      : 'border-gray-700 hover:bg-gray-800'}
+                  >
+                    {status === '' ? 'Alle' : status === 'ACTIVE' ? 'Aktiv' : status === 'PAID' ? 'Bezahlt' : 'Abgelaufen'}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-gray-400 text-sm self-center mr-2">Kategorie:</span>
+                {['', 'ABMELDUNG', 'RESPEKTVERHALTEN', 'FUNKCHECK', 'REAKTIONSPFLICHT'].map((cat) => (
+                  <Button
+                    key={cat}
+                    variant={selectedCategory === cat ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedCategory(cat)}
+                    className={selectedCategory === cat 
+                      ? 'bg-red-600 hover:bg-red-700 text-white' 
+                      : 'border-gray-700 hover:bg-gray-800'}
+                  >
+                    {cat === '' ? 'Alle' : getCategoryDisplayName(cat)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Sanctions Table */}
-      <Card className="lasanta-card">
-        <CardHeader>
-          <CardTitle>
+      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+        <CardHeader className="border-b border-gray-800">
+          <CardTitle className="text-white">
             {showMySanctions ? 'Meine Sanktionen' : 'Alle Sanktionen'}
           </CardTitle>
-          <CardDescription>
-            {!showMySanctions && (
-              <div className="flex gap-2 mt-2">
-                <Button
-                  variant={selectedStatus === '' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedStatus('')}
-                >
-                  Alle Status
-                </Button>
-                <Button
-                  variant={selectedStatus === 'ACTIVE' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedStatus('ACTIVE')}
-                >
-                  Aktiv
-                </Button>
-                <Button
-                  variant={selectedStatus === 'PAID' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedStatus('PAID')}
-                >
-                  Bezahlt
-                </Button>
-                <Button
-                  variant={selectedStatus === 'EXPIRED' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedStatus('EXPIRED')}
-                >
-                  Abgelaufen
-                </Button>
-              </div>
-            )}
-            {!showMySanctions && (
-              <div className="flex gap-2 mt-2">
-                <Button
-                  variant={selectedCategory === '' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('')}
-                >
-                  Alle Kategorien
-                </Button>
-                <Button
-                  variant={selectedCategory === 'ABMELDUNG' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('ABMELDUNG')}
-                >
-                  Abmeldung
-                </Button>
-                <Button
-                  variant={selectedCategory === 'RESPEKTVERHALTEN' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('RESPEKTVERHALTEN')}
-                >
-                  Respektverhalten
-                </Button>
-                <Button
-                  variant={selectedCategory === 'FUNKCHECK' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('FUNKCHECK')}
-                >
-                  Funkcheck
-                </Button>
-                <Button
-                  variant={selectedCategory === 'REAKTIONSPFLICHT' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('REAKTIONSPFLICHT')}
-                >
-                  Reaktionspflicht
-                </Button>
-                <Button
-                  variant={selectedCategory === 'NICHT_BEZAHLT' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('NICHT_BEZAHLT')}
-                >
-                  Wochenabgabe nicht bezahlt
-                </Button>
-                <Button
-                  variant={selectedCategory === 'NICHT_BEZAHLT_48H' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('NICHT_BEZAHLT_48H')}
-                >
-                  Sanktion nicht bezahlt (48h)
-                </Button>
-              </div>
-            )}
+          <CardDescription className="text-gray-400">
+            {(showMySanctions ? mySanctions : sanctions).length} Einträge
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {(showMySanctions ? mySanctions : sanctions).length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
-              Keine Sanktionen gefunden
+            <div className="py-16 text-center">
+              <CheckCircle className="h-16 w-16 mx-auto text-green-500/50 mb-4" />
+              <p className="text-gray-400 text-lg">Keine Sanktionen gefunden</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Benutzer</TableHead>
-                  <TableHead>Kategorie</TableHead>
-                  <TableHead>Level</TableHead>
-                  <TableHead>Beschreibung</TableHead>
-                  <TableHead>Strafe</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Erstellt von</TableHead>
-                  <TableHead>Erstellt</TableHead>
-                  <TableHead>Ablauf</TableHead>
-                  {!showMySanctions && isLeadership && <TableHead>Aktionen</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(showMySanctions ? mySanctions : sanctions).map((sanction: Sanction) => (
-                  <TableRow key={sanction.id}>
-                    <TableCell className="font-medium">
-                      {formatUserName(sanction.user)}
-                    </TableCell>
-                    <TableCell>{getCategoryName(sanction.category)}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Level {sanction.level}</Badge>
-                    </TableCell>
-                    <TableCell>{sanction.description}</TableCell>
-                    <TableCell>
-                      {sanction.amount && (
-                        <div className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4" />
-                          {sanction.amount.toLocaleString('de-DE')} Schwarzgeld
-                        </div>
-                      )}
-                      {sanction.penalty && (
-                        <div className="text-sm text-yellow-400">{sanction.penalty}</div>
-                      )}
-                      {!sanction.amount && !sanction.penalty && '-'}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(sanction.status)}</TableCell>
-                    <TableCell>{sanction.createdBy.username}</TableCell>
-                    <TableCell>{formatDateTime(sanction.createdAt)}</TableCell>
-                    <TableCell>
-                      {sanction.expiresAt ? formatDate(sanction.expiresAt) : '-'}
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Benutzer</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategorie</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Level</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Beschreibung</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Strafe</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erstellt</th>
                     {!showMySanctions && isLeadership && (
-                      <TableCell>
-                        <div className="flex gap-2">
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {(showMySanctions ? mySanctions : sanctions).map((sanction: Sanction) => (
+                    <tr key={sanction.id} className="group hover:bg-red-950/20 transition-colors">
+                      <td className="py-4 px-6">
+                        <span className="font-medium text-white">{formatUserName(sanction.user)}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-gray-300">{getCategoryDisplayName(sanction.category)}</span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <Badge variant="outline" className="border-red-500/30 text-red-400">
+                          Level {sanction.level}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4 max-w-xs">
+                        <span className="text-gray-400 text-sm truncate block">{sanction.description}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        {sanction.amount && (
+                          <div className="flex items-center gap-1 text-amber-400">
+                            <DollarSign className="h-4 w-4" />
+                            {sanction.amount.toLocaleString('de-DE')}
+                          </div>
+                        )}
+                        {sanction.penalty && (
+                          <div className="text-sm text-yellow-400">{sanction.penalty}</div>
+                        )}
+                        {!sanction.amount && !sanction.penalty && <span className="text-gray-500">-</span>}
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        {getStatusBadge(sanction.status)}
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-sm text-gray-400">{formatDateTime(sanction.createdAt)}</div>
+                        <div className="text-xs text-gray-500">von {sanction.createdBy.username}</div>
+                      </td>
+                      {!showMySanctions && isLeadership && (
+                        <td className="py-4 px-6">
                           {sanction.status === 'ACTIVE' && (
-                            <>
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <Button
-                                variant="outline"
                                 size="sm"
+                                variant="ghost"
+                                className="h-8 px-3 text-green-400 hover:text-green-300 hover:bg-green-500/10"
                                 onClick={() => paySanctionMutation.mutate(sanction.id)}
                                 disabled={paySanctionMutation.isPending}
                               >
                                 Bezahlt
                               </Button>
                               <Button
-                                variant="outline"
                                 size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                                 onClick={() => removeSanctionMutation.mutate(sanction.id)}
                                 disabled={removeSanctionMutation.isPending}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
-                            </>
+                            </div>
                           )}
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Sanction Categories Info */}
       {categoriesData && (
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle>Sanktionskategorien</CardTitle>
-            <CardDescription>
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
+            <CardTitle className="text-white">Sanktionskategorien</CardTitle>
+            <CardDescription className="text-gray-400">
               Übersicht über die verschiedenen Sanktionskategorien und deren Strafen
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="p-4">
+            <div className="grid gap-4 md:grid-cols-2">
               {categoriesData.categories.map((category: SanctionCategory) => (
-                <div key={category.key} className="border rounded-lg p-4">
+                <div key={category.key} className="border border-gray-700 rounded-xl p-4 bg-gray-800/30">
                   <h4 className="font-semibold text-white mb-2">{category.name}</h4>
                   <p className="text-gray-400 text-sm mb-3">{category.description}</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {category.penalties.map((penalty) => (
-                      <div key={penalty.level} className="text-center p-2 bg-gray-800 rounded">
-                        <div className="text-sm font-medium text-white">Level {penalty.level}</div>
-                        <div className="text-xs text-gray-400">
-                          {penalty.amount && penalty.penalty 
-                            ? `${penalty.amount.toLocaleString('de-DE')} Schwarzgeld / ${penalty.penalty}`
-                            : penalty.amount && `${penalty.amount.toLocaleString('de-DE')} Schwarzgeld`
-                          }
-                          {penalty.penalty && !penalty.amount && penalty.penalty}
-                          {!penalty.amount && !penalty.penalty && 'Verwarnung'}
+                      <div key={penalty.level} className="text-center px-3 py-2 bg-gray-800 rounded-lg">
+                        <div className="text-xs font-medium text-red-400">Level {penalty.level}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">
+                          {penalty.amount ? `${penalty.amount.toLocaleString('de-DE')} SG` : 
+                           penalty.penalty || 'Verwarnung'}
                         </div>
                       </div>
                     ))}
@@ -615,7 +560,7 @@ export default function SanctionsPage() {
         </Card>
       )}
 
-      {/* Create Sanction Modal */}
+      {/* Modals */}
       <CreateSanctionModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
@@ -623,7 +568,6 @@ export default function SanctionsPage() {
         isLoading={createSanctionMutation.isPending}
       />
 
-      {/* Reset Sanction Levels Modal */}
       <ResetSanctionLevelsModal
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}
