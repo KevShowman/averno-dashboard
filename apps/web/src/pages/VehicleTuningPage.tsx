@@ -52,10 +52,21 @@ export default function VehicleTuningPage() {
         <AlertDescription className="text-white ml-2">
           <div className="space-y-2">
             <p className="font-semibold text-lg">{data?.workshop?.name}</p>
-            <p className="text-sm text-gray-300">
-              Codewort: <span className="font-mono text-primary">{data?.workshop?.codeword}</span>
-            </p>
-            <div className="flex gap-4 text-sm">
+            {data?.workshop?.codeword ? (
+              <p className="text-sm text-gray-300">
+                Codewort: <span className="font-mono text-primary">{data?.workshop?.codeword}</span>
+              </p>
+            ) : (
+              <div className="bg-green-900/30 border border-green-500/30 rounded-lg p-3 mt-2">
+                <p className="text-green-400 font-medium text-sm">
+                  ✅ Kein Codewort benötigt
+                </p>
+                <p className="text-green-200/70 text-xs mt-1">
+                  Einfach sagen, dass du zu <span className="font-semibold">La Santa Calavera</span> gehörst.
+                </p>
+              </div>
+            )}
+            <div className="flex gap-4 text-sm mt-2">
               <span className="text-gray-300">
                 Familienfahrzeuge: <span className="text-primary font-semibold">{data?.workshop?.discounts?.familyVehicles}</span> Rabatt
               </span>

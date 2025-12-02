@@ -31,6 +31,9 @@ interface UnassignedDiscordUser {
   avatar: string | null;
   highestSystemRole: string;
   joinedAt: string;
+  icFirstName?: string | null;
+  icLastName?: string | null;
+  isInDatabase?: boolean;
 }
 
 interface GhostUser {
@@ -196,11 +199,23 @@ export default function BloodListPage() {
 
   const openLinkModal = (discordUser: UnassignedDiscordUser) => {
     setSelectedDiscordUser(discordUser);
-    // Vorausfüllen mit Username falls möglich
-    const nameParts = discordUser.username.split(' ');
+    
+    // Vorausfüllen mit IC-Namen wenn vorhanden, sonst Username
+    let vorname = '';
+    let nachname = '';
+    
+    if (discordUser.icFirstName && discordUser.icLastName) {
+      vorname = discordUser.icFirstName;
+      nachname = discordUser.icLastName;
+    } else {
+      const nameParts = discordUser.username.split(' ');
+      vorname = nameParts[0] || '';
+      nachname = nameParts.slice(1).join(' ') || '';
+    }
+    
     setLinkData({
-      vorname: nameParts[0] || '',
-      nachname: nameParts.slice(1).join(' ') || '',
+      vorname,
+      nachname,
       telefon: '',
       steam: '',
       bloodinDurch: user?.icFirstName && user?.icLastName 
@@ -536,10 +551,20 @@ export default function BloodListPage() {
                           <h3 className="text-lg font-bold text-white">
                             {discordUser.username}
                           </h3>
-                          <div className="flex items-center gap-2 text-sm">
+                          {discordUser.icFirstName && discordUser.icLastName && (
+                            <p className="text-sm text-gray-300">
+                              IC: {discordUser.icFirstName} {discordUser.icLastName}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 text-sm mt-1">
                             <Badge variant="outline" className="text-blue-400 border-blue-400">
                               {discordUser.highestSystemRole}
                             </Badge>
+                            {discordUser.isInDatabase && (
+                              <Badge variant="outline" className="text-green-400 border-green-400">
+                                In DB
+                              </Badge>
+                            )}
                             <span className="text-gray-400">
                               Beigetreten: {formatDate(discordUser.joinedAt)}
                             </span>

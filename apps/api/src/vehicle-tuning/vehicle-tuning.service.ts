@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class VehicleTuningService {
+  constructor(private settingsService: SettingsService) {}
+
   async getTuningSpecs() {
+    // Xiao Motors Settings aus der Datenbank holen
+    const xiaoSettings = await this.settingsService.getXiaoMotorsSettings();
+
     return {
       workshop: {
         name: 'Xiao Motors',
-        codeword: 'WIRD_VOM_ADMIN_GESETZT', // Placeholder - kann über Settings verwaltet werden
+        // Kein Codewort mehr benötigt - einfach sagen dass man zu La Santa Calavera gehört
+        codeword: xiaoSettings.codewort || null,
+        hinweis: xiaoSettings.hinweis,
+        enabled: xiaoSettings.enabled,
         discounts: {
           familyVehicles: '50%',
           privateVehicles: '20%',

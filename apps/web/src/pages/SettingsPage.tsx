@@ -14,7 +14,8 @@ import {
   FlaskConical,
   Skull,
   Hash,
-  AlertTriangle
+  AlertTriangle,
+  Car
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
 import { api, packagesApi, discordApi, settingsApi } from '../lib/api'
@@ -57,6 +58,9 @@ export default function SettingsPage() {
   // Blood List channel settings states
   const [bloodInChannelId, setBloodInChannelId] = useState('')
   const [bloodOutChannelId, setBloodOutChannelId] = useState('')
+
+  // Xiao Motors settings states
+  const [xiaoMotorsCodewort, setXiaoMotorsCodewort] = useState('')
 
   // Permission checks
   const canManageUsers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
@@ -105,6 +109,12 @@ export default function SettingsPage() {
   const { data: bloodListSettings } = useQuery({
     queryKey: ['bloodlist-settings'],
     queryFn: () => settingsApi.getBloodListSettings().then(res => res.data),
+    enabled: canManageSettings,
+  })
+
+  const { data: xiaoMotorsSettings } = useQuery({
+    queryKey: ['xiao-motors-settings'],
+    queryFn: () => settingsApi.getXiaoMotorsSettings().then(res => res.data),
     enabled: canManageSettings,
   })
 
@@ -183,6 +193,19 @@ export default function SettingsPage() {
     },
   })
 
+  const saveXiaoMotorsSettingsMutation = useMutation({
+    mutationFn: (data: { codewort: string; enabled: boolean }) =>
+      settingsApi.setXiaoMotorsSettings(data),
+    onSuccess: () => {
+      toast.success('Xiao Motors Einstellungen gespeichert')
+      queryClient.invalidateQueries({ queryKey: ['xiao-motors-settings'] })
+      queryClient.invalidateQueries({ queryKey: ['vehicle-tuning'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Speichern der Einstellungen')
+    },
+  })
+
   // Set initial values
   useEffect(() => {
     if (user?.icFirstName) setIcFirstName(user.icFirstName)
@@ -212,6 +235,12 @@ export default function SettingsPage() {
       setBloodOutChannelId(bloodListSettings.bloodOutChannelId)
     }
   }, [bloodListSettings])
+
+  useEffect(() => {
+    if (xiaoMotorsSettings?.codewort !== undefined) {
+      setXiaoMotorsCodewort(xiaoMotorsSettings.codewort || '')
+    }
+  }, [xiaoMotorsSettings])
 
   const handleUpdateIcName = () => {
     if (icFirstName.trim() && icLastName.trim()) {
@@ -246,6 +275,21 @@ export default function SettingsPage() {
     } else {
       toast.error('Bitte beide Channels auswählen')
     }
+  }
+
+  const handleSaveXiaoMotorsSettings = () => {
+    saveXiaoMotorsSettingsMutation.mutate({
+      codewort: xiaoMotorsCodewort.trim(),
+      enabled: true,
+    })
+  }
+
+  const handleClearXiaoMotorsCodewort = () => {
+    saveXiaoMotorsSettingsMutation.mutate({
+      codewort: '',
+      enabled: true,
+    })
+    setXiaoMotorsCodewort('')
   }
 
   return (
@@ -490,6 +534,68 @@ export default function SettingsPage() {
                 >
                   <Save className="h-4 w-4" />
                   {saveBloodListSettingsMutation.isPending ? 'Speichern...' : 'Channel-Einstellungen speichern'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Xiao Motors Einstellungen - für Leaderschaft */}
+      {canManageSettings && (
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Car className="mr-2 h-5 w-5 text-blue-500" />
+              Xiao Motors
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Konfiguriere das Codewort für Xiao Motors (oder leer lassen für "La Santa Calavera")
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">
+                  Codewort (optional)
+                </label>
+                <Input
+                  value={xiaoMotorsCodewort}
+                  onChange={(e) => setXiaoMotorsCodewort(e.target.value)}
+                  placeholder="Leer = Kein Codewort benötigt"
+                  className="bg-gray-700 border-gray-600 text-white"
+                />
+                <p className="text-xs text-gray-500">
+                  Wenn leer: "Einfach sagen, dass man zu La Santa Calavera gehört"
+                </p>
+              </div>
+              
+              {!xiaoMotorsCodewort && xiaoMotorsSettings?.codewort === '' && (
+                <div className="p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                  <p className="text-green-400 text-sm">
+                    ✅ Aktuell kein Codewort - Mitglieder sagen einfach, dass sie zu La Santa Calavera gehören.
+                  </p>
+                </div>
+              )}
+              
+              <div className="flex gap-2 justify-end">
+                {xiaoMotorsCodewort && (
+                  <Button
+                    onClick={handleClearXiaoMotorsCodewort}
+                    variant="outline"
+                    disabled={saveXiaoMotorsSettingsMutation.isPending}
+                    className="flex items-center gap-2"
+                  >
+                    Codewort entfernen
+                  </Button>
+                )}
+                <Button
+                  onClick={handleSaveXiaoMotorsSettings}
+                  disabled={saveXiaoMotorsSettingsMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {saveXiaoMotorsSettingsMutation.isPending ? 'Speichern...' : 'Speichern'}
                 </Button>
               </div>
             </div>
