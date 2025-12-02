@@ -218,7 +218,7 @@ export default function AbmeldungenPage() {
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const isCurrentMonth = isSameMonth(day, currentMonth);
           const isCurrentDay = isToday(day);
-          const isDisabled = minDate && isBefore(day, minDate);
+          const isDisabled = minDate ? isBefore(day, minDate) : false;
           
           return (
             <button
