@@ -330,29 +330,104 @@ export default function FamiliensammelnPage() {
 
       {/* Statistik-Ansicht */}
       {showStatistics && statistics && (
-        <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-gold-400">Teilnahme-Statistik</CardTitle>
-            <CardDescription className="text-gray-400">
-              Woche vom {new Date(currentWeek.weekStart).toLocaleDateString('de-DE')} bis{' '}
-              {new Date(currentWeek.weekEnd).toLocaleDateString('de-DE')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/30 border border-amber-500/30">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl" />
+          
+          <div className="relative p-6 border-b border-amber-500/20">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg shadow-amber-500/30">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Wochenstatistik</h2>
+                <p className="text-amber-200/60 text-sm">
+                  {new Date(currentWeek.weekStart).toLocaleDateString('de-DE')} – {new Date(currentWeek.weekEnd).toLocaleDateString('de-DE')}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative p-6">
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-gradient-to-br from-green-900/40 to-green-800/20 rounded-xl p-4 border border-green-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-500/20 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-green-400">
+                      {statistics.statistics.filter(s => s.hasPassed).length}
+                    </div>
+                    <div className="text-xs text-green-300/60 uppercase tracking-wide">Bestanden</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-red-900/40 to-red-800/20 rounded-xl p-4 border border-red-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-500/20 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-red-400">
+                      {statistics.statistics.filter(s => !s.hasPassed).length}
+                    </div>
+                    <div className="text-xs text-red-300/60 uppercase tracking-wide">Offen</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-amber-900/40 to-amber-800/20 rounded-xl p-4 border border-amber-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-500/20 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-amber-400">
+                      {statistics.statistics.reduce((sum, s) => sum + s.totalTours, 0)}
+                    </div>
+                    <div className="text-xs text-amber-300/60 uppercase tracking-wide">Touren</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-yellow-900/40 to-yellow-800/20 rounded-xl p-4 border border-yellow-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-yellow-500/20 rounded-lg">
+                    <Calendar className="h-5 w-5 text-yellow-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-yellow-400">
+                      {statistics.statistics.filter(s => s.mustPayWeeklyDelivery).length}
+                    </div>
+                    <div className="text-xs text-yellow-300/60 uppercase tracking-wide">Abgabe fällig</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* User List */}
             <div className="space-y-3">
               {statistics.statistics.map((stat) => (
                 <div
                   key={stat.user.id}
-                  className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700"
+                  className={`group flex items-center justify-between p-4 rounded-xl border transition-all ${
+                    stat.hasPassed 
+                      ? 'bg-green-900/10 border-green-500/20 hover:border-green-500/40' 
+                      : 'bg-gray-800/30 border-gray-700/50 hover:border-amber-500/30'
+                  }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-600 to-gold-800 flex items-center justify-center">
-                      <span className="text-white font-bold">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      stat.hasPassed 
+                        ? 'bg-gradient-to-br from-green-500 to-emerald-600' 
+                        : 'bg-gradient-to-br from-amber-500 to-orange-600'
+                    }`}>
+                      <span className="text-white font-bold text-lg">
                         {stat.user.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium text-white">{stat.user.username}</p>
+                      <p className="font-semibold text-white">{stat.user.username}</p>
                       {stat.user.icFirstName && (
                         <p className="text-sm text-gray-400">
                           {stat.user.icFirstName} {stat.user.icLastName}
@@ -361,154 +436,192 @@ export default function FamiliensammelnPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm text-gray-400">Tage</p>
-                      <p className="text-lg font-bold text-white">{stat.participationCount} / 4</p>
+                  <div className="flex items-center gap-6">
+                    {/* Progress Indicator */}
+                    <div className="hidden md:flex items-center gap-2">
+                      <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all ${
+                            stat.hasPassed ? 'bg-green-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${Math.min(100, (stat.participationCount / 4) * 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-sm text-gray-400 w-12">{stat.participationCount}/4</span>
                     </div>
-
-                    <div className="text-right">
-                      <p className="text-sm text-gray-400">Touren</p>
-                      <p className="text-lg font-bold text-gold-400">{stat.totalTours}</p>
+                    
+                    <div className="text-center min-w-[60px]">
+                      <p className="text-2xl font-bold text-amber-400">{stat.totalTours}</p>
+                      <p className="text-xs text-gray-500">Touren</p>
                     </div>
 
                     {stat.hasPassed ? (
-                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                        <CheckCircle className="h-3 w-3 mr-1" />
+                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30 px-3 py-1.5">
+                        <CheckCircle className="h-4 w-4 mr-1.5" />
                         Bestanden
                       </Badge>
                     ) : (
-                      <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        {stat.remainingDays} Tag(e) oder {stat.remainingTours} Tour(en)
+                      <Badge className="bg-red-500/20 text-red-300 border-red-500/30 px-3 py-1.5">
+                        <AlertTriangle className="h-4 w-4 mr-1.5" />
+                        {stat.remainingDays}T / {stat.remainingTours}T fehlt
                       </Badge>
                     )}
 
                     {stat.mustPayWeeklyDelivery && (
-                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                        Wochenabgabe fällig
+                      <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 px-3 py-1.5">
+                        💰 Fällig
                       </Badge>
                     )}
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Gesamtstatistik & Leaderboard */}
       {showAllTimeStats && allTimeStats && (
         <div className="space-y-6">
-          {/* Gesamtstatistik Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card className="bg-gradient-to-br from-gold-900/50 to-gold-800/50 border-gold-500/30">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-gold-400 text-sm font-medium">Gesamte Touren</p>
-                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.totalTours}</p>
+          {/* Modern Header */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900/40 via-green-900/30 to-teal-900/40 border border-emerald-500/30">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl" />
+            
+            <div className="relative p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/30">
+                  <TrendingUp className="h-6 w-6 text-white" />
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-green-900/50 to-green-800/50 border-green-500/30">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-green-400 text-sm font-medium">Teilnahmen (Tage)</p>
-                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.totalParticipations}</p>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Gesamtstatistik</h2>
+                  <p className="text-emerald-200/60 text-sm">Alle Zeiten • Komplettes Tracking</p>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-blue-900/50 to-blue-800/50 border-blue-500/30">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-blue-400 text-sm font-medium">Aktive User</p>
-                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.activeUsers}</p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="bg-gradient-to-br from-amber-900/50 to-amber-800/30 rounded-xl p-4 border border-amber-500/30 text-center">
+                  <div className="p-2 bg-amber-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <TrendingUp className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <p className="text-3xl font-bold text-amber-400">{allTimeStats.totalStats.totalTours}</p>
+                  <p className="text-xs text-amber-300/60 uppercase tracking-wide mt-1">Touren Gesamt</p>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 border-purple-500/30">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-purple-400 text-sm font-medium">Gesamt Wochen</p>
-                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.totalWeeks}</p>
+                <div className="bg-gradient-to-br from-green-900/50 to-green-800/30 rounded-xl p-4 border border-green-500/30 text-center">
+                  <div className="p-2 bg-green-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <Calendar className="h-5 w-5 text-green-400" />
+                  </div>
+                  <p className="text-3xl font-bold text-green-400">{allTimeStats.totalStats.totalParticipations}</p>
+                  <p className="text-xs text-green-300/60 uppercase tracking-wide mt-1">Teilnahmen</p>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-orange-900/50 to-orange-800/50 border-orange-500/30">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-orange-400 text-sm font-medium">Ø Touren/Tag</p>
-                  <p className="text-4xl font-bold text-white mt-2">{allTimeStats.totalStats.averageToursPerParticipation}</p>
+                <div className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-4 border border-blue-500/30 text-center">
+                  <div className="p-2 bg-blue-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <Users className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <p className="text-3xl font-bold text-blue-400">{allTimeStats.totalStats.activeUsers}</p>
+                  <p className="text-xs text-blue-300/60 uppercase tracking-wide mt-1">Aktive User</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-4 border border-purple-500/30 text-center">
+                  <div className="p-2 bg-purple-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <Calendar className="h-5 w-5 text-purple-400" />
+                  </div>
+                  <p className="text-3xl font-bold text-purple-400">{allTimeStats.totalStats.totalWeeks}</p>
+                  <p className="text-xs text-purple-300/60 uppercase tracking-wide mt-1">Wochen</p>
+                </div>
+                <div className="bg-gradient-to-br from-cyan-900/50 to-cyan-800/30 rounded-xl p-4 border border-cyan-500/30 text-center">
+                  <div className="p-2 bg-cyan-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <TrendingUp className="h-5 w-5 text-cyan-400" />
+                  </div>
+                  <p className="text-3xl font-bold text-cyan-400">{allTimeStats.totalStats.averageToursPerParticipation}</p>
+                  <p className="text-xs text-cyan-300/60 uppercase tracking-wide mt-1">Ø Touren/Tag</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Leaderboard */}
-          <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-gold-400">🏆 Touren-Leaderboard</CardTitle>
-              <CardDescription className="text-gray-400">
-                Die fleißigsten Familienmitglieder aller Zeiten
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {allTimeStats.leaderboard.map((entry, index) => (
-                  <div
-                    key={entry.user.id}
-                    className={`flex items-center justify-between p-4 rounded-lg border ${
-                      index === 0
-                        ? 'bg-gold-900/30 border-gold-500/50'
-                        : index === 1
-                        ? 'bg-gray-700/50 border-gray-500/50'
-                        : index === 2
-                        ? 'bg-orange-900/30 border-orange-500/50'
-                        : 'bg-gray-800/50 border-gray-700'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Platzierung */}
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-600 to-gold-800 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
-                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                        </span>
-                      </div>
-                      {/* User Info */}
-                      <div>
-                        <p className="font-medium text-white">{entry.user.username}</p>
-                        {entry.user.icFirstName && (
-                          <p className="text-sm text-gray-400">
-                            {entry.user.icFirstName} {entry.user.icLastName}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <p className="text-sm text-gray-400">Touren</p>
-                        <p className="text-lg font-bold text-gold-400">{entry.totalTours}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-400">Tage</p>
-                        <p className="text-lg font-bold text-white">{entry.totalDays}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-400">Wochen</p>
-                        <p className="text-lg font-bold text-blue-400">{entry.weeksParticipated}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-400">Ø Touren/Tag</p>
-                        <p className="text-lg font-bold text-green-400">{entry.averageToursPerDay}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/30 border border-amber-500/30">
+            <div className="absolute top-0 left-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl" />
+            
+            <div className="relative p-6 border-b border-amber-500/20">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+                  <span className="text-2xl">🏆</span>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Touren-Leaderboard</h2>
+                  <p className="text-amber-200/60 text-sm">Die fleißigsten Familienmitglieder aller Zeiten</p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            
+            <div className="relative p-6">
+              <div className="space-y-3">
+                {allTimeStats.leaderboard.map((entry, index) => {
+                  const isTop3 = index < 3;
+                  const medals = ['🥇', '🥈', '🥉'];
+                  const bgColors = [
+                    'bg-gradient-to-r from-amber-900/40 to-yellow-900/30 border-amber-500/50',
+                    'bg-gradient-to-r from-gray-700/40 to-gray-600/30 border-gray-400/50',
+                    'bg-gradient-to-r from-orange-900/40 to-amber-900/30 border-orange-500/50'
+                  ];
+                  
+                  return (
+                    <div
+                      key={entry.user.id}
+                      className={`group flex items-center justify-between p-4 rounded-xl border transition-all hover:scale-[1.01] ${
+                        isTop3 ? bgColors[index] : 'bg-gray-800/30 border-gray-700/50 hover:border-amber-500/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        {/* Rank */}
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          isTop3 
+                            ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30'
+                            : 'bg-gray-700'
+                        }`}>
+                          <span className="text-xl font-bold text-white">
+                            {isTop3 ? medals[index] : `#${index + 1}`}
+                          </span>
+                        </div>
+                        
+                        {/* User */}
+                        <div>
+                          <p className="font-semibold text-white text-lg">{entry.user.username}</p>
+                          {entry.user.icFirstName && (
+                            <p className="text-sm text-gray-400">
+                              {entry.user.icFirstName} {entry.user.icLastName}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="flex items-center gap-4 md:gap-8">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-amber-400">{entry.totalTours}</p>
+                          <p className="text-xs text-gray-500 uppercase">Touren</p>
+                        </div>
+                        <div className="hidden md:block text-center">
+                          <p className="text-xl font-bold text-white">{entry.totalDays}</p>
+                          <p className="text-xs text-gray-500 uppercase">Tage</p>
+                        </div>
+                        <div className="hidden md:block text-center">
+                          <p className="text-xl font-bold text-blue-400">{entry.weeksParticipated}</p>
+                          <p className="text-xs text-gray-500 uppercase">Wochen</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xl font-bold text-green-400">{entry.averageToursPerDay}</p>
+                          <p className="text-xs text-gray-500 uppercase">Ø/Tag</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

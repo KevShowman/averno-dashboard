@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sicarioApi } from '../lib/api'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
@@ -75,6 +76,7 @@ interface SicarioAufstellung {
 export default function SicarioPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
+  usePageTitle('Sicario Division')
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedAufstellung, setSelectedAufstellung] = useState<string | null>(null)
@@ -209,10 +211,9 @@ export default function SicarioPage() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="relative">
-          <div className="absolute -inset-4 bg-gradient-to-r from-red-500/20 via-rose-500/20 to-red-500/20 blur-xl opacity-70" />
-          <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-2 border-red-500/50 max-w-md overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 to-transparent" />
-            <CardContent className="relative pt-8 pb-8 text-center">
+          <div className="absolute -inset-4 bg-gradient-to-r from-red-500/20 via-rose-500/20 to-red-500/20 blur-xl opacity-70 pointer-events-none" />
+          <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-2 border-red-500/50 max-w-md">
+            <CardContent className="pt-8 pb-8 text-center">
               <div className="p-4 bg-red-500/20 rounded-2xl w-fit mx-auto mb-4">
                 <Lock className="h-16 w-16 text-red-500" />
               </div>
@@ -321,7 +322,7 @@ export default function SicarioPage() {
       {/* Ausstehende Einsätze */}
       {myPending && myPending.length > 0 && (
         <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-red-500/30 via-rose-500/30 to-orange-500/30 blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -inset-1 bg-gradient-to-r from-red-500/30 via-rose-500/30 to-orange-500/30 blur-xl opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" />
           <Card className="relative bg-gradient-to-br from-red-900/40 via-rose-900/30 to-orange-900/40 border-2 border-red-500/50 shadow-2xl overflow-hidden">
             <CardHeader className="relative pb-4">
               <div className="flex items-center justify-between">
@@ -724,9 +725,8 @@ export default function SicarioPage() {
               </Button>
             </div>
 
-            <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-red-500/30 shadow-xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent" />
-              <CardHeader className="relative border-b border-red-500/20 pb-4">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-800/80 border-red-500/30 shadow-xl">
+              <CardHeader className="border-b border-red-500/20 pb-4">
                 <CardTitle className="text-2xl text-red-300 mb-2">{aufstellungDetails.reason}</CardTitle>
                 <div className="flex items-center gap-4 text-gray-300 flex-wrap">
                   <span className="flex items-center gap-2">
@@ -749,7 +749,7 @@ export default function SicarioPage() {
                   Erstellt von {getDisplayName(aufstellungDetails.createdBy)}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="relative pt-6 space-y-6">
+              <CardContent className="pt-6 space-y-6">
                 {/* Meine Reaktion */}
                 {!isDeadlinePassed(aufstellungDetails.deadline) && (
                   <div className="bg-gray-800/50 p-4 rounded-xl border border-red-500/20">
@@ -991,9 +991,8 @@ export default function SicarioPage() {
 
       {/* Team Übersicht */}
       {team && team.members && (
-        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-red-500/30 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent" />
-          <CardHeader className="relative">
+        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-red-500/30">
+          <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <div className="p-2 bg-red-500/20 rounded-lg">
                 <Users className="h-5 w-5 text-red-400" />
@@ -1001,7 +1000,7 @@ export default function SicarioPage() {
               Sicario Team ({team.total})
             </CardTitle>
           </CardHeader>
-          <CardContent className="relative">
+          <CardContent>
             <div className="flex flex-wrap gap-2">
               {team.members.map((member: any) => (
                 <Badge 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { abmeldungApi } from '../lib/api';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
@@ -45,6 +46,7 @@ interface Abmeldung {
 export default function AbmeldungenPage() {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
+  usePageTitle('Abmeldungen');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isRangeMode, setIsRangeMode] = useState(true);
   
@@ -397,9 +399,8 @@ export default function AbmeldungenPage() {
 
       {/* Aktuelle Abmeldungen */}
       {currentAbmeldungen.length > 0 && (
-        <Card className="bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-green-500/30 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent" />
-          <CardHeader className="relative">
+        <Card className="bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-green-500/30">
+          <CardHeader>
             <CardTitle className="text-green-400 flex items-center gap-3">
               <div className="p-2 bg-green-500/20 rounded-lg">
                 <Clock className="h-5 w-5" />
@@ -410,7 +411,7 @@ export default function AbmeldungenPage() {
               Diese Abmeldungen sind gerade aktiv
             </CardDescription>
           </CardHeader>
-          <CardContent className="relative">
+          <CardContent>
             <div className="space-y-2">
               {currentAbmeldungen.map((abmeldung: Abmeldung) => (
                 <div
@@ -459,9 +460,8 @@ export default function AbmeldungenPage() {
       )}
 
       {/* Alle Abmeldungen */}
-      <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-cyan-500/30 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent" />
-        <CardHeader className="relative">
+      <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-cyan-500/30">
+        <CardHeader>
           <CardTitle className="text-white flex items-center gap-3">
             <div className="p-2 bg-cyan-500/20 rounded-lg">
               <CalendarDays className="h-5 w-5 text-cyan-400" />
@@ -472,7 +472,7 @@ export default function AbmeldungenPage() {
             Übersicht aller {isLeadership ? '' : 'deiner '}Abwesenheiten
           </CardDescription>
         </CardHeader>
-        <CardContent className="relative">
+        <CardContent>
           {abmeldungen.length === 0 ? (
             <div className="text-center py-12">
               <div className="p-4 bg-gray-800/50 rounded-2xl w-fit mx-auto mb-4">
@@ -563,7 +563,7 @@ export default function AbmeldungenPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-md relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-cyan-600/20 via-teal-500/20 to-cyan-600/20 blur-xl rounded-2xl" />
+            <div className="absolute -inset-2 bg-gradient-to-r from-cyan-600/20 via-teal-500/20 to-cyan-600/20 blur-xl rounded-2xl pointer-events-none" />
             
             <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-cyan-500/30 shadow-2xl shadow-cyan-500/10 rounded-2xl overflow-hidden">
               {/* Header mit Gradient */}

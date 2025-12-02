@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { 
-  Package, 
   DollarSign, 
   AlertTriangle, 
   TrendingUp, 
@@ -37,13 +37,11 @@ interface DashboardStats {
   pendingTransactions: number
   todayChange: number
   weekChange: number
-  pendingDeposits: number
-  confirmedDeposits: number
-  packagePrice: number
 }
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuthStore()
+  usePageTitle('Dashboard')
 
   const { data: lagerStats } = useQuery({
     queryKey: ['lager-stats'],
@@ -64,14 +62,6 @@ export default function DashboardPage() {
     refetchOnWindowFocus: false,
   })
 
-  const { data: packageStats } = useQuery({
-    queryKey: ['packages-stats'],
-    queryFn: () => api.get('/packages/summary').then(res => res.data),
-    enabled: isAuthenticated && !!user,
-    retry: 3,
-    refetchOnWindowFocus: false,
-  })
-
   const stats: DashboardStats = {
     criticalItems: lagerStats?.criticalItems || 0,
     totalItems: lagerStats?.totalItems || 0,
@@ -79,9 +69,6 @@ export default function DashboardPage() {
     pendingTransactions: cashStats?.pendingTransactions || 0,
     todayChange: cashStats?.todayChange || 0,
     weekChange: cashStats?.weekChange || 0,
-    pendingDeposits: packageStats?.pendingDeposits || 0,
-    confirmedDeposits: packageStats?.confirmedDeposits || 0,
-    packagePrice: 0,
   }
 
   // Module gruppiert
@@ -94,7 +81,6 @@ export default function DashboardPage() {
         { key: 'kasse', name: 'Kasse', icon: DollarSign, color: 'green', desc: 'Schwarzgeld-Verwaltung' },
         { key: 'lager', name: 'Lager', icon: Boxes, color: 'blue', desc: 'Waffen & Ausrüstung' },
         { key: 'lager-movements', name: 'Lagerbewegungen', icon: Clock, color: 'purple', desc: 'Genehmigungen' },
-        { key: 'packages', name: 'Pakete', icon: Package, color: 'cyan', desc: 'Wochenabgabe Tracking' },
       ]
     },
     {
@@ -115,7 +101,7 @@ export default function DashboardPage() {
         { key: 'aufstellungen', name: 'Aufstellungen', icon: CalendarCheck, color: 'amber', desc: 'Termine & Teilnahme' },
         { key: 'abmeldungen', name: 'Abmeldungen', icon: CalendarDays, color: 'yellow', desc: 'Abwesenheiten' },
         { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, color: 'emerald', desc: 'Touren-Tracking' },
-        { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, color: 'teal', desc: '300 Pakete/Woche' },
+        { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, color: 'teal', desc: 'Wochenabgaben' },
       ]
     },
     {

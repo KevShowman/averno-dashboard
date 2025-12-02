@@ -2,13 +2,15 @@ import { Navigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuthStore } from '../stores/auth'
 import { Button } from '../components/ui/button'
-import { Checkbox } from '../components/ui/checkbox'
 import { Shield, Lock, Sparkles } from 'lucide-react'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function LoginPage() {
   const { isAuthenticated, login } = useAuthStore()
   const [rememberMe, setRememberMe] = useState(true)
   const [isHovering, setIsHovering] = useState(false)
+  
+  usePageTitle('Anmelden')
 
   if (isAuthenticated) {
     return <Navigate to="/app" replace />
@@ -44,7 +46,7 @@ export default function LoginPage() {
       {/* Main Content */}
       <div className="relative w-full max-w-lg">
         {/* Glow Behind Card */}
-        <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-red-500/20 rounded-3xl blur-2xl opacity-60" />
+        <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-red-500/20 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
         
         {/* Card */}
         <div className="relative bg-gradient-to-br from-gray-900/90 via-gray-900/95 to-gray-950/90 backdrop-blur-xl rounded-3xl border border-amber-500/20 shadow-2xl shadow-amber-500/10 overflow-hidden">
@@ -125,28 +127,34 @@ export default function LoginPage() {
               </div>
               
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-[#5865F2]/50 blur-xl transition-opacity duration-300 -z-10 ${isHovering ? 'opacity-50' : 'opacity-0'}`} />
+              <div className={`absolute -inset-1 bg-[#5865F2]/50 blur-xl transition-opacity duration-300 -z-10 pointer-events-none ${isHovering ? 'opacity-50' : 'opacity-0'}`} />
             </button>
 
-            {/* Remember Me */}
+            {/* Remember Me - Modern Toggle */}
             <div className="mt-6">
-              <label 
-                htmlFor="remember" 
-                className="group flex items-center justify-center gap-3 py-3 px-5 bg-gray-800/30 hover:bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-amber-500/30 cursor-pointer transition-all duration-300"
+              <button 
+                type="button"
+                onClick={() => setRememberMe(!rememberMe)}
+                className="group w-full flex items-center justify-between py-4 px-5 bg-gray-800/30 hover:bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-amber-500/30 cursor-pointer transition-all duration-300"
               >
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked === true)}
-                  className="data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500 border-gray-600"
-                />
-                <div className="flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-gray-500 group-hover:text-amber-500/70 transition-colors" />
+                <div className="flex items-center gap-3">
+                  <Lock className="h-4 w-4 text-gray-500 group-hover:text-amber-400 transition-colors" />
                   <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
                     Eingeloggt bleiben (7 Tage)
                   </span>
                 </div>
-              </label>
+                
+                {/* Modern Toggle Switch */}
+                <div className={`relative w-12 h-6 rounded-full transition-all duration-300 ${
+                  rememberMe 
+                    ? 'bg-gradient-to-r from-amber-500 to-yellow-500 shadow-lg shadow-amber-500/30' 
+                    : 'bg-gray-700'
+                }`}>
+                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-all duration-300 ${
+                    rememberMe ? 'left-7' : 'left-1'
+                  }`} />
+                </div>
+              </button>
             </div>
 
             {/* Footer */}

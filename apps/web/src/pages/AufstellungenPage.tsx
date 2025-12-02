@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { aufstellungApi } from '../lib/api'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
@@ -73,6 +74,7 @@ interface Aufstellung {
 export default function AufstellungenPage() {
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
+  usePageTitle('Aufstellungen')
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showExclusions, setShowExclusions] = useState(false)
@@ -346,7 +348,7 @@ export default function AufstellungenPage() {
       {/* Ausstehende Benachrichtigungen - Prominent */}
       {myPending && myPending.length > 0 && (
         <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 via-orange-500/30 to-red-500/30 blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 via-orange-500/30 to-red-500/30 blur-xl opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" />
           <Card className="relative bg-gradient-to-br from-yellow-900/40 via-orange-900/30 to-red-900/40 border-2 border-yellow-500/50 shadow-2xl overflow-hidden">
             <CardHeader className="relative pb-4">
               <div className="flex items-center justify-between">
@@ -724,9 +726,8 @@ export default function AufstellungenPage() {
             
             <div className="space-y-4">
               {/* Header Card */}
-              <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-amber-500/30 shadow-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent" />
-                <CardHeader className="relative border-b border-amber-500/20 pb-4">
+              <Card className="bg-gradient-to-br from-gray-900 to-gray-800/80 border-amber-500/30 shadow-xl">
+                <CardHeader className="border-b border-amber-500/20 pb-4">
                   <CardTitle className="text-2xl text-amber-300 mb-2">{aufstellungDetails.reason}</CardTitle>
                   <div className="flex items-center gap-4 text-gray-300 flex-wrap">
                     <span className="flex items-center gap-2">
@@ -743,7 +744,7 @@ export default function AufstellungenPage() {
                     Erstellt von {getDisplayName(aufstellungDetails.createdBy)}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="relative pt-6 space-y-6">
+                <CardContent className="pt-6 space-y-6">
                   {/* Meine Reaktion */}
                   {!isDeadlinePassed(aufstellungDetails.deadline) && (
                     <div className="bg-gray-800/50 p-4 rounded-xl border border-amber-500/20">
@@ -1027,9 +1028,8 @@ export default function AufstellungenPage() {
 
       {/* Exclusions List */}
       {showExclusions && canManageAufstellungen && (
-        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-amber-500/30 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent" />
-          <CardHeader className="relative">
+        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-amber-500/30">
+          <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <div className="p-2 bg-amber-500/20 rounded-lg">
                 <UserX className="h-5 w-5 text-amber-400" />
@@ -1040,7 +1040,7 @@ export default function AufstellungenPage() {
               User, die von Aufstellungen ausgeschlossen sind und nicht sanktioniert werden
             </CardDescription>
           </CardHeader>
-          <CardContent className="relative">
+          <CardContent>
             {exclusionsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="h-8 w-8 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
