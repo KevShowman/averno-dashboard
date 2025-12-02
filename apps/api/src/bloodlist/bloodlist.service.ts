@@ -477,14 +477,25 @@ export class BloodListService {
   }
 
   // Alle Discord User holen die noch nicht in der Blood List sind
-  // Scope: Nur User OHNE Rollen (keine Bots)
+  // Scope: ALLE User (keine Bots) die noch kein aktives Blood Record haben
   async getUnassignedDiscordUsers() {
-    // Alle Discord Member OHNE Rollen holen (potentielle Blood In Kandidaten)
-    const discordMembersNoRoles = await this.discordService.getMembersWithNoRoles();
+    // Alle Discord Member holen
+    const allDiscordMembers = await this.discordService.getAllServerMembers();
     
     // Alle aktiven Blood Records holen
     const activeBloodRecords = await this.prisma.bloodRecord.findMany({
       where: { status: BloodStatus.ACTIVE },
+    });
+
+    // Alle DB-User die einen Blood Record haben könnten
+    const dbUsers = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        discordId: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+      },
     });
 
     // Set von Blood Record Namen (lowercase für Vergleich)
@@ -492,33 +503,54 @@ export class BloodListService {
       activeBloodRecords.map(r => `${r.vorname} ${r.nachname}`.toLowerCase().trim())
     );
 
-    // Prüfe für jeden Discord Member ohne Rollen ob er bereits ein Blood Record hat
-    const unassignedMembers = discordMembersNoRoles.filter(member => {
-      // Prüfe ob der Discord Username in den Blood Records ist
-      const username = member.username?.toLowerCase().trim();
-      if (username && bloodRecordNames.has(username)) {
-        return false;
+    // Set von Discord IDs die bereits ein Blood Record haben
+    const discordIdsWithBloodRecord = new Set<string>();
+    for (const dbUser of dbUsers) {
+      if (dbUser.icFirstName && dbUser.icLastName) {
+        const icName = `${dbUser.icFirstName} ${dbUser.icLastName}`.toLowerCase().trim();
+        if (bloodRecordNames.has(icName)) {
+          discordIdsWithBloodRecord.add(dbUser.discordId);
+        }
       }
+    }
 
-      // Kein Blood Record gefunden - User ist unassigned
+    // Filtere alle Discord Member die:
+    // 1. Keine Bots sind
+    // 2. Kein Blood Record haben
+    const unassignedMembers = allDiscordMembers.filter((member: any) => {
+      // Bots ausschließen
+      if (member.user?.bot) return false;
+      
+      // Prüfe ob Discord ID bereits ein Blood Record hat
+      if (discordIdsWithBloodRecord.has(member.user.id)) return false;
+
+      // Prüfe ob der Username in den Blood Records ist
+      const username = (member.nick || member.user?.global_name || member.user?.username)?.toLowerCase().trim();
+      if (username && bloodRecordNames.has(username)) return false;
+
       return true;
     });
 
     // Formatiere für Frontend
-    const enrichedMembers = unassignedMembers.map(member => ({
-      discordId: member.discordId,
-      username: member.username,
-      avatar: member.avatar,
-      highestSystemRole: null, // Hat keine Rollen
-      joinedAt: member.joinedAt,
-      icFirstName: null,
-      icLastName: null,
-      isInDatabase: false,
-    }));
+    const enrichedMembers = unassignedMembers.map((member: any) => {
+      const dbUser = dbUsers.find(u => u.discordId === member.user.id);
+      const hasRoles = member.roles && member.roles.length > 0;
+      
+      return {
+        discordId: member.user.id,
+        username: member.nick || member.user?.global_name || member.user?.username,
+        avatar: member.user?.avatar,
+        hasRoles: hasRoles,
+        joinedAt: member.joined_at,
+        icFirstName: dbUser?.icFirstName || null,
+        icLastName: dbUser?.icLastName || null,
+        isInDatabase: !!dbUser,
+      };
+    });
 
     return {
       unassignedDiscordUsers: enrichedMembers,
-      totalDiscordMembers: discordMembersNoRoles.length,
+      totalDiscordMembers: allDiscordMembers.filter((m: any) => !m.user?.bot).length,
       totalUnassigned: enrichedMembers.length,
       totalBloodRecords: activeBloodRecords.length,
     };
@@ -627,13 +659,13 @@ export class BloodListService {
       },
     });
 
-    // Falls User noch nicht in DB existiert, importieren
+    // Falls User noch nicht in DB existiert, importieren (ohne Rollen-Check für Blood In)
     let dbUser = await this.prisma.user.findUnique({
       where: { discordId },
     });
 
     if (!dbUser) {
-      dbUser = await this.discordService.importMemberToDatabase(discordId);
+      dbUser = await this.discordService.importMemberToDatabaseForBloodIn(discordId);
     }
 
     // IC Name setzen

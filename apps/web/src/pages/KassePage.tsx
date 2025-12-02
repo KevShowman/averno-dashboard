@@ -37,13 +37,12 @@ import { toast } from 'sonner'
 export default function KassePage() {
   const user = useAuthStore((state) => state.user)
   const queryClient = useQueryClient()
-  const [selectedRange, setSelectedRange] = useState('week')
   const [showTransactionModal, setShowTransactionModal] = useState(false)
   const [transactionType, setTransactionType] = useState<'EINZAHLUNG' | 'AUSZAHLUNG'>('EINZAHLUNG')
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['cash-summary', selectedRange],
-    queryFn: () => api.get(`/cash/summary?range=${selectedRange}`).then(res => res.data),
+    queryKey: ['cash-summary'],
+    queryFn: () => api.get('/cash/summary?range=all').then(res => res.data),
   })
 
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
@@ -52,8 +51,8 @@ export default function KassePage() {
   })
 
   const { data: chartData, error: chartError, isLoading: chartLoading } = useQuery({
-    queryKey: ['cash-chart', selectedRange],
-    queryFn: () => api.get(`/cash/chart?range=${selectedRange}`).then(res => res.data),
+    queryKey: ['cash-chart'],
+    queryFn: () => api.get('/cash/chart?range=all').then(res => res.data),
     retry: 1,
   })
 
@@ -170,17 +169,6 @@ export default function KassePage() {
               Nur lesen
             </Badge>
           )}
-          <div className="border-l border-gray-600 mx-2" />
-          {['day', 'week', 'month'].map((range) => (
-            <Button
-              key={range}
-              variant={selectedRange === range ? "default" : "outline"}
-              onClick={() => setSelectedRange(range)}
-              size="sm"
-            >
-              {range === 'day' ? 'Tag' : range === 'week' ? 'Woche' : 'Monat'}
-            </Button>
-          ))}
         </div>
       </div>
 
@@ -239,39 +227,11 @@ export default function KassePage() {
       {/* Chart */}
       <Card className="lasanta-card">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
-              <CardDescription className="text-gray-400">
-                Entwicklung des Schwarzgeld-Saldos über Zeit
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant={selectedRange === 'today' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedRange('today')}
-                className={selectedRange === 'today' ? 'bg-gold-600 hover:bg-gold-700' : ''}
-              >
-                Heute
-              </Button>
-              <Button
-                variant={selectedRange === 'week' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedRange('week')}
-                className={selectedRange === 'week' ? 'bg-gold-600 hover:bg-gold-700' : ''}
-              >
-                7 Tage
-              </Button>
-              <Button
-                variant={selectedRange === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedRange('all')}
-                className={selectedRange === 'all' ? 'bg-gold-600 hover:bg-gold-700' : ''}
-              >
-                Gesamt
-              </Button>
-            </div>
+          <div>
+            <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
+            <CardDescription className="text-gray-400">
+              Komplette Entwicklung des Schwarzgeld-Saldos
+            </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
@@ -295,12 +255,7 @@ export default function KassePage() {
               <Line
                 data={{
                   labels: chartData.map(item => {
-                    if (selectedRange === 'today') {
-                      return new Date(item.date).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
-                    } else if (selectedRange === 'all') {
-                      return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' })
-                    }
-                    return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+                    return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' })
                   }),
                   datasets: [
                     {

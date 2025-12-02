@@ -715,6 +715,72 @@ export class DiscordService {
     }
   }
 
+  // Spezielle Import-Methode für Blood In - ohne Rollen-Prüfung
+  async importMemberToDatabaseForBloodIn(discordId: string): Promise<any> {
+    try {
+      // Discord-Benutzerdaten abrufen
+      const userResponse = await fetch(
+        `${this.discordApiUrl}/users/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!userResponse.ok) {
+        throw new Error(`Discord API Fehler: ${userResponse.status}`);
+      }
+
+      const discordUser = await userResponse.json();
+      
+      // Discord-Rollen des Benutzers abrufen
+      const userDiscordRoles = await this.getUserRoles(discordId);
+      
+      // Server-spezifische Mitgliedsdaten abrufen (für Nickname)
+      const memberResponse = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      let serverNickname = discordUser.username;
+      if (memberResponse.ok) {
+        const memberData = await memberResponse.json();
+        serverNickname = memberData.nick || memberData.user?.display_name || discordUser.username;
+      }
+      
+      // Versuche Rollen zu validieren, aber verwende FUTURO als Fallback
+      const validation = await this.validateUserAccess(discordId);
+      const role = validation.hasAccess ? validation.highestRole : 'FUTURO';
+      const allRoles = validation.hasAccess ? (validation.allRoles || [role]) : ['FUTURO'];
+
+      // Benutzer in Datenbank erstellen
+      const user = await this.prisma.user.create({
+        data: {
+          discordId,
+          username: serverNickname,
+          avatarUrl: discordUser.avatar ? 
+            `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : null,
+          email: null,
+          role: role as any,
+          allRoles: allRoles as any[],
+          discordRoles: userDiscordRoles,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      console.error('Fehler beim Importieren des Benutzers für Blood In:', error);
+      throw error;
+    }
+  }
+
   async syncAllMembersWithAllowedRoles() {
     try {
       const members = await this.getMembersWithAllowedRoles();

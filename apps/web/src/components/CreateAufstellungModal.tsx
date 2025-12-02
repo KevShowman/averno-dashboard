@@ -47,6 +47,7 @@ export default function CreateAufstellungModal({
     text: 'text-red-200/70',
     ring: 'focus:ring-red-500/20 focus:border-red-500',
     buttonGradient: 'from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500',
+    buttonText: 'text-white',
   } : {
     gradient: 'from-gold-600 to-amber-600',
     border: 'border-gold-500/30',
@@ -57,6 +58,7 @@ export default function CreateAufstellungModal({
     text: 'text-amber-200/70',
     ring: 'focus:ring-gold-500/20 focus:border-gold-500',
     buttonGradient: 'from-gold-600 to-amber-600 hover:from-gold-500 hover:to-amber-500',
+    buttonText: 'text-gray-900',
   }
 
   const handleCreate = () => {
@@ -324,11 +326,11 @@ export default function CreateAufstellungModal({
               <Button
                 onClick={handleCreate}
                 disabled={isLoading || !selectedDate || !selectedTime || !reason.trim()}
-                className={`flex-1 h-12 bg-gradient-to-r ${theme.buttonGradient} text-white font-semibold shadow-lg ${theme.shadow} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`flex-1 h-12 bg-gradient-to-r ${theme.buttonGradient} ${theme.buttonText} font-semibold shadow-lg ${theme.shadow} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
-                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className={`h-4 w-4 border-2 ${isSicario ? 'border-white/30 border-t-white' : 'border-gray-900/30 border-t-gray-900'} rounded-full animate-spin`} />
                     Erstelle...
                   </span>
                 ) : (
