@@ -1,14 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { weeklyDeliveryApi } from '../lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Calendar, Package, DollarSign, Users, AlertCircle, CheckCircle, Clock, X, UserPlus, RefreshCw } from 'lucide-react'
+import { 
+  Calendar, 
+  Package, 
+  DollarSign, 
+  Users, 
+  AlertCircle, 
+  CheckCircle, 
+  Clock, 
+  X, 
+  UserPlus, 
+  RefreshCw,
+  Archive,
+  PackageCheck,
+  PackageX,
+  Hourglass
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '../stores/auth'
-import { hasRole, formatDate, getDisplayName, formatCurrency } from '../lib/utils'
+import { hasRole, getDisplayName, formatCurrency } from '../lib/utils'
 import WeeklyDeliveryPayModal from '../components/WeeklyDeliveryPayModal'
 import CreateExclusionModal from '../components/CreateExclusionModal'
 
@@ -56,15 +70,6 @@ interface WeeklyDeliveryExclusion {
   }
 }
 
-interface WeeklyDeliveryStats {
-  total: number
-  pending: number
-  partiallyPaid: number
-  paid: number
-  confirmed: number
-  overdue: number
-}
-
 export default function WeeklyDeliveryPage() {
   const [showExclusions, setShowExclusions] = useState(false)
   const [showPayModal, setShowPayModal] = useState(false)
@@ -73,7 +78,6 @@ export default function WeeklyDeliveryPage() {
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
-  // Check if user has leadership role
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const isElPatron = hasRole(user, 'EL_PATRON')
   const canPayForOthers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
@@ -83,7 +87,6 @@ export default function WeeklyDeliveryPage() {
     queryKey: ['weekly-delivery', 'current-week'],
     queryFn: () => weeklyDeliveryApi.getCurrentWeek().then(res => res.data),
   })
-
 
   const { data: exclusions = [], isLoading: loadingExclusions } = useQuery({
     queryKey: ['weekly-delivery', 'exclusions'],
@@ -113,8 +116,6 @@ export default function WeeklyDeliveryPage() {
     },
   })
 
-  // Bestätigen-Workflow entfernt - PAID ist jetzt der finale Status
-
   const deactivateExclusionMutation = useMutation({
     mutationFn: (id: string) => weeklyDeliveryApi.deactivateExclusion(id),
     onSuccess: () => {
@@ -126,7 +127,6 @@ export default function WeeklyDeliveryPage() {
     },
   })
 
-  // Admin mutations
   const indexUsersMutation = useMutation({
     mutationFn: () => weeklyDeliveryApi.indexAllUsers(),
     onSuccess: () => {
@@ -143,7 +143,7 @@ export default function WeeklyDeliveryPage() {
     onSuccess: (response) => {
       toast.success(response.data.message || 'Überfällige Abgaben wurden sanktioniert')
       queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
-      queryClient.invalidateQueries({ queryKey: ['sanctions'] }) // Auch Sanktionen aktualisieren
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] })
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Sanktionieren')
@@ -156,7 +156,7 @@ export default function WeeklyDeliveryPage() {
       const data = response.data
       toast.success(`Wochenreset durchgeführt: ${data.deletedCurrentWeek} Abgaben gelöscht, ${data.overdueCount} als überfällig markiert`)
       queryClient.invalidateQueries({ queryKey: ['weekly-delivery'] })
-      queryClient.invalidateQueries({ queryKey: ['sanctions'] }) // Auch Sanktionen aktualisieren
+      queryClient.invalidateQueries({ queryKey: ['sanctions'] })
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Wochenreset')
@@ -190,7 +190,6 @@ export default function WeeklyDeliveryPage() {
     },
   })
 
-  // Handler für Pay Modal
   const handleOpenPayModal = (delivery: WeeklyDelivery) => {
     setSelectedDelivery(delivery)
     setShowPayModal(true)
@@ -203,33 +202,8 @@ export default function WeeklyDeliveryPage() {
 
   const handlePayDelivery = (data: { paidAmount?: number; paidMoney?: number }) => {
     if (selectedDelivery) {
-      payDeliveryMutation.mutate({
-        id: selectedDelivery.id,
-        data,
-      })
+      payDeliveryMutation.mutate({ id: selectedDelivery.id, data })
       handleClosePayModal()
-    }
-  }
-
-  // Bestätigen-Funktion entfernt
-
-  const getStatusBadge = (delivery: WeeklyDelivery) => {
-    // Check if user is abgemeldet (>2 days)
-    if (delivery.isAbgemeldet) {
-      return <Badge variant="outline" className="text-red-600 border-red-600 bg-red-900/20">Abgemeldet</Badge>
-    }
-    
-    switch (delivery.status) {
-      case 'PENDING':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">Ausstehend</Badge>
-      case 'PARTIALLY_PAID':
-        return <Badge variant="outline" className="text-orange-600 border-orange-600">Teilbezahlt</Badge>
-      case 'PAID':
-        return <Badge variant="outline" className="text-green-600 border-green-600">Bezahlt</Badge>
-      case 'OVERDUE':
-        return <Badge variant="outline" className="text-red-600 border-red-600">Überfällig</Badge>
-      default:
-        return <Badge variant="outline">{delivery.status}</Badge>
     }
   }
 
@@ -237,18 +211,19 @@ export default function WeeklyDeliveryPage() {
     return new Date(dateString).toLocaleDateString('de-DE')
   }
 
-  const formatUserName = (user: WeeklyDelivery['user']) => {
-    if (user.icFirstName && user.icLastName) {
-      return `${user.icFirstName} ${user.icLastName}`
+  const formatUserName = (userObj: WeeklyDelivery['user']) => {
+    if (userObj.icFirstName && userObj.icLastName) {
+      return `${userObj.icFirstName} ${userObj.icLastName}`
     }
-    return user.username
+    return userObj.username
   }
 
   if (loadingCurrentWeek || loadingStats) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-400">Lade Wochenabgabe-Daten...</div>
+      <div className="p-6 flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <p className="text-gray-400">Lade Wochenabgabe-Daten...</p>
         </div>
       </div>
     )
@@ -257,365 +232,394 @@ export default function WeeklyDeliveryPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Wochenabgabe-System</h1>
-          <p className="text-gray-400 mt-2">
-            Verwaltung der wöchentlichen Paket-Abgaben (300 Stück pro Woche)
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowExclusions(!showExclusions)}
-            className="flex items-center gap-2"
-          >
-            <Users className="h-4 w-4" />
-            {showExclusions ? 'Abgaben anzeigen' : 'Ausschlüsse anzeigen'}
-          </Button>
-          
-          {isElPatron && (
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-cyan-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-teal-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl shadow-lg shadow-cyan-500/30">
+              <Package className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Wochenabgabe</h1>
+              <p className="text-gray-400 mt-1">
+                300 Pakete pro Woche • Verwaltung und Tracking
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
             <Button
-              variant="default"
-              onClick={() => setShowCreateExclusionModal(true)}
-              className="flex items-center gap-2"
+              variant="outline"
+              onClick={() => setShowExclusions(!showExclusions)}
+              className="border-gray-700 hover:bg-gray-800"
             >
-              <UserPlus className="h-4 w-4" />
-              Ausschluss erstellen
+              <Users className="mr-2 h-4 w-4" />
+              {showExclusions ? 'Abgaben' : 'Ausschlüsse'}
             </Button>
-          )}
-          
-          {canPayForOthers && (
-            <>
+            
+            {isElPatron && (
               <Button
-                variant="outline"
-                onClick={() => indexUsersMutation.mutate()}
-                disabled={indexUsersMutation.isPending}
-                className="flex items-center gap-2"
+                onClick={() => setShowCreateExclusionModal(true)}
+                className="bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-400 border border-cyan-500/30"
               >
-                <UserPlus className="h-4 w-4" />
-                Alle User indexieren
+                <UserPlus className="mr-2 h-4 w-4" />
+                Ausschluss
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => autoSanctionMutation.mutate()}
-                disabled={autoSanctionMutation.isPending}
-                className="flex items-center gap-2"
-              >
-                <AlertCircle className="h-4 w-4" />
-                Sanktionieren
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => weeklyResetMutation.mutate()}
-                disabled={weeklyResetMutation.isPending}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Wochenreset
-              </Button>
-              
-              <Button
-                variant="destructive"
-                onClick={() => archiveMutation.mutate()}
-                disabled={archiveMutation.isPending}
-                className="flex items-center gap-2"
-              >
-                <Package className="h-4 w-4" />
-                Woche archivieren
-              </Button>
-            </>
-          )}
+            )}
+            
+            {canPayForOthers && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => indexUsersMutation.mutate()}
+                  disabled={indexUsersMutation.isPending}
+                  className="border-gray-700 hover:bg-gray-800"
+                >
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => autoSanctionMutation.mutate()}
+                  disabled={autoSanctionMutation.isPending}
+                  className="border-gray-700 hover:bg-gray-800"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => weeklyResetMutation.mutate()}
+                  disabled={weeklyResetMutation.isPending}
+                  className="border-gray-700 hover:bg-gray-800"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  onClick={() => archiveMutation.mutate()}
+                  disabled={archiveMutation.isPending}
+                  className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30"
+                >
+                  <Archive className="mr-2 h-4 w-4" />
+                  Archivieren
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-primary" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.total}</div>
-                  <div className="text-sm text-gray-400">Gesamt</div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-cyan-900/30 to-teal-900/20 border-cyan-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-cyan-500/20 rounded-lg">
+                  <Package className="h-5 w-5 text-cyan-400" />
                 </div>
               </div>
+              <p className="text-cyan-300/70 text-sm">Gesamt</p>
+              <p className="text-2xl font-bold text-white">{stats.total}</p>
             </CardContent>
           </Card>
           
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-yellow-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.pending}</div>
-                  <div className="text-sm text-gray-400">Ausstehend</div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-yellow-900/30 to-amber-900/20 border-yellow-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-yellow-500/20 rounded-lg">
+                  <Hourglass className="h-5 w-5 text-yellow-400" />
                 </div>
               </div>
+              <p className="text-yellow-300/70 text-sm">Ausstehend</p>
+              <p className="text-2xl font-bold text-yellow-400">{stats.pending}</p>
             </CardContent>
           </Card>
 
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-orange-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.partiallyPaid}</div>
-                  <div className="text-sm text-gray-400">Teilbezahlt</div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-orange-900/30 to-amber-900/20 border-orange-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-orange-500/20 rounded-lg">
+                  <DollarSign className="h-5 w-5 text-orange-400" />
                 </div>
               </div>
+              <p className="text-orange-300/70 text-sm">Teilbezahlt</p>
+              <p className="text-2xl font-bold text-orange-400">{stats.partiallyPaid}</p>
             </CardContent>
           </Card>
 
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.paid}</div>
-                  <div className="text-sm text-gray-400">Bezahlt</div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <PackageCheck className="h-5 w-5 text-green-400" />
                 </div>
               </div>
+              <p className="text-green-300/70 text-sm">Bezahlt</p>
+              <p className="text-2xl font-bold text-green-400">{stats.paid}</p>
             </CardContent>
           </Card>
 
-          <Card className="lasanta-card">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-red-500" />
-                <div>
-                  <div className="text-2xl font-bold text-white">{stats.overdue}</div>
-                  <div className="text-sm text-gray-400">Überfällig</div>
+          <Card className={`relative overflow-hidden ${stats.overdue > 0 ? 'bg-gradient-to-br from-red-900/30 to-rose-900/20 border-red-500/30' : 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700'}`}>
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className={`p-2 ${stats.overdue > 0 ? 'bg-red-500/20' : 'bg-gray-500/20'} rounded-lg`}>
+                  <PackageX className={`h-5 w-5 ${stats.overdue > 0 ? 'text-red-400' : 'text-gray-400'}`} />
                 </div>
               </div>
+              <p className={`${stats.overdue > 0 ? 'text-red-300/70' : 'text-gray-400'} text-sm`}>Überfällig</p>
+              <p className={`text-2xl font-bold ${stats.overdue > 0 ? 'text-red-400' : 'text-white'}`}>{stats.overdue}</p>
             </CardContent>
           </Card>
         </div>
       )}
 
       {showExclusions ? (
-        /* Exclusions */
-        <Card className="lasanta-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+        /* Exclusions Table */
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Users className="h-5 w-5 text-cyan-400" />
               Aktive Ausschlüsse
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Benutzer, die von der Wochenabgabe ausgeschlossen sind
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {exclusions.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                Keine aktiven Ausschlüsse
+              <div className="py-16 text-center">
+                <Users className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Keine aktiven Ausschlüsse</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Benutzer</TableHead>
-                    <TableHead>Grund</TableHead>
-                    <TableHead>Von</TableHead>
-                    <TableHead>Bis</TableHead>
-                    <TableHead>Erstellt von</TableHead>
-                    <TableHead>Aktionen</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {exclusions.map((exclusion: WeeklyDeliveryExclusion) => (
-                    <TableRow key={exclusion.id}>
-                      <TableCell className="font-medium">
-                        {formatUserName(exclusion.user)}
-                      </TableCell>
-                      <TableCell>{exclusion.reason}</TableCell>
-                      <TableCell>{formatDate(exclusion.startDate)}</TableCell>
-                      <TableCell>
-                        {exclusion.endDate ? formatDate(exclusion.endDate) : 'Unbegrenzt'}
-                      </TableCell>
-                      <TableCell>{exclusion.createdBy.username}</TableCell>
-                      <TableCell>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-800 bg-gray-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Benutzer</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Grund</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Von</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Bis</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erstellt von</th>
+                      {isLeadership && (
+                        <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/50">
+                    {exclusions.map((exclusion: WeeklyDeliveryExclusion) => (
+                      <tr key={exclusion.id} className="group hover:bg-gray-800/30 transition-colors">
+                        <td className="py-4 px-6">
+                          <span className="font-medium text-white">{formatUserName(exclusion.user)}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-300">{exclusion.reason}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400">{formatDate(exclusion.startDate)}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400">{exclusion.endDate ? formatDate(exclusion.endDate) : 'Unbegrenzt'}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400">{exclusion.createdBy.username}</span>
+                        </td>
                         {isLeadership && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deactivateExclusionMutation.mutate(exclusion.id)}
-                            disabled={deactivateExclusionMutation.isPending}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+                          <td className="py-4 px-6 text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deactivateExclusionMutation.mutate(exclusion.id)}
+                              disabled={deactivateExclusionMutation.isPending}
+                              className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </td>
                         )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </CardContent>
         </Card>
       ) : (
-        /* Deliveries */
-        <>
-          {/* Current Week */}
-          <Card className="lasanta-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Aktuelle Woche
-              </CardTitle>
-              <CardDescription>
-                Wochenabgaben für die laufende Woche
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {currentWeekDeliveries.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  Keine Abgaben für diese Woche
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Benutzer</TableHead>
-                      <TableHead>Woche</TableHead>
-                      <TableHead>Bezahlt</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Aktionen</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+        /* Deliveries Table */
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-cyan-400" />
+              Aktuelle Woche
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Wochenabgaben für die laufende Woche
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            {currentWeekDeliveries.length === 0 ? (
+              <div className="py-16 text-center">
+                <Package className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Keine Abgaben für diese Woche</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-800 bg-gray-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Benutzer</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Woche</th>
+                      <th className="text-right py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Bezahlt</th>
+                      <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/50">
                     {currentWeekDeliveries.map((delivery: WeeklyDelivery) => (
-                      <TableRow key={delivery.id}>
-                        <TableCell className="font-medium">
-                          {formatUserName(delivery.user)}
-                        </TableCell>
-                        <TableCell>
-                          {formatDate(delivery.weekStart)} - {formatDate(delivery.weekEnd)}
-                        </TableCell>
-                        <TableCell>
-                          {delivery.paidAmount && delivery.paidAmount > 0 && `${delivery.paidAmount} Pakete`}
-                          {delivery.paidMoney && delivery.paidMoney > 0 && formatCurrency(delivery.paidMoney)}
+                      <tr key={delivery.id} className="group hover:bg-gray-800/30 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${
+                              delivery.isAbgemeldet ? 'bg-purple-500' :
+                              delivery.status === 'PAID' ? 'bg-green-500' :
+                              delivery.status === 'PARTIALLY_PAID' ? 'bg-orange-500' :
+                              delivery.status === 'OVERDUE' ? 'bg-red-500' : 'bg-yellow-500'
+                            }`} />
+                            <span className="font-medium text-white">{formatUserName(delivery.user)}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400 text-sm">
+                            {formatDate(delivery.weekStart)} - {formatDate(delivery.weekEnd)}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          {delivery.paidAmount && delivery.paidAmount > 0 && (
+                            <span className="text-cyan-400 font-medium">{delivery.paidAmount} Pakete</span>
+                          )}
+                          {delivery.paidMoney && delivery.paidMoney > 0 && (
+                            <span className="text-green-400 font-medium">{formatCurrency(delivery.paidMoney)}</span>
+                          )}
                           {(!delivery.paidAmount || delivery.paidAmount === 0) && (!delivery.paidMoney || delivery.paidMoney === 0) && (
                             delivery.status === 'PAID' && delivery.note 
                               ? <span className="text-gold-400">{delivery.note}</span>
-                              : '-'
+                              : <span className="text-gray-500">-</span>
                           )}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(delivery)}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && 
-                             !delivery.isAbgemeldet && (
-                              // Nur El Patron und Don können für andere bezahlen, andere nur für sich selbst
-                              (canPayForOthers || delivery.userId === user?.id) && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleOpenPayModal(delivery)}
-                                  disabled={payDeliveryMutation.isPending}
-                                >
-                                  {delivery.status === 'PARTIALLY_PAID' ? 'Weiter bezahlen' : 'Bezahlen'}
-                                </Button>
-                              )
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {delivery.isAbgemeldet ? (
+                            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">Abgemeldet</Badge>
+                          ) : delivery.status === 'PENDING' ? (
+                            <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">Ausstehend</Badge>
+                          ) : delivery.status === 'PARTIALLY_PAID' ? (
+                            <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">Teilbezahlt</Badge>
+                          ) : delivery.status === 'PAID' ? (
+                            <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                              <CheckCircle className="mr-1 h-3 w-3" />
+                              Bezahlt
+                            </Badge>
+                          ) : delivery.status === 'OVERDUE' ? (
+                            <Badge className="bg-red-500/20 text-red-300 border-red-500/30">Überfällig</Badge>
+                          ) : (
+                            <Badge variant="outline">{delivery.status}</Badge>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          {(delivery.status === 'PENDING' || delivery.status === 'PARTIALLY_PAID') && 
+                           !delivery.isAbgemeldet && 
+                           (canPayForOthers || delivery.userId === user?.id) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenPayModal(delivery)}
+                              disabled={payDeliveryMutation.isPending}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                            >
+                              {delivery.status === 'PARTIALLY_PAID' ? 'Weiter' : 'Bezahlen'}
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
                     ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-
-        </>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
-      {/* Pay Modal */}
-      {/* Archive Section */}
+      {/* Archives */}
       {archives && archives.length > 0 && (
-        <Card className="lasanta-card">
-          <CardHeader>
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Alle Wochenübergaben
+              <Archive className="h-5 w-5 text-purple-400" />
+              Archiv
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Archivierte Wochenabgaben mit Zusammenfassung
+              Vergangene Wochen mit Zusammenfassung
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {loadingArchives ? (
               <div className="text-center py-8 text-gray-400">Lade Archive...</div>
             ) : (
-            <div className="space-y-6">
-              {archives.map((archive: any, index: number) => (
-                <div key={archive.id}>
-                  {index > 0 && (
-                    <div className="border-t border-gray-700 my-6"></div>
-                  )}
-                  <div className="bg-gray-800/50 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
+              <div className="space-y-4">
+                {archives.map((archive: any) => (
+                  <div key={archive.id} className="bg-gray-800/30 border border-gray-700/50 rounded-xl p-5">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                       <div>
-                        <h3 className="font-semibold text-white">{archive.archiveName}</h3>
+                        <h3 className="font-semibold text-white text-lg">{archive.archiveName}</h3>
                         <p className="text-sm text-gray-400">
                           {formatDate(archive.weekStart)} - {formatDate(archive.weekEnd)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-400">Archiviert von</p>
-                        <p className="text-white font-medium">
-                          {getDisplayName(archive.archivedBy)}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {formatDate(archive.createdAt)}
-                        </p>
+                        <p className="text-xs text-gray-500">Archiviert von</p>
+                        <p className="text-white font-medium">{getDisplayName(archive.archivedBy)}</p>
                       </div>
                     </div>
                     
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-white">{archive.totalDeliveries}</div>
-                      <div className="text-xs text-gray-400">Gesamt</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-400">{archive.paidDeliveries}</div>
-                      <div className="text-xs text-gray-400">Bezahlt</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-400">{archive.overdueDeliveries}</div>
-                      <div className="text-xs text-gray-400">Überfällig</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-yellow-400">{archive.pendingDeliveries}</div>
-                      <div className="text-xs text-gray-400">Ausstehend</div>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-600/30 mb-4"></div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-green-400">{archive.paidPackages}</div>
-                        <div className="text-xs text-gray-400">Pakete bezahlt</div>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-white">{archive.totalDeliveries}</p>
+                        <p className="text-xs text-gray-400">Gesamt</p>
                       </div>
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-blue-400">{formatCurrency(archive.totalMoney)}</div>
-                        <div className="text-xs text-gray-400">Schwarzgeld gesamt</div>
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-green-400">{archive.paidDeliveries}</p>
+                        <p className="text-xs text-gray-400">Bezahlt</p>
+                      </div>
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-red-400">{archive.overdueDeliveries}</p>
+                        <p className="text-xs text-gray-400">Überfällig</p>
+                      </div>
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-yellow-400">{archive.pendingDeliveries}</p>
+                        <p className="text-xs text-gray-400">Ausstehend</p>
+                      </div>
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-cyan-400">{archive.paidPackages}</p>
+                        <p className="text-xs text-gray-400">Pakete</p>
+                      </div>
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-emerald-400">{formatCurrency(archive.totalMoney)}</p>
+                        <p className="text-xs text-gray-400">Geld</p>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
+      {/* Modals */}
       <WeeklyDeliveryPayModal
         isOpen={showPayModal}
         onClose={handleClosePayModal}
@@ -625,7 +629,6 @@ export default function WeeklyDeliveryPage() {
         isLoading={payDeliveryMutation.isPending}
       />
 
-      {/* Create Exclusion Modal */}
       <CreateExclusionModal
         isOpen={showCreateExclusionModal}
         onClose={() => setShowCreateExclusionModal(false)}

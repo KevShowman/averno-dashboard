@@ -6,7 +6,24 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
-import { Skull, Plus, UserX, User, Phone, Gamepad2, Calendar, AlertTriangle, History, TrendingUp, Users, Ghost, Link2, Settings } from 'lucide-react';
+import { 
+  Skull, 
+  Plus, 
+  UserX, 
+  User, 
+  Phone, 
+  Gamepad2, 
+  Calendar, 
+  AlertTriangle, 
+  History, 
+  TrendingUp, 
+  Users, 
+  Ghost, 
+  Link2, 
+  Settings,
+  UserCheck,
+  UserMinus
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../stores/auth';
@@ -78,12 +95,10 @@ export default function BloodListPage() {
   });
 
   const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
-  // Leaderschaft + Formación können Blood Ins machen und Unassigned Users sehen
   const canBloodIn = user && (
     ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'FORMACION'].includes(user.role as string) ||
     (user.allRoles && (user.allRoles as string[]).includes('FORMACION'))
   );
-  // NUR Leaderschaft kann Blood Outs machen (NICHT Formación!)
   const canBloodOut = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
 
   // Queries
@@ -119,7 +134,7 @@ export default function BloodListPage() {
   const { data: ghostData, isLoading: loadingGhost } = useQuery({
     queryKey: ['bloodlist', 'ghost'],
     queryFn: () => bloodListApi.getGhostUsers(),
-    enabled: !!isLeadership && viewMode === 'ghost', // Ghost nur für Leaderschaft
+    enabled: !!isLeadership && viewMode === 'ghost',
   });
 
   // Mutations
@@ -165,17 +180,12 @@ export default function BloodListPage() {
 
   const handleBloodInSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const telefon = parseInt(bloodInData.telefon);
     if (isNaN(telefon)) {
       toast.error('Telefonnummer muss eine Zahl sein');
       return;
     }
-
-    bloodInMutation.mutate({
-      ...bloodInData,
-      telefon,
-    });
+    bloodInMutation.mutate({ ...bloodInData, telefon });
   };
 
   const handleBloodOutSubmit = (e: React.FormEvent) => {
@@ -186,13 +196,11 @@ export default function BloodListPage() {
   const handleLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDiscordUser) return;
-
     const telefon = parseInt(linkData.telefon);
     if (isNaN(telefon)) {
       toast.error('Telefonnummer muss eine Zahl sein');
       return;
     }
-
     linkDiscordUserMutation.mutate({
       discordId: selectedDiscordUser.discordId,
       vorname: linkData.vorname,
@@ -205,11 +213,8 @@ export default function BloodListPage() {
 
   const openLinkModal = (discordUser: UnassignedDiscordUser) => {
     setSelectedDiscordUser(discordUser);
-    
-    // Vorausfüllen mit IC-Namen wenn vorhanden, sonst Username
     let vorname = '';
     let nachname = '';
-    
     if (discordUser.icFirstName && discordUser.icLastName) {
       vorname = discordUser.icFirstName;
       nachname = discordUser.icLastName;
@@ -218,7 +223,6 @@ export default function BloodListPage() {
       vorname = nameParts[0] || '';
       nachname = nameParts.slice(1).join(' ') || '';
     }
-    
     setLinkData({
       vorname,
       nachname,
@@ -244,21 +248,24 @@ export default function BloodListPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-400">Laden...</div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+          <p className="text-gray-400">Laden...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Warning wenn Channels nicht konfiguriert */}
+      {/* Warning Banner */}
       {canBloodIn && !isConfigured && (
-        <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg flex items-start gap-3">
+        <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-xl flex items-start gap-3">
           <AlertTriangle className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-yellow-400 font-semibold">Blood List Channels nicht konfiguriert</p>
             <p className="text-yellow-200/70 text-sm mt-1">
-              Blood In {canBloodOut && 'und Blood Out '} {canBloodOut ? 'sind' : 'ist'} deaktiviert. Bitte wende dich an die Leaderschaft.
+              Blood In {canBloodOut && 'und Blood Out '} {canBloodOut ? 'sind' : 'ist'} deaktiviert.
             </p>
             {isLeadership && (
               <Link to="/settings">
@@ -273,80 +280,62 @@ export default function BloodListPage() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Skull className="h-8 w-8 text-primary" />
-            Blood List
-          </h1>
-          <p className="text-gray-400 mt-1">
-            LaSanta Calavera Family Mitgliederverwaltung
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {canBloodIn && (
-            <Button
-              onClick={() => setShowBloodInModal(true)}
-              disabled={!isConfigured}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              title={!isConfigured ? 'Channels müssen zuerst in den Einstellungen konfiguriert werden' : undefined}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Blood In
-            </Button>
-          )}
-          {canBloodOut && (
-            <Button
-              onClick={() => setShowBloodOutModal(true)}
-              disabled={!isConfigured}
-              variant="destructive"
-              className="bg-gray-800 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-              title={!isConfigured ? 'Channels müssen zuerst in den Einstellungen konfiguriert werden' : undefined}
-            >
-              <UserX className="mr-2 h-4 w-4" />
-              Blood Out
-            </Button>
-          )}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-red-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-orange-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-red-600 to-orange-600 rounded-xl shadow-lg shadow-red-500/30">
+              <Skull className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Blood List</h1>
+              <p className="text-gray-400 mt-1">
+                La Santa Calavera Family • Mitgliederverwaltung
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* View Tabs - Formación kann nur Active + Unassigned sehen, Leaderschaft alle */}
+      {/* View Tabs */}
       {canBloodIn && (
         <div className="flex gap-2 flex-wrap">
           <Button
             onClick={() => setViewMode('active')}
             variant={viewMode === 'active' ? 'default' : 'outline'}
-            className={viewMode === 'active' ? '' : 'border-gray-600'}
+            className={viewMode === 'active' ? 'bg-red-600 hover:bg-red-700' : 'border-gray-700 hover:bg-gray-800'}
           >
-            <User className="mr-2 h-4 w-4" />
-            Aktive Mitglieder
+            <UserCheck className="mr-2 h-4 w-4" />
+            Aktive
           </Button>
           {isLeadership && (
             <Button
               onClick={() => setViewMode('history')}
               variant={viewMode === 'history' ? 'default' : 'outline'}
-              className={viewMode === 'history' ? '' : 'border-gray-600'}
+              className={viewMode === 'history' ? 'bg-gray-600 hover:bg-gray-700' : 'border-gray-700 hover:bg-gray-800'}
             >
               <History className="mr-2 h-4 w-4" />
-              Blood Out Historie
+              Historie
             </Button>
           )}
           <Button
             onClick={() => setViewMode('unassigned')}
             variant={viewMode === 'unassigned' ? 'default' : 'outline'}
-            className={viewMode === 'unassigned' ? '' : 'border-gray-600'}
+            className={viewMode === 'unassigned' ? 'bg-blue-600 hover:bg-blue-700' : 'border-gray-700 hover:bg-gray-800'}
           >
             <Users className="mr-2 h-4 w-4" />
-            Unverknüpfte Discord User
+            Unverknüpft
           </Button>
           {isLeadership && (
             <Button
               onClick={() => setViewMode('ghost')}
               variant={viewMode === 'ghost' ? 'default' : 'outline'}
-              className={viewMode === 'ghost' ? '' : 'border-gray-600'}
+              className={viewMode === 'ghost' ? 'bg-purple-600 hover:bg-purple-700' : 'border-gray-700 hover:bg-gray-800'}
             >
               <Ghost className="mr-2 h-4 w-4" />
-              Ghost Users
+              Ghosts
             </Button>
           )}
         </div>
@@ -355,306 +344,351 @@ export default function BloodListPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 border-primary/30">
-            <CardContent className="p-6">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-red-900/30 to-orange-900/20 border-red-500/30">
+            <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Aktive Mitglieder</p>
+                  <p className="text-red-300/70 text-sm">Aktive Mitglieder</p>
                   <p className="text-3xl font-bold text-white">{stats.totalActive}</p>
                 </div>
-                <User className="h-12 w-12 text-primary opacity-50" />
+                <UserCheck className="h-10 w-10 text-red-500/30" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-gray-900/20 to-gray-800/20 border-gray-500/30">
-            <CardContent className="p-6">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700">
+            <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Blood Outs</p>
                   <p className="text-3xl font-bold text-white">{stats.totalBloodOuts}</p>
                 </div>
-                <UserX className="h-12 w-12 text-gray-400 opacity-50" />
+                <UserMinus className="h-10 w-10 text-gray-600" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-gold-900/20 to-gold-800/20 border-gold-500/30">
-            <CardContent className="p-6">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border-amber-500/30">
+            <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Gesamt Records</p>
+                  <p className="text-amber-300/70 text-sm">Gesamt Records</p>
                   <p className="text-3xl font-bold text-white">{stats.totalRecords}</p>
                 </div>
-                <TrendingUp className="h-12 w-12 text-gold-400 opacity-50" />
+                <TrendingUp className="h-10 w-10 text-amber-500/30" />
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Active Members Table */}
       {viewMode === 'active' && (
-        /* Aktive Mitglieder */
-        <Card className="lasanta-card">
-          <CardHeader>
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-white flex items-center gap-2">
               🩸 Aktive Blood Ins ({activeMembers.length})
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Alle aktiven Familienmitglieder
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {activeMembers.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <Skull className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Keine aktiven Mitglieder</p>
+              <div className="py-16 text-center">
+                <Skull className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Keine aktiven Mitglieder</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {activeMembers.map((member: BloodRecord) => (
-                  <div
-                    key={member.id}
-                    className="p-4 bg-gradient-to-r from-yellow-900/10 to-yellow-800/5 border border-primary/20 rounded-lg hover:border-primary/40 transition-all"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <User className="h-5 w-5 text-primary" />
-                          <h3 className="text-xl font-bold text-white">
-                            {member.vorname} {member.nachname}
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                          <div className="flex items-center gap-2 text-gray-300">
-                            <Phone className="h-4 w-4 text-gray-400" />
-                            <span>{member.telefon}</span>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-800 bg-gray-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Telefon</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Steam</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blood In</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Durch</th>
+                      {canBloodOut && (
+                        <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/50">
+                    {activeMembers.map((member: BloodRecord) => (
+                      <tr key={member.id} className="group hover:bg-red-950/20 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-green-500" />
+                            <span className="font-medium text-white">{member.vorname} {member.nachname}</span>
                           </div>
+                        </td>
+                        <td className="py-4 px-4">
                           <div className="flex items-center gap-2 text-gray-300">
-                            <Gamepad2 className="h-4 w-4 text-gray-400" />
-                            <span className="truncate">{member.steam}</span>
+                            <Phone className="h-3 w-3 text-gray-500" />
+                            {member.telefon}
                           </div>
-                          <div className="flex items-center gap-2 text-gray-300">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            <span>{formatDate(member.bloodinTimestamp)}</span>
-                          </div>
-                        </div>
-                        <div className="mt-2 text-sm text-gray-400">
-                          Blood In durch: <span className="text-primary">{member.bloodinDurch}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-300 text-sm truncate max-w-[150px] block">{member.steam}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400 text-sm">{formatDate(member.bloodinTimestamp)}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge variant="outline" className="bg-red-500/10 border-red-500/30 text-red-300 font-normal">
+                            {member.bloodinDurch}
+                          </Badge>
+                        </td>
+                        {canBloodOut && (
+                          <td className="py-4 px-6 text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setBloodOutData({ identifier: `${member.vorname} ${member.nachname}`, grund: '' });
+                                setShowBloodOutModal(true);
+                              }}
+                              disabled={!isConfigured}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                              title={!isConfigured ? 'Channels müssen zuerst konfiguriert werden' : 'Blood Out'}
+                            >
+                              <UserX className="h-4 w-4 mr-1" />
+                              Blood Out
+                            </Button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
+      {/* History Table */}
       {viewMode === 'history' && (
-        /* Blood Out Historie */
-        <Card className="lasanta-card">
-          <CardHeader>
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-white flex items-center gap-2">
               💀 Blood Out Historie ({history.length})
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Alle ausgeschlossenen Mitglieder
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {history.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <UserX className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Keine Blood Outs in der Historie</p>
+              <div className="py-16 text-center">
+                <UserX className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Keine Blood Outs in der Historie</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {history.map((record: BloodRecord) => (
-                  <div
-                    key={record.id}
-                    className="p-4 bg-gradient-to-r from-gray-900/30 to-gray-800/10 border border-gray-700/30 rounded-lg"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <UserX className="h-5 w-5 text-gray-400" />
-                          <h3 className="text-xl font-bold text-white">
-                            {record.vorname} {record.nachname}
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-2">
-                          <div className="flex items-center gap-2 text-gray-300">
-                            <Phone className="h-4 w-4 text-gray-400" />
-                            <span>{record.telefon}</span>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-800 bg-gray-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Telefon</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blood Out</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Durch</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Grund</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/50">
+                    {history.map((record: BloodRecord) => (
+                      <tr key={record.id} className="group hover:bg-gray-800/30 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-gray-500" />
+                            <span className="font-medium text-white">{record.vorname} {record.nachname}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-gray-300">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            Blood Out: {record.bloodoutTimestamp && formatDate(record.bloodoutTimestamp)}
-                          </div>
-                        </div>
-                        {record.bloodoutGrund && (
-                          <div className="flex items-start gap-2 text-sm bg-orange-900/10 border border-orange-500/20 p-3 rounded">
-                            <AlertTriangle className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <span className="text-orange-300 font-medium">Grund: </span>
-                              <span className="text-gray-300">{record.bloodoutGrund}</span>
-                            </div>
-                          </div>
-                        )}
-                        <div className="mt-2 text-sm text-gray-400">
-                          Blood Out durch: <span className="text-orange-300">{record.bloodoutDurch}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400">{record.telefon}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400 text-sm">
+                            {record.bloodoutTimestamp && formatDate(record.bloodoutTimestamp)}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-orange-300">{record.bloodoutDurch}</span>
+                        </td>
+                        <td className="py-4 px-4 max-w-xs">
+                          {record.bloodoutGrund && (
+                            <span className="text-gray-300 text-sm truncate block">{record.bloodoutGrund}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
+      {/* Unassigned Discord Users Table */}
       {viewMode === 'unassigned' && (
-        /* Unverknüpfte Discord User */
-        <Card className="lasanta-card">
-          <CardHeader>
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
+              <Users className="h-5 w-5 text-blue-400" />
               Unverknüpfte Discord User ({unassignedData?.totalUnassigned || 0})
             </CardTitle>
-            <CardDescription>
-              Discord Mitglieder die noch nicht mit einem Blood Record verknüpft sind
+            <CardDescription className="text-gray-400">
+              Discord Mitglieder ohne Blood Record
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {loadingUnassigned ? (
-              <div className="text-center py-12 text-gray-400">
-                Lade Discord User...
+              <div className="py-16 text-center">
+                <div className="h-8 w-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-gray-400">Lade Discord User...</p>
               </div>
             ) : (unassignedData?.unassignedDiscordUsers?.length || 0) === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Alle Discord User sind verknüpft</p>
+              <div className="py-16 text-center">
+                <Users className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Alle Discord User sind verknüpft</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {unassignedData?.unassignedDiscordUsers?.map((discordUser: UnassignedDiscordUser) => (
-                  <div
-                    key={discordUser.discordId}
-                    className="p-4 bg-gradient-to-r from-blue-900/10 to-blue-800/5 border border-blue-500/20 rounded-lg hover:border-blue-500/40 transition-all"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {discordUser.avatar ? (
-                          <img
-                            src={`https://cdn.discordapp.com/avatars/${discordUser.discordId}/${discordUser.avatar}.png`}
-                            alt={discordUser.username}
-                            className="w-10 h-10 rounded-full"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                            <User className="h-5 w-5 text-gray-400" />
-                          </div>
-                        )}
-                        <div>
-                          <h3 className="text-lg font-bold text-white">
-                            {discordUser.username}
-                          </h3>
-                          {discordUser.icFirstName && discordUser.icLastName && (
-                            <p className="text-sm text-gray-300">
-                              IC: {discordUser.icFirstName} {discordUser.icLastName}
-                            </p>
-                          )}
-                          <div className="flex items-center gap-2 text-sm mt-1">
-                            <Badge variant="outline" className="text-blue-400 border-blue-400">
-                              {discordUser.highestSystemRole}
-                            </Badge>
-                            {discordUser.isInDatabase && (
-                              <Badge variant="outline" className="text-green-400 border-green-400">
-                                In DB
-                              </Badge>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-800 bg-gray-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">User</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">IC Name</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Rolle</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Beigetreten</th>
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/50">
+                    {unassignedData?.unassignedDiscordUsers?.map((discordUser: UnassignedDiscordUser) => (
+                      <tr key={discordUser.discordId} className="group hover:bg-blue-950/20 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            {discordUser.avatar ? (
+                              <img
+                                src={`https://cdn.discordapp.com/avatars/${discordUser.discordId}/${discordUser.avatar}.png`}
+                                alt={discordUser.username}
+                                className="w-8 h-8 rounded-full"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                                <User className="h-4 w-4 text-gray-400" />
+                              </div>
                             )}
-                            <span className="text-gray-400">
-                              Beigetreten: {formatDate(discordUser.joinedAt)}
-                            </span>
+                            <span className="font-medium text-white">{discordUser.username}</span>
+                            {discordUser.isInDatabase && (
+                              <Badge variant="outline" className="text-green-400 border-green-400/30 text-xs">DB</Badge>
+                            )}
                           </div>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => openLinkModal(discordUser)}
-                        disabled={!isConfigured}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title={!isConfigured ? 'Channels müssen zuerst in den Einstellungen konfiguriert werden' : undefined}
-                      >
-                        <Link2 className="mr-2 h-4 w-4" />
-                        Blood In
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                        </td>
+                        <td className="py-4 px-4">
+                          {discordUser.icFirstName && discordUser.icLastName ? (
+                            <span className="text-gray-300">{discordUser.icFirstName} {discordUser.icLastName}</span>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge variant="outline" className="text-blue-400 border-blue-400/30 font-normal">
+                            {discordUser.highestSystemRole}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400 text-sm">{formatDate(discordUser.joinedAt)}</span>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <Button
+                            onClick={() => openLinkModal(discordUser)}
+                            disabled={!isConfigured}
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30"
+                          >
+                            <Link2 className="mr-2 h-3 w-3" />
+                            Blood In
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
+      {/* Ghost Users Table */}
       {viewMode === 'ghost' && (
-        /* Ghost Users - nicht mehr im Discord */
-        <Card className="lasanta-card">
-          <CardHeader>
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Ghost className="h-5 w-5 text-purple-500" />
+              <Ghost className="h-5 w-5 text-purple-400" />
               Ghost Users ({ghostData?.totalGhostUsers || 0})
             </CardTitle>
-            <CardDescription>
-              User die in der Datenbank sind, aber nicht mehr im Discord Server
+            <CardDescription className="text-gray-400">
+              In der Datenbank, aber nicht mehr im Discord
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {loadingGhost ? (
-              <div className="text-center py-12 text-gray-400">
-                Lade Ghost Users...
+              <div className="py-16 text-center">
+                <div className="h-8 w-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-gray-400">Lade Ghost Users...</p>
               </div>
             ) : (ghostData?.ghostUsers?.length || 0) === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <Ghost className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Keine Ghost Users gefunden</p>
+              <div className="py-16 text-center">
+                <Ghost className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Keine Ghost Users gefunden</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {ghostData?.ghostUsers?.map((ghostUser: GhostUser) => (
-                  <div
-                    key={ghostUser.userId}
-                    className="p-4 bg-gradient-to-r from-purple-900/10 to-purple-800/5 border border-purple-500/20 rounded-lg"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Ghost className="h-5 w-5 text-purple-500" />
-                          <h3 className="text-xl font-bold text-white">
-                            {ghostUser.icFirstName && ghostUser.icLastName 
-                              ? `${ghostUser.icFirstName} ${ghostUser.icLastName}`
-                              : ghostUser.username}
-                          </h3>
-                          <Badge variant="outline" className="text-purple-400 border-purple-400">
-                            Nicht im Discord
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-gray-400">
-                          Discord Username: {ghostUser.username}
-                        </div>
-                        {ghostUser.linkedBloodRecord && (
-                          <div className="mt-2 p-2 bg-yellow-900/10 border border-yellow-500/20 rounded">
-                            <span className="text-yellow-400 text-sm">
-                              ⚠️ Hat Blood Record: {ghostUser.linkedBloodRecord.vorname} {ghostUser.linkedBloodRecord.nachname}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-800 bg-gray-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Discord</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blood Record</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/50">
+                    {ghostData?.ghostUsers?.map((ghostUser: GhostUser) => (
+                      <tr key={ghostUser.userId} className="group hover:bg-purple-950/20 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <Ghost className="h-4 w-4 text-purple-400" />
+                            <span className="font-medium text-white">
+                              {ghostUser.icFirstName && ghostUser.icLastName 
+                                ? `${ghostUser.icFirstName} ${ghostUser.icLastName}`
+                                : ghostUser.username}
                             </span>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="text-gray-400">{ghostUser.username}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                            Nicht im Discord
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4">
+                          {ghostUser.linkedBloodRecord && (
+                            <span className="text-yellow-400 text-sm">
+                              ⚠️ {ghostUser.linkedBloodRecord.vorname} {ghostUser.linkedBloodRecord.nachname}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
@@ -665,11 +699,8 @@ export default function BloodListPage() {
       {showBloodInModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
-            {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 via-primary/20 to-red-600/20 blur-xl rounded-2xl" />
-            
             <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-red-500/30 shadow-2xl rounded-2xl overflow-hidden">
-              {/* Header mit Gradient */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-red-900/50 via-red-800/30 to-transparent" />
                 <CardHeader className="relative pb-4">
@@ -678,137 +709,56 @@ export default function BloodListPage() {
                       <Skull className="h-7 w-7 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl font-bold text-white">
-                        Blood In
-                      </CardTitle>
-                      <CardDescription className="text-red-200/70 mt-1">
-                        Willkommen in der Familie
-                      </CardDescription>
+                      <CardTitle className="text-2xl font-bold text-white">Blood In</CardTitle>
+                      <CardDescription className="text-red-200/70 mt-1">Willkommen in der Familie</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
               </div>
-
               <CardContent className="pt-2 pb-6">
                 <form onSubmit={handleBloodInSubmit} className="space-y-5">
-                  {/* Name Felder in einer Reihe */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <User className="h-4 w-4 text-red-400" />
-                        Vorname
+                        <User className="h-4 w-4 text-red-400" />Vorname
                       </label>
-                      <Input
-                        value={bloodInData.vorname}
-                        onChange={(e) => setBloodInData({ ...bloodInData, vorname: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
-                        placeholder="z.B. Carlos"
-                        required
-                      />
+                      <Input value={bloodInData.vorname} onChange={(e) => setBloodInData({ ...bloodInData, vorname: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-red-500 text-white h-11" placeholder="z.B. Carlos" required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <User className="h-4 w-4 text-red-400" />
-                        Nachname
+                        <User className="h-4 w-4 text-red-400" />Nachname
                       </label>
-                      <Input
-                        value={bloodInData.nachname}
-                        onChange={(e) => setBloodInData({ ...bloodInData, nachname: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
-                        placeholder="z.B. Martinez"
-                        required
-                      />
+                      <Input value={bloodInData.nachname} onChange={(e) => setBloodInData({ ...bloodInData, nachname: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-red-500 text-white h-11" placeholder="z.B. Martinez" required />
                     </div>
                   </div>
-
-                  {/* Telefon und Steam */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-red-400" />
-                        Telefonnummer
+                        <Phone className="h-4 w-4 text-red-400" />Telefon
                       </label>
-                      <Input
-                        type="number"
-                        value={bloodInData.telefon}
-                        onChange={(e) => setBloodInData({ ...bloodInData, telefon: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        placeholder="555-1234"
-                        required
-                      />
+                      <Input type="number" value={bloodInData.telefon} onChange={(e) => setBloodInData({ ...bloodInData, telefon: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-red-500 text-white h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder="555-1234" required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Gamepad2 className="h-4 w-4 text-red-400" />
-                        Steam ID
+                        <Gamepad2 className="h-4 w-4 text-red-400" />Steam ID
                       </label>
-                      <Input
-                        value={bloodInData.steam}
-                        onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
-                        placeholder="steam:xxxx"
-                        required
-                      />
+                      <Input value={bloodInData.steam} onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-red-500 text-white h-11" placeholder="steam:xxxx" required />
                     </div>
                   </div>
-
-                  {/* Divider */}
                   <div className="relative py-2">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-700/50" />
-                    </div>
-                    <div className="relative flex justify-center">
-                      <span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">
-                        Aufnahme durch
-                      </span>
-                    </div>
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-700/50" /></div>
+                    <div className="relative flex justify-center"><span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">Aufnahme durch</span></div>
                   </div>
-
-                  {/* Blood In Durch */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Skull className="h-4 w-4 text-red-400" />
-                      Durchgeführt von
+                      <Skull className="h-4 w-4 text-red-400" />Durchgeführt von
                     </label>
-                    <Input
-                      value={bloodInData.bloodinDurch}
-                      onChange={(e) => setBloodInData({ ...bloodInData, bloodinDurch: e.target.value })}
-                      className="bg-gray-800/50 border-gray-700 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-500 h-11"
-                      placeholder="Name des Verantwortlichen"
-                      required
-                    />
+                    <Input value={bloodInData.bloodinDurch} onChange={(e) => setBloodInData({ ...bloodInData, bloodinDurch: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-red-500 text-white h-11" placeholder="Name des Verantwortlichen" required />
                   </div>
-
-                  {/* Buttons */}
                   <div className="flex gap-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setShowBloodInModal(false);
-                        setBloodInData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
-                      }}
-                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
-                      disabled={bloodInMutation.isPending}
-                    >
-                      Abbrechen
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="flex-1 h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-lg shadow-red-500/25 transition-all duration-200 hover:shadow-red-500/40"
-                      disabled={bloodInMutation.isPending}
-                    >
-                      {bloodInMutation.isPending ? (
-                        <span className="flex items-center gap-2">
-                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Wird aufgenommen...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          <Plus className="h-5 w-5" />
-                          Blood In
-                        </span>
-                      )}
+                    <Button type="button" variant="outline" onClick={() => { setShowBloodInModal(false); setBloodInData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' }); }} className="flex-1 h-12 border-gray-600 hover:bg-gray-800 text-gray-300" disabled={bloodInMutation.isPending}>Abbrechen</Button>
+                    <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-lg shadow-red-500/25" disabled={bloodInMutation.isPending}>
+                      {bloodInMutation.isPending ? <span className="flex items-center gap-2"><div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Wird aufgenommen...</span> : <span className="flex items-center gap-2"><Plus className="h-5 w-5" />Blood In</span>}
                     </Button>
                   </div>
                 </form>
@@ -822,11 +772,8 @@ export default function BloodListPage() {
       {showBloodOutModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
-            {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-red-500/20 to-orange-600/20 blur-xl rounded-2xl" />
-            
             <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden">
-              {/* Header mit Gradient */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-900/50 via-red-800/30 to-transparent" />
                 <CardHeader className="relative pb-4">
@@ -835,20 +782,14 @@ export default function BloodListPage() {
                       <UserX className="h-7 w-7 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl font-bold text-white">
-                        Blood Out
-                      </CardTitle>
-                      <CardDescription className="text-orange-200/70 mt-1">
-                        ⚠️ Diese Aktion ist unwiderruflich
-                      </CardDescription>
+                      <CardTitle className="text-2xl font-bold text-white">Blood Out</CardTitle>
+                      <CardDescription className="text-orange-200/70 mt-1">⚠️ Diese Aktion ist unwiderruflich</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
               </div>
-
               <CardContent className="pt-2 pb-6">
                 <form onSubmit={handleBloodOutSubmit} className="space-y-5">
-                  {/* Warning Banner */}
                   <div className="bg-red-900/30 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
@@ -856,71 +797,23 @@ export default function BloodListPage() {
                       <p className="text-red-200/70 mt-1">Eine Ankündigung wird im Blood Out Channel gepostet.</p>
                     </div>
                   </div>
-
-                  {/* Identifier */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <User className="h-4 w-4 text-orange-400" />
-                      Mitglied identifizieren
+                      <User className="h-4 w-4 text-orange-400" />Mitglied identifizieren
                     </label>
-                    <Input
-                      value={bloodOutData.identifier}
-                      onChange={(e) => setBloodOutData({ ...bloodOutData, identifier: e.target.value })}
-                      placeholder="Telefonnummer oder 'Vorname Nachname'"
-                      className="bg-gray-800/50 border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 text-white placeholder:text-gray-500 h-11"
-                      required
-                    />
-                    <p className="text-xs text-gray-500">
-                      z.B. <span className="text-gray-400">12345678</span> oder <span className="text-gray-400">Max Mustermann</span>
-                    </p>
+                    <Input value={bloodOutData.identifier} onChange={(e) => setBloodOutData({ ...bloodOutData, identifier: e.target.value })} placeholder="Telefonnummer oder 'Vorname Nachname'" className="bg-gray-800/50 border-gray-700 focus:border-orange-500 text-white h-11" required />
+                    <p className="text-xs text-gray-500">z.B. <span className="text-gray-400">12345678</span> oder <span className="text-gray-400">Max Mustermann</span></p>
                   </div>
-
-                  {/* Grund */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Skull className="h-4 w-4 text-orange-400" />
-                      Grund für Blood Out
+                      <Skull className="h-4 w-4 text-orange-400" />Grund für Blood Out
                     </label>
-                    <Textarea
-                      value={bloodOutData.grund}
-                      onChange={(e) => setBloodOutData({ ...bloodOutData, grund: e.target.value })}
-                      placeholder="Warum wird das Mitglied entfernt..."
-                      rows={4}
-                      className="!bg-gray-800/50 border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 resize-none text-white placeholder:text-gray-500"
-                      required
-                    />
+                    <Textarea value={bloodOutData.grund} onChange={(e) => setBloodOutData({ ...bloodOutData, grund: e.target.value })} placeholder="Warum wird das Mitglied entfernt..." rows={4} className="!bg-gray-800/50 border-gray-700 focus:border-orange-500 resize-none text-white" required />
                   </div>
-
-                  {/* Buttons */}
                   <div className="flex gap-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setShowBloodOutModal(false);
-                        setBloodOutData({ identifier: '', grund: '' });
-                      }}
-                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
-                      disabled={bloodOutMutation.isPending}
-                    >
-                      Abbrechen
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="flex-1 h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-semibold shadow-lg shadow-red-500/25 transition-all duration-200 hover:shadow-red-500/40"
-                      disabled={bloodOutMutation.isPending}
-                    >
-                      {bloodOutMutation.isPending ? (
-                        <span className="flex items-center gap-2">
-                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Wird entfernt...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          <UserX className="h-5 w-5" />
-                          Blood Out
-                        </span>
-                      )}
+                    <Button type="button" variant="outline" onClick={() => { setShowBloodOutModal(false); setBloodOutData({ identifier: '', grund: '' }); }} className="flex-1 h-12 border-gray-600 hover:bg-gray-800 text-gray-300" disabled={bloodOutMutation.isPending}>Abbrechen</Button>
+                    <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-semibold shadow-lg shadow-red-500/25" disabled={bloodOutMutation.isPending}>
+                      {bloodOutMutation.isPending ? <span className="flex items-center gap-2"><div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Wird entfernt...</span> : <span className="flex items-center gap-2"><UserX className="h-5 w-5" />Blood Out</span>}
                     </Button>
                   </div>
                 </form>
@@ -934,11 +827,8 @@ export default function BloodListPage() {
       {showLinkModal && selectedDiscordUser && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
-            {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-cyan-500/20 to-blue-600/20 blur-xl rounded-2xl" />
-            
             <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-blue-500/30 shadow-2xl rounded-2xl overflow-hidden">
-              {/* Header mit Gradient */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 via-cyan-800/30 to-transparent" />
                 <CardHeader className="relative pb-4">
@@ -947,138 +837,56 @@ export default function BloodListPage() {
                       <Link2 className="h-7 w-7 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl font-bold text-white">
-                        Blood In & Verknüpfen
-                      </CardTitle>
-                      <CardDescription className="text-blue-200/70 mt-1">
-                        Discord User: <span className="text-blue-300 font-medium">{selectedDiscordUser.username}</span>
-                      </CardDescription>
+                      <CardTitle className="text-2xl font-bold text-white">Blood In & Verknüpfen</CardTitle>
+                      <CardDescription className="text-blue-200/70 mt-1">Discord: <span className="text-blue-300 font-medium">{selectedDiscordUser.username}</span></CardDescription>
                     </div>
                   </div>
                 </CardHeader>
               </div>
-
               <CardContent className="pt-2 pb-6">
                 <form onSubmit={handleLinkSubmit} className="space-y-5">
-                  {/* Name Felder in einer Reihe */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-400" />
-                        Vorname (IC)
+                        <User className="h-4 w-4 text-blue-400" />Vorname (IC)
                       </label>
-                      <Input
-                        value={linkData.vorname}
-                        onChange={(e) => setLinkData({ ...linkData, vorname: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
-                        placeholder="z.B. Carlos"
-                        required
-                      />
+                      <Input value={linkData.vorname} onChange={(e) => setLinkData({ ...linkData, vorname: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white h-11" placeholder="z.B. Carlos" required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-400" />
-                        Nachname (IC)
+                        <User className="h-4 w-4 text-blue-400" />Nachname (IC)
                       </label>
-                      <Input
-                        value={linkData.nachname}
-                        onChange={(e) => setLinkData({ ...linkData, nachname: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
-                        placeholder="z.B. Martinez"
-                        required
-                      />
+                      <Input value={linkData.nachname} onChange={(e) => setLinkData({ ...linkData, nachname: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white h-11" placeholder="z.B. Martinez" required />
                     </div>
                   </div>
-
-                  {/* Telefon und Steam */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-blue-400" />
-                        Telefonnummer
+                        <Phone className="h-4 w-4 text-blue-400" />Telefon
                       </label>
-                      <Input
-                        type="number"
-                        value={linkData.telefon}
-                        onChange={(e) => setLinkData({ ...linkData, telefon: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        placeholder="555-1234"
-                        required
-                      />
+                      <Input type="number" value={linkData.telefon} onChange={(e) => setLinkData({ ...linkData, telefon: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white h-11 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder="555-1234" required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Gamepad2 className="h-4 w-4 text-blue-400" />
-                        Steam ID
+                        <Gamepad2 className="h-4 w-4 text-blue-400" />Steam ID
                       </label>
-                      <Input
-                        value={linkData.steam}
-                        onChange={(e) => setLinkData({ ...linkData, steam: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
-                        placeholder="steam:xxxx"
-                        required
-                      />
+                      <Input value={linkData.steam} onChange={(e) => setLinkData({ ...linkData, steam: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white h-11" placeholder="steam:xxxx" required />
                     </div>
                   </div>
-
-                  {/* Divider */}
                   <div className="relative py-2">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-700/50" />
-                    </div>
-                    <div className="relative flex justify-center">
-                      <span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">
-                        Aufnahme durch
-                      </span>
-                    </div>
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-700/50" /></div>
+                    <div className="relative flex justify-center"><span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">Aufnahme durch</span></div>
                   </div>
-
-                  {/* Blood In Durch */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Skull className="h-4 w-4 text-blue-400" />
-                      Durchgeführt von
+                      <Skull className="h-4 w-4 text-blue-400" />Durchgeführt von
                     </label>
-                    <Input
-                      value={linkData.bloodinDurch}
-                      onChange={(e) => setLinkData({ ...linkData, bloodinDurch: e.target.value })}
-                      className="bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-500 h-11"
-                      placeholder="Name des Verantwortlichen"
-                      required
-                    />
+                    <Input value={linkData.bloodinDurch} onChange={(e) => setLinkData({ ...linkData, bloodinDurch: e.target.value })} className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white h-11" placeholder="Name des Verantwortlichen" required />
                   </div>
-
-                  {/* Buttons */}
                   <div className="flex gap-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setShowLinkModal(false);
-                        setSelectedDiscordUser(null);
-                        setLinkData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' });
-                      }}
-                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
-                      disabled={linkDiscordUserMutation.isPending}
-                    >
-                      Abbrechen
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/40"
-                      disabled={linkDiscordUserMutation.isPending}
-                    >
-                      {linkDiscordUserMutation.isPending ? (
-                        <span className="flex items-center gap-2">
-                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Wird verknüpft...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          <Link2 className="h-5 w-5" />
-                          Blood In & Verknüpfen
-                        </span>
-                      )}
+                    <Button type="button" variant="outline" onClick={() => { setShowLinkModal(false); setSelectedDiscordUser(null); setLinkData({ vorname: '', nachname: '', telefon: '', steam: '', bloodinDurch: '' }); }} className="flex-1 h-12 border-gray-600 hover:bg-gray-800 text-gray-300" disabled={linkDiscordUserMutation.isPending}>Abbrechen</Button>
+                    <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-blue-500/25" disabled={linkDiscordUserMutation.isPending}>
+                      {linkDiscordUserMutation.isPending ? <span className="flex items-center gap-2"><div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Wird verknüpft...</span> : <span className="flex items-center gap-2"><Link2 className="h-5 w-5" />Blood In & Verknüpfen</span>}
                     </Button>
                   </div>
                 </form>
@@ -1090,4 +898,3 @@ export default function BloodListPage() {
     </div>
   );
 }
-

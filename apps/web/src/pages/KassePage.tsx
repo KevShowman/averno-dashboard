@@ -5,8 +5,20 @@ import { useAuthStore } from '../stores/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Plus, Minus } from 'lucide-react'
+import { 
+  DollarSign, 
+  TrendingUp, 
+  TrendingDown, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  Plus, 
+  Minus,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  RotateCcw
+} from 'lucide-react'
 import { formatCurrency, formatDate, getTransactionStatusColor, getDisplayName, hasRole } from '../lib/utils'
 import {
   Chart as ChartJS,
@@ -57,6 +69,7 @@ export default function KassePage() {
   })
 
   const canApprove = hasRole(user, 'EL_PATRON')
+  const canTransact = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
 
   const approveTransactionMutation = useMutation({
     mutationFn: (transactionId: string) => api.post(`/cash/transactions/${transactionId}/approve`),
@@ -114,130 +127,132 @@ export default function KassePage() {
     }
   }
 
-  const getKindIcon = (kind: string) => {
-    switch (kind) {
-      case 'EINZAHLUNG': return <TrendingUp className="h-4 w-4 text-green-400" />
-      case 'AUSZAHLUNG': return <TrendingDown className="h-4 w-4 text-red-400" />
-      case 'TRANSFER': return <DollarSign className="h-4 w-4 text-blue-400" />
-      case 'KORREKTUR': return <Clock className="h-4 w-4 text-yellow-400" />
-      default: return <DollarSign className="h-4 w-4" />
-    }
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white flex items-center">
-            <DollarSign className="mr-3 h-8 w-8 text-accent" />
-            Kassensystem
-          </h1>
-          <p className="text-gray-400 mt-2">
-            Schwarzgeld-Verwaltung und Buchungen
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          {hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']) && (
-            <>
-              <Button
-                onClick={() => {
-                  setTransactionType('EINZAHLUNG')
-                  setShowTransactionModal(true)
-                }}
-                variant="outline"
-                className="text-green-400 border-green-400 hover:bg-green-400/10"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Einzahlung
-              </Button>
-              <Button
-                onClick={() => {
-                  setTransactionType('AUSZAHLUNG')
-                  setShowTransactionModal(true)
-                }}
-                variant="outline"
-                className="text-red-400 border-red-400 hover:bg-red-400/10"
-              >
-                <Minus className="mr-2 h-4 w-4" />
-                Auszahlung
-              </Button>
-            </>
-          )}
-          {hasRole(user, ['EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO', 'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO', 'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO', 'FUTURO']) && (
-            <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
-              Nur lesen
-            </Badge>
-          )}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-green-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-emerald-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl shadow-lg shadow-green-500/30">
+              <Wallet className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Kassensystem</h1>
+              <p className="text-gray-400 mt-1">
+                Schwarzgeld-Verwaltung und Buchungen
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {canTransact && (
+              <>
+                <Button
+                  onClick={() => {
+                    setTransactionType('EINZAHLUNG')
+                    setShowTransactionModal(true)
+                  }}
+                  className="bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-500/30"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Einzahlung
+                </Button>
+                <Button
+                  onClick={() => {
+                    setTransactionType('AUSZAHLUNG')
+                    setShowTransactionModal(true)
+                  }}
+                  className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30"
+                >
+                  <Minus className="mr-2 h-4 w-4" />
+                  Auszahlung
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Aktueller Saldo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {formatCurrency(summary?.currentBalance || 0)}
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-500/30">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full blur-2xl" />
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <DollarSign className="h-5 w-5 text-green-400" />
+              </div>
             </div>
+            <p className="text-green-300/70 text-sm">Aktueller Saldo</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.currentBalance || 0)}</p>
           </CardContent>
         </Card>
-
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Heute</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${
-              (summary?.todayChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {summary?.todayChange >= 0 ? '+' : ''}{formatCurrency(summary?.todayChange || 0)}
+        
+        <Card className={`relative overflow-hidden ${(summary?.todayChange || 0) >= 0 ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/20 border-emerald-500/30' : 'bg-gradient-to-br from-red-900/30 to-orange-900/20 border-red-500/30'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.todayChange || 0) >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'} rounded-full blur-2xl`} />
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className={`p-2 ${(summary?.todayChange || 0) >= 0 ? 'bg-emerald-500/20' : 'bg-red-500/20'} rounded-lg`}>
+                {(summary?.todayChange || 0) >= 0 ? (
+                  <ArrowUpRight className="h-5 w-5 text-emerald-400" />
+                ) : (
+                  <ArrowDownRight className="h-5 w-5 text-red-400" />
+                )}
+              </div>
             </div>
+            <p className={`${(summary?.todayChange || 0) >= 0 ? 'text-emerald-300/70' : 'text-red-300/70'} text-sm`}>Heute</p>
+            <p className={`text-2xl font-bold ${(summary?.todayChange || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {(summary?.todayChange || 0) >= 0 ? '+' : ''}{formatCurrency(summary?.todayChange || 0)}
+            </p>
           </CardContent>
         </Card>
-
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Diese Woche</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${
-              (summary?.weekChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {summary?.weekChange >= 0 ? '+' : ''}{formatCurrency(summary?.weekChange || 0)}
+        
+        <Card className={`relative overflow-hidden ${(summary?.weekChange || 0) >= 0 ? 'bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-500/30' : 'bg-gradient-to-br from-orange-900/30 to-red-900/20 border-orange-500/30'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.weekChange || 0) >= 0 ? 'bg-blue-500/10' : 'bg-orange-500/10'} rounded-full blur-2xl`} />
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className={`p-2 ${(summary?.weekChange || 0) >= 0 ? 'bg-blue-500/20' : 'bg-orange-500/20'} rounded-lg`}>
+                <TrendingUp className={`h-5 w-5 ${(summary?.weekChange || 0) >= 0 ? 'text-blue-400' : 'text-orange-400'}`} />
+              </div>
             </div>
+            <p className={`${(summary?.weekChange || 0) >= 0 ? 'text-blue-300/70' : 'text-orange-300/70'} text-sm`}>Diese Woche</p>
+            <p className={`text-2xl font-bold ${(summary?.weekChange || 0) >= 0 ? 'text-blue-400' : 'text-orange-400'}`}>
+              {(summary?.weekChange || 0) >= 0 ? '+' : ''}{formatCurrency(summary?.weekChange || 0)}
+            </p>
           </CardContent>
         </Card>
-
-        <Card className="lasanta-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400">Ausstehend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-400">
+        
+        <Card className={`relative overflow-hidden ${(summary?.pendingTransactions || 0) > 0 ? 'bg-gradient-to-br from-yellow-900/30 to-amber-900/20 border-yellow-500/30' : 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/10' : 'bg-gray-500/10'} rounded-full blur-2xl`} />
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className={`p-2 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/20' : 'bg-gray-500/20'} rounded-lg`}>
+                <Clock className={`h-5 w-5 ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-gray-400'}`} />
+              </div>
+            </div>
+            <p className={`${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-300/70' : 'text-gray-400'} text-sm`}>Ausstehend</p>
+            <p className={`text-2xl font-bold ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-white'}`}>
               {summary?.pendingTransactions || 0}
-            </div>
-            <p className="text-xs text-gray-400">Transaktionen</p>
+            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Chart */}
-      <Card className="lasanta-card">
-        <CardHeader>
-          <div>
-            <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
-            <CardDescription className="text-gray-400">
-              Komplette Entwicklung des Schwarzgeld-Saldos
-            </CardDescription>
-          </div>
+      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+        <CardHeader className="border-b border-gray-800">
+          <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
+          <CardDescription className="text-gray-400">
+            Komplette Entwicklung des Schwarzgeld-Saldos
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {chartLoading ? (
             <div className="h-80 flex items-center justify-center text-gray-400">
-              <div className="text-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
                 <p>Lade Chart-Daten...</p>
               </div>
             </div>
@@ -254,24 +269,23 @@ export default function KassePage() {
             <div className="h-80">
               <Line
                 data={{
-                  labels: chartData.map(item => {
+                  labels: chartData.map((item: any) => {
                     return new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' })
                   }),
                   datasets: [
                     {
                       label: 'Saldo',
-                      data: chartData.map(item => item.balance),
-                      borderColor: 'rgb(212, 175, 55)', // Lasanta gold
-                      backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                      data: chartData.map((item: any) => item.balance),
+                      borderColor: 'rgb(34, 197, 94)',
+                      backgroundColor: 'rgba(34, 197, 94, 0.1)',
                       borderWidth: 3,
                       fill: true,
                       tension: 0.4,
-                      pointBackgroundColor: 'rgb(212, 175, 55)',
-                      pointBorderColor: 'rgb(255, 215, 0)', // Helles gold
+                      pointBackgroundColor: 'rgb(34, 197, 94)',
+                      pointBorderColor: 'rgb(74, 222, 128)',
                       pointBorderWidth: 2,
-                      pointRadius: 5,
-                      pointHoverRadius: 7,
-                      pointHoverBorderWidth: 3,
+                      pointRadius: 4,
+                      pointHoverRadius: 6,
                     }
                   ]
                 }}
@@ -279,84 +293,47 @@ export default function KassePage() {
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
-                    legend: {
-                      display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                       backgroundColor: 'rgb(31, 41, 55)',
                       titleColor: 'rgb(249, 250, 251)',
                       bodyColor: 'rgb(249, 250, 251)',
-                      borderColor: 'rgb(212, 175, 55)',
+                      borderColor: 'rgb(34, 197, 94)',
                       borderWidth: 2,
                       cornerRadius: 12,
                       displayColors: false,
-                      titleFont: {
-                        size: 14,
-                        weight: 'bold'
-                      },
-                      bodyFont: {
-                        size: 13
-                      },
                       callbacks: {
                         title: (context) => {
                           const dataIndex = context[0].dataIndex;
                           return new Date(chartData[dataIndex].date).toLocaleDateString('de-DE');
                         },
-                        label: (context) => {
-                          const value = context.parsed.y;
-                          return `Saldo: ${formatCurrency(value ?? 0)}`;
-                        }
+                        label: (context) => `Saldo: ${formatCurrency(context.parsed.y ?? 0)}`
                       }
                     }
                   },
                   scales: {
                     x: {
-                      grid: {
-                        color: 'rgba(212, 175, 55, 0.2)',
-                      },
-                      ticks: {
-                        color: 'rgb(156, 163, 175)',
-                        font: {
-                          size: 12,
-                          weight: 'normal'
-                        }
-                      }
+                      grid: { color: 'rgba(75, 85, 99, 0.3)' },
+                      ticks: { color: 'rgb(156, 163, 175)' }
                     },
                     y: {
-                      grid: {
-                        color: 'rgba(212, 175, 55, 0.2)',
-                      },
+                      grid: { color: 'rgba(75, 85, 99, 0.3)' },
                       ticks: {
                         color: 'rgb(156, 163, 175)',
-                        font: {
-                          size: 12,
-                          weight: 'normal'
-                        },
-                        callback: function(value) {
-                          return formatCurrency(value as number);
-                        }
+                        callback: (value) => formatCurrency(value as number)
                       }
                     }
                   },
-                  elements: {
-                    point: {
-                      hoverBorderWidth: 3
-                    }
-                  },
-                  interaction: {
-                    intersect: false,
-                    mode: 'index'
-                  }
+                  interaction: { intersect: false, mode: 'index' }
                 }}
               />
             </div>
           ) : (
             <div className="h-80 flex items-center justify-center text-gray-400">
               <div className="text-center">
+                <DollarSign className="h-16 w-16 mx-auto mb-4 opacity-30" />
                 <p>Keine Daten verfügbar</p>
-                <p className="text-sm mt-2">
-                  Erstelle Transaktionen um den Saldo-Verlauf zu sehen
-                </p>
+                <p className="text-sm mt-2">Erstelle Transaktionen um den Saldo-Verlauf zu sehen</p>
               </div>
             </div>
           )}
@@ -364,112 +341,141 @@ export default function KassePage() {
       </Card>
 
       {/* Transactions Table */}
-      <Card className="lasanta-card">
-        <CardHeader>
+      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+        <CardHeader className="border-b border-gray-800">
           <CardTitle className="text-white">Letzte Transaktionen</CardTitle>
           <CardDescription className="text-gray-400">
             Übersicht über alle Buchungen
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {transactionsLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="flex justify-center py-16">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
+                <p className="text-gray-400">Lade Transaktionen...</p>
+              </div>
+            </div>
+          ) : (!transactions?.transactions || transactions.transactions.length === 0) ? (
+            <div className="py-16 text-center">
+              <DollarSign className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+              <p className="text-gray-400 text-lg">Keine Transaktionen gefunden</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-gray-400">Typ</TableHead>
-                    <TableHead className="text-gray-400">Betrag</TableHead>
-                    <TableHead className="text-gray-400">Kategorie</TableHead>
-                    <TableHead className="text-gray-400">Notiz</TableHead>
-                    <TableHead className="text-gray-400">Status</TableHead>
-                    <TableHead className="text-gray-400">Erstellt von</TableHead>
-                    <TableHead className="text-gray-400">Datum</TableHead>
-                    <TableHead className="text-gray-400">Aktionen</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Typ</th>
+                    <th className="text-right py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Betrag</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategorie</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Notiz</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erstellt von</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Datum</th>
+                    {canApprove && (
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
                   {transactions?.transactions?.map((tx: any) => (
-                    <TableRow key={tx.id} className="hover:bg-gray-800/50">
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {getKindIcon(tx.kind)}
-                          <span className="text-white">{getKindDisplay(tx.kind)}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className={
-                        tx.kind === 'EINZAHLUNG' ? 'text-green-400 font-medium' : 
-                        tx.kind === 'AUSZAHLUNG' ? 'text-red-400 font-medium' : 
-                        'text-white font-medium'
-                      }>
-                        {tx.kind === 'EINZAHLUNG' ? '+' : tx.kind === 'AUSZAHLUNG' ? '-' : ''}
-                        {formatCurrency(tx.amount)}
-                      </TableCell>
-                      <TableCell className="text-gray-300">
-                        {tx.category || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-300 max-w-xs truncate">
-                        {tx.note || '-'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getTransactionStatusColor(tx.status)}>
-                          {tx.status === 'APPROVED' && <CheckCircle className="mr-1 h-3 w-3" />}
-                          {tx.status === 'PENDING' && <Clock className="mr-1 h-3 w-3" />}
-                          {tx.status === 'REJECTED' && <XCircle className="mr-1 h-3 w-3" />}
-                          {getStatusDisplay(tx.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-gray-300">
-                        {getDisplayName(tx.createdBy)}
-                      </TableCell>
-                      <TableCell className="text-gray-300">
-                        {formatDate(tx.createdAt)}
-                      </TableCell>
-                      <TableCell>
-                        {tx.status === 'PENDING' && canApprove && (
-                          <div className="flex space-x-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-green-400 border-green-400 hover:bg-green-400/10"
-                              onClick={() => handleApprove(tx.id)}
-                              disabled={approveTransactionMutation.isPending}
-                              title="Genehmigen"
-                            >
-                              <CheckCircle className="h-3 w-3" />
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-red-400 border-red-400 hover:bg-red-400/10"
-                              onClick={() => handleReject(tx.id)}
-                              disabled={rejectTransactionMutation.isPending}
-                              title="Ablehnen"
-                            >
-                              <XCircle className="h-3 w-3" />
-                            </Button>
+                    <tr key={tx.id} className="group hover:bg-gray-800/30 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            tx.kind === 'EINZAHLUNG' ? 'bg-green-500' : 
+                            tx.kind === 'AUSZAHLUNG' ? 'bg-red-500' : 
+                            tx.kind === 'KORREKTUR' ? 'bg-yellow-500' : 'bg-blue-500'
+                          }`} />
+                          <div className="flex items-center gap-2">
+                            {tx.kind === 'EINZAHLUNG' && <TrendingUp className="h-4 w-4 text-green-400" />}
+                            {tx.kind === 'AUSZAHLUNG' && <TrendingDown className="h-4 w-4 text-red-400" />}
+                            {tx.kind === 'KORREKTUR' && <RotateCcw className="h-4 w-4 text-yellow-400" />}
+                            {tx.kind === 'TRANSFER' && <DollarSign className="h-4 w-4 text-blue-400" />}
+                            <span className="text-white font-medium">{getKindDisplay(tx.kind)}</span>
                           </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <span className={`font-semibold text-lg ${
+                          tx.kind === 'EINZAHLUNG' ? 'text-green-400' : 
+                          tx.kind === 'AUSZAHLUNG' ? 'text-red-400' : 'text-white'
+                        }`}>
+                          {tx.kind === 'EINZAHLUNG' ? '+' : tx.kind === 'AUSZAHLUNG' ? '-' : ''}
+                          {formatCurrency(tx.amount)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4">
+                        {tx.category ? (
+                          <Badge variant="outline" className="bg-gray-800/50 border-gray-700 text-gray-300 font-normal">
+                            {tx.category}
+                          </Badge>
+                        ) : (
+                          <span className="text-gray-500">-</span>
                         )}
-                        {tx.status === 'PENDING' && !canApprove && (
-                          <Badge className="text-yellow-400 bg-yellow-400/10">
+                      </td>
+                      <td className="py-4 px-4 max-w-xs">
+                        <span className="text-gray-300 truncate block">{tx.note || '-'}</span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        {tx.status === 'APPROVED' && (
+                          <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                            <CheckCircle className="mr-1 h-3 w-3" />
+                            Genehmigt
+                          </Badge>
+                        )}
+                        {tx.status === 'PENDING' && (
+                          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                             <Clock className="mr-1 h-3 w-3" />
                             Ausstehend
                           </Badge>
                         )}
-                      </TableCell>
-                    </TableRow>
+                        {tx.status === 'REJECTED' && (
+                          <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
+                            <XCircle className="mr-1 h-3 w-3" />
+                            Abgelehnt
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-gray-300">{getDisplayName(tx.createdBy)}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-gray-400 text-sm">{formatDate(tx.createdAt)}</span>
+                      </td>
+                      {canApprove && (
+                        <td className="py-4 px-6">
+                          {tx.status === 'PENDING' && (
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                                onClick={() => handleApprove(tx.id)}
+                                disabled={approveTransactionMutation.isPending}
+                                title="Genehmigen"
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                onClick={() => handleReject(tx.id)}
+                                disabled={rejectTransactionMutation.isPending}
+                                title="Ablehnen"
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </td>
+                      )}
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-              
-              {(!transactions?.transactions || transactions.transactions.length === 0) && (
-                <div className="text-center py-8 text-gray-400">
-                  Keine Transaktionen gefunden
-                </div>
-              )}
+                </tbody>
+              </table>
             </div>
           )}
         </CardContent>
