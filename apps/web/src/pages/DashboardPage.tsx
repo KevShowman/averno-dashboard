@@ -101,7 +101,7 @@ export default function DashboardPage() {
         { key: 'aufstellungen', name: 'Aufstellungen', icon: CalendarCheck, color: 'amber', desc: 'Termine & Teilnahme' },
         { key: 'abmeldungen', name: 'Abmeldungen', icon: CalendarDays, color: 'yellow', desc: 'Abwesenheiten' },
         { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, color: 'emerald', desc: 'Touren-Tracking' },
-        { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, color: 'teal', desc: 'Wochenabgaben' },
+        { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, color: 'teal', desc: 'Einer für alle!' },
       ]
     },
     {

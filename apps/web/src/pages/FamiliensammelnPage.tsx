@@ -437,21 +437,44 @@ export default function FamiliensammelnPage() {
                   </div>
 
                   <div className="flex items-center gap-6">
-                    {/* Progress Indicator */}
-                    <div className="hidden md:flex items-center gap-2">
-                      <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full transition-all ${
-                            stat.hasPassed ? 'bg-green-500' : 'bg-amber-500'
-                          }`}
-                          style={{ width: `${Math.min(100, (stat.participationCount / 4) * 100)}%` }}
-                        />
+                    {/* Progress Indicator - shows the better progress between days or tours */}
+                    <div className="hidden md:flex flex-col gap-1.5">
+                      {/* Days Progress */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-12">Tage</span>
+                        <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all ${
+                              stat.participationCount >= 4 ? 'bg-green-500' : 'bg-amber-500'
+                            }`}
+                            style={{ width: `${Math.min(100, (stat.participationCount / 4) * 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-400 w-8">{stat.participationCount}/4</span>
                       </div>
-                      <span className="text-sm text-gray-400 w-12">{stat.participationCount}/4</span>
+                      {/* Tours Progress */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-12">Touren</span>
+                        <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all ${
+                              stat.totalTours >= 4 ? 'bg-green-500' : 'bg-cyan-500'
+                            }`}
+                            style={{ width: `${Math.min(100, (stat.totalTours / 4) * 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-400 w-8">{stat.totalTours}/4</span>
+                      </div>
                     </div>
                     
-                    <div className="text-center min-w-[60px]">
-                      <p className="text-2xl font-bold text-amber-400">{stat.totalTours}</p>
+                    {/* Mobile: Show combined stats */}
+                    <div className="md:hidden text-center min-w-[50px]">
+                      <p className="text-lg font-bold text-white">{stat.participationCount}</p>
+                      <p className="text-xs text-gray-500">Tage</p>
+                    </div>
+                    
+                    <div className="text-center min-w-[50px]">
+                      <p className="text-lg md:text-2xl font-bold text-amber-400">{stat.totalTours}</p>
                       <p className="text-xs text-gray-500">Touren</p>
                     </div>
 

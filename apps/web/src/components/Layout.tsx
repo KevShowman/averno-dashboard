@@ -326,7 +326,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1 sidebar-scrollbar">
         {navGroups.map((group) => (
           <NavGroupComponent
             key={group.name}
@@ -472,7 +472,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="p-4 lg:p-6">
+        <main className="p-4 lg:p-6 min-h-[calc(100vh-4rem)] lg:min-h-screen bg-gray-900">
           {children}
         </main>
       </div>
