@@ -444,7 +444,7 @@ export default function SicarioPage() {
                     }`}
                     onClick={() => setSelectedAufstellung(auf.id)}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
                     <div className="relative p-4">
                       <div className="flex items-start justify-between gap-3">
@@ -588,7 +588,7 @@ export default function SicarioPage() {
                         }`}
                         onClick={() => setSelectedAufstellung(auf.id)}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
                         <div className="relative p-4">
                           <div className="flex items-start justify-between gap-3">

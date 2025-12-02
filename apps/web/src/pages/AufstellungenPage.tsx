@@ -464,7 +464,7 @@ export default function AufstellungenPage() {
                     }`}
                     onClick={() => setSelectedAufstellung(auf.id)}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/5 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/5 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     
                     <div className="relative p-4">
                       <div className="flex items-start justify-between gap-3">
@@ -599,7 +599,7 @@ export default function AufstellungenPage() {
                         }`}
                         onClick={() => setSelectedAufstellung(auf.id)}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/5 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/5 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                         
                         <div className="relative p-4">
                           <div className="flex items-start justify-between gap-3">
