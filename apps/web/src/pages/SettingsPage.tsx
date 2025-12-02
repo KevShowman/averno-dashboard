@@ -11,10 +11,13 @@ import {
   Users, 
   Settings, 
   Package, 
-  FlaskConical
+  FlaskConical,
+  Skull,
+  Hash,
+  AlertTriangle
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
-import { api, packagesApi } from '../lib/api'
+import { api, packagesApi, discordApi, settingsApi } from '../lib/api'
 import { formatCurrency, getRoleColor, getDisplayName, hasRole } from '../lib/utils'
 import DiscordRoleSync from '../components/DiscordRoleSync'
 import DiscordMembersManager from '../components/DiscordMembersManager'
@@ -51,6 +54,10 @@ export default function SettingsPage() {
   const [weeklyDeliveryPackages, setWeeklyDeliveryPackages] = useState(300)
   const [weeklyDeliveryMoneyPerPackage, setWeeklyDeliveryMoneyPerPackage] = useState(1000)
 
+  // Blood List channel settings states
+  const [bloodInChannelId, setBloodInChannelId] = useState('')
+  const [bloodOutChannelId, setBloodOutChannelId] = useState('')
+
   // Permission checks
   const canManageUsers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const canManageSettings = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
@@ -86,6 +93,18 @@ export default function SettingsPage() {
   const { data: weeklyDeliverySettings } = useQuery({
     queryKey: ['weekly-delivery-settings'],
     queryFn: () => api.get('/settings/weekly-delivery/values').then(res => res.data),
+    enabled: canManageSettings,
+  })
+
+  const { data: discordChannels, isLoading: loadingChannels } = useQuery({
+    queryKey: ['discord-channels'],
+    queryFn: () => discordApi.getChannels().then(res => res.data),
+    enabled: canManageSettings,
+  })
+
+  const { data: bloodListSettings } = useQuery({
+    queryKey: ['bloodlist-settings'],
+    queryFn: () => settingsApi.getBloodListSettings().then(res => res.data),
     enabled: canManageSettings,
   })
 
@@ -152,6 +171,18 @@ export default function SettingsPage() {
     },
   })
 
+  const saveBloodListSettingsMutation = useMutation({
+    mutationFn: (data: { bloodInChannelId: string; bloodOutChannelId: string }) =>
+      settingsApi.setBloodListSettings(data),
+    onSuccess: () => {
+      toast.success('Blood List Channel-Einstellungen gespeichert')
+      queryClient.invalidateQueries({ queryKey: ['bloodlist-settings'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Speichern der Einstellungen')
+    },
+  })
+
   // Set initial values
   useEffect(() => {
     if (user?.icFirstName) setIcFirstName(user.icFirstName)
@@ -172,6 +203,15 @@ export default function SettingsPage() {
       setWeeklyDeliveryMoneyPerPackage(weeklyDeliverySettings.moneyPerPackage)
     }
   }, [weeklyDeliverySettings])
+
+  useEffect(() => {
+    if (bloodListSettings?.bloodInChannelId) {
+      setBloodInChannelId(bloodListSettings.bloodInChannelId)
+    }
+    if (bloodListSettings?.bloodOutChannelId) {
+      setBloodOutChannelId(bloodListSettings.bloodOutChannelId)
+    }
+  }, [bloodListSettings])
 
   const handleUpdateIcName = () => {
     if (icFirstName.trim() && icLastName.trim()) {
@@ -194,6 +234,17 @@ export default function SettingsPage() {
         packages: weeklyDeliveryPackages,
         moneyPerPackage: weeklyDeliveryMoneyPerPackage,
       })
+    }
+  }
+
+  const handleSaveBloodListSettings = () => {
+    if (bloodInChannelId && bloodOutChannelId) {
+      saveBloodListSettingsMutation.mutate({
+        bloodInChannelId,
+        bloodOutChannelId,
+      })
+    } else {
+      toast.error('Bitte beide Channels auswählen')
     }
   }
 
@@ -344,6 +395,101 @@ export default function SettingsPage() {
                 >
                   <Save className="h-4 w-4" />
                   {saveWeeklyDeliverySettingsMutation.isPending ? 'Speichern...' : 'Einstellungen speichern'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Blood List Channel-Einstellungen - für Leaderschaft */}
+      {canManageSettings && (
+        <Card className="lasanta-card">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Skull className="mr-2 h-5 w-5 text-red-500" />
+              Blood List Discord-Channels
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Konfiguriere die Discord-Channels für Blood In/Out Ankündigungen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!bloodListSettings?.isConfigured && (
+              <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-yellow-400 font-medium">Channels nicht konfiguriert</p>
+                  <p className="text-yellow-200/70 text-sm">
+                    Blood In/Out Funktionen sind deaktiviert, bis beide Channels ausgewählt wurden.
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Hash className="h-4 w-4 text-green-500" />
+                    Blood In Ankündigungs-Channel
+                  </label>
+                  {loadingChannels ? (
+                    <div className="text-gray-400 text-sm">Lade Channels...</div>
+                  ) : (
+                    <select
+                      value={bloodInChannelId}
+                      onChange={(e) => setBloodInChannelId(e.target.value)}
+                      className="w-full h-10 px-3 bg-gray-700 border border-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="">Channel auswählen...</option>
+                      {discordChannels?.channels?.map((channel: any) => (
+                        <option key={channel.id} value={channel.id}>
+                          #{channel.name} {channel.parentName ? `(${channel.parentName})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    In diesem Channel werden Blood In Ankündigungen gepostet
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Hash className="h-4 w-4 text-red-500" />
+                    Blood Out Ankündigungs-Channel
+                  </label>
+                  {loadingChannels ? (
+                    <div className="text-gray-400 text-sm">Lade Channels...</div>
+                  ) : (
+                    <select
+                      value={bloodOutChannelId}
+                      onChange={(e) => setBloodOutChannelId(e.target.value)}
+                      className="w-full h-10 px-3 bg-gray-700 border border-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="">Channel auswählen...</option>
+                      {discordChannels?.channels?.map((channel: any) => (
+                        <option key={channel.id} value={channel.id}>
+                          #{channel.name} {channel.parentName ? `(${channel.parentName})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    In diesem Channel werden Blood Out Ankündigungen gepostet + User wird gekickt
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSaveBloodListSettings}
+                  disabled={saveBloodListSettingsMutation.isPending || !bloodInChannelId || !bloodOutChannelId}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {saveBloodListSettingsMutation.isPending ? 'Speichern...' : 'Channel-Einstellungen speichern'}
                 </Button>
               </div>
             </div>

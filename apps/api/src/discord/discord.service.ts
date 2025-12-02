@@ -768,6 +768,271 @@ export class DiscordService {
     }
   }
 
+  // Discord DM senden
+  async sendDirectMessage(discordId: string, content: string): Promise<boolean> {
+    try {
+      // Erst einen DM-Channel mit dem User erstellen
+      const dmChannelResponse = await fetch(
+        `${this.discordApiUrl}/users/@me/channels`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            recipient_id: discordId,
+          }),
+        }
+      );
+
+      if (!dmChannelResponse.ok) {
+        console.error(`Fehler beim Erstellen des DM-Channels: ${dmChannelResponse.status}`);
+        return false;
+      }
+
+      const dmChannel = await dmChannelResponse.json();
+
+      // Nachricht in den DM-Channel senden
+      const messageResponse = await fetch(
+        `${this.discordApiUrl}/channels/${dmChannel.id}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content,
+          }),
+        }
+      );
+
+      if (!messageResponse.ok) {
+        console.error(`Fehler beim Senden der DM: ${messageResponse.status}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Senden der Discord DM:', error);
+      return false;
+    }
+  }
+
+  // Discord Embed DM senden
+  async sendEmbedDirectMessage(discordId: string, embed: {
+    title?: string;
+    description?: string;
+    color?: number;
+    fields?: Array<{ name: string; value: string; inline?: boolean }>;
+    footer?: { text: string; icon_url?: string };
+    timestamp?: string;
+    url?: string;
+  }): Promise<boolean> {
+    try {
+      // Erst einen DM-Channel mit dem User erstellen
+      const dmChannelResponse = await fetch(
+        `${this.discordApiUrl}/users/@me/channels`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            recipient_id: discordId,
+          }),
+        }
+      );
+
+      if (!dmChannelResponse.ok) {
+        console.error(`Fehler beim Erstellen des DM-Channels: ${dmChannelResponse.status}`);
+        return false;
+      }
+
+      const dmChannel = await dmChannelResponse.json();
+
+      // Embed-Nachricht in den DM-Channel senden
+      const messageResponse = await fetch(
+        `${this.discordApiUrl}/channels/${dmChannel.id}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            embeds: [embed],
+          }),
+        }
+      );
+
+      if (!messageResponse.ok) {
+        console.error(`Fehler beim Senden der Embed DM: ${messageResponse.status}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Senden der Discord Embed DM:', error);
+      return false;
+    }
+  }
+
+  // Prüfen ob ein Discord User noch im Server ist
+  async isUserInServer(discordId: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // User vom Server kicken
+  async kickUser(discordId: string, reason?: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+            'X-Audit-Log-Reason': reason || 'Blood Out',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Kicken des Users: ${response.status}`);
+        return false;
+      }
+
+      console.log(`User ${discordId} wurde vom Server gekickt. Grund: ${reason || 'Blood Out'}`);
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Kicken des Users:', error);
+      return false;
+    }
+  }
+
+  // Nachricht in einen Channel senden
+  async sendChannelMessage(channelId: string, content: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/channels/${channelId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Senden der Channel-Nachricht: ${response.status}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Senden der Channel-Nachricht:', error);
+      return false;
+    }
+  }
+
+  // Embed-Nachricht in einen Channel senden
+  async sendChannelEmbed(channelId: string, embed: {
+    title?: string;
+    description?: string;
+    color?: number;
+    fields?: Array<{ name: string; value: string; inline?: boolean }>;
+    footer?: { text: string; icon_url?: string };
+    timestamp?: string;
+    thumbnail?: { url: string };
+    image?: { url: string };
+  }): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/channels/${channelId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ embeds: [embed] }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Senden des Channel-Embeds: ${response.status}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Senden des Channel-Embeds:', error);
+      return false;
+    }
+  }
+
+  // Alle Text-Channels des Servers abrufen
+  async getServerChannels(): Promise<Array<{ id: string; name: string; type: number; parentId?: string; parentName?: string }>> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/channels`,
+        {
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Abrufen der Channels: ${response.status}`);
+        return [];
+      }
+
+      const channels = await response.json();
+      
+      // Kategorien (type 4) für Parent-Namen
+      const categories = channels.filter((c: any) => c.type === 4);
+      const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
+
+      // Nur Text-Channels (type 0) und News-Channels (type 5) zurückgeben
+      const textChannels = channels
+        .filter((c: any) => c.type === 0 || c.type === 5)
+        .map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          type: c.type,
+          parentId: c.parent_id,
+          parentName: c.parent_id ? categoryMap.get(c.parent_id) : undefined,
+        }))
+        .sort((a: any, b: any) => a.name.localeCompare(b.name));
+
+      return textChannels;
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Server-Channels:', error);
+      return [];
+    }
+  }
+
   // Synchronisiert User mit Discord und entfernt User die nicht mehr im Server sind
   async syncUsersAndRemoveInactive() {
     try {

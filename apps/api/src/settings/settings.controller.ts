@@ -26,6 +26,16 @@ interface WeeklyDeliverySettingsDto {
   moneyPerPackage: number;
 }
 
+interface XiaoMotorsSettingsDto {
+  codewort: string;
+  enabled: boolean;
+}
+
+interface BloodListSettingsDto {
+  bloodInChannelId: string;
+  bloodOutChannelId: string;
+}
+
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
 export class SettingsController {
@@ -84,6 +94,40 @@ export class SettingsController {
     return this.settingsService.setWeeklyDeliverySettings(
       settingsDto.packages,
       settingsDto.moneyPerPackage
+    );
+  }
+
+  // Xiao Motors Settings abrufen (alle authentifizierten User)
+  @Get('xiao-motors/values')
+  async getXiaoMotorsSettings() {
+    return this.settingsService.getXiaoMotorsSettings();
+  }
+
+  // Xiao Motors Settings setzen (Leaderschaft)
+  @Put('xiao-motors')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @UseGuards(RolesGuard)
+  async setXiaoMotorsSettings(@Body() settingsDto: XiaoMotorsSettingsDto) {
+    return this.settingsService.setXiaoMotorsSettings(
+      settingsDto.codewort,
+      settingsDto.enabled
+    );
+  }
+
+  // Blood List Channel Settings abrufen (alle authentifizierten User)
+  @Get('bloodlist/values')
+  async getBloodListSettings() {
+    return this.settingsService.getBloodListSettings();
+  }
+
+  // Blood List Channel Settings setzen (Leaderschaft)
+  @Put('bloodlist')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @UseGuards(RolesGuard)
+  async setBloodListSettings(@Body() settingsDto: BloodListSettingsDto) {
+    return this.settingsService.setBloodListSettings(
+      settingsDto.bloodInChannelId,
+      settingsDto.bloodOutChannelId
     );
   }
 }

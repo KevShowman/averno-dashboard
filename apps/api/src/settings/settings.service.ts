@@ -72,6 +72,52 @@ export class SettingsService {
     };
   }
 
+  // Xiao Motors Settings
+  async getXiaoMotorsSettings() {
+    const codewort = await this.getSetting('xiao_motors_codewort') || '';
+    const enabled = await this.getSetting('xiao_motors_enabled') || false;
+
+    return {
+      codewort: String(codewort),
+      enabled: Boolean(enabled),
+      // Hinweis: Kein Codewort mehr benötigt - nur sagen dass man zu La Santa Calavera gehört
+      hinweis: 'Kein Codewort mehr benötigt - einfach sagen, dass man zu La Santa Calavera gehört',
+    };
+  }
+
+  async setXiaoMotorsSettings(codewort: string, enabled: boolean) {
+    await this.setSetting('xiao_motors_codewort', codewort, 'string');
+    await this.setSetting('xiao_motors_enabled', enabled, 'boolean');
+
+    return {
+      codewort,
+      enabled,
+    };
+  }
+
+  // Blood List Channel Settings
+  async getBloodListSettings() {
+    const bloodInChannelId = await this.getSetting('bloodlist_blood_in_channel_id') || '';
+    const bloodOutChannelId = await this.getSetting('bloodlist_blood_out_channel_id') || '';
+
+    return {
+      bloodInChannelId: String(bloodInChannelId),
+      bloodOutChannelId: String(bloodOutChannelId),
+      isConfigured: Boolean(bloodInChannelId && bloodOutChannelId),
+    };
+  }
+
+  async setBloodListSettings(bloodInChannelId: string, bloodOutChannelId: string) {
+    await this.setSetting('bloodlist_blood_in_channel_id', bloodInChannelId, 'string');
+    await this.setSetting('bloodlist_blood_out_channel_id', bloodOutChannelId, 'string');
+
+    return {
+      bloodInChannelId,
+      bloodOutChannelId,
+      isConfigured: Boolean(bloodInChannelId && bloodOutChannelId),
+    };
+  }
+
   // Helper methods
   private parseSettingValue(value: any, type: string) {
     switch (type) {

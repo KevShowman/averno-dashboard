@@ -137,4 +137,24 @@ export class DiscordController {
   async syncUsersAndRemoveInactive() {
     return this.discordService.syncUsersAndRemoveInactive();
   }
+
+  // Alle Text-Channels des Servers abrufen (für Settings Dropdown)
+  @Get('channels')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async getServerChannels() {
+    try {
+      const channels = await this.discordService.getServerChannels();
+      return {
+        message: 'Channels erfolgreich abgerufen',
+        count: channels.length,
+        channels,
+      };
+    } catch (error) {
+      return {
+        error: 'Fehler beim Abrufen der Channels',
+        message: error.message,
+        channels: [],
+      };
+    }
+  }
 }

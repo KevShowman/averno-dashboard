@@ -2,12 +2,16 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Sanction, SanctionCategory, SanctionStatus } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
+import { DiscordService } from '../discord/discord.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class SanctionsService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    private discordService: DiscordService,
+    private settingsService: SettingsService,
   ) {}
 
   // Automatische 48h-Sanktionierung für unbezahlte Sanktionen
@@ -147,7 +151,7 @@ export class SanctionsService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 28);
 
-    return this.prisma.sanction.create({
+    const sanction = await this.prisma.sanction.create({
       data: {
         userId,
         category,
@@ -162,6 +166,7 @@ export class SanctionsService {
         user: {
           select: {
             id: true,
+            discordId: true,
             username: true,
             icFirstName: true,
             icLastName: true,
@@ -175,6 +180,109 @@ export class SanctionsService {
         },
       },
     });
+
+    // Discord DM senden
+    await this.sendSanctionNotification(sanction);
+
+    return sanction;
+  }
+
+  // Discord DM bei Sanktion senden
+  private async sendSanctionNotification(sanction: any) {
+    try {
+      const user = sanction.user;
+      if (!user?.discordId) {
+        console.log('Keine Discord ID für Sanktions-Benachrichtigung gefunden');
+        return;
+      }
+
+      const categoryName = this.getCategoryDisplayName(sanction.category);
+      const userName = user.icFirstName && user.icLastName 
+        ? `${user.icFirstName} ${user.icLastName}` 
+        : user.username;
+      
+      // Strafe formatieren
+      let strafeText = '';
+      if (sanction.amount) {
+        strafeText = `${sanction.amount.toLocaleString('de-DE')} Schwarzgeld`;
+      }
+      if (sanction.penalty) {
+        strafeText = strafeText ? `${strafeText} + ${sanction.penalty}` : sanction.penalty;
+      }
+      if (!strafeText) {
+        strafeText = 'Keine Geldstrafe';
+      }
+
+      // Frontend URL aus Settings holen
+      let frontendUrl = process.env.FRONTEND_URL || 'https://lasanta.example.com';
+      const sanctionLink = `${frontendUrl}/sanctions`;
+
+      // Embed für Discord DM erstellen
+      const embed = {
+        title: '⚖️ SANKTION ERHALTEN',
+        description: `¡HOLA ${userName}! 👋\n\nDu hast eine Sanktion erhalten.`,
+        color: 0xDC2626, // Rot
+        fields: [
+          {
+            name: '⚖️ DETAILS',
+            value: `**ID:** ${sanction.id.slice(-8)}\n**Typ:** ${categoryName}\n**Verstoß:** ${sanction.description}\n**Level:** ${sanction.level}\n**Strafe:** ${strafeText}`,
+            inline: false,
+          },
+          {
+            name: '💰 ZAHLUNGSFRIST',
+            value: `⚠️ **WICHTIG:** Diese Strafe muss spätestens in **48 Stunden** bei der Leaderschaft bezahlt werden!\n\n❌ Bei Nichtzahlung: **+100.000 Schwarzgeld zusätzlich**`,
+            inline: false,
+          },
+          {
+            name: '👑 ERSTELLT VON',
+            value: sanction.createdBy?.username || 'System',
+            inline: false,
+          },
+          {
+            name: '🔗 Link',
+            value: `[Zur Sanktionsübersicht](${sanctionLink})`,
+            inline: false,
+          },
+        ],
+        footer: {
+          text: 'La Santa Calavera - Sanktionssystem',
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      await this.discordService.sendEmbedDirectMessage(user.discordId, embed);
+      console.log(`Sanktions-DM an ${userName} (${user.discordId}) gesendet`);
+    } catch (error) {
+      console.error('Fehler beim Senden der Sanktions-DM:', error);
+      // Fehler nicht werfen, Sanktion wurde trotzdem erstellt
+    }
+  }
+
+  // Kategorie-Namen für Anzeige
+  private getCategoryDisplayName(category: SanctionCategory): string {
+    const names: Record<SanctionCategory, string> = {
+      ABMELDUNG: 'Abmeldung',
+      RESPEKTVERHALTEN: 'Respektverhalten',
+      FUNKCHECK: 'Funkcheck',
+      REAKTIONSPFLICHT: 'Reaktionspflicht',
+      NICHT_BEZAHLT: 'Wochenabgabe nicht bezahlt',
+      NICHT_BEZAHLT_48H: 'Sanktion nicht bezahlt (48h)',
+      RESPEKTLOS_ZIVILISTEN: 'Respektlos gegenüber Zivilisten',
+      RESPEKTLOS_FAMILIE: 'Respektlos gegenüber Familie',
+      TOETUNG_FAMILIENMITGLIEDER: 'Tötung von Familienmitgliedern',
+      SEXUELLE_BELAESTIGUNG: 'Sexuelle Belästigung',
+      UNNOETIGES_BOXEN_SCHIESSEN: 'Unnötiges Boxen/Schießen',
+      MISSACHTUNG_ANWEISUNGEN: 'Missachtung von Anweisungen',
+      FEHLEN_AUFSTELLUNG: 'Fehlen bei Aufstellung',
+      NICHT_ANMELDEN_FUNKCHECK: 'Nicht beim Funkcheck angemeldet',
+      KLEIDERORDNUNG: 'Kleiderordnung nicht eingehalten',
+      MUNITIONSVERSCHWENDUNG: 'Munitionsverschwendung',
+      CASA_OHNE_ANKUENDIGUNG: 'Casa ohne Ankündigung betreten',
+      FUNKPFLICHT_MISSACHTUNG: 'Funkpflicht missachtet',
+      FUNKDISZIPLIN_MISSACHTUNG: 'Funkdisziplin missachtet',
+      WOCHENABGABE_NICHT_ENTRICHTET: 'Wochenabgabe nicht entrichtet',
+    };
+    return names[category] || category;
   }
 
   // Sanktion als bezahlt markieren

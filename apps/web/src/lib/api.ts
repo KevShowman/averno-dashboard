@@ -86,6 +86,12 @@ export const settingsApi = {
   deleteSetting: (key: string) => api.delete(`/settings/${key}`),
   getWeeklyDeliverySettings: () => api.get('/settings/weekly-delivery/values'),
   setWeeklyDeliverySettings: (data: { packages: number; moneyPerPackage: number }) => api.put('/settings/weekly-delivery', data),
+  // Xiao Motors Settings
+  getXiaoMotorsSettings: () => api.get('/settings/xiao-motors/values'),
+  setXiaoMotorsSettings: (data: { codewort: string; enabled: boolean }) => api.put('/settings/xiao-motors', data),
+  // Blood List Settings
+  getBloodListSettings: () => api.get('/settings/bloodlist/values'),
+  setBloodListSettings: (data: { bloodInChannelId: string; bloodOutChannelId: string }) => api.put('/settings/bloodlist', data),
 }
 
 // Users API
@@ -130,6 +136,7 @@ export const discordApi = {
   syncAllMembers: () => api.post('/discord/sync-all'),
   getUserRole: (discordId: string) => api.get(`/discord/user-role/${discordId}`),
   syncAndRemoveInactive: () => api.post('/discord/sync-and-remove-inactive'),
+  getChannels: () => api.get('/discord/channels'),
 }
 
 // Aufstellung API
@@ -179,6 +186,12 @@ export const bloodListApi = {
   getStats: () => api.get('/bloodlist/stats').then(res => res.data),
   search: (query: string) => api.get('/bloodlist/search', { params: { q: query } }).then(res => res.data),
   getById: (id: string) => api.get(`/bloodlist/${id}`).then(res => res.data),
+  getStatus: () => api.get('/bloodlist/status').then(res => res.data),
+  // Neue Discord-Funktionen
+  getUnassignedDiscordUsers: () => api.get('/bloodlist/discord/unassigned').then(res => res.data),
+  getGhostUsers: () => api.get('/bloodlist/discord/ghost-users').then(res => res.data),
+  linkDiscordUser: (data: { discordId: string; vorname: string; nachname: string; telefon: number; steam: string; bloodinDurch: string }) =>
+    api.post('/bloodlist/link-discord-user', data).then(res => res.data),
 };
 
 // Familiensammeln API

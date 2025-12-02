@@ -19,6 +19,15 @@ interface BloodOutDto {
   grund: string;
 }
 
+interface LinkDiscordUserDto {
+  discordId: string;
+  vorname: string;
+  nachname: string;
+  telefon: number;
+  steam: string;
+  bloodinDurch: string;
+}
+
 @Controller('bloodlist')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class BloodListController {
@@ -53,6 +62,12 @@ export class BloodListController {
     );
   }
 
+  // Status der Blood List Settings - alle authentifizierten User
+  @Get('status')
+  async getBloodListStatus() {
+    return this.bloodListService.getBloodListStatus();
+  }
+
   // Aktive Blood List - Alle authentifizierten User
   @Get('active')
   async getActiveBloodList() {
@@ -85,7 +100,38 @@ export class BloodListController {
     return this.bloodListService.searchRecords(query);
   }
 
+  // Discord User die noch nicht zugewiesen sind - Leaderschaft
+  // WICHTIG: Diese Route muss VOR :id stehen!
+  @Get('discord/unassigned')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async getUnassignedDiscordUsers() {
+    return this.bloodListService.getUnassignedDiscordUsers();
+  }
+
+  // Ghost Users - User die nicht mehr im Discord sind - Leaderschaft
+  // WICHTIG: Diese Route muss VOR :id stehen!
+  @Get('discord/ghost-users')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async getGhostUsers() {
+    return this.bloodListService.getGhostUsers();
+  }
+
+  // Discord User mit Blood Record verknüpfen - Leaderschaft
+  @Post('link-discord-user')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async linkDiscordUser(@Body() linkDto: LinkDiscordUserDto, @CurrentUser() user: User) {
+    return this.bloodListService.linkDiscordUserToBloodRecord(
+      linkDto.discordId,
+      linkDto.vorname,
+      linkDto.nachname,
+      linkDto.telefon,
+      linkDto.steam,
+      linkDto.bloodinDurch,
+    );
+  }
+
   // Einzelner Record - Alle authentifizierten User
+  // WICHTIG: Diese Route muss ZULETZT stehen, da :id alles matcht!
   @Get(':id')
   async getRecordById(@Param('id') id: string) {
     return this.bloodListService.getRecordById(id);
