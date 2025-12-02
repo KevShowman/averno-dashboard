@@ -133,14 +133,13 @@ export default function ClothingPage() {
         </CardHeader>
         <CardContent className="relative">
           <div className="flex gap-4 justify-center">
-            <Button
-              variant={selectedGender === 'MALE' ? 'default' : 'outline'}
+            <button
               onClick={() => handleGenderChange('MALE')}
               disabled={updateGenderMutation.isPending}
-              className={`flex-1 max-w-xs h-14 text-lg ${
+              className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 selectedGender === 'MALE' 
-                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white' 
-                  : 'border-gray-700 hover:bg-gray-800'
+                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-lg shadow-rose-500/25' 
+                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
               {updateGenderMutation.isPending && selectedGender === 'MALE' ? (
@@ -149,15 +148,14 @@ export default function ClothingPage() {
                 <User className="mr-2 h-5 w-5" />
               )}
               Männlich
-            </Button>
-            <Button
-              variant={selectedGender === 'FEMALE' ? 'default' : 'outline'}
+            </button>
+            <button
               onClick={() => handleGenderChange('FEMALE')}
               disabled={updateGenderMutation.isPending}
-              className={`flex-1 max-w-xs h-14 text-lg ${
+              className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white' 
-                  : 'border-gray-700 hover:bg-gray-800'
+                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-lg shadow-rose-500/25' 
+                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
               {updateGenderMutation.isPending && selectedGender === 'FEMALE' ? (
@@ -166,7 +164,7 @@ export default function ClothingPage() {
                 <Users className="mr-2 h-5 w-5" />
               )}
               Weiblich
-            </Button>
+            </button>
           </div>
         </CardContent>
       </Card>

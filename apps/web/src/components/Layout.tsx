@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth'
 import { 
-  Skull, 
   Home, 
   Package, 
   DollarSign, 
@@ -177,15 +176,17 @@ function NavGroupComponent({
   group, 
   user, 
   isActive, 
-  onLinkClick 
+  onLinkClick,
+  isOpen,
+  onToggle
 }: { 
   group: NavGroup
   user: any
   isActive: (href: string) => boolean
   onLinkClick?: () => void
+  isOpen: boolean
+  onToggle: () => void
 }) {
-  const [isOpen, setIsOpen] = useState(group.defaultOpen ?? false)
-  
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const isSicario = hasRole(user, 'SICARIO')
   const isPatron = hasRole(user, 'EL_PATRON')
@@ -207,7 +208,7 @@ function NavGroupComponent({
   return (
     <div className="mb-1">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className={cn(
           "w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
           hasActiveItem
@@ -265,6 +266,38 @@ export default function Layout({ children }: LayoutProps) {
 
   const isActive = (href: string) => location.pathname === href
 
+  // Initialize expanded groups - open groups that have the active item or are default open
+  const getInitialExpandedGroups = () => {
+    const expanded: string[] = []
+    navGroups.forEach(group => {
+      const hasActiveItem = group.items.some(item => location.pathname === item.href)
+      if (hasActiveItem || group.defaultOpen) {
+        expanded.push(group.name)
+      }
+    })
+    return expanded
+  }
+
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(getInitialExpandedGroups)
+
+  // Update expanded groups when location changes to include the active group
+  useEffect(() => {
+    navGroups.forEach(group => {
+      const hasActiveItem = group.items.some(item => location.pathname === item.href)
+      if (hasActiveItem && !expandedGroups.includes(group.name)) {
+        setExpandedGroups(prev => [...prev, group.name])
+      }
+    })
+  }, [location.pathname])
+
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups(prev => 
+      prev.includes(groupName) 
+        ? prev.filter(name => name !== groupName)
+        : [...prev, groupName]
+    )
+  }
+
   // Don't render navigation if not authenticated
   if (!isAuthenticated) {
     return <div className="min-h-screen bg-gray-900">{children}</div>
@@ -276,9 +309,13 @@ export default function Layout({ children }: LayoutProps) {
       <div className="p-5 border-b border-white/5">
         <Link to="/app" className="flex items-center gap-3 group" onClick={onLinkClick}>
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-red-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative p-2.5 bg-gradient-to-br from-amber-500 to-red-600 rounded-xl shadow-lg">
-              <Skull className="h-7 w-7 text-white" />
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/40 to-amber-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
+            <div className="relative w-14 h-14 flex items-center justify-center">
+              <img 
+                src="/logo.png" 
+                alt="La Santa Calavera" 
+                className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(251,191,36,0.5)] group-hover:drop-shadow-[0_0_20px_rgba(251,191,36,0.7)] transition-all duration-300 group-hover:scale-105"
+              />
             </div>
           </div>
           <div>
@@ -297,6 +334,8 @@ export default function Layout({ children }: LayoutProps) {
             user={user}
             isActive={isActive}
             onLinkClick={onLinkClick}
+            isOpen={expandedGroups.includes(group.name)}
+            onToggle={() => toggleGroup(group.name)}
           />
         ))}
       </nav>
@@ -420,9 +459,11 @@ export default function Layout({ children }: LayoutProps) {
 
           <div className="flex-1 flex justify-center">
             <Link to="/app" className="flex items-center gap-2">
-              <div className="p-1.5 bg-gradient-to-br from-amber-500 to-red-600 rounded-lg">
-                <Skull className="h-5 w-5 text-white" />
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="La Santa Calavera" 
+                className="h-9 w-9 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+              />
               <span className="font-bold text-white">La Santa Calavera</span>
             </Link>
           </div>

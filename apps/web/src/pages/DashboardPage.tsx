@@ -22,7 +22,6 @@ import {
   Droplet, 
   FileText, 
   Settings,
-  Skull,
   Boxes,
   Wallet,
   TrendingDown,
@@ -163,8 +162,15 @@ export default function DashboardPage() {
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-500/10 rounded-full blur-3xl" />
         
         <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <Skull className="h-10 w-10 text-gold-400" />
+          <div className="flex items-center gap-4 mb-2">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-amber-600/30 rounded-full blur-xl scale-125" />
+              <img 
+                src="/logo.png" 
+                alt="La Santa Calavera" 
+                className="relative h-14 w-14 object-contain drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]"
+              />
+            </div>
             <h1 className="text-4xl font-bold text-white">La Santa Calavera</h1>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl">
@@ -301,7 +307,11 @@ export default function DashboardPage() {
       <Card className="bg-gray-900/30 border-gray-800">
         <CardContent className="p-4 flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            <Skull className="h-4 w-4 text-gold-500/50" />
+            <img 
+              src="/logo.png" 
+              alt="LSC" 
+              className="h-5 w-5 object-contain opacity-50"
+            />
             <span>La Familia se cuida, Compadres!</span>
           </div>
           <span>LSC Management System v2.0</span>

@@ -227,30 +227,28 @@ export default function ClothingManagementPage() {
         </CardHeader>
         <CardContent className="p-4">
           <div className="flex gap-3">
-            <Button
-              variant={selectedGender === 'MALE' ? 'default' : 'outline'}
+            <button
               onClick={() => setSelectedGender('MALE')}
-              className={`flex-1 h-12 ${
+              className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
                 selectedGender === 'MALE' 
-                  ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white' 
-                  : 'border-gray-700 hover:bg-gray-800'
+                  ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white shadow-lg shadow-fuchsia-500/25' 
+                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
               <User className="mr-2 h-4 w-4" />
               Männlich
-            </Button>
-            <Button
-              variant={selectedGender === 'FEMALE' ? 'default' : 'outline'}
+            </button>
+            <button
               onClick={() => setSelectedGender('FEMALE')}
-              className={`flex-1 h-12 ${
+              className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
                 selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white' 
-                  : 'border-gray-700 hover:bg-gray-800'
+                  ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white shadow-lg shadow-fuchsia-500/25' 
+                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
               <Users className="mr-2 h-4 w-4" />
               Weiblich
-            </Button>
+            </button>
           </div>
         </CardContent>
       </Card>
