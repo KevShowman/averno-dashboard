@@ -458,7 +458,7 @@ export default function FamiliensammelnPage() {
                         <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full transition-all ${
-                              stat.totalTours >= 4 ? 'bg-green-500' : 'bg-cyan-500'
+                              stat.totalTours >= 4 ? 'bg-green-500' : 'bg-amber-500'
                             }`}
                             style={{ width: `${Math.min(100, (stat.totalTours / 4) * 100)}%` }}
                           />
@@ -751,7 +751,7 @@ export default function FamiliensammelnPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
         <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative p-6 border-b border-teal-500/20">
+        <div className="relative p-6 border-b border-amber-500/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
@@ -759,7 +759,7 @@ export default function FamiliensammelnPage() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Verarbeiter-Tracking</h2>
-                <p className="text-teal-200/60 text-sm">
+                <p className="text-gray-400 text-sm">
                   Kapazität: 3000 Stück • Verarbeitung: 10/min → ~5 Stunden
                 </p>
               </div>
@@ -799,20 +799,20 @@ export default function FamiliensammelnPage() {
                       className={`relative overflow-hidden rounded-xl border p-4 transition-all ${
                         isFinished
                           ? 'border-green-500/50 bg-green-900/20'
-                          : 'border-gray-700 bg-gray-800/50 hover:border-teal-500/30'
+                          : 'border-gray-700 bg-gray-800/50 hover:border-amber-500/30'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl ${
-                            isFinished ? 'bg-green-500/20' : 'bg-teal-500/20'
+                            isFinished ? 'bg-green-500/20' : 'bg-amber-500/20'
                           }`}>
                             {isFinished ? (
                               <CheckCircle className="h-6 w-6 text-green-400" />
                             ) : (
                               <>
-                                <Clock className="h-6 w-6 text-teal-400" />
-                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse" />
+                                <Clock className="h-6 w-6 text-amber-400" />
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-pulse" />
                               </>
                             )}
                           </div>
@@ -835,7 +835,7 @@ export default function FamiliensammelnPage() {
                           <Badge className={
                             isFinished
                               ? 'bg-green-500/20 text-green-300 border-green-500/30 px-3 py-1'
-                              : 'bg-teal-500/20 text-teal-300 border-teal-500/30 px-3 py-1'
+                              : 'bg-amber-500/20 text-amber-300 border-amber-500/30 px-3 py-1'
                           }>
                             {isFinished ? (
                               <span className="flex items-center gap-1.5">
@@ -922,7 +922,7 @@ export default function FamiliensammelnPage() {
                       <CardTitle className="text-2xl font-bold text-white">
                         Verarbeiter starten
                       </CardTitle>
-                      <CardDescription className="text-emerald-200/70 mt-1">
+                      <CardDescription className="text-amber-200/70 mt-1">
                         Wähle ein Mitglied aus
                       </CardDescription>
                     </div>
@@ -933,7 +933,7 @@ export default function FamiliensammelnPage() {
               <CardContent className="pt-2 pb-6 space-y-5">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Users className="h-4 w-4 text-emerald-400" />
+                    <Users className="h-4 w-4 text-amber-400" />
                     Mitglied auswählen
                   </label>
                   <EnhancedPeoplePicker

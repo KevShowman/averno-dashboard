@@ -757,8 +757,8 @@ export default function AufstellungenPage() {
                           variant={getMyResponse(aufstellungDetails)?.status === 'COMING' ? 'default' : 'outline'}
                           className={`h-12 transition-all ${
                             getMyResponse(aufstellungDetails)?.status === 'COMING'
-                              ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 border-green-500 shadow-lg shadow-green-500/20 text-white'
-                              : 'border-green-500/30 hover:border-green-500 hover:bg-green-900/20 text-green-400'
+                              ? 'bg-green-600 hover:bg-green-500 border-green-500 shadow-lg shadow-green-500/20 text-white'
+                              : 'border-gray-600 hover:border-green-500 hover:bg-green-900/20 text-gray-300 hover:text-green-400'
                           }`}
                           onClick={() =>
                             respondMutation.mutate({
@@ -775,8 +775,8 @@ export default function AufstellungenPage() {
                           variant={getMyResponse(aufstellungDetails)?.status === 'NOT_COMING' ? 'default' : 'outline'}
                           className={`h-12 transition-all ${
                             getMyResponse(aufstellungDetails)?.status === 'NOT_COMING'
-                              ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 border-red-500 shadow-lg shadow-red-500/20 text-white'
-                              : 'border-red-500/30 hover:border-red-500 hover:bg-red-900/20 text-red-400'
+                              ? 'bg-red-600 hover:bg-red-500 border-red-500 shadow-lg shadow-red-500/20 text-white'
+                              : 'border-gray-600 hover:border-red-500 hover:bg-red-900/20 text-gray-300 hover:text-red-400'
                           }`}
                           onClick={() =>
                             respondMutation.mutate({
@@ -793,8 +793,8 @@ export default function AufstellungenPage() {
                           variant={getMyResponse(aufstellungDetails)?.status === 'UNSURE' ? 'default' : 'outline'}
                           className={`h-12 transition-all ${
                             getMyResponse(aufstellungDetails)?.status === 'UNSURE'
-                              ? 'bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 border-yellow-500 shadow-lg shadow-yellow-500/20 text-white'
-                              : 'border-yellow-500/30 hover:border-yellow-500 hover:bg-yellow-900/20 text-yellow-400'
+                              ? 'bg-yellow-600 hover:bg-yellow-500 border-yellow-500 shadow-lg shadow-yellow-500/20 text-gray-900'
+                              : 'border-gray-600 hover:border-yellow-500 hover:bg-yellow-900/20 text-gray-300 hover:text-yellow-400'
                           }`}
                           onClick={() =>
                             respondMutation.mutate({

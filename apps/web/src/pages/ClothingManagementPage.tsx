@@ -173,13 +173,13 @@ export default function ClothingManagementPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-fuchsia-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/5 via-transparent to-pink-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-3xl" />
+      {/* Header - Gold Theme */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-fuchsia-600 to-pink-600 rounded-xl shadow-lg shadow-fuchsia-500/30">
+          <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
             <Settings className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -195,7 +195,7 @@ export default function ClothingManagementPage() {
       <Card className="bg-gray-900/50 border-gray-800">
         <CardHeader className="border-b border-gray-800">
           <CardTitle className="text-white flex items-center gap-2">
-            <Shirt className="h-5 w-5 text-fuchsia-400" />
+            <Shirt className="h-5 w-5 text-amber-400" />
             Ranggruppe auswählen
           </CardTitle>
         </CardHeader>
@@ -208,8 +208,8 @@ export default function ClothingManagementPage() {
                 onClick={() => setSelectedRankGroup(group.id)}
                 className={`h-auto py-3 flex flex-col items-start text-left ${
                   selectedRankGroup === group.id 
-                    ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white' 
-                    : 'border-gray-700 hover:bg-gray-800'
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900' 
+                    : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'
                 }`}
               >
                 <span className="font-medium">{group.label}</span>
@@ -231,7 +231,7 @@ export default function ClothingManagementPage() {
               onClick={() => setSelectedGender('MALE')}
               className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
                 selectedGender === 'MALE' 
-                  ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white shadow-lg shadow-fuchsia-500/25' 
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
                   : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
@@ -242,7 +242,7 @@ export default function ClothingManagementPage() {
               onClick={() => setSelectedGender('FEMALE')}
               className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
                 selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white shadow-lg shadow-fuchsia-500/25' 
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
                   : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
@@ -258,7 +258,7 @@ export default function ClothingManagementPage() {
         <Card className="bg-gray-900/50 border-gray-800">
           <CardContent className="flex items-center justify-center py-16">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 className="h-8 w-8 animate-spin text-fuchsia-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
               <p className="text-gray-400">Lade Vorlage...</p>
             </div>
           </CardContent>
@@ -297,7 +297,7 @@ export default function ClothingManagementPage() {
                           updateClothingPart(partKey, selectedGender, 'item', e.target.value ? parseInt(e.target.value) : null)
                         }
                         disabled={partData.customizable}
-                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-fuchsia-500"
+                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
                       />
                     </div>
                     <div className="space-y-2">
@@ -310,7 +310,7 @@ export default function ClothingManagementPage() {
                           updateClothingPart(partKey, selectedGender, 'variation', e.target.value ? parseInt(e.target.value) : null)
                         }
                         disabled={partData.customizable}
-                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-fuchsia-500"
+                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
                       />
                     </div>
                     <div className="space-y-2">
@@ -323,7 +323,7 @@ export default function ClothingManagementPage() {
                           updateClothingPart(partKey, selectedGender, 'color', e.target.value || null)
                         }
                         disabled={!partData.customizable}
-                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-fuchsia-500"
+                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
                       />
                     </div>
                     <div className="flex items-end">
@@ -358,7 +358,7 @@ export default function ClothingManagementPage() {
               <Button
                 onClick={handleSave}
                 disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white h-11 px-6"
+                className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 h-11 px-6"
               >
                 {saveMutation.isPending ? (
                   <>

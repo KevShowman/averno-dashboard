@@ -95,7 +95,7 @@ export default function ClothingPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
           <p className="text-gray-400">Lade Kleidungsvorlage...</p>
         </div>
       </div>
@@ -116,15 +116,15 @@ export default function ClothingPage() {
           <div>
             <h1 className="text-3xl font-bold text-white">Meine Kleidung</h1>
             <p className="text-gray-400 mt-1">
-              Basierend auf deinem Rang: <span className="text-rose-400 font-semibold">{user?.role ? getRoleDisplayName(user.role) : 'Unbekannt'}</span>
+              Basierend auf deinem Rang: <span className="text-amber-400 font-semibold">{user?.role ? getRoleDisplayName(user.role) : 'Unbekannt'}</span>
             </p>
           </div>
         </div>
       </div>
 
       {/* Gender Selector */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-rose-500/30">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-3xl" />
+      <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <CardHeader className="relative">
           <CardTitle className="text-white">Geschlecht auswählen</CardTitle>
           <CardDescription className="text-gray-400">
@@ -173,7 +173,7 @@ export default function ClothingPage() {
       <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
         <CardHeader className="border-b border-gray-800">
           <CardTitle className="text-white flex items-center gap-2">
-            <Shirt className="h-5 w-5 text-rose-400" />
+            <Shirt className="h-5 w-5 text-amber-400" />
             Deine Kleidungsvorlage ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
           </CardTitle>
         </CardHeader>

@@ -25,7 +25,14 @@ import {
   Wallet,
   TrendingDown,
   Crown,
-  ArrowUpRight
+  ArrowUpRight,
+  Crosshair,
+  Shirt,
+  Car,
+  Radio,
+  ScrollText,
+  Home,
+  Network
 } from 'lucide-react'
 import { formatCurrency, hasRole } from '../lib/utils'
 
@@ -70,21 +77,39 @@ export default function DashboardPage() {
     weekChange: cashStats?.weekChange || 0,
   }
 
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isSicario = hasRole(user, 'SICARIO')
+
   // Module - alle mit Gold Theme, semantische Icons
   const modules = [
+    // Finanzen & Lager
     { key: 'kasse', name: 'Kasse', icon: DollarSign, desc: 'Schwarzgeld-Verwaltung' },
     { key: 'lager', name: 'Lager', icon: Boxes, desc: 'Waffen & Ausrüstung' },
     { key: 'lager-movements', name: 'Lagerbewegungen', icon: Clock, desc: 'Genehmigungen' },
-    { key: 'bloodlist', name: 'Blood List', icon: Droplet, desc: 'Blood In / Blood Out' },
-    { key: 'organigramm', name: 'Hierarchie', icon: Crown, desc: 'Familienstruktur' },
-    { key: 'sanctions', name: 'Sanktionen', icon: Scale, desc: 'Verstöße & Strafen' },
+    // Familie
+    { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, desc: 'Einer für alle!' },
+    { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, desc: 'Touren-Tracking' },
     { key: 'aufstellungen', name: 'Aufstellungen', icon: CalendarCheck, desc: 'Termine & Teilnahme' },
     { key: 'abmeldungen', name: 'Abmeldungen', icon: CalendarDays, desc: 'Abwesenheiten' },
-    { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, desc: 'Touren-Tracking' },
-    { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, desc: 'Einer für alle!' },
-    { key: 'audit', name: 'Audit-Log', icon: FileText, desc: 'Aktivitäts-Protokoll' },
-    { key: 'ticker', name: 'Live-Ticker', icon: Activity, desc: 'Echtzeit-Feed' },
+    // Sicario (nur für Sicarios + Leadership)
+    ...((isSicario || isLeadership) ? [{ key: 'sicario', name: 'Sicario Bereich', icon: Crosshair, desc: 'Spezialeinheit' }] : []),
+    // Mitglieder
+    { key: 'bloodlist', name: 'Blood List', icon: Droplet, desc: 'Blood In / Blood Out' },
+    { key: 'sanctions', name: 'Sanktionen', icon: Scale, desc: 'Verstöße & Strafen' },
+    { key: 'organigramm', name: 'Organisation', icon: Network, desc: 'Familienstruktur' },
+    ...(isLeadership ? [{ key: 'member-files', name: 'Aktensystem', icon: FileText, desc: 'Mitglieder-Akten' }] : []),
     ...(hasRole(user, 'EL_PATRON') ? [{ key: 'user-management', name: 'Benutzer', icon: Shield, desc: 'Rollen & Rechte' }] : []),
+    // Ausstattung
+    { key: 'clothing', name: 'Meine Kleidung', icon: Shirt, desc: 'Deine Outfits' },
+    ...(isLeadership ? [{ key: 'clothing-management', name: 'Kleidungsverwaltung', icon: Shirt, desc: 'Vorlagen verwalten' }] : []),
+    { key: 'vehicle-tuning', name: 'Fahrzeugtuning', icon: Car, desc: 'Tuning-Specs' },
+    // Kommunikation
+    { key: 'communication', name: 'Funk/DarkChat', icon: Radio, desc: 'Funkfrequenzen' },
+    { key: 'botschaft', name: 'Botschaft', icon: ScrollText, desc: 'Familia-News' },
+    { key: 'la-casa', name: 'La Casa', icon: Home, desc: 'Unser Zuhause' },
+    // System
+    { key: 'ticker', name: 'Live-Ticker', icon: Activity, desc: 'Echtzeit-Feed' },
+    { key: 'audit', name: 'Audit-Log', icon: FileText, desc: 'Aktivitäts-Protokoll' },
     { key: 'settings', name: 'Einstellungen', icon: Settings, desc: 'Konfiguration' },
   ]
 

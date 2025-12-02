@@ -197,7 +197,7 @@ export default function AbmeldungenPage() {
     onSelect: (date: Date) => void; 
     minDate?: Date | null;
   }) => (
-    <div className="absolute z-50 mt-2 w-full bg-gray-800 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 p-4">
+    <div className="absolute z-50 mt-2 w-full bg-gray-800 border border-amber-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 p-4">
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-4">
         <Button
@@ -254,7 +254,7 @@ export default function AbmeldungenPage() {
                 isSelected
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 shadow-lg shadow-amber-500/30'
                   : isCurrentDay
-                    ? 'bg-cyan-900/50 text-cyan-300 border border-cyan-500/30'
+                    ? 'bg-cyan-900/50 text-cyan-300 border border-amber-500/30'
                     : isDisabled
                       ? 'text-gray-600 cursor-not-allowed'
                       : isCurrentMonth
@@ -290,7 +290,7 @@ export default function AbmeldungenPage() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <div className="h-8 w-8 border-4 border-amber-500/30 border-t-cyan-500 rounded-full animate-spin" />
           <span className="text-gray-400 text-lg">Lädt Abmeldungen...</span>
         </div>
       </div>
@@ -462,7 +462,7 @@ export default function AbmeldungenPage() {
       )}
 
       {/* Alle Abmeldungen */}
-      <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-cyan-500/30">
+      <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-amber-500/30">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-3">
             <div className="p-2 bg-cyan-500/20 rounded-lg">
@@ -567,7 +567,7 @@ export default function AbmeldungenPage() {
             {/* Glow Effect */}
             <div className="absolute -inset-2 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
             
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-cyan-500/30 shadow-2xl shadow-cyan-500/10 rounded-2xl overflow-hidden">
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl shadow-cyan-500/10 rounded-2xl overflow-hidden">
               {/* Header mit Gradient */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
