@@ -33,6 +33,7 @@ import VehicleTuningPage from './pages/VehicleTuningPage'
 import CasaPage from './pages/CasaPage'
 import BotschaftPage from './pages/BotschaftPage'
 import SicarioPage from './pages/SicarioPage'
+import ListenfuehrungPage from './pages/ListenfuehrungPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -256,6 +257,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <SicarioPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/listenfuehrung" element={
+          <ProtectedRoute>
+            <Layout>
+              <ListenfuehrungPage />
             </Layout>
           </ProtectedRoute>
         } />

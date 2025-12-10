@@ -31,7 +31,8 @@ import {
   Wallet,
   Shield,
   Building,
-  Cog
+  Cog,
+  BookOpen
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -80,6 +81,7 @@ interface NavItem {
   leadershipOnly?: boolean
   sicarioOnly?: boolean
   patronOnly?: boolean
+  contactoOnly?: boolean
 }
 
 interface NavGroup {
@@ -153,6 +155,7 @@ const navGroups: NavGroup[] = [
     items: [
       { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
       { name: 'Botschaft', href: '/botschaft', icon: ScrollText },
+      { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen, contactoOnly: true },
     ]
   },
   {
@@ -192,10 +195,13 @@ function NavGroupComponent({
   const isPatron = hasRole(user, 'EL_PATRON')
 
   // Filter items based on permissions
+  const isContacto = hasRole(user, 'CONTACTO')
+  
   const visibleItems = group.items.filter(item => {
     if (item.patronOnly && !isPatron) return false
     if (item.leadershipOnly && !isLeadership) return false
     if (item.sicarioOnly && !isLeadership && !isSicario) return false
+    if (item.contactoOnly && !isLeadership && !isContacto) return false
     return true
   })
 

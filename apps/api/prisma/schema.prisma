@@ -759,4 +759,35 @@ model SicarioAufstellungResponse {
   @@map("sicario_aufstellung_responses")
 }
 
+// Listenführung - Familien-Kontakte
+model FamilyContact {
+  id                  String              @id @default(cuid())
+  familyName          String              // Familienname
+  status              FamilyContactStatus @default(UNKNOWN) // Status der Familie
+  propertyZip         String?             // Anwesen PLZ (max 6 Stellen)
+  // Ansprechpartner 1
+  contact1FirstName   String?
+  contact1LastName    String?
+  contact1Phone       String?             // IC Rufnummer
+  // Ansprechpartner 2
+  contact2FirstName   String?
+  contact2LastName    String?
+  contact2Phone       String?             // IC Rufnummer
+  // Kontaktdaten Patron / Führung
+  leadershipInfo      String?             // Kann Vorname, Nachname oder Telefonnummer sein
+  notes               String?             @db.Text // Zusätzliche Notizen
+  createdById         String
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@map("family_contacts")
+}
+
+enum FamilyContactStatus {
+  UNKNOWN    // Unbekannt
+  ACTIVE     // Aktiv
+  ENDANGERED // Gefährdet
+  DISSOLVED  // Aufgelöst
+}
+
 // Discord Role Mappings

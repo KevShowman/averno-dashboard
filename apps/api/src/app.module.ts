@@ -26,6 +26,7 @@ import { MemberFilesModule } from './member-files/member-files.module';
 import { VehicleTuningModule } from './vehicle-tuning/vehicle-tuning.module';
 import { CasaModule } from './casa/casa.module';
 import { SicarioModule } from './sicario/sicario.module';
+import { FamilyContactsModule } from './family-contacts/family-contacts.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -65,6 +66,7 @@ import { AppService } from './app.service';
     VehicleTuningModule,
     CasaModule,
     SicarioModule,
+    FamilyContactsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

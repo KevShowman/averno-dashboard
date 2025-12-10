@@ -32,7 +32,8 @@ import {
   Radio,
   ScrollText,
   Home,
-  Network
+  Network,
+  BookOpen
 } from 'lucide-react'
 import { formatCurrency, hasRole } from '../lib/utils'
 
@@ -79,6 +80,7 @@ export default function DashboardPage() {
 
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const isSicario = hasRole(user, 'SICARIO')
+  const isContacto = hasRole(user, 'CONTACTO')
 
   // Module - alle mit Gold Theme, semantische Icons
   const modules = [
@@ -106,6 +108,7 @@ export default function DashboardPage() {
     // Kommunikation
     { key: 'communication', name: 'Funk/DarkChat', icon: Radio, desc: 'Funkfrequenzen' },
     { key: 'botschaft', name: 'Botschaft', icon: ScrollText, desc: 'Familia-News' },
+    ...((isContacto || isLeadership) ? [{ key: 'listenfuehrung', name: 'Listenführung', icon: BookOpen, desc: 'Familien-Kontakte' }] : []),
     { key: 'la-casa', name: 'La Casa', icon: Home, desc: 'Unser Zuhause' },
     // System
     { key: 'ticker', name: 'Live-Ticker', icon: Activity, desc: 'Echtzeit-Feed' },
