@@ -1,0 +1,8 @@
+{
+  "name": "narco-city",
+  "width": 6144,
+  "height": 9216,
+  "tileSize": 256,
+  "minZoom": 0,
+  "maxZoom": 6
+}

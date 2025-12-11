@@ -8,13 +8,16 @@
     "lint": "pnpm --recursive lint",
     "test": "pnpm --recursive test",
     "db:migrate": "pnpm --filter api db:migrate",
-    "db:seed": "pnpm --filter api db:seed"
+    "db:seed": "pnpm --filter api db:seed",
+    "generate-tiles": "node scripts/generate-map-tiles.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
     "prettier": "^3.0.0",
+    "sharp": "^0.33.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.0.0"
   },
   "pnpm": {

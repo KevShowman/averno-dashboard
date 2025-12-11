@@ -32,7 +32,8 @@ import {
   Shield,
   Building,
   Cog,
-  BookOpen
+  BookOpen,
+  Map
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -156,6 +157,7 @@ const navGroups: NavGroup[] = [
       { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
       { name: 'Botschaft', href: '/botschaft', icon: ScrollText },
       { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen, contactoOnly: true },
+      { name: 'Interaktive Karte', href: '/karte', icon: Map },
     ]
   },
   {

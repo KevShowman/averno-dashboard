@@ -106,3 +106,6 @@ temp/
 
 # OS generated files
 Thumbs.db
+
+# Map source files (zu groß für Git - werden lokal generiert)
+apps/web/map-sources/

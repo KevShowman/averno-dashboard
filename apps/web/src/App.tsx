@@ -34,6 +34,7 @@ import CasaPage from './pages/CasaPage'
 import BotschaftPage from './pages/BotschaftPage'
 import SicarioPage from './pages/SicarioPage'
 import ListenfuehrungPage from './pages/ListenfuehrungPage'
+import KartePage from './pages/KartePage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -264,6 +265,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <ListenfuehrungPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/karte" element={
+          <ProtectedRoute>
+            <Layout>
+              <KartePage />
             </Layout>
           </ProtectedRoute>
         } />

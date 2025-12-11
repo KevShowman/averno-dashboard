@@ -27,6 +27,7 @@ import { VehicleTuningModule } from './vehicle-tuning/vehicle-tuning.module';
 import { CasaModule } from './casa/casa.module';
 import { SicarioModule } from './sicario/sicario.module';
 import { FamilyContactsModule } from './family-contacts/family-contacts.module';
+import { MapAnnotationsModule } from './map-annotations/map-annotations.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -67,6 +68,7 @@ import { AppService } from './app.service';
     CasaModule,
     SicarioModule,
     FamilyContactsModule,
+    MapAnnotationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -54,6 +54,7 @@ model User {
   fileEntriesCreated            MemberFileEntry[]              @relation("file_entries_created")
   sicarioAufstellungenCreated   SicarioAufstellung[]           @relation("sicario_aufstellung_created_by")
   sicarioAufstellungResponses   SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
+  mapAnnotationsCreated         MapAnnotation[]                @relation("map_annotation_created_by")
 
   @@map("users")
 }
@@ -780,6 +781,9 @@ model FamilyContact {
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 
+  // Relations
+  mapAnnotations      MapAnnotation[]     @relation("map_annotation_family")
+
   @@map("family_contacts")
 }
 
@@ -788,6 +792,30 @@ enum FamilyContactStatus {
   ACTIVE     // Aktiv
   ENDANGERED // Gefährdet
   DISSOLVED  // Aufgelöst
+}
+
+// Interaktive Karte - Map Annotationen
+model MapAnnotation {
+  id              String          @id @default(cuid())
+  mapName         MapName         // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  x               Float           // Normalisierte X-Koordinate (0.0 - 1.0)
+  y               Float           // Normalisierte Y-Koordinate (0.0 - 1.0)
+  icon            String          @default("home") // Icon: home, building, warehouse, skull, etc.
+  label           String?         // Optionaler Kurztext für Tooltip
+  familyContactId String?
+  familyContact   FamilyContact?  @relation("map_annotation_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  createdById     String
+  createdBy       User            @relation("map_annotation_created_by", fields: [createdById], references: [id])
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("map_annotations")
+}
+
+enum MapName {
+  NARCO_CITY
+  ROXWOOD
+  CAYO_PERICO
 }
 
 // Discord Role Mappings
