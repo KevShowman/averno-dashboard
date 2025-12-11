@@ -33,7 +33,8 @@ import {
   ScrollText,
   Home,
   Network,
-  BookOpen
+  BookOpen,
+  Map
 } from 'lucide-react'
 import { formatCurrency, hasRole } from '../lib/utils'
 
@@ -109,6 +110,7 @@ export default function DashboardPage() {
     { key: 'communication', name: 'Funk/DarkChat', icon: Radio, desc: 'Funkfrequenzen' },
     { key: 'botschaft', name: 'Botschaft', icon: ScrollText, desc: 'Familia-News' },
     ...((isContacto || isLeadership) ? [{ key: 'listenfuehrung', name: 'Listenführung', icon: BookOpen, desc: 'Familien-Kontakte' }] : []),
+    { key: 'karte', name: 'Interaktive Karte', icon: Map, desc: 'Territorien & Standorte' },
     { key: 'la-casa', name: 'La Casa', icon: Home, desc: 'Unser Zuhause' },
     // System
     { key: 'ticker', name: 'Live-Ticker', icon: Activity, desc: 'Echtzeit-Feed' },

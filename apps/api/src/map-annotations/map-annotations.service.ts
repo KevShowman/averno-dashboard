@@ -250,5 +250,145 @@ export class MapAnnotationsService {
       orderBy: { familyName: 'asc' },
     });
   }
+
+  // ============ MAP AREAS (Gebiete) ============
+
+  async findAllAreas(mapName?: MapName) {
+    const where = mapName ? { mapName } : {};
+
+    return this.prisma.mapArea.findMany({
+      where,
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createArea(
+    user: any,
+    data: {
+      mapName: MapName;
+      points: { x: number; y: number }[];
+      label: string;
+      color?: string;
+    },
+  ) {
+    if (!this.canManageAnnotations(user)) {
+      throw new ForbiddenException(
+        'Nur Leadership, Contactos und Intelligencia können Gebiete erstellen',
+      );
+    }
+
+    // Validiere Punkte (mindestens 3 für ein Polygon)
+    if (!data.points || data.points.length < 3) {
+      throw new ForbiddenException('Ein Gebiet benötigt mindestens 3 Punkte');
+    }
+
+    // Validiere alle Koordinaten (0-1)
+    for (const point of data.points) {
+      if (point.x < 0 || point.x > 1 || point.y < 0 || point.y > 1) {
+        throw new ForbiddenException('Alle Koordinaten müssen zwischen 0 und 1 liegen');
+      }
+    }
+
+    return this.prisma.mapArea.create({
+      data: {
+        mapName: data.mapName,
+        points: data.points,
+        label: data.label,
+        color: data.color || '#f59e0b',
+        createdById: user.id,
+      },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateArea(
+    user: any,
+    id: string,
+    data: {
+      points?: { x: number; y: number }[];
+      label?: string;
+      color?: string;
+    },
+  ) {
+    if (!this.canManageAnnotations(user)) {
+      throw new ForbiddenException(
+        'Nur Leadership, Contactos und Intelligencia können Gebiete bearbeiten',
+      );
+    }
+
+    const area = await this.prisma.mapArea.findUnique({
+      where: { id },
+    });
+
+    if (!area) {
+      throw new NotFoundException('Gebiet nicht gefunden');
+    }
+
+    // Validiere Punkte falls angegeben
+    if (data.points) {
+      if (data.points.length < 3) {
+        throw new ForbiddenException('Ein Gebiet benötigt mindestens 3 Punkte');
+      }
+      for (const point of data.points) {
+        if (point.x < 0 || point.x > 1 || point.y < 0 || point.y > 1) {
+          throw new ForbiddenException('Alle Koordinaten müssen zwischen 0 und 1 liegen');
+        }
+      }
+    }
+
+    return this.prisma.mapArea.update({
+      where: { id },
+      data,
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteArea(user: any, id: string) {
+    if (!this.canManageAnnotations(user)) {
+      throw new ForbiddenException(
+        'Nur Leadership, Contactos und Intelligencia können Gebiete löschen',
+      );
+    }
+
+    const area = await this.prisma.mapArea.findUnique({
+      where: { id },
+    });
+
+    if (!area) {
+      throw new NotFoundException('Gebiet nicht gefunden');
+    }
+
+    return this.prisma.mapArea.delete({
+      where: { id },
+    });
+  }
 }
 

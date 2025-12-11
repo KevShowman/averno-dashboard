@@ -70,5 +70,45 @@ export class MapAnnotationsController {
   delete(@CurrentUser() user: any, @Param('id') id: string) {
     return this.mapAnnotationsService.delete(user, id);
   }
+
+  // ============ MAP AREAS (Gebiete) ============
+
+  @Get('areas/list')
+  findAllAreas(@Query('map') mapName?: MapName) {
+    return this.mapAnnotationsService.findAllAreas(mapName);
+  }
+
+  @Post('areas')
+  createArea(
+    @CurrentUser() user: any,
+    @Body()
+    data: {
+      mapName: MapName;
+      points: { x: number; y: number }[];
+      label: string;
+      color?: string;
+    },
+  ) {
+    return this.mapAnnotationsService.createArea(user, data);
+  }
+
+  @Put('areas/:id')
+  updateArea(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body()
+    data: {
+      points?: { x: number; y: number }[];
+      label?: string;
+      color?: string;
+    },
+  ) {
+    return this.mapAnnotationsService.updateArea(user, id, data);
+  }
+
+  @Delete('areas/:id')
+  deleteArea(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.mapAnnotationsService.deleteArea(user, id);
+  }
 }
 

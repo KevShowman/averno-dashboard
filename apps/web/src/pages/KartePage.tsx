@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
@@ -11,6 +11,7 @@ import {
   Marker,
   Popup,
   Tooltip,
+  Polygon,
   useMapEvents,
   useMap,
 } from 'react-leaflet'
@@ -46,6 +47,10 @@ import {
   XCircle,
   AlertCircle,
   HelpCircle,
+  Hexagon,
+  Palette,
+  Check,
+  RotateCcw,
 } from 'lucide-react'
 
 // Map Types
@@ -84,6 +89,33 @@ interface MapAnnotation {
   createdAt: string
 }
 
+interface MapArea {
+  id: string
+  mapName: MapName
+  points: { x: number; y: number }[]
+  label: string
+  color: string
+  createdBy: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+  }
+  createdAt: string
+}
+
+// Verfügbare Farben für Gebiete
+const AREA_COLORS = [
+  { value: '#f59e0b', label: 'Gold' },
+  { value: '#ef4444', label: 'Rot' },
+  { value: '#22c55e', label: 'Grün' },
+  { value: '#3b82f6', label: 'Blau' },
+  { value: '#8b5cf6', label: 'Violett' },
+  { value: '#ec4899', label: 'Pink' },
+  { value: '#06b6d4', label: 'Cyan' },
+  { value: '#f97316', label: 'Orange' },
+]
+
 // Map Configuration
 const MAP_CONFIG: Record<MapName, { name: string; width: number; height: number; file: string }> = {
   NARCO_CITY: { name: 'Narco City', width: 6144, height: 9216, file: 'narco-city' },
@@ -116,9 +148,9 @@ const createMarkerIcon = (iconName: string, status?: FamilyContactStatus) => {
   const statusColor = status ? statusConfig[status].color : '#f59e0b'
   
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
       <circle cx="12" cy="12" r="11" fill="${statusColor}" stroke="#1f2937" stroke-width="2"/>
-      <g fill="white" transform="translate(4, 4) scale(0.67)">
+      <g fill="white" transform="translate(5, 5) scale(0.58)">
         ${getIconPath(iconName)}
       </g>
     </svg>
@@ -127,9 +159,9 @@ const createMarkerIcon = (iconName: string, status?: FamilyContactStatus) => {
   return L.divIcon({
     html: iconSvg,
     className: 'custom-marker-icon',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -16],
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10],
   })
 }
 
@@ -150,24 +182,48 @@ const getIconPath = (iconName: string): string => {
 
 // Map click handler component
 function MapClickHandler({ 
-  onRightClick, 
-  canEdit 
+  onRightClick,
+  onLeftClick,
+  canEdit,
+  mapBounds,
+  isDrawingMode,
 }: { 
   onRightClick: (x: number, y: number) => void
-  canEdit: boolean 
+  onLeftClick?: (x: number, y: number) => void
+  canEdit: boolean
+  mapBounds: L.LatLngBoundsExpression
+  isDrawingMode?: boolean
 }) {
   const map = useMap()
   
   useMapEvents({
-    contextmenu: (e) => {
-      if (!canEdit) return
+    click: (e) => {
+      if (!isDrawingMode || !onLeftClick) return
       
-      const bounds = map.getBounds()
-      const mapSize = map.getSize()
+      const boundsArray = mapBounds as [[number, number], [number, number]]
+      const mapHeight = boundsArray[1][0]
+      const mapWidth = boundsArray[1][1]
+      
+      const x = e.latlng.lng / mapWidth
+      const y = 1 - (e.latlng.lat / mapHeight)
+      
+      onLeftClick(Math.max(0, Math.min(1, x)), Math.max(0, Math.min(1, y)))
+    },
+    contextmenu: (e) => {
+      // Prevent default context menu
+      e.originalEvent.preventDefault()
+      e.originalEvent.stopPropagation()
+      
+      if (!canEdit || isDrawingMode) return
+      
+      // Use the known map bounds for calculation (not current view bounds)
+      const boundsArray = mapBounds as [[number, number], [number, number]]
+      const mapHeight = boundsArray[1][0]
+      const mapWidth = boundsArray[1][1]
       
       // Convert click position to normalized coordinates (0-1)
-      const x = (e.latlng.lng - bounds.getWest()) / (bounds.getEast() - bounds.getWest())
-      const y = (bounds.getNorth() - e.latlng.lat) / (bounds.getNorth() - bounds.getSouth())
+      const x = e.latlng.lng / mapWidth
+      const y = 1 - (e.latlng.lat / mapHeight)
       
       onRightClick(Math.max(0, Math.min(1, x)), Math.max(0, Math.min(1, y)))
     },
@@ -176,12 +232,16 @@ function MapClickHandler({
   return null
 }
 
-// Fit bounds component
+// Fit bounds component - only runs once on mount
 function FitBounds({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap()
+  const hasInitialized = useRef(false)
   
   useEffect(() => {
-    map.fitBounds(bounds)
+    if (!hasInitialized.current) {
+      map.fitBounds(bounds)
+      hasInitialized.current = true
+    }
   }, [map, bounds])
   
   return null
@@ -199,11 +259,25 @@ export default function KartePage() {
   const [selectedAnnotation, setSelectedAnnotation] = useState<MapAnnotation | null>(null)
   const [newMarkerPosition, setNewMarkerPosition] = useState<{ x: number; y: number } | null>(null)
   
+  // Area (Gebiet) state
+  const [isDrawingMode, setIsDrawingMode] = useState(false)
+  const [drawingPoints, setDrawingPoints] = useState<{ x: number; y: number }[]>([])
+  const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
+  const [isEditAreaDialogOpen, setIsEditAreaDialogOpen] = useState(false)
+  const [isDeleteAreaDialogOpen, setIsDeleteAreaDialogOpen] = useState(false)
+  const [selectedArea, setSelectedArea] = useState<MapArea | null>(null)
+  
   // Form state
   const [formData, setFormData] = useState({
     icon: 'home',
     label: '',
     familyContactId: '',
+  })
+  
+  // Area form state
+  const [areaFormData, setAreaFormData] = useState({
+    label: '',
+    color: '#f59e0b',
   })
   
   // Permission check
@@ -222,6 +296,12 @@ export default function KartePage() {
   const { data: familyContacts = [] } = useQuery({
     queryKey: ['map-annotations-family-contacts'],
     queryFn: () => api.get('/map-annotations/family-contacts').then(res => res.data),
+  })
+  
+  // Fetch areas for current map
+  const { data: areas = [] } = useQuery({
+    queryKey: ['map-areas', activeMap],
+    queryFn: () => api.get(`/map-annotations/areas/list?map=${activeMap}`).then(res => res.data),
   })
   
   // Mutations
@@ -270,6 +350,92 @@ export default function KartePage() {
   
   const resetForm = () => {
     setFormData({ icon: 'home', label: '', familyContactId: '' })
+  }
+  
+  const resetAreaForm = () => {
+    setAreaFormData({ label: '', color: '#f59e0b' })
+    setDrawingPoints([])
+  }
+  
+  // Area Mutations
+  const createAreaMutation = useMutation({
+    mutationFn: (data: { mapName: MapName; points: { x: number; y: number }[]; label: string; color: string }) =>
+      api.post('/map-annotations/areas', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['map-areas'] })
+      setIsAreaDialogOpen(false)
+      setIsDrawingMode(false)
+      resetAreaForm()
+      toast.success('Gebiet erstellt')
+    },
+    onError: () => {
+      toast.error('Fehler beim Erstellen des Gebiets')
+    },
+  })
+  
+  const updateAreaMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { label?: string; color?: string } }) =>
+      api.put(`/map-annotations/areas/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['map-areas'] })
+      setIsEditAreaDialogOpen(false)
+      setSelectedArea(null)
+      toast.success('Gebiet aktualisiert')
+    },
+    onError: () => {
+      toast.error('Fehler beim Aktualisieren')
+    },
+  })
+  
+  const deleteAreaMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/map-annotations/areas/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['map-areas'] })
+      setIsDeleteAreaDialogOpen(false)
+      setSelectedArea(null)
+      toast.success('Gebiet gelöscht')
+    },
+    onError: () => {
+      toast.error('Fehler beim Löschen')
+    },
+  })
+  
+  // Handle drawing mode
+  const handleStartDrawing = () => {
+    setIsDrawingMode(true)
+    setDrawingPoints([])
+  }
+  
+  const handleAddPoint = (x: number, y: number) => {
+    setDrawingPoints(prev => [...prev, { x, y }])
+  }
+  
+  const handleUndoPoint = () => {
+    setDrawingPoints(prev => prev.slice(0, -1))
+  }
+  
+  const handleFinishDrawing = () => {
+    if (drawingPoints.length >= 3) {
+      setIsAreaDialogOpen(true)
+    } else {
+      toast.error('Ein Gebiet benötigt mindestens 3 Punkte')
+    }
+  }
+  
+  const handleCancelDrawing = () => {
+    setIsDrawingMode(false)
+    resetAreaForm()
+  }
+  
+  const handleCreateArea = () => {
+    if (drawingPoints.length < 3) return
+    
+    createAreaMutation.mutate({
+      mapName: activeMap,
+      points: drawingPoints,
+      label: areaFormData.label,
+      color: areaFormData.color,
+    })
   }
   
   // Handle right-click to create new marker
@@ -369,11 +535,61 @@ export default function KartePage() {
           </div>
         </div>
         
-        {/* Instructions */}
+        {/* Instructions & Drawing Tools */}
         {canManage && (
-          <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            <span>Rechtsklick auf die Karte, um eine neue Markierung zu setzen</span>
+          <div className="mb-4 flex flex-wrap gap-3">
+            {!isDrawingMode ? (
+              <>
+                <div className="flex-1 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span>Rechtsklick auf die Karte, um eine neue Markierung zu setzen</span>
+                </div>
+                <Button
+                  onClick={handleStartDrawing}
+                  className="bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30"
+                >
+                  <Hexagon className="h-4 w-4 mr-2" />
+                  Gebiet zeichnen
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="flex-1 p-3 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-sm flex items-center gap-2">
+                  <Hexagon className="h-4 w-4" />
+                  <span>
+                    Klicke auf die Karte um Punkte zu setzen ({drawingPoints.length} Punkte)
+                    {drawingPoints.length >= 3 && ' - Bereit zum Abschließen'}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleUndoPoint}
+                    disabled={drawingPoints.length === 0}
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    Rückgängig
+                  </Button>
+                  <Button
+                    onClick={handleFinishDrawing}
+                    disabled={drawingPoints.length < 3}
+                    className="bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30"
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Fertig
+                  </Button>
+                  <Button
+                    onClick={handleCancelDrawing}
+                    variant="outline"
+                    className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Abbrechen
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         )}
         
@@ -418,7 +634,69 @@ export default function KartePage() {
               />
               
               {/* Click Handler */}
-              <MapClickHandler onRightClick={handleMapRightClick} canEdit={canManage} />
+              <MapClickHandler 
+                onRightClick={handleMapRightClick} 
+                onLeftClick={handleAddPoint}
+                canEdit={canManage} 
+                mapBounds={bounds}
+                isDrawingMode={isDrawingMode}
+              />
+              
+              {/* Areas (Gebiete) */}
+              {areas.map((area: MapArea) => (
+                <Polygon
+                  key={area.id}
+                  positions={area.points.map((p: { x: number; y: number }) => toMapCoords(p.x, p.y))}
+                  pathOptions={{
+                    color: area.color,
+                    fillColor: area.color,
+                    fillOpacity: 0.2,
+                    weight: 2,
+                  }}
+                  eventHandlers={{
+                    click: () => {
+                      if (canManage && !isDrawingMode) {
+                        setSelectedArea(area)
+                        setAreaFormData({ label: area.label, color: area.color })
+                        setIsEditAreaDialogOpen(true)
+                      }
+                    },
+                  }}
+                >
+                  <Tooltip direction="center" permanent className="area-label">
+                    <span style={{ color: area.color, fontWeight: 'bold' }}>{area.label}</span>
+                  </Tooltip>
+                </Polygon>
+              ))}
+              
+              {/* Current Drawing Polygon */}
+              {isDrawingMode && drawingPoints.length > 0 && (
+                <>
+                  <Polygon
+                    positions={drawingPoints.map(p => toMapCoords(p.x, p.y))}
+                    pathOptions={{
+                      color: areaFormData.color,
+                      fillColor: areaFormData.color,
+                      fillOpacity: 0.3,
+                      weight: 2,
+                      dashArray: '5, 10',
+                    }}
+                  />
+                  {/* Draw points as small circles */}
+                  {drawingPoints.map((point, index) => (
+                    <Marker
+                      key={`drawing-point-${index}`}
+                      position={toMapCoords(point.x, point.y)}
+                      icon={L.divIcon({
+                        html: `<div style="width: 10px; height: 10px; background: ${areaFormData.color}; border: 2px solid white; border-radius: 50%;"></div>`,
+                        className: 'drawing-point',
+                        iconSize: [10, 10],
+                        iconAnchor: [5, 5],
+                      })}
+                    />
+                  ))}
+                </>
+              )}
               
               {/* Markers */}
               {annotations.map((annotation: MapAnnotation) => (
@@ -789,6 +1067,201 @@ export default function KartePage() {
         </DialogContent>
       </Dialog>
       
+      {/* Create Area Dialog */}
+      <Dialog open={isAreaDialogOpen} onOpenChange={setIsAreaDialogOpen}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-violet-400">
+              <Hexagon className="h-5 w-5" />
+              Neues Gebiet
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              {drawingPoints.length} Punkte gezeichnet
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Label */}
+            <div>
+              <Label className="text-gray-300">Gebietsname *</Label>
+              <Input
+                value={areaFormData.label}
+                onChange={(e) => setAreaFormData({ ...areaFormData, label: e.target.value })}
+                placeholder="z.B. Territorium Nord"
+                className="mt-1 bg-gray-700 border-gray-600 text-white"
+              />
+            </div>
+            
+            {/* Color Selection */}
+            <div>
+              <Label className="text-gray-300">Farbe</Label>
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {AREA_COLORS.map(color => (
+                  <button
+                    key={color.value}
+                    onClick={() => setAreaFormData({ ...areaFormData, color: color.value })}
+                    className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
+                      areaFormData.color === color.value
+                        ? 'border-white bg-white/10'
+                        : 'border-gray-600 bg-gray-700/50 hover:border-gray-500'
+                    }`}
+                  >
+                    <div 
+                      className="w-6 h-6 rounded-full" 
+                      style={{ backgroundColor: color.value }}
+                    />
+                    <span className="text-xs text-gray-300">{color.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsAreaDialogOpen(false)
+              }}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Abbrechen
+            </Button>
+            <Button
+              onClick={handleCreateArea}
+              disabled={createAreaMutation.isPending || !areaFormData.label}
+              className="bg-violet-500 hover:bg-violet-600 text-white"
+            >
+              {createAreaMutation.isPending ? 'Erstelle...' : 'Erstellen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Area Dialog */}
+      <Dialog open={isEditAreaDialogOpen} onOpenChange={setIsEditAreaDialogOpen}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-violet-400">
+              <Pencil className="h-5 w-5" />
+              Gebiet bearbeiten
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Label */}
+            <div>
+              <Label className="text-gray-300">Gebietsname</Label>
+              <Input
+                value={areaFormData.label}
+                onChange={(e) => setAreaFormData({ ...areaFormData, label: e.target.value })}
+                placeholder="z.B. Territorium Nord"
+                className="mt-1 bg-gray-700 border-gray-600 text-white"
+              />
+            </div>
+            
+            {/* Color Selection */}
+            <div>
+              <Label className="text-gray-300">Farbe</Label>
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {AREA_COLORS.map(color => (
+                  <button
+                    key={color.value}
+                    onClick={() => setAreaFormData({ ...areaFormData, color: color.value })}
+                    className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
+                      areaFormData.color === color.value
+                        ? 'border-white bg-white/10'
+                        : 'border-gray-600 bg-gray-700/50 hover:border-gray-500'
+                    }`}
+                  >
+                    <div 
+                      className="w-6 h-6 rounded-full" 
+                      style={{ backgroundColor: color.value }}
+                    />
+                    <span className="text-xs text-gray-300">{color.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditAreaDialogOpen(false)
+                setIsDeleteAreaDialogOpen(true)
+              }}
+              className="border-red-500/30 text-red-400 hover:bg-red-500/20 mr-auto"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Löschen
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditAreaDialogOpen(false)
+                setSelectedArea(null)
+              }}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Abbrechen
+            </Button>
+            <Button
+              onClick={() => {
+                if (!selectedArea) return
+                updateAreaMutation.mutate({
+                  id: selectedArea.id,
+                  data: {
+                    label: areaFormData.label,
+                    color: areaFormData.color,
+                  },
+                })
+              }}
+              disabled={updateAreaMutation.isPending || !areaFormData.label}
+              className="bg-violet-500 hover:bg-violet-600 text-white"
+            >
+              {updateAreaMutation.isPending ? 'Speichere...' : 'Speichern'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Area Confirmation Dialog */}
+      <Dialog open={isDeleteAreaDialogOpen} onOpenChange={setIsDeleteAreaDialogOpen}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-400">
+              <Trash2 className="h-5 w-5" />
+              Gebiet löschen
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Bist du sicher, dass du das Gebiet "{selectedArea?.label}" löschen möchtest?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteAreaDialogOpen(false)
+                setSelectedArea(null)
+              }}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Abbrechen
+            </Button>
+            <Button
+              onClick={() => selectedArea && deleteAreaMutation.mutate(selectedArea.id)}
+              disabled={deleteAreaMutation.isPending}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              {deleteAreaMutation.isPending ? 'Lösche...' : 'Löschen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
       {/* Custom Leaflet Styles */}
       <style>{`
         .custom-marker-icon {
@@ -824,6 +1297,20 @@ export default function KartePage() {
         }
         .leaflet-container {
           font-family: inherit;
+        }
+        .area-label {
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+          font-weight: bold;
+          text-shadow: 0 0 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.5);
+        }
+        .area-label::before {
+          display: none !important;
+        }
+        .drawing-point {
+          background: none !important;
+          border: none !important;
         }
       `}</style>
     </div>

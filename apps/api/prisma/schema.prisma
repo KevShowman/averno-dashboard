@@ -55,6 +55,7 @@ model User {
   sicarioAufstellungenCreated   SicarioAufstellung[]           @relation("sicario_aufstellung_created_by")
   sicarioAufstellungResponses   SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
   mapAnnotationsCreated         MapAnnotation[]                @relation("map_annotation_created_by")
+  mapAreasCreated               MapArea[]                      @relation("map_area_created_by")
 
   @@map("users")
 }
@@ -816,6 +817,21 @@ enum MapName {
   NARCO_CITY
   ROXWOOD
   CAYO_PERICO
+}
+
+// Interaktive Karte - Gebiete/Bereiche
+model MapArea {
+  id              String          @id @default(cuid())
+  mapName         MapName         // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  points          Json            // Array von {x, y} Koordinaten (normalisiert 0-1)
+  label           String          // Gebietsname
+  color           String          @default("#f59e0b") // Hex-Farbe
+  createdById     String
+  createdBy       User            @relation("map_area_created_by", fields: [createdById], references: [id])
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("map_areas")
 }
 
 // Discord Role Mappings
