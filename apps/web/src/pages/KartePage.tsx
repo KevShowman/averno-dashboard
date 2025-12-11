@@ -241,7 +241,7 @@ export default function KartePage() {
   })
   
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<typeof formData> }) =>
+    mutationFn: ({ id, data }: { id: string; data: { icon?: string; label?: string; familyContactId?: string | null } }) =>
       api.put(`/map-annotations/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['map-annotations'] })
