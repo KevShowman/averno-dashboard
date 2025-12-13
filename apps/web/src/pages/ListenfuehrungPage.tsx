@@ -339,7 +339,7 @@ export default function ListenfuehrungPage() {
                         )}
                         {/* Veraltet Badge */}
                         {contact.isOutdated && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30" title="Information veraltet">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-300 border border-red-500/30" title="Information veraltet">
                             <Clock className="h-3 w-3" />
                           </span>
                         )}
@@ -373,7 +373,7 @@ export default function ListenfuehrungPage() {
                       variant="ghost"
                       onClick={() => markOutdatedMutation.mutate({ id: contact.id, isOutdated: !contact.isOutdated })}
                       disabled={markOutdatedMutation.isPending}
-                      className={`h-8 w-8 p-0 ${contact.isOutdated ? 'text-orange-400 hover:text-orange-300' : 'text-gray-400 hover:text-orange-400 opacity-0 group-hover:opacity-100'} transition-all`}
+                      className={`h-8 w-8 p-0 ${contact.isOutdated ? 'text-red-400 hover:text-red-300' : 'text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100'} transition-all`}
                       title={contact.isOutdated ? 'Als aktuell markieren' : 'Als veraltet markieren'}
                     >
                       <Clock className="h-4 w-4" />
@@ -469,7 +469,7 @@ export default function ListenfuehrungPage() {
                 {/* Veraltet-Info */}
                 {contact.isOutdated && contact.outdatedMarkedBy && (
                   <div className="pt-2 border-t border-gray-800">
-                    <div className="flex items-center gap-2 text-xs text-orange-400/70">
+                    <div className="flex items-center gap-2 text-xs text-red-400/70">
                       <Clock className="h-3 w-3" />
                       <span>
                         Als veraltet markiert von {contact.outdatedMarkedBy.icFirstName || contact.outdatedMarkedBy.username}

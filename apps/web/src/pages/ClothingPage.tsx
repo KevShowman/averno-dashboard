@@ -1,13 +1,40 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select'
 import { useAuthStore } from '../stores/auth'
-import { Loader2, Shirt, Info, User, Users, Check, ChevronRight } from 'lucide-react'
-import { clothingApi } from '../lib/api'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { Loader2, Shirt, Info, User, Users, Check, Sparkles, Image as ImageIcon } from 'lucide-react'
 import { api } from '../lib/api'
 import { toast } from 'sonner'
+
+interface MaleOutfit {
+  id: string
+  outfitNumber: number
+  name: string
+  imagePath?: string
+  maskItem?: number
+  maskVariation?: number
+  torsoItem?: number
+  torsoVariation?: number
+  tshirtItem?: number
+  tshirtVariation?: number
+  vesteItem?: number
+  vesteVariation?: number
+  hoseItem?: number
+  hoseVariation?: number
+  schuheItem?: number
+  schuheVariation?: number
+  rucksackItem?: number
+  rucksackVariation?: number
+}
 
 interface ClothingDisplay {
   part: string
@@ -18,31 +45,14 @@ interface ClothingDisplay {
   color: string | null
 }
 
-const getRoleDisplayName = (role: string): string => {
-  const roleMap: Record<string, string> = {
-    EL_PATRON: 'El Patrón',
-    DON_CAPITAN: 'Don - El Capitán',
-    DON_COMANDANTE: 'Don - El Comandante',
-    EL_MANO_DERECHA: 'El Mano Derecha',
-    EL_CUSTODIO: 'El Custodio',
-    EL_MENTOR: 'El Mentor',
-    EL_ENCARGADO: 'El Encargado',
-    EL_TENIENTE: 'El Teniente',
-    SOLDADO: 'Soldado',
-    EL_PREFECTO: 'El Prefecto',
-    EL_CONFIDENTE: 'El Confidente',
-    EL_PROTECTOR: 'El Protector',
-    EL_NOVATO: 'El Novato',
-    SICARIO: 'Sicario',
-    FUTURO: 'Futuro',
-  }
-  return roleMap[role] || role
-}
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 export default function ClothingPage() {
   const { user } = useAuthStore()
+  usePageTitle('Meine Kleidung')
   const queryClient = useQueryClient()
   const [selectedGender, setSelectedGender] = useState<'MALE' | 'FEMALE'>('MALE')
+  const [selectedOutfit, setSelectedOutfit] = useState<number>(1)
 
   useEffect(() => {
     if (user?.gender) {
@@ -50,9 +60,10 @@ export default function ClothingPage() {
     }
   }, [user])
 
-  const { data: template, isLoading: templateLoading, refetch } = useQuery({
-    queryKey: ['clothing-my-template'],
-    queryFn: () => clothingApi.getAllTemplates(),
+  // Fetch clothing data
+  const { data: clothingData, isLoading } = useQuery({
+    queryKey: ['clothing-my-template', selectedGender],
+    queryFn: () => api.get('/clothing/my-clothing').then(res => res.data),
   })
 
   const updateGenderMutation = useMutation({
@@ -62,7 +73,7 @@ export default function ClothingPage() {
     onSuccess: () => {
       toast.success('Geschlecht erfolgreich aktualisiert!')
       queryClient.invalidateQueries({ queryKey: ['auth'] })
-      refetch()
+      queryClient.invalidateQueries({ queryKey: ['clothing-my-template'] })
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Geschlechts')
@@ -74,10 +85,16 @@ export default function ClothingPage() {
     updateGenderMutation.mutate(gender)
   }
 
-  const hasSicarioClothing = template && typeof template === 'object' && 'rank' in template && 'sicario' in template
-  const rankTemplate = hasSicarioClothing ? template.rank : template
-  const sicarioTemplate = hasSicarioClothing ? template.sicario : null
+  // Check type of clothing data
+  const isFreeChoice = clothingData?.type === 'free_choice'
+  const hasOutfits = clothingData?.type === 'outfits'
+  const outfits: MaleOutfit[] = hasOutfits ? (clothingData?.outfits || []) : []
+  const hasSicario = !!clothingData?.sicario
 
+  // Get current selected outfit
+  const currentOutfit = outfits.find(o => o.outfitNumber === selectedOutfit) || outfits[0]
+
+  // Create clothing parts display for sicario
   const createClothingParts = (data: any): ClothingDisplay[] => [
     { part: 'mask', label: 'Maske', item: data?.maskItem ?? null, variation: data?.maskVariation ?? null, customizable: data?.maskCustomizable ?? false, color: data?.maskColor ?? null },
     { part: 'torso', label: 'Torso', item: data?.torsoItem ?? null, variation: data?.torsoVariation ?? null, customizable: data?.torsoCustomizable ?? false, color: data?.torsoColor ?? null },
@@ -88,10 +105,20 @@ export default function ClothingPage() {
     { part: 'backpack', label: 'Rucksack', item: data?.rucksackItem ?? null, variation: data?.rucksackVariation ?? null, customizable: data?.rucksackCustomizable ?? false, color: data?.rucksackColor ?? null },
   ]
 
-  const rankClothingParts = createClothingParts(rankTemplate)
-  const sicarioClothingParts = sicarioTemplate ? createClothingParts(sicarioTemplate) : null
+  const sicarioClothingParts = hasSicario ? createClothingParts(clothingData.sicario) : null
 
-  if (templateLoading) {
+  // Create clothing parts from outfit
+  const outfitClothingParts = currentOutfit ? [
+    { label: 'Maske', item: currentOutfit.maskItem, variation: currentOutfit.maskVariation },
+    { label: 'Torso', item: currentOutfit.torsoItem, variation: currentOutfit.torsoVariation },
+    { label: 'T-Shirt', item: currentOutfit.tshirtItem, variation: currentOutfit.tshirtVariation },
+    { label: 'Weste', item: currentOutfit.vesteItem, variation: currentOutfit.vesteVariation },
+    { label: 'Hose', item: currentOutfit.hoseItem, variation: currentOutfit.hoseVariation },
+    { label: 'Schuhe', item: currentOutfit.schuheItem, variation: currentOutfit.schuheVariation },
+    { label: 'Rucksack', item: currentOutfit.rucksackItem, variation: currentOutfit.rucksackVariation },
+  ] : []
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
@@ -114,9 +141,11 @@ export default function ClothingPage() {
             <Shirt className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">Meine Kleidung</h1>
+            <h1 className="text-3xl font-bold text-white">Familienkleidung</h1>
             <p className="text-gray-400 mt-1">
-              Basierend auf deinem Rang: <span className="text-amber-400 font-semibold">{user?.role ? getRoleDisplayName(user.role) : 'Unbekannt'}</span>
+              {isFreeChoice 
+                ? 'Du hast freie Klamottenwahl!' 
+                : 'Wähle eines der 5 vordefinierten Outfits'}
             </p>
           </div>
         </div>
@@ -169,69 +198,146 @@ export default function ClothingPage() {
         </CardContent>
       </Card>
 
-      {/* Clothing Template */}
-      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-        <CardHeader className="border-b border-gray-800">
-          <CardTitle className="text-white flex items-center gap-2">
-            <Shirt className="h-5 w-5 text-amber-400" />
-            Deine Kleidungsvorlage ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 space-y-4">
-          {rankClothingParts.map((part) => (
-            <div
-              key={part.part}
-              className={`rounded-xl border p-4 ${
-                part.customizable 
-                  ? 'border-green-500/30 bg-green-900/10' 
-                  : 'border-gray-700 bg-gray-800/30'
-              }`}
+      {/* Main Content */}
+      {isFreeChoice ? (
+        // Free Choice Display (Women)
+        <Card className="bg-gray-900/50 border-green-500/30 overflow-hidden">
+          <CardHeader className="border-b border-green-500/20">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-green-400" />
+              Freie Klamottenwahl
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center mb-6">
+                <Check className="h-12 w-12 text-green-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Du hast freie Klamottenwahl!</h2>
+              <p className="text-gray-400 max-w-md">
+                Als Frau kannst du deine Kleidung frei wählen. Es gibt keine vorgegebenen Outfits.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : hasOutfits && outfits.length > 0 ? (
+        // Outfit Selection (Men)
+        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+          <CardHeader className="border-b border-gray-800">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Shirt className="h-5 w-5 text-amber-400" />
+              Outfit auswählen
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Wähle eines der 5 vordefinierten Outfits aus.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 space-y-6">
+            {/* Outfit Dropdown */}
+            <Select
+              value={String(selectedOutfit)}
+              onValueChange={(val) => setSelectedOutfit(parseInt(val))}
             >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold text-white">{part.label}</h3>
-                {part.customizable && (
-                  <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-                    <Check className="h-3 w-3 mr-1" />
-                    Frei wählbar
-                  </Badge>
+              <SelectTrigger className="w-full h-16 bg-gray-800/50 border-gray-700">
+                <SelectValue>
+                  <div className="flex items-center gap-3">
+                    {currentOutfit?.imagePath ? (
+                      <img
+                        src={`${API_BASE}/uploads/outfits/${currentOutfit.imagePath}`}
+                        alt={currentOutfit.name}
+                        className="h-10 w-10 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded bg-gray-700 flex items-center justify-center">
+                        <ImageIcon className="h-5 w-5 text-gray-500" />
+                      </div>
+                    )}
+                    <span className="text-white font-medium">{currentOutfit?.name || `Outfit ${selectedOutfit}`}</span>
+                  </div>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-700">
+                {outfits.map((outfit) => (
+                  <SelectItem key={outfit.outfitNumber} value={String(outfit.outfitNumber)}>
+                    <div className="flex items-center gap-3">
+                      {outfit.imagePath ? (
+                        <img
+                          src={`${API_BASE}/uploads/outfits/${outfit.imagePath}`}
+                          alt={outfit.name}
+                          className="h-10 w-10 rounded object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded bg-gray-700 flex items-center justify-center">
+                          <ImageIcon className="h-5 w-5 text-gray-500" />
+                        </div>
+                      )}
+                      <span>{outfit.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Outfit Preview and Clothing Parts - Side by Side */}
+            <div className="flex gap-6 items-center">
+              {/* Left: Outfit Preview Image */}
+              <div className="flex-shrink-0">
+                {currentOutfit?.imagePath ? (
+                  <img
+                    src={`${API_BASE}/uploads/outfits/${currentOutfit.imagePath}`}
+                    alt={currentOutfit.name}
+                    className="w-64 h-auto rounded-xl border border-gray-700 object-cover"
+                  />
+                ) : (
+                  <div className="w-64 h-80 rounded-xl border border-gray-700 bg-gray-800/50 flex items-center justify-center">
+                    <div className="text-center">
+                      <ImageIcon className="h-16 w-16 text-gray-600 mx-auto mb-2" />
+                      <span className="text-gray-500 text-sm">Kein Bild</span>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              {part.customizable ? (
-                <div className="space-y-2">
-                  <p className="text-green-300 text-sm">
-                    Dieses Kleidungsstück ist frei wählbar!
-                  </p>
-                  {part.color !== null && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400 text-sm">Vorgabe:</span>
-                      <span className="text-white font-mono bg-gray-800 px-2 py-1 rounded">{part.color}</span>
+              {/* Right: Clothing Parts Table */}
+              <div className="flex-1 grid gap-3">
+                {outfitClothingParts.map((part, index) => (
+                  <div
+                    key={index}
+                    className="rounded-xl border border-gray-700 bg-gray-800/30 p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-white">{part.label}</h3>
+                    <div className="flex gap-4">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider">Item</p>
+                        <p className="text-lg font-mono text-white">{part.item ?? '-'}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider">Variation</p>
+                        <p className="text-lg font-mono text-white">{part.variation ?? '-'}</p>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Item</p>
-                    <p className="text-lg font-mono text-white">{part.item !== null ? part.item : '-'}</p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Variation</p>
-                    <p className="text-lg font-mono text-white">{part.variation !== null ? part.variation : '-'}</p>
                   </div>
                 </div>
-              )}
+              ))}
+              </div>
             </div>
-          ))}
 
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex items-start gap-3">
-            <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-blue-300">
-              Alle Kleidungsteile wurden von der Leitung festgelegt oder sind frei wählbar in den angegebenen Farben.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex items-start gap-3">
+              <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-300">
+                Die Outfits wurden von der Leaderschaft festgelegt. Wähle eines der 5 vordefinierten Outfits.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="bg-gray-900/50 border-gray-800">
+          <CardContent className="p-6 text-center text-gray-400">
+            Keine Kleidungsdaten verfügbar.
+          </CardContent>
+        </Card>
+      )}
 
       {/* Sicario Clothing Section */}
       {sicarioClothingParts && (
@@ -240,7 +346,7 @@ export default function ClothingPage() {
           <CardHeader className="border-b border-orange-500/20 relative">
             <CardTitle className="text-white flex items-center gap-2">
               <Shirt className="h-5 w-5 text-orange-400" />
-              Sicario Kleidung ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
+              Sicario Kleidung
             </CardTitle>
             <CardDescription className="text-orange-200/60">
               Als <span className="text-orange-400 font-semibold">Sicario</span> hast du Zugriff auf diese spezielle Kleidung.
@@ -294,7 +400,7 @@ export default function ClothingPage() {
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-start gap-3">
               <Info className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-orange-300">
-                Du kannst zwischen deiner Rang-Kleidung und der Sicario-Kleidung wählen.
+                Du kannst zwischen deinen Familien-Outfits und der Sicario-Kleidung wählen.
               </p>
             </div>
           </CardContent>

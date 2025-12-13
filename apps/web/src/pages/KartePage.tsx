@@ -152,21 +152,21 @@ const createMarkerIcon = (iconName: string, status?: FamilyContactStatus, isKeyF
   // Determine secondary badge
   let secondaryBadge = ''
   if (isKeyFamily) {
-    // Key icon for Schlüsselfamilie
+    // Key icon for Schlüsselfamilie - gold background, larger and bolder
     secondaryBadge = `
-      <g transform="translate(14, -2)">
-        <circle cx="6" cy="6" r="7" fill="#f59e0b" stroke="#1f2937" stroke-width="1.5"/>
-        <g fill="white" transform="translate(2, 2) scale(0.33)">
+      <g transform="translate(14, 0)">
+        <circle cx="8" cy="8" r="9" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+        <g fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(3, 3) scale(0.42)">
           <path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>
         </g>
       </g>
     `
   } else if (isOutdated) {
-    // Clock icon for veraltet
+    // Clock icon for veraltet - RED background, larger and bolder
     secondaryBadge = `
-      <g transform="translate(14, -2)">
-        <circle cx="6" cy="6" r="7" fill="#f97316" stroke="#1f2937" stroke-width="1.5"/>
-        <g fill="none" stroke="white" stroke-width="1.5" transform="translate(2, 2) scale(0.33)">
+      <g transform="translate(14, 0)">
+        <circle cx="8" cy="8" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+        <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(3, 3) scale(0.42)">
           <circle cx="12" cy="12" r="10"/>
           <polyline points="12,6 12,12 16,14"/>
         </g>
@@ -175,7 +175,7 @@ const createMarkerIcon = (iconName: string, status?: FamilyContactStatus, isKeyF
   }
   
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${secondaryBadge ? '28' : '24'} 24" width="${secondaryBadge ? '28' : '20'}" height="20">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${secondaryBadge ? '32' : '24'} 24" width="${secondaryBadge ? '32' : '20'}" height="24" style="overflow: visible;">
       <circle cx="12" cy="12" r="11" fill="${statusColor}" stroke="#1f2937" stroke-width="2"/>
       <g fill="white" transform="translate(5, 5) scale(0.58)">
         ${getIconPath(iconName)}
@@ -187,9 +187,9 @@ const createMarkerIcon = (iconName: string, status?: FamilyContactStatus, isKeyF
   return L.divIcon({
     html: iconSvg,
     className: 'custom-marker-icon',
-    iconSize: [secondaryBadge ? 28 : 20, 20],
-    iconAnchor: [10, 10],
-    popupAnchor: [0, -10],
+    iconSize: [secondaryBadge ? 32 : 20, 24],
+    iconAnchor: [10, 12],
+    popupAnchor: [0, -12],
   })
 }
 
@@ -780,7 +780,7 @@ export default function KartePage() {
                               {annotation.familyContact.isOutdated && (
                                 <span 
                                   className="px-2 py-0.5 rounded-full text-xs font-medium"
-                                  style={{ backgroundColor: '#f9731620', color: '#f97316' }}
+                                  style={{ backgroundColor: '#ef444420', color: '#ef4444' }}
                                   title="Information veraltet"
                                 >
                                   ⏰

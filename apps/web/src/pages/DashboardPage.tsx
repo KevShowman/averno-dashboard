@@ -94,6 +94,7 @@ export default function DashboardPage() {
     { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, desc: 'Touren-Tracking' },
     { key: 'aufstellungen', name: 'Aufstellungen', icon: CalendarCheck, desc: 'Termine & Teilnahme' },
     { key: 'abmeldungen', name: 'Abmeldungen', icon: CalendarDays, desc: 'Abwesenheiten' },
+    { key: 'anwesenheit', name: 'Anwesenheitsliste', icon: Calendar, desc: 'Tägliche Aktivität' },
     // Sicario (nur für Sicarios + Leadership)
     ...((isSicario || isLeadership) ? [{ key: 'sicario', name: 'Sicario Bereich', icon: Crosshair, desc: 'Spezialeinheit' }] : []),
     // Mitglieder

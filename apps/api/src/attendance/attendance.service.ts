@@ -92,19 +92,24 @@ export class AttendanceService {
     // Erstelle Map für schnellen Zugriff
     const attendanceMap = new Map<string, Set<string>>();
     attendances.forEach(a => {
-      const dateKey = a.date.toISOString().split('T')[0];
-      const key = `${a.userId}-${dateKey}`;
+      // Format date without UTC conversion
+      const d = new Date(a.date);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       if (!attendanceMap.has(a.userId)) {
         attendanceMap.set(a.userId, new Set());
       }
       attendanceMap.get(a.userId)!.add(dateKey);
     });
     
-    // Generiere Tage der Woche
+    // Generiere Tage der Woche (ohne UTC-Konvertierung)
     const days: string[] = [];
     const currentDate = new Date(startDate);
     while (currentDate <= endDate) {
-      days.push(currentDate.toISOString().split('T')[0]);
+      // Format as YYYY-MM-DD without UTC conversion
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      days.push(`${year}-${month}-${day}`);
       currentDate.setDate(currentDate.getDate() + 1);
     }
     
@@ -118,10 +123,14 @@ export class AttendanceService {
       totalDays: attendanceMap.get(user.id)?.size || 0,
     }));
     
+    // Helper function for local date formatting
+    const formatLocalDate = (d: Date) => 
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
     return {
       week: weekString,
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: formatLocalDate(startDate),
+      endDate: formatLocalDate(endDate),
       days,
       users: userAttendance,
     };
@@ -250,10 +259,14 @@ export class AttendanceService {
     
     const inactive = allUsers.map(u => ({ user: u, count: 0 }));
     
+    // Helper function for local date formatting
+    const formatLocalDate = (d: Date) => 
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
     return {
       period: {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatLocalDate(startDate),
+        endDate: formatLocalDate(endDate),
         weeks,
       },
       topActive: stats.slice(0, 10),
@@ -355,6 +368,218 @@ export class AttendanceService {
     const onejan = new Date(now.getFullYear(), 0, 1);
     const week = Math.ceil(((now.getTime() - onejan.getTime()) / 86400000 + onejan.getDay() + 1) / 7);
     return `${now.getFullYear()}-W${week.toString().padStart(2, '0')}`;
+  }
+
+  // Detaillierte Statistiken mit Blood-In Daten
+  async getDetailedStats() {
+    // GLOBAL START DATE - Tracking began on this date
+    const TRACKING_START_DATE = new Date('2025-12-13');
+    TRACKING_START_DATE.setHours(0, 0, 0, 0);
+
+    // Hole alle aktiven User
+    const users = await this.prisma.user.findMany({
+      where: {
+        role: { notIn: ['FUTURO', 'GAST'] },
+      },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        role: true,
+        avatarUrl: true,
+      },
+    });
+
+    // Hole alle Blood Records (aktiv)
+    const bloodRecords = await this.prisma.bloodRecord.findMany({
+      where: { status: 'ACTIVE' },
+      select: {
+        vorname: true,
+        nachname: true,
+        bloodinTimestamp: true,
+      },
+    });
+
+    // Hole ALLE Anwesenheiten
+    const allAttendances = await this.prisma.dailyAttendance.findMany({
+      select: {
+        userId: true,
+        date: true,
+      },
+    });
+
+    // Zähle Anwesenheiten pro User
+    const attendanceCountMap = new Map<string, number>();
+    const userAttendanceDates = new Map<string, Date[]>();
+    
+    allAttendances.forEach(a => {
+      attendanceCountMap.set(a.userId, (attendanceCountMap.get(a.userId) || 0) + 1);
+      if (!userAttendanceDates.has(a.userId)) {
+        userAttendanceDates.set(a.userId, []);
+      }
+      userAttendanceDates.get(a.userId)!.push(a.date);
+    });
+
+    // Berechne Statistiken pro User
+    const now = new Date();
+    const userStats = users.map(user => {
+      // Finde Blood Record für diesen User (case-insensitive name matching)
+      const bloodRecord = bloodRecords.find(br => 
+        br.vorname?.toLowerCase() === user.icFirstName?.toLowerCase() &&
+        br.nachname?.toLowerCase() === user.icLastName?.toLowerCase()
+      );
+
+      const bloodInDate = bloodRecord?.bloodinTimestamp || null;
+      const totalAttendance = attendanceCountMap.get(user.id) || 0;
+      const attendanceDates = userAttendanceDates.get(user.id) || [];
+
+      // Berechne Tage seit Tracking-Start (nicht vor TRACKING_START_DATE)
+      let daysSinceTrackingOrBloodIn = 0;
+      let attendancePercentage = 0;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Determine effective start date
+      let effectiveStartDate = TRACKING_START_DATE;
+      
+      if (bloodInDate) {
+        const bloodInDay = new Date(bloodInDate);
+        bloodInDay.setHours(0, 0, 0, 0);
+        
+        // Use the LATER of blood-in date or tracking start date
+        if (bloodInDay > TRACKING_START_DATE) {
+          effectiveStartDate = bloodInDay;
+        }
+      }
+      
+      // Calculate days from effective start date
+      daysSinceTrackingOrBloodIn = Math.floor((today.getTime() - effectiveStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 to include today
+      
+      // Only count attendance AFTER effective start date
+      const validAttendances = attendanceDates.filter(d => {
+        const attendanceDate = new Date(d);
+        attendanceDate.setHours(0, 0, 0, 0);
+        return attendanceDate >= effectiveStartDate;
+      }).length;
+      
+      // Calculate percentage based on valid tracking period
+      if (daysSinceTrackingOrBloodIn > 0) {
+        attendancePercentage = Math.round((validAttendances / daysSinceTrackingOrBloodIn) * 100);
+      }
+
+      // Berechne aktuelle Streak
+      let currentStreak = 0;
+      if (attendanceDates.length > 0) {
+        const sortedDates = attendanceDates
+          .map(d => new Date(d))
+          .sort((a, b) => b.getTime() - a.getTime());
+        
+        let checkDate = new Date(today);
+        for (const date of sortedDates) {
+          const d = new Date(date);
+          d.setHours(0, 0, 0, 0);
+          
+          if (d.getTime() === checkDate.getTime()) {
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          } else if (d.getTime() < checkDate.getTime()) {
+            break;
+          }
+        }
+      }
+
+      // Berechne letzte 7 Tage (but not before tracking start)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+      const effectiveSevenDaysAgo = sevenDaysAgo > TRACKING_START_DATE ? sevenDaysAgo : TRACKING_START_DATE;
+      const last7DaysCount = attendanceDates.filter(d => {
+        const date = new Date(d);
+        date.setHours(0, 0, 0, 0);
+        return date >= effectiveSevenDaysAgo;
+      }).length;
+      
+      // Calculate actual days in last 7 days period (capped at tracking start)
+      const actualLast7Days = Math.min(7, Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+      // Berechne letzte 30 Tage (but not before tracking start)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      thirtyDaysAgo.setHours(0, 0, 0, 0);
+      const effectiveThirtyDaysAgo = thirtyDaysAgo > TRACKING_START_DATE ? thirtyDaysAgo : TRACKING_START_DATE;
+      const last30DaysCount = attendanceDates.filter(d => {
+        const date = new Date(d);
+        date.setHours(0, 0, 0, 0);
+        return date >= effectiveThirtyDaysAgo;
+      }).length;
+      
+      // Calculate actual days in last 30 days period (capped at tracking start)
+      const actualLast30Days = Math.min(30, Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+      return {
+        user,
+        bloodInDate,
+        daysSinceBloodIn: daysSinceTrackingOrBloodIn,
+        totalAttendance: validAttendances, // Only count valid attendances
+        attendancePercentage: Math.min(attendancePercentage, 100), // Cap at 100%
+        currentStreak,
+        last7Days: last7DaysCount,
+        last30Days: last30DaysCount,
+        last7DaysPercentage: actualLast7Days > 0 ? Math.round((last7DaysCount / actualLast7Days) * 100) : 0,
+        last30DaysPercentage: actualLast30Days > 0 ? Math.round((last30DaysCount / actualLast30Days) * 100) : 0,
+        actualLast7Days,
+        actualLast30Days,
+      };
+    });
+
+    // Sortiere nach verschiedenen Kriterien
+    const byPercentage = [...userStats]
+      .filter(s => s.bloodInDate && s.daysSinceBloodIn > 7) // Nur User mit Blood-In und mind. 7 Tage
+      .sort((a, b) => b.attendancePercentage - a.attendancePercentage);
+
+    const byStreak = [...userStats]
+      .sort((a, b) => b.currentStreak - a.currentStreak);
+
+    const byLast7Days = [...userStats]
+      .sort((a, b) => b.last7Days - a.last7Days);
+
+    const byTotal = [...userStats]
+      .sort((a, b) => b.totalAttendance - a.totalAttendance);
+
+    // Gesamt-Statistiken
+    const totalUsers = users.length;
+    const usersWithBloodIn = userStats.filter(s => s.bloodInDate).length;
+    const avgPercentage = usersWithBloodIn > 0
+      ? Math.round(userStats.filter(s => s.bloodInDate && s.daysSinceBloodIn > 7).reduce((sum, s) => sum + s.attendancePercentage, 0) / usersWithBloodIn)
+      : 0;
+    const avgLast7Days = Math.round(userStats.reduce((sum, s) => sum + s.last7Days, 0) / totalUsers * 10) / 10;
+
+    // Calculate days since tracking started
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const daysSinceTrackingStart = Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+    return {
+      userStats,
+      rankings: {
+        byPercentage: byPercentage.slice(0, 15),
+        byStreak: byStreak.slice(0, 10),
+        byLast7Days: byLast7Days.slice(0, 10),
+        byTotal: byTotal.slice(0, 10),
+        lowestPercentage: byPercentage.slice(-10).reverse(),
+      },
+      overview: {
+        totalUsers,
+        usersWithBloodIn,
+        avgPercentage,
+        avgLast7Days,
+        totalAttendances: allAttendances.length,
+        trackingStartDate: `${TRACKING_START_DATE.getFullYear()}-${String(TRACKING_START_DATE.getMonth() + 1).padStart(2, '0')}-${String(TRACKING_START_DATE.getDate()).padStart(2, '0')}`,
+        daysSinceTrackingStart,
+      },
+    };
   }
 }
 

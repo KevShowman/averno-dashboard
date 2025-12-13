@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -7,11 +7,31 @@ import { Label } from '../components/ui/label'
 import { Checkbox } from '../components/ui/checkbox'
 import { Badge } from '../components/ui/badge'
 import { useAuthStore } from '../stores/auth'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { toast } from 'sonner'
-import { Loader2, Shirt, Save, User, Users, Settings } from 'lucide-react'
-import { clothingApi } from '../lib/api'
+import { Loader2, Shirt, Save, Settings, Upload, Image as ImageIcon, User, Crosshair } from 'lucide-react'
+import { api } from '../lib/api'
 
-type Gender = 'MALE' | 'FEMALE'
+interface MaleOutfit {
+  id: string
+  outfitNumber: number
+  name: string
+  imagePath?: string
+  maskItem?: number | null
+  maskVariation?: number | null
+  torsoItem?: number | null
+  torsoVariation?: number | null
+  tshirtItem?: number | null
+  tshirtVariation?: number | null
+  vesteItem?: number | null
+  vesteVariation?: number | null
+  hoseItem?: number | null
+  hoseVariation?: number | null
+  schuheItem?: number | null
+  schuheVariation?: number | null
+  rucksackItem?: number | null
+  rucksackVariation?: number | null
+}
 
 interface ClothingItemData {
   item: number | null
@@ -20,160 +40,168 @@ interface ClothingItemData {
   color: string | null
 }
 
-interface ClothingTemplate {
-  rankGroup: string
-  mask: { male: ClothingItemData; female: ClothingItemData }
-  torso: { male: ClothingItemData; female: ClothingItemData }
-  tshirt: { male: ClothingItemData; female: ClothingItemData }
-  vest: { male: ClothingItemData; female: ClothingItemData }
-  pants: { male: ClothingItemData; female: ClothingItemData }
-  shoes: { male: ClothingItemData; female: ClothingItemData }
-  backpack: { male: ClothingItemData; female: ClothingItemData }
-}
-
-const rankGroups = [
-  { id: '1-3', label: 'Ränge 1-3', sublabel: 'El Novato, El Protector, El Confidente' },
-  { id: '4-6', label: 'Ränge 4-6', sublabel: 'El Prefecto, Soldado, El Teniente' },
-  { id: '7-9', label: 'Ränge 7-9', sublabel: 'El Encargado, El Mentor, El Custodio' },
-  { id: 'EL_PATRON', label: 'El Patrón', sublabel: 'Leitung' },
-  { id: 'DON_CAPITAN', label: 'Don - El Capitán', sublabel: 'Leitung' },
-  { id: 'DON_COMANDANTE', label: 'Don - El Comandante', sublabel: 'Leitung' },
-  { id: 'EL_MANO_DERECHA', label: 'El Mano Derecha', sublabel: 'Leitung' },
-  { id: 'SICARIO', label: 'Sicario', sublabel: 'Funktionsrolle' },
-]
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const clothingParts = [
-  { id: 'mask', label: 'Maske' },
-  { id: 'torso', label: 'Torso' },
-  { id: 'tshirt', label: 'T-Shirt' },
-  { id: 'vest', label: 'Weste' },
-  { id: 'pants', label: 'Hose' },
-  { id: 'shoes', label: 'Schuhe' },
-  { id: 'backpack', label: 'Rucksack' },
+  { id: 'mask', label: 'Maske', itemKey: 'maskItem', varKey: 'maskVariation' },
+  { id: 'torso', label: 'Torso', itemKey: 'torsoItem', varKey: 'torsoVariation' },
+  { id: 'tshirt', label: 'T-Shirt', itemKey: 'tshirtItem', varKey: 'tshirtVariation' },
+  { id: 'veste', label: 'Weste', itemKey: 'vesteItem', varKey: 'vesteVariation' },
+  { id: 'hose', label: 'Hose', itemKey: 'hoseItem', varKey: 'hoseVariation' },
+  { id: 'schuhe', label: 'Schuhe', itemKey: 'schuheItem', varKey: 'schuheVariation' },
+  { id: 'rucksack', label: 'Rucksack', itemKey: 'rucksackItem', varKey: 'rucksackVariation' },
 ]
-
-const emptyItem = (): ClothingItemData => ({
-  item: null,
-  variation: null,
-  customizable: false,
-  color: null,
-})
-
-const emptyTemplate = (): ClothingTemplate => ({
-  rankGroup: '',
-  mask: { male: emptyItem(), female: emptyItem() },
-  torso: { male: emptyItem(), female: emptyItem() },
-  tshirt: { male: emptyItem(), female: emptyItem() },
-  vest: { male: emptyItem(), female: emptyItem() },
-  pants: { male: emptyItem(), female: emptyItem() },
-  shoes: { male: emptyItem(), female: emptyItem() },
-  backpack: { male: emptyItem(), female: emptyItem() },
-})
 
 export default function ClothingManagementPage() {
   const { user } = useAuthStore()
+  usePageTitle('Kleidungsverwaltung')
   const queryClient = useQueryClient()
-  const [selectedRankGroup, setSelectedRankGroup] = useState<string>('1-3')
-  const [selectedGender, setSelectedGender] = useState<Gender>('MALE')
-  const [template, setTemplate] = useState<ClothingTemplate>(emptyTemplate())
+  const [activeTab, setActiveTab] = useState<'outfits' | 'sicario'>('outfits')
+  const [selectedOutfit, setSelectedOutfit] = useState<number>(1)
+  const [outfitForm, setOutfitForm] = useState<Partial<MaleOutfit>>({})
+  const [sicarioForm, setSicarioForm] = useState<Record<string, ClothingItemData>>({})
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { data: loadedTemplate, isLoading } = useQuery({
-    queryKey: ['clothing-template', selectedRankGroup],
-    queryFn: () => clothingApi.getTemplate(selectedRankGroup),
-    enabled: !!selectedRankGroup,
+  // Fetch male outfits
+  const { data: outfits = [], isLoading: outfitsLoading } = useQuery<MaleOutfit[]>({
+    queryKey: ['male-outfits'],
+    queryFn: () => api.get('/clothing/male-outfits').then(res => res.data),
   })
 
-  useEffect(() => {
-    if (loadedTemplate) {
-      setTemplate({
-        rankGroup: selectedRankGroup,
-        mask: {
-          male: { item: loadedTemplate.maskItemMale, variation: loadedTemplate.maskVariationMale, customizable: loadedTemplate.maskCustomizableMale, color: loadedTemplate.maskColorMale },
-          female: { item: loadedTemplate.maskItemFemale, variation: loadedTemplate.maskVariationFemale, customizable: loadedTemplate.maskCustomizableFemale, color: loadedTemplate.maskColorFemale },
-        },
-        torso: {
-          male: { item: loadedTemplate.torsoItemMale, variation: loadedTemplate.torsoVariationMale, customizable: loadedTemplate.torsoCustomizableMale, color: loadedTemplate.torsoColorMale },
-          female: { item: loadedTemplate.torsoItemFemale, variation: loadedTemplate.torsoVariationFemale, customizable: loadedTemplate.torsoCustomizableFemale, color: loadedTemplate.torsoColorFemale },
-        },
-        tshirt: {
-          male: { item: loadedTemplate.tshirtItemMale, variation: loadedTemplate.tshirtVariationMale, customizable: loadedTemplate.tshirtCustomizableMale, color: loadedTemplate.tshirtColorMale },
-          female: { item: loadedTemplate.tshirtItemFemale, variation: loadedTemplate.tshirtVariationFemale, customizable: loadedTemplate.tshirtCustomizableFemale, color: loadedTemplate.tshirtColorFemale },
-        },
-        vest: {
-          male: { item: loadedTemplate.vesteItemMale, variation: loadedTemplate.vesteVariationMale, customizable: loadedTemplate.vesteCustomizableMale, color: loadedTemplate.vesteColorMale },
-          female: { item: loadedTemplate.vesteItemFemale, variation: loadedTemplate.vesteVariationFemale, customizable: loadedTemplate.vesteCustomizableFemale, color: loadedTemplate.vesteColorFemale },
-        },
-        pants: {
-          male: { item: loadedTemplate.hoseItemMale, variation: loadedTemplate.hoseVariationMale, customizable: loadedTemplate.hoseCustomizableMale, color: loadedTemplate.hoseColorMale },
-          female: { item: loadedTemplate.hoseItemFemale, variation: loadedTemplate.hoseVariationFemale, customizable: loadedTemplate.hoseCustomizableFemale, color: loadedTemplate.hoseColorFemale },
-        },
-        shoes: {
-          male: { item: loadedTemplate.schuheItemMale, variation: loadedTemplate.schuheVariationMale, customizable: loadedTemplate.schuheCustomizableMale, color: loadedTemplate.schuheColorMale },
-          female: { item: loadedTemplate.schuheItemFemale, variation: loadedTemplate.schuheVariationFemale, customizable: loadedTemplate.schuheCustomizableFemale, color: loadedTemplate.schuheColorFemale },
-        },
-        backpack: {
-          male: { item: loadedTemplate.rucksackItemMale, variation: loadedTemplate.rucksackVariationMale, customizable: loadedTemplate.rucksackCustomizableMale, color: loadedTemplate.rucksackColorMale },
-          female: { item: loadedTemplate.rucksackItemFemale, variation: loadedTemplate.rucksackVariationFemale, customizable: loadedTemplate.rucksackCustomizableFemale, color: loadedTemplate.rucksackColorFemale },
-        },
-      })
-    } else {
-      setTemplate({ ...emptyTemplate(), rankGroup: selectedRankGroup })
-    }
-  }, [loadedTemplate, selectedRankGroup])
+  // Fetch sicario template
+  const { data: sicarioTemplate, isLoading: sicarioLoading } = useQuery({
+    queryKey: ['clothing-template', 'SICARIO'],
+    queryFn: () => api.get('/clothing/templates/SICARIO').then(res => res.data),
+  })
 
-  const saveMutation = useMutation({
-    mutationFn: async (data: ClothingTemplate) => {
-      return clothingApi.saveTemplate(data.rankGroup, {
-        maskItemMale: data.mask.male.item, maskVariationMale: data.mask.male.variation, maskCustomizableMale: data.mask.male.customizable, maskColorMale: data.mask.male.color,
-        maskItemFemale: data.mask.female.item, maskVariationFemale: data.mask.female.variation, maskCustomizableFemale: data.mask.female.customizable, maskColorFemale: data.mask.female.color,
-        torsoItemMale: data.torso.male.item, torsoVariationMale: data.torso.male.variation, torsoCustomizableMale: data.torso.male.customizable, torsoColorMale: data.torso.male.color,
-        torsoItemFemale: data.torso.female.item, torsoVariationFemale: data.torso.female.variation, torsoCustomizableFemale: data.torso.female.customizable, torsoColorFemale: data.torso.female.color,
-        tshirtItemMale: data.tshirt.male.item, tshirtVariationMale: data.tshirt.male.variation, tshirtCustomizableMale: data.tshirt.male.customizable, tshirtColorMale: data.tshirt.male.color,
-        tshirtItemFemale: data.tshirt.female.item, tshirtVariationFemale: data.tshirt.female.variation, tshirtCustomizableFemale: data.tshirt.female.customizable, tshirtColorFemale: data.tshirt.female.color,
-        vesteItemMale: data.vest.male.item, vesteVariationMale: data.vest.male.variation, vesteCustomizableMale: data.vest.male.customizable, vesteColorMale: data.vest.male.color,
-        vesteItemFemale: data.vest.female.item, vesteVariationFemale: data.vest.female.variation, vesteCustomizableFemale: data.vest.female.customizable, vesteColorFemale: data.vest.female.color,
-        hoseItemMale: data.pants.male.item, hoseVariationMale: data.pants.male.variation, hoseCustomizableMale: data.pants.male.customizable, hoseColorMale: data.pants.male.color,
-        hoseItemFemale: data.pants.female.item, hoseVariationFemale: data.pants.female.variation, hoseCustomizableFemale: data.pants.female.customizable, hoseColorFemale: data.pants.female.color,
-        schuheItemMale: data.shoes.male.item, schuheVariationMale: data.shoes.male.variation, schuheCustomizableMale: data.shoes.male.customizable, schuheColorMale: data.shoes.male.color,
-        schuheItemFemale: data.shoes.female.item, schuheVariationFemale: data.shoes.female.variation, schuheCustomizableFemale: data.shoes.female.customizable, schuheColorFemale: data.shoes.female.color,
-        rucksackItemMale: data.backpack.male.item, rucksackVariationMale: data.backpack.male.variation, rucksackCustomizableMale: data.backpack.male.customizable, rucksackColorMale: data.backpack.male.color,
-        rucksackItemFemale: data.backpack.female.item, rucksackVariationFemale: data.backpack.female.variation, rucksackCustomizableFemale: data.backpack.female.customizable, rucksackColorFemale: data.backpack.female.color,
+  // Get current outfit
+  const currentOutfit = outfits.find(o => o.outfitNumber === selectedOutfit)
+
+  // Update outfit mutation
+  const updateOutfitMutation = useMutation({
+    mutationFn: async ({ outfitNumber, data }: { outfitNumber: number; data: Partial<MaleOutfit> }) => {
+      return api.put(`/clothing/male-outfits/${outfitNumber}`, data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['male-outfits'] })
+      toast.success('Outfit erfolgreich gespeichert!')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Speichern')
+    },
+  })
+
+  // Upload image mutation
+  const uploadImageMutation = useMutation({
+    mutationFn: async ({ outfitNumber, file }: { outfitNumber: number; file: File }) => {
+      const formData = new FormData()
+      formData.append('image', file)
+      return api.post(`/clothing/male-outfits/${outfitNumber}/image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clothing-template', selectedRankGroup] })
-      toast.success('Kleidungsvorlage erfolgreich gespeichert!')
+      queryClient.invalidateQueries({ queryKey: ['male-outfits'] })
+      toast.success('Bild erfolgreich hochgeladen!')
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Speichern der Vorlage')
+      toast.error(error.response?.data?.message || 'Fehler beim Hochladen')
     },
   })
 
-  const handleSave = () => {
-    saveMutation.mutate(template)
+  // Save sicario template mutation
+  const saveSicarioMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return api.post('/clothing/templates/SICARIO', data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clothing-template', 'SICARIO'] })
+      toast.success('Sicario-Kleidung erfolgreich gespeichert!')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Speichern')
+    },
+  })
+
+  const handleOutfitChange = (field: string, value: any) => {
+    setOutfitForm(prev => ({ ...prev, [field]: value }))
   }
 
-  const updateClothingPart = (
-    part: keyof Omit<ClothingTemplate, 'rankGroup'>,
-    gender: Gender,
-    field: keyof ClothingItemData,
-    value: any
-  ) => {
-    setTemplate((prev) => ({
-      ...prev,
-      [part]: {
-        ...prev[part],
-        [gender.toLowerCase()]: {
-          ...prev[part][gender.toLowerCase() as 'male' | 'female'],
-          [field]: value,
-        },
-      },
-    }))
+  const handleSaveOutfit = () => {
+    updateOutfitMutation.mutate({
+      outfitNumber: selectedOutfit,
+      data: outfitForm,
+    })
   }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      uploadImageMutation.mutate({ outfitNumber: selectedOutfit, file })
+    }
+  }
+
+  const handleSaveSicario = () => {
+    const data: any = {}
+    
+    clothingParts.forEach(part => {
+      const partData = sicarioForm[part.id] || {}
+      data[`${part.id}ItemMale`] = partData.item
+      data[`${part.id}VariationMale`] = partData.variation
+      data[`${part.id}CustomizableMale`] = partData.customizable || false
+      data[`${part.id}ColorMale`] = partData.color
+      // Für Frauen ist es frei wählbar, also setzen wir customizable auf true
+      data[`${part.id}ItemFemale`] = null
+      data[`${part.id}VariationFemale`] = null
+      data[`${part.id}CustomizableFemale`] = true
+      data[`${part.id}ColorFemale`] = null
+    })
+    
+    saveSicarioMutation.mutate(data)
+  }
+
+  // Initialize sicario form when data loads
+  useState(() => {
+    if (sicarioTemplate) {
+      const form: Record<string, ClothingItemData> = {}
+      clothingParts.forEach(part => {
+        form[part.id] = {
+          item: sicarioTemplate[`${part.id}ItemMale`] ?? null,
+          variation: sicarioTemplate[`${part.id}VariationMale`] ?? null,
+          customizable: sicarioTemplate[`${part.id}CustomizableMale`] ?? false,
+          color: sicarioTemplate[`${part.id}ColorMale`] ?? null,
+        }
+      })
+      setSicarioForm(form)
+    }
+  })
+
+  // Initialize outfit form when outfit changes
+  useState(() => {
+    if (currentOutfit) {
+      setOutfitForm({
+        name: currentOutfit.name,
+        maskItem: currentOutfit.maskItem,
+        maskVariation: currentOutfit.maskVariation,
+        torsoItem: currentOutfit.torsoItem,
+        torsoVariation: currentOutfit.torsoVariation,
+        tshirtItem: currentOutfit.tshirtItem,
+        tshirtVariation: currentOutfit.tshirtVariation,
+        vesteItem: currentOutfit.vesteItem,
+        vesteVariation: currentOutfit.vesteVariation,
+        hoseItem: currentOutfit.hoseItem,
+        hoseVariation: currentOutfit.hoseVariation,
+        schuheItem: currentOutfit.schuheItem,
+        schuheVariation: currentOutfit.schuheVariation,
+        rucksackItem: currentOutfit.rucksackItem,
+        rucksackVariation: currentOutfit.rucksackVariation,
+      })
+    }
+  })
 
   return (
     <div className="space-y-6">
-      {/* Header - Gold Theme */}
+      {/* Header */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
         <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
         <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -185,197 +213,369 @@ export default function ClothingManagementPage() {
           <div>
             <h1 className="text-3xl font-bold text-white">Kleidungsverwaltung</h1>
             <p className="text-gray-400 mt-1">
-              Kleidungsvorlagen für verschiedene Ranggruppen
+              Verwalte die 5 Männer-Outfits und Sicario-Kleidung
             </p>
           </div>
         </div>
       </div>
 
-      {/* Rank Group Selector */}
+      {/* Tab Selector */}
       <Card className="bg-gray-900/50 border-gray-800">
-        <CardHeader className="border-b border-gray-800">
-          <CardTitle className="text-white flex items-center gap-2">
-            <Shirt className="h-5 w-5 text-amber-400" />
-            Ranggruppe auswählen
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {rankGroups.map((group) => (
-              <Button
-                key={group.id}
-                variant={selectedRankGroup === group.id ? 'default' : 'outline'}
-                onClick={() => setSelectedRankGroup(group.id)}
-                className={`h-auto py-3 flex flex-col items-start text-left ${
-                  selectedRankGroup === group.id 
-                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900' 
-                    : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'
-                }`}
-              >
-                <span className="font-medium">{group.label}</span>
-                <span className="text-xs opacity-70">{group.sublabel}</span>
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Gender Selector */}
-      <Card className="bg-gray-900/50 border-gray-800">
-        <CardHeader className="border-b border-gray-800">
-          <CardTitle className="text-white">Geschlecht auswählen</CardTitle>
-        </CardHeader>
         <CardContent className="p-4">
           <div className="flex gap-3">
             <button
-              onClick={() => setSelectedGender('MALE')}
+              onClick={() => setActiveTab('outfits')}
               className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
-                selectedGender === 'MALE' 
+                activeTab === 'outfits'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
                   : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
               <User className="mr-2 h-4 w-4" />
-              Männlich
+              Männer Outfits (5)
             </button>
             <button
-              onClick={() => setSelectedGender('FEMALE')}
+              onClick={() => setActiveTab('sicario')}
               className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
-                selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
+                activeTab === 'sicario'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-gray-900 shadow-lg shadow-orange-500/25' 
                   : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
-              <Users className="mr-2 h-4 w-4" />
-              Weiblich
+              <Crosshair className="mr-2 h-4 w-4" />
+              Sicario Kleidung
             </button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Clothing Configuration */}
-      {isLoading ? (
-        <Card className="bg-gray-900/50 border-gray-800">
-          <CardContent className="flex items-center justify-center py-16">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-              <p className="text-gray-400">Lade Vorlage...</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-          <CardHeader className="border-b border-gray-800">
-            <CardTitle className="text-white">
-              Kleidung für {rankGroups.find((g) => g.id === selectedRankGroup)?.label} ({selectedGender === 'MALE' ? 'Männlich' : 'Weiblich'})
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Legen Sie für jeden Kleidungsteil die Item-ID, Variation und ob es anpassbar ist fest.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 space-y-6">
-            {clothingParts.map((part) => {
-              const partKey = part.id as keyof Omit<ClothingTemplate, 'rankGroup'>
-              const partData = template[partKey][selectedGender.toLowerCase() as 'male' | 'female']
-
-              return (
-                <div key={part.id} className="space-y-4 border-b border-gray-800 pb-6 last:border-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white">{part.label}</h3>
-                    {partData.customizable && (
-                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Anpassbar</Badge>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-gray-300 text-sm">Item</Label>
-                      <Input
-                        type="number"
-                        placeholder="z.B. 1"
-                        value={partData.item ?? ''}
-                        onChange={(e) =>
-                          updateClothingPart(partKey, selectedGender, 'item', e.target.value ? parseInt(e.target.value) : null)
+      {/* Male Outfits Tab */}
+      {activeTab === 'outfits' && (
+        <>
+          {/* Outfit Selector */}
+          <Card className="bg-gray-900/50 border-gray-800">
+            <CardHeader className="border-b border-gray-800">
+              <CardTitle className="text-white flex items-center gap-2">
+                <Shirt className="h-5 w-5 text-amber-400" />
+                Outfit auswählen
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-5 gap-3">
+                {[1, 2, 3, 4, 5].map((num) => {
+                  const outfit = outfits.find(o => o.outfitNumber === num)
+                  return (
+                    <button
+                      key={num}
+                      onClick={() => {
+                        setSelectedOutfit(num)
+                        if (outfit) {
+                          setOutfitForm({
+                            name: outfit.name,
+                            maskItem: outfit.maskItem,
+                            maskVariation: outfit.maskVariation,
+                            torsoItem: outfit.torsoItem,
+                            torsoVariation: outfit.torsoVariation,
+                            tshirtItem: outfit.tshirtItem,
+                            tshirtVariation: outfit.tshirtVariation,
+                            vesteItem: outfit.vesteItem,
+                            vesteVariation: outfit.vesteVariation,
+                            hoseItem: outfit.hoseItem,
+                            hoseVariation: outfit.hoseVariation,
+                            schuheItem: outfit.schuheItem,
+                            schuheVariation: outfit.schuheVariation,
+                            rucksackItem: outfit.rucksackItem,
+                            rucksackVariation: outfit.rucksackVariation,
+                          })
                         }
-                        disabled={partData.customizable}
-                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-gray-300 text-sm">Variation</Label>
-                      <Input
-                        type="number"
-                        placeholder="z.B. 0"
-                        value={partData.variation ?? ''}
-                        onChange={(e) =>
-                          updateClothingPart(partKey, selectedGender, 'variation', e.target.value ? parseInt(e.target.value) : null)
-                        }
-                        disabled={partData.customizable}
-                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-gray-300 text-sm">Farbname</Label>
-                      <Input
-                        type="text"
-                        placeholder="z.B. schwarz"
-                        value={partData.color ?? ''}
-                        onChange={(e) =>
-                          updateClothingPart(partKey, selectedGender, 'color', e.target.value || null)
-                        }
-                        disabled={!partData.customizable}
-                        className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
-                      />
-                    </div>
-                    <div className="flex items-end">
-                      <div className="flex items-center space-x-2 h-10">
-                        <Checkbox
-                          id={`${part.id}-customizable`}
-                          checked={partData.customizable}
-                          onCheckedChange={(checked) => {
-                            updateClothingPart(partKey, selectedGender, 'customizable', checked === true)
-                            if (checked === true) {
-                              updateClothingPart(partKey, selectedGender, 'item', null)
-                              updateClothingPart(partKey, selectedGender, 'variation', null)
-                            }
-                          }}
+                      }}
+                      className={`p-4 rounded-xl border transition-all ${
+                        selectedOutfit === num
+                          ? 'border-amber-500 bg-amber-500/10'
+                          : 'border-gray-700 bg-gray-800/30 hover:border-gray-600'
+                      }`}
+                    >
+                      {outfit?.imagePath ? (
+                        <img
+                          src={`${API_BASE}/uploads/outfits/${outfit.imagePath}`}
+                          alt={outfit.name}
+                          className="w-full h-20 object-cover rounded-lg mb-2"
                         />
-                        <Label htmlFor={`${part.id}-customizable`} className="text-sm text-gray-300 cursor-pointer">
-                          Anpassbar
-                        </Label>
+                      ) : (
+                        <div className="w-full h-20 bg-gray-700/50 rounded-lg mb-2 flex items-center justify-center">
+                          <ImageIcon className="h-8 w-8 text-gray-500" />
+                        </div>
+                      )}
+                      <p className="text-white font-medium text-sm truncate">
+                        {outfit?.name || `Outfit ${num}`}
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Outfit Editor */}
+          {outfitsLoading ? (
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardContent className="flex items-center justify-center py-16">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+                  <p className="text-gray-400">Lade Outfits...</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
+              <CardHeader className="border-b border-gray-800">
+                <CardTitle className="text-white">
+                  Outfit {selectedOutfit} bearbeiten
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Lege für jedes Kleidungsstück die Item-ID und Variation fest.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 space-y-6">
+                {/* Name & Image */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Outfit Name</Label>
+                    <Input
+                      type="text"
+                      placeholder="z.B. Business Casual"
+                      value={outfitForm.name || ''}
+                      onChange={(e) => handleOutfitChange('name', e.target.value)}
+                      className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Outfit Bild</Label>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadImageMutation.isPending}
+                        className="border-gray-700 hover:bg-gray-800"
+                      >
+                        {uploadImageMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Upload className="h-4 w-4 mr-2" />
+                        )}
+                        Bild hochladen
+                      </Button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      {currentOutfit?.imagePath && (
+                        <img
+                          src={`${API_BASE}/uploads/outfits/${currentOutfit.imagePath}`}
+                          alt="Preview"
+                          className="h-10 w-10 rounded object-cover"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Clothing Parts */}
+                {clothingParts.map((part) => (
+                  <div key={part.id} className="space-y-4 border-b border-gray-800 pb-6 last:border-0">
+                    <h3 className="text-lg font-semibold text-white">{part.label}</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-gray-300 text-sm">Item</Label>
+                        <Input
+                          type="number"
+                          placeholder="z.B. 1"
+                          value={outfitForm[part.itemKey as keyof MaleOutfit] ?? ''}
+                          onChange={(e) => handleOutfitChange(part.itemKey, e.target.value ? parseInt(e.target.value) : null)}
+                          className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-gray-300 text-sm">Variation</Label>
+                        <Input
+                          type="number"
+                          placeholder="z.B. 0"
+                          value={outfitForm[part.varKey as keyof MaleOutfit] ?? ''}
+                          onChange={(e) => handleOutfitChange(part.varKey, e.target.value ? parseInt(e.target.value) : null)}
+                          className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
+                        />
                       </div>
                     </div>
                   </div>
-                  {partData.customizable && (
-                    <p className="text-sm text-blue-400">
-                      ℹ️ Bei "Anpassbar" wird KEINE Item/Variation vorgegeben. Benutzer können das Teil frei wählen.
-                    </p>
-                  )}
-                </div>
-              )
-            })}
+                ))}
 
-            <div className="flex justify-end pt-4">
-              <Button
-                onClick={handleSave}
-                disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 h-11 px-6"
-              >
-                {saveMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Speichern...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Vorlage speichern
-                  </>
-                )}
-              </Button>
-            </div>
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSaveOutfit}
+                    disabled={updateOutfitMutation.isPending}
+                    className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 h-11 px-6"
+                  >
+                    {updateOutfitMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Speichern...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Outfit speichern
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Sicario Tab */}
+      {activeTab === 'sicario' && (
+        <Card className="bg-gray-900/50 border-orange-500/30 overflow-hidden">
+          <CardHeader className="border-b border-orange-500/20">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Crosshair className="h-5 w-5 text-orange-400" />
+              Sicario Kleidung (Männlich)
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Lege die spezielle Sicario-Kleidung fest. Frauen haben automatisch freie Wahl.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 space-y-6">
+            {sicarioLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+              </div>
+            ) : (
+              <>
+                {clothingParts.map((part) => {
+                  const partData = sicarioForm[part.id] || { item: null, variation: null, customizable: false, color: null }
+                  
+                  return (
+                    <div key={part.id} className="space-y-4 border-b border-gray-800 pb-6 last:border-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-white">{part.label}</h3>
+                        {partData.customizable && (
+                          <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Anpassbar</Badge>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-gray-300 text-sm">Item</Label>
+                          <Input
+                            type="number"
+                            placeholder="z.B. 1"
+                            value={partData.item ?? ''}
+                            onChange={(e) => setSicarioForm(prev => ({
+                              ...prev,
+                              [part.id]: { ...partData, item: e.target.value ? parseInt(e.target.value) : null }
+                            }))}
+                            disabled={partData.customizable}
+                            className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-orange-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-gray-300 text-sm">Variation</Label>
+                          <Input
+                            type="number"
+                            placeholder="z.B. 0"
+                            value={partData.variation ?? ''}
+                            onChange={(e) => setSicarioForm(prev => ({
+                              ...prev,
+                              [part.id]: { ...partData, variation: e.target.value ? parseInt(e.target.value) : null }
+                            }))}
+                            disabled={partData.customizable}
+                            className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-orange-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-gray-300 text-sm">Farbname</Label>
+                          <Input
+                            type="text"
+                            placeholder="z.B. schwarz"
+                            value={partData.color ?? ''}
+                            onChange={(e) => setSicarioForm(prev => ({
+                              ...prev,
+                              [part.id]: { ...partData, color: e.target.value || null }
+                            }))}
+                            disabled={!partData.customizable}
+                            className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-orange-500"
+                          />
+                        </div>
+                        <div className="flex items-end">
+                          <div className="flex items-center space-x-2 h-10">
+                            <Checkbox
+                              id={`sicario-${part.id}-customizable`}
+                              checked={partData.customizable}
+                              onCheckedChange={(checked) => {
+                                setSicarioForm(prev => ({
+                                  ...prev,
+                                  [part.id]: {
+                                    ...partData,
+                                    customizable: checked === true,
+                                    item: checked ? null : partData.item,
+                                    variation: checked ? null : partData.variation,
+                                  }
+                                }))
+                              }}
+                            />
+                            <Label htmlFor={`sicario-${part.id}-customizable`} className="text-sm text-gray-300 cursor-pointer">
+                              Anpassbar
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSaveSicario}
+                    disabled={saveSicarioMutation.isPending}
+                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white h-11 px-6"
+                  >
+                    {saveSicarioMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Speichern...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Sicario-Kleidung speichern
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       )}
+
+      {/* Info Box */}
+      <Card className="bg-blue-500/10 border-blue-500/30">
+        <CardContent className="p-4 flex items-start gap-3">
+          <Shirt className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-300">
+            <p className="font-medium mb-1">Hinweis zum neuen Kleidungssystem:</p>
+            <ul className="list-disc list-inside space-y-1 text-blue-200/80">
+              <li><strong>Männer</strong> wählen eines der 5 vordefinierten Outfits</li>
+              <li><strong>Frauen</strong> haben automatisch freie Klamottenwahl</li>
+              <li><strong>Sicarios</strong> haben zusätzlich Zugriff auf die spezielle Sicario-Kleidung</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

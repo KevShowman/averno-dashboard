@@ -29,6 +29,12 @@ export class AttendanceController {
     return this.attendanceService.getStats(weeksNum);
   }
 
+  // Detaillierte Statistiken mit Blood-In Daten
+  @Get('detailed-stats')
+  async getDetailedStats() {
+    return this.attendanceService.getDetailedStats();
+  }
+
   // Berechtigungen abrufen
   @Get('permissions')
   async getPermissions() {

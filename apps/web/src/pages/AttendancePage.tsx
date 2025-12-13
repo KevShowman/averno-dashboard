@@ -32,6 +32,12 @@ import {
   Check,
   Search,
   AlertCircle,
+  BarChart3,
+  Flame,
+  Target,
+  Award,
+  Percent,
+  CalendarDays,
 } from 'lucide-react'
 import { Input } from '../components/ui/input'
 
@@ -93,17 +99,54 @@ const getDateFromWeekString = (weekString: string): Date => {
 // Tag-Namen
 const DAY_NAMES = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
+interface UserStat {
+  user: User
+  bloodInDate: string | null
+  daysSinceBloodIn: number
+  totalAttendance: number
+  attendancePercentage: number
+  currentStreak: number
+  last7Days: number
+  last30Days: number
+  last7DaysPercentage: number
+  last30DaysPercentage: number
+  actualLast7Days: number
+  actualLast30Days: number
+}
+
+interface DetailedStats {
+  userStats: UserStat[]
+  rankings: {
+    byPercentage: UserStat[]
+    byStreak: UserStat[]
+    byLast7Days: UserStat[]
+    byTotal: UserStat[]
+    lowestPercentage: UserStat[]
+  }
+  overview: {
+    totalUsers: number
+    usersWithBloodIn: number
+    avgPercentage: number
+    avgLast7Days: number
+    totalAttendances: number
+    trackingStartDate: string
+    daysSinceTrackingStart: number
+  }
+}
+
 export default function AttendancePage() {
   const { user } = useAuthStore()
   usePageTitle('Anwesenheitsliste')
   const queryClient = useQueryClient()
 
+  const [activeTab, setActiveTab] = useState<'weekly' | 'statistics'>('weekly')
   const [currentWeek, setCurrentWeek] = useState(getWeekString(new Date()))
-  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set())
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  // Selected cells: Set of "userId:date" strings
+  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set())
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [statsSearchTerm, setStatsSearchTerm] = useState('')
   const [confirmAction, setConfirmAction] = useState<'add' | 'remove'>('add')
 
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
@@ -124,6 +167,13 @@ export default function AttendancePage() {
   const { data: statsData } = useQuery({
     queryKey: ['attendance-stats'],
     queryFn: () => api.get('/attendance/stats?weeks=4').then(res => res.data),
+  })
+
+  // Fetch detailed stats
+  const { data: detailedStats, isLoading: detailedStatsLoading } = useQuery<DetailedStats>({
+    queryKey: ['attendance-detailed-stats'],
+    queryFn: () => api.get('/attendance/detailed-stats').then(res => res.data),
+    enabled: activeTab === 'statistics',
   })
 
   // Fetch permissions (for settings)
@@ -149,9 +199,7 @@ export default function AttendancePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attendance'] })
       queryClient.invalidateQueries({ queryKey: ['attendance-stats'] })
-      toast.success('Anwesenheit eingetragen')
-      setSelectedUsers(new Set())
-      setIsConfirmDialogOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['attendance-detailed-stats'] })
     },
     onError: () => {
       toast.error('Fehler beim Eintragen')
@@ -165,9 +213,7 @@ export default function AttendancePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attendance'] })
       queryClient.invalidateQueries({ queryKey: ['attendance-stats'] })
-      toast.success('Anwesenheit entfernt')
-      setSelectedUsers(new Set())
-      setIsConfirmDialogOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['attendance-detailed-stats'] })
     },
     onError: () => {
       toast.error('Fehler beim Entfernen')
@@ -229,43 +275,97 @@ export default function AttendancePage() {
     setCurrentWeek(getWeekString(new Date()))
   }
 
+  // Helper to create cell key
+  const getCellKey = (userId: string, date: string) => `${userId}:${date}`
+  const parseCellKey = (key: string) => {
+    const [userId, date] = key.split(':')
+    return { userId, date }
+  }
+
+  // Check if cell is selected
+  const isCellSelected = (userId: string, date: string) => selectedCells.has(getCellKey(userId, date))
+
   // Handle cell click
   const handleCellClick = (userId: string, date: string, isPresent: boolean) => {
     if (!canMark) return
     
-    setSelectedDate(date)
-    setConfirmAction(isPresent ? 'remove' : 'add')
+    const cellKey = getCellKey(userId, date)
+    const newSelected = new Set(selectedCells)
     
-    const newSelected = new Set(selectedUsers)
-    if (newSelected.has(userId)) {
-      newSelected.delete(userId)
+    if (newSelected.has(cellKey)) {
+      // Deselect this cell
+      newSelected.delete(cellKey)
     } else {
-      newSelected.add(userId)
+      // Select this cell - check if we're mixing add/remove actions
+      const currentAction = isPresent ? 'remove' : 'add'
+      
+      // If we have existing selections, check if action matches
+      if (newSelected.size > 0) {
+        const firstKey = Array.from(newSelected)[0]
+        const { userId: firstUserId, date: firstDate } = parseCellKey(firstKey)
+        const firstUser = weekData?.users.find(u => u.user.id === firstUserId)
+        const firstIsPresent = firstUser?.attendance[firstDate] || false
+        const firstAction = firstIsPresent ? 'remove' : 'add'
+        
+        if (currentAction !== firstAction) {
+          // Different action - start new selection
+          newSelected.clear()
+          setConfirmAction(currentAction)
+        }
+      } else {
+        setConfirmAction(currentAction)
+      }
+      
+      newSelected.add(cellKey)
     }
-    setSelectedUsers(newSelected)
+    
+    setSelectedCells(newSelected)
   }
 
-  // Handle confirm
-  const handleConfirm = () => {
-    if (!selectedDate || selectedUsers.size === 0) return
+  // Handle confirm - process all selected cells
+  const handleConfirm = async () => {
+    if (selectedCells.size === 0) return
     
-    if (confirmAction === 'add') {
-      markMutation.mutate({
-        userIds: Array.from(selectedUsers),
-        date: selectedDate,
-      })
-    } else {
-      removeMutation.mutate({
-        userIds: Array.from(selectedUsers),
-        date: selectedDate,
-      })
+    // Group selections by date
+    const byDate = new Map<string, string[]>()
+    selectedCells.forEach(cellKey => {
+      const { userId, date } = parseCellKey(cellKey)
+      if (!byDate.has(date)) {
+        byDate.set(date, [])
+      }
+      byDate.get(date)!.push(userId)
+    })
+    
+    try {
+      // Process each date
+      if (confirmAction === 'add') {
+        for (const [date, userIds] of byDate) {
+          await markMutation.mutateAsync({ userIds, date })
+        }
+        toast.success(`${selectedCells.size} Anwesenheit(en) eingetragen`)
+      } else {
+        for (const [date, userIds] of byDate) {
+          await removeMutation.mutateAsync({ userIds, date })
+        }
+        toast.success(`${selectedCells.size} Anwesenheit(en) entfernt`)
+      }
+      
+      setSelectedCells(new Set())
+      setIsConfirmDialogOpen(false)
+    } catch {
+      // Error already handled by mutation
     }
+  }
+
+  // Clear selection
+  const clearSelection = () => {
+    setSelectedCells(new Set())
   }
 
   // Open confirm dialog
   const openConfirmDialog = () => {
-    if (selectedUsers.size === 0 || !selectedDate) {
-      toast.error('Wähle mindestens einen User und ein Datum aus')
+    if (selectedCells.size === 0) {
+      toast.error('Wähle mindestens eine Zelle aus')
       return
     }
     setIsConfirmDialogOpen(true)
@@ -319,6 +419,36 @@ export default function AttendancePage() {
         </div>
       </div>
 
+      {/* Tab Switcher */}
+      <div className="flex gap-2 p-1 bg-gray-900/50 rounded-xl border border-gray-800 w-fit">
+        <Button
+          onClick={() => setActiveTab('weekly')}
+          variant="ghost"
+          className={`px-6 py-2 rounded-lg transition-all ${
+            activeTab === 'weekly'
+              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+          }`}
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Wochenansicht
+        </Button>
+        <Button
+          onClick={() => setActiveTab('statistics')}
+          variant="ghost"
+          className={`px-6 py-2 rounded-lg transition-all ${
+            activeTab === 'statistics'
+              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+          }`}
+        >
+          <BarChart3 className="h-4 w-4 mr-2" />
+          Statistiken
+        </Button>
+      </div>
+
+      {activeTab === 'weekly' && (
+      <>
       {/* Week Navigation */}
       <Card className="bg-gray-900/50 border-gray-800">
         <CardContent className="p-4">
@@ -378,14 +508,10 @@ export default function AttendancePage() {
                       className="pl-9 w-48 bg-gray-800/50 border-gray-700"
                     />
                   </div>
-                  {canMark && selectedUsers.size > 0 && selectedDate && (
-                    <Button
-                      onClick={openConfirmDialog}
-                      className="bg-cyan-600 hover:bg-cyan-700"
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      {selectedUsers.size} Bestätigen
-                    </Button>
+                  {canMark && selectedCells.size > 0 && (
+                    <span className="text-cyan-400 text-sm font-medium">
+                      {selectedCells.size} ausgewählt
+                    </span>
                   )}
                 </div>
               </div>
@@ -403,12 +529,18 @@ export default function AttendancePage() {
                         <th className="text-left p-3 text-gray-400 font-medium sticky left-0 bg-gray-900/95 z-10">
                           Mitglied
                         </th>
-                        {weekData.days.map((day, index) => (
-                          <th key={day} className="p-3 text-center text-gray-400 font-medium min-w-[60px]">
-                            <div>{DAY_NAMES[index]}</div>
-                            <div className="text-xs">{formatDate(day)}</div>
-                          </th>
-                        ))}
+                        {weekData.days.map((day) => {
+                          // Get actual day of week from the date
+                          const date = new Date(day + 'T12:00:00') // Use noon to avoid timezone issues
+                          const dayOfWeek = date.getDay() // 0 = Sunday, 1 = Monday, ...
+                          const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Convert to Monday = 0
+                          return (
+                            <th key={day} className="p-3 text-center text-gray-400 font-medium min-w-[60px]">
+                              <div>{DAY_NAMES[dayIndex]}</div>
+                              <div className="text-xs">{formatDate(day)}</div>
+                            </th>
+                          )
+                        })}
                         <th className="p-3 text-center text-gray-400 font-medium">
                           Σ
                         </th>
@@ -437,23 +569,33 @@ export default function AttendancePage() {
                           </td>
                           {weekData.days.map((day) => {
                             const isPresent = ua.attendance[day]
-                            const isSelected = selectedUsers.has(ua.user.id) && selectedDate === day
+                            const isSelected = isCellSelected(ua.user.id, day)
+                            const isSelectedForRemoval = isSelected && isPresent
+                            const isSelectedForAdd = isSelected && !isPresent
                             return (
                               <td key={day} className="p-3 text-center">
                                 <button
                                   onClick={() => handleCellClick(ua.user.id, day, isPresent)}
                                   disabled={!canMark}
                                   className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                                    isSelected
-                                      ? 'bg-cyan-500 text-white ring-2 ring-cyan-400'
-                                      : isPresent
-                                        ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                                        : canMark
-                                          ? 'bg-gray-800/50 text-gray-600 hover:bg-gray-700/50 hover:text-gray-400'
-                                          : 'bg-gray-800/30 text-gray-700'
+                                    isSelectedForRemoval
+                                      ? 'bg-red-500 text-white ring-2 ring-red-400 ring-offset-1 ring-offset-gray-900'
+                                      : isSelectedForAdd
+                                        ? 'bg-cyan-500 text-white ring-2 ring-cyan-400 ring-offset-1 ring-offset-gray-900'
+                                        : isPresent
+                                          ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                                          : canMark
+                                            ? 'bg-gray-800/50 text-gray-600 hover:bg-gray-700/50 hover:text-gray-400'
+                                            : 'bg-gray-800/30 text-gray-700'
                                   }`}
                                 >
-                                  {isPresent ? <Check className="h-4 w-4" /> : null}
+                                  {isSelectedForRemoval ? (
+                                    <UserX className="h-4 w-4" />
+                                  ) : isSelectedForAdd ? (
+                                    <Check className="h-4 w-4" />
+                                  ) : isPresent ? (
+                                    <Check className="h-4 w-4" />
+                                  ) : null}
                                 </button>
                               </td>
                             )
@@ -482,6 +624,38 @@ export default function AttendancePage() {
               <span className="text-yellow-300 text-sm">
                 Du hast keine Berechtigung, Anwesenheiten einzutragen. Kontaktiere die Leaderschaft.
               </span>
+            </div>
+          )}
+
+          {/* Floating Action Bar */}
+          {selectedCells.size > 0 && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+              <div className="bg-gray-900 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 px-6 py-3 flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                    <Check className="h-4 w-4 text-cyan-400" />
+                  </div>
+                  <span className="text-white font-medium">{selectedCells.size} ausgewählt</span>
+                </div>
+                <div className="w-px h-8 bg-gray-700" />
+                <Button
+                  onClick={clearSelection}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-white"
+                >
+                  Abbrechen
+                </Button>
+                <Button
+                  onClick={openConfirmDialog}
+                  size="sm"
+                  className={confirmAction === 'add' 
+                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white' 
+                    : 'bg-red-600 hover:bg-red-700 text-white'}
+                >
+                  {confirmAction === 'add' ? 'Anwesenheit eintragen' : 'Entfernen'}
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -551,6 +725,400 @@ export default function AttendancePage() {
           </Card>
         </div>
       </div>
+      </>
+      )}
+
+      {/* Statistics Tab */}
+      {activeTab === 'statistics' && (
+        <div className="space-y-6">
+          {detailedStatsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin h-8 w-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+            </div>
+          ) : detailedStats ? (
+            <>
+              {/* Tracking Info Banner */}
+              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-4 flex items-center gap-3">
+                <Calendar className="h-5 w-5 text-cyan-400" />
+                <div>
+                  <span className="text-cyan-300 text-sm">
+                    Tracking seit <span className="font-bold">13.12.2025</span> • {detailedStats.overview.daysSinceTrackingStart} Tag(e) erfasst
+                  </span>
+                </div>
+              </div>
+
+              {/* Overview Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardContent className="p-4 text-center">
+                    <Users className="h-6 w-6 text-cyan-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">{detailedStats.overview.totalUsers}</div>
+                    <div className="text-sm text-gray-400">Gesamt Mitglieder</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardContent className="p-4 text-center">
+                    <CalendarDays className="h-6 w-6 text-green-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">{detailedStats.overview.totalAttendances}</div>
+                    <div className="text-sm text-gray-400">Anwesenheiten Total</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardContent className="p-4 text-center">
+                    <Percent className="h-6 w-6 text-amber-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">{detailedStats.overview.avgPercentage}%</div>
+                    <div className="text-sm text-gray-400">Ø Anwesenheit</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardContent className="p-4 text-center">
+                    <Target className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">{detailedStats.overview.avgLast7Days}</div>
+                    <div className="text-sm text-gray-400">Ø Tage (letzte 7)</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardContent className="p-4 text-center">
+                    <Award className="h-6 w-6 text-rose-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">{detailedStats.overview.usersWithBloodIn}</div>
+                    <div className="text-sm text-gray-400">Mit Blood-In</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Rankings Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Top by Percentage */}
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-white flex items-center gap-2 text-lg">
+                      <TrendingUp className="h-5 w-5 text-green-400" />
+                      Beste Anwesenheitsquote
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Basierend auf Tagen seit Blood-In (min. 7 Tage)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {detailedStats.rankings.byPercentage.slice(0, 10).map((stat, index) => (
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            index === 0 ? 'bg-amber-500 text-black' :
+                            index === 1 ? 'bg-gray-300 text-black' :
+                            index === 2 ? 'bg-amber-700 text-white' :
+                            'bg-gray-700 text-gray-300'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          {stat.user.avatarUrl ? (
+                            <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                              {(stat.user.icFirstName || stat.user.username).charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-white text-sm font-medium">
+                              {stat.user.icFirstName && stat.user.icLastName
+                                ? `${stat.user.icFirstName} ${stat.user.icLastName}`
+                                : stat.user.username}
+                            </div>
+                            <div className="text-gray-500 text-xs">
+                              {stat.totalAttendance} von {stat.daysSinceBloodIn} Tagen
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-lg font-bold ${
+                            stat.attendancePercentage >= 70 ? 'text-green-400' :
+                            stat.attendancePercentage >= 40 ? 'text-amber-400' :
+                            'text-red-400'
+                          }`}>
+                            {stat.attendancePercentage}%
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {detailedStats.rankings.byPercentage.length === 0 && (
+                      <p className="text-gray-500 text-sm text-center py-4">Keine Daten verfügbar</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Lowest Percentage */}
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-white flex items-center gap-2 text-lg">
+                      <TrendingDown className="h-5 w-5 text-red-400" />
+                      Niedrigste Anwesenheitsquote
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Mitglieder mit Verbesserungspotenzial
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {detailedStats.rankings.lowestPercentage.slice(0, 10).map((stat, index) => (
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-red-900/50 text-red-300">
+                            {index + 1}
+                          </div>
+                          {stat.user.avatarUrl ? (
+                            <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                              {(stat.user.icFirstName || stat.user.username).charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-white text-sm font-medium">
+                              {stat.user.icFirstName && stat.user.icLastName
+                                ? `${stat.user.icFirstName} ${stat.user.icLastName}`
+                                : stat.user.username}
+                            </div>
+                            <div className="text-gray-500 text-xs">
+                              {stat.totalAttendance} von {stat.daysSinceBloodIn} Tagen
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-lg font-bold ${
+                            stat.attendancePercentage >= 70 ? 'text-green-400' :
+                            stat.attendancePercentage >= 40 ? 'text-amber-400' :
+                            'text-red-400'
+                          }`}>
+                            {stat.attendancePercentage}%
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {detailedStats.rankings.lowestPercentage.length === 0 && (
+                      <p className="text-gray-500 text-sm text-center py-4">Keine Daten verfügbar</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Top Streaks */}
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-white flex items-center gap-2 text-lg">
+                      <Flame className="h-5 w-5 text-orange-400" />
+                      Aktuelle Streaks
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Aufeinanderfolgende aktive Tage
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {detailedStats.rankings.byStreak.filter(s => s.currentStreak > 0).slice(0, 10).map((stat, index) => (
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            index === 0 ? 'bg-orange-500 text-black' :
+                            index === 1 ? 'bg-orange-400 text-black' :
+                            index === 2 ? 'bg-orange-300 text-black' :
+                            'bg-gray-700 text-gray-300'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          {stat.user.avatarUrl ? (
+                            <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                              {(stat.user.icFirstName || stat.user.username).charAt(0)}
+                            </div>
+                          )}
+                          <div className="text-white text-sm font-medium">
+                            {stat.user.icFirstName && stat.user.icLastName
+                              ? `${stat.user.icFirstName} ${stat.user.icLastName}`
+                              : stat.user.username}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-orange-400">
+                          <Flame className="h-4 w-4" />
+                          <span className="text-lg font-bold">{stat.currentStreak}</span>
+                          <span className="text-sm text-gray-400">Tage</span>
+                        </div>
+                      </div>
+                    ))}
+                    {detailedStats.rankings.byStreak.filter(s => s.currentStreak > 0).length === 0 && (
+                      <p className="text-gray-500 text-sm text-center py-4">Keine aktiven Streaks</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Recent Days */}
+                <Card className="bg-gray-900/50 border-gray-800">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-white flex items-center gap-2 text-lg">
+                      <Calendar className="h-5 w-5 text-cyan-400" />
+                      Letzte {detailedStats.userStats[0]?.actualLast7Days || 7} Tage
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Aktivste Mitglieder seit Tracking-Start
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {detailedStats.rankings.byLast7Days.slice(0, 10).map((stat, index) => (
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            index === 0 ? 'bg-cyan-500 text-black' :
+                            index === 1 ? 'bg-cyan-400 text-black' :
+                            index === 2 ? 'bg-cyan-300 text-black' :
+                            'bg-gray-700 text-gray-300'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          {stat.user.avatarUrl ? (
+                            <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                              {(stat.user.icFirstName || stat.user.username).charAt(0)}
+                            </div>
+                          )}
+                          <div className="text-white text-sm font-medium">
+                            {stat.user.icFirstName && stat.user.icLastName
+                              ? `${stat.user.icFirstName} ${stat.user.icLastName}`
+                              : stat.user.username}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-cyan-400">{stat.last7Days}/{stat.actualLast7Days}</div>
+                          <div className="text-xs text-gray-500">{stat.last7DaysPercentage}%</div>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* All Users Table */}
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Users className="h-5 w-5 text-cyan-400" />
+                        Alle Mitglieder Übersicht
+                      </CardTitle>
+                      <CardDescription className="text-gray-400">
+                        Detaillierte Statistiken aller Mitglieder
+                      </CardDescription>
+                    </div>
+                    <div className="relative w-64">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Input
+                        placeholder="Suchen..."
+                        value={statsSearchTerm}
+                        onChange={(e) => setStatsSearchTerm(e.target.value)}
+                        className="pl-9 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
+                      />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-800">
+                          <th className="text-left text-gray-400 text-sm font-medium py-3 px-2">Mitglied</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Blood-In</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Tage</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Anwesend</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Quote</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Streak</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">7 Tage</th>
+                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">30 Tage</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {detailedStats.userStats
+                          .filter(stat => {
+                            if (!statsSearchTerm) return true
+                            const name = stat.user.icFirstName && stat.user.icLastName
+                              ? `${stat.user.icFirstName} ${stat.user.icLastName}`
+                              : stat.user.username
+                            return name.toLowerCase().includes(statsSearchTerm.toLowerCase())
+                          })
+                          .sort((a, b) => b.attendancePercentage - a.attendancePercentage)
+                          .map((stat) => (
+                            <tr key={stat.user.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
+                              <td className="py-3 px-2">
+                                <div className="flex items-center gap-2">
+                                  {stat.user.avatarUrl ? (
+                                    <img src={stat.user.avatarUrl} alt="" className="h-7 w-7 rounded-full" />
+                                  ) : (
+                                    <div className="h-7 w-7 rounded-full bg-gray-700 flex items-center justify-center text-xs">
+                                      {(stat.user.icFirstName || stat.user.username).charAt(0)}
+                                    </div>
+                                  )}
+                                  <span className="text-white text-sm">
+                                    {stat.user.icFirstName && stat.user.icLastName
+                                      ? `${stat.user.icFirstName} ${stat.user.icLastName}`
+                                      : stat.user.username}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-2 text-center">
+                                {stat.bloodInDate ? (
+                                  <span className="text-gray-300 text-sm">
+                                    {new Date(stat.bloodInDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-600 text-sm">-</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-2 text-center text-gray-300 text-sm">
+                                {stat.daysSinceBloodIn || '-'}
+                              </td>
+                              <td className="py-3 px-2 text-center text-white font-medium text-sm">
+                                {stat.totalAttendance}
+                              </td>
+                              <td className="py-3 px-2 text-center">
+                                <span className={`font-bold text-sm ${
+                                  stat.attendancePercentage >= 70 ? 'text-green-400' :
+                                  stat.attendancePercentage >= 40 ? 'text-amber-400' :
+                                  stat.attendancePercentage > 0 ? 'text-red-400' :
+                                  'text-gray-600'
+                                }`}>
+                                  {stat.bloodInDate ? `${stat.attendancePercentage}%` : '-'}
+                                </span>
+                              </td>
+                              <td className="py-3 px-2 text-center">
+                                {stat.currentStreak > 0 ? (
+                                  <span className="inline-flex items-center gap-1 text-orange-400 text-sm">
+                                    <Flame className="h-3 w-3" />
+                                    {stat.currentStreak}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-600 text-sm">-</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-2 text-center">
+                                <span className={`text-sm ${stat.last7DaysPercentage >= 70 ? 'text-green-400' : stat.last7DaysPercentage >= 40 ? 'text-amber-400' : 'text-gray-400'}`}>
+                                  {stat.last7Days}/{stat.actualLast7Days}
+                                </span>
+                              </td>
+                              <td className="py-3 px-2 text-center">
+                                <span className={`text-sm ${stat.last30DaysPercentage >= 70 ? 'text-green-400' : stat.last30DaysPercentage >= 40 ? 'text-amber-400' : 'text-gray-400'}`}>
+                                  {stat.last30Days}/{stat.actualLast30Days}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-400">Fehler beim Laden der Statistiken</div>
+          )}
+        </div>
+      )}
 
       {/* Confirm Dialog */}
       <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
@@ -563,15 +1131,13 @@ export default function AttendancePage() {
             <DialogDescription className="text-gray-400">
               {confirmAction === 'add' ? (
                 <>
-                  Bitte bestätige, dass die ausgewählten {selectedUsers.size} Person(en) am{' '}
-                  <span className="text-white font-medium">{selectedDate ? formatDate(selectedDate) : ''}</span>{' '}
+                  Bitte bestätige, dass die ausgewählten <span className="text-white font-medium">{selectedCells.size} Einträge</span>{' '}
                   <span className="text-cyan-400 font-medium">nach 17:00 Uhr</span> für{' '}
                   <span className="text-cyan-400 font-medium">mindestens 1 Stunde</span> aktiv waren.
                 </>
               ) : (
                 <>
-                  Möchtest du die Anwesenheit von {selectedUsers.size} Person(en) am{' '}
-                  <span className="text-white font-medium">{selectedDate ? formatDate(selectedDate) : ''}</span>{' '}
+                  Möchtest du <span className="text-white font-medium">{selectedCells.size} Einträge</span>{' '}
                   entfernen?
                 </>
               )}
