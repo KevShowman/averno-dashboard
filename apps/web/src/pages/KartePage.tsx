@@ -69,6 +69,8 @@ interface FamilyContact {
   contact2LastName?: string
   contact2Phone?: string
   leadershipInfo?: string
+  isKeyFamily?: boolean
+  isOutdated?: boolean
 }
 
 interface MapAnnotation {
@@ -143,23 +145,49 @@ const statusConfig: Record<FamilyContactStatus, { label: string; color: string; 
   DISSOLVED: { label: 'Aufgelöst', color: '#ef4444', icon: XCircle },
 }
 
-// Create custom marker icon
-const createMarkerIcon = (iconName: string, status?: FamilyContactStatus) => {
+// Create custom marker icon with optional secondary badge
+const createMarkerIcon = (iconName: string, status?: FamilyContactStatus, isKeyFamily?: boolean, isOutdated?: boolean) => {
   const statusColor = status ? statusConfig[status].color : '#f59e0b'
   
+  // Determine secondary badge
+  let secondaryBadge = ''
+  if (isKeyFamily) {
+    // Key icon for Schlüsselfamilie
+    secondaryBadge = `
+      <g transform="translate(14, -2)">
+        <circle cx="6" cy="6" r="7" fill="#f59e0b" stroke="#1f2937" stroke-width="1.5"/>
+        <g fill="white" transform="translate(2, 2) scale(0.33)">
+          <path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+        </g>
+      </g>
+    `
+  } else if (isOutdated) {
+    // Clock icon for veraltet
+    secondaryBadge = `
+      <g transform="translate(14, -2)">
+        <circle cx="6" cy="6" r="7" fill="#f97316" stroke="#1f2937" stroke-width="1.5"/>
+        <g fill="none" stroke="white" stroke-width="1.5" transform="translate(2, 2) scale(0.33)">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </g>
+      </g>
+    `
+  }
+  
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${secondaryBadge ? '28' : '24'} 24" width="${secondaryBadge ? '28' : '20'}" height="20">
       <circle cx="12" cy="12" r="11" fill="${statusColor}" stroke="#1f2937" stroke-width="2"/>
       <g fill="white" transform="translate(5, 5) scale(0.58)">
         ${getIconPath(iconName)}
       </g>
+      ${secondaryBadge}
     </svg>
   `
   
   return L.divIcon({
     html: iconSvg,
     className: 'custom-marker-icon',
-    iconSize: [20, 20],
+    iconSize: [secondaryBadge ? 28 : 20, 20],
     iconAnchor: [10, 10],
     popupAnchor: [0, -10],
   })
@@ -703,7 +731,12 @@ export default function KartePage() {
                 <Marker
                   key={annotation.id}
                   position={toMapCoords(annotation.x, annotation.y)}
-                  icon={createMarkerIcon(annotation.icon, annotation.familyContact?.status)}
+                  icon={createMarkerIcon(
+                    annotation.icon, 
+                    annotation.familyContact?.status,
+                    annotation.familyContact?.isKeyFamily,
+                    annotation.familyContact?.isOutdated
+                  )}
                   eventHandlers={{
                     click: () => handleMarkerClick(annotation),
                   }}
@@ -732,17 +765,37 @@ export default function KartePage() {
                     <div className="min-w-[200px] p-2">
                       {annotation.familyContact ? (
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-2">
                             <span className="font-bold text-lg">{annotation.familyContact.familyName}</span>
-                            <span 
-                              className="px-2 py-0.5 rounded-full text-xs font-medium"
-                              style={{ 
-                                backgroundColor: `${statusConfig[annotation.familyContact.status].color}20`,
-                                color: statusConfig[annotation.familyContact.status].color
-                              }}
-                            >
-                              {statusConfig[annotation.familyContact.status].label}
-                            </span>
+                            <div className="flex items-center gap-1">
+                              {annotation.familyContact.isKeyFamily && (
+                                <span 
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  style={{ backgroundColor: '#f59e0b20', color: '#f59e0b' }}
+                                  title="Schlüsselfamilie"
+                                >
+                                  🔑
+                                </span>
+                              )}
+                              {annotation.familyContact.isOutdated && (
+                                <span 
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  style={{ backgroundColor: '#f9731620', color: '#f97316' }}
+                                  title="Information veraltet"
+                                >
+                                  ⏰
+                                </span>
+                              )}
+                              <span 
+                                className="px-2 py-0.5 rounded-full text-xs font-medium"
+                                style={{ 
+                                  backgroundColor: `${statusConfig[annotation.familyContact.status].color}20`,
+                                  color: statusConfig[annotation.familyContact.status].color
+                                }}
+                              >
+                                {statusConfig[annotation.familyContact.status].label}
+                              </span>
+                            </div>
                           </div>
                           
                           {annotation.familyContact.propertyZip && (

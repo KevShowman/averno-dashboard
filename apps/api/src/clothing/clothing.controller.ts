@@ -2,13 +2,21 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Param,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { ClothingService, ClothingTemplate } from './clothing.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import * as fs from 'fs';
 
 @Controller('clothing')
 @UseGuards(JwtAuthGuard)
@@ -136,5 +144,100 @@ export class ClothingController {
     
     const result = await this.clothingService.upsertTemplate(req.user.role, rankGroup, structuredData);
     return this.clothingService.flattenTemplate(result);
+  }
+
+  // ============ MALE OUTFITS ============
+
+  /**
+   * Holt alle 5 Männer-Outfits
+   */
+  @Get('male-outfits')
+  async getMaleOutfits() {
+    return this.clothingService.getAllMaleOutfits();
+  }
+
+  /**
+   * Holt ein einzelnes Outfit
+   */
+  @Get('male-outfits/:outfitNumber')
+  async getMaleOutfit(@Param('outfitNumber') outfitNumber: string) {
+    return this.clothingService.getMaleOutfit(parseInt(outfitNumber));
+  }
+
+  /**
+   * Aktualisiert ein Männer-Outfit (nur Leadership)
+   */
+  @Put('male-outfits/:outfitNumber')
+  async updateMaleOutfit(
+    @Request() req,
+    @Param('outfitNumber') outfitNumber: string,
+    @Body() data: {
+      name?: string;
+      maskItem?: number | null;
+      maskVariation?: number | null;
+      torsoItem?: number | null;
+      torsoVariation?: number | null;
+      tshirtItem?: number | null;
+      tshirtVariation?: number | null;
+      vesteItem?: number | null;
+      vesteVariation?: number | null;
+      hoseItem?: number | null;
+      hoseVariation?: number | null;
+      schuheItem?: number | null;
+      schuheVariation?: number | null;
+      rucksackItem?: number | null;
+      rucksackVariation?: number | null;
+    },
+  ) {
+    return this.clothingService.updateMaleOutfit(req.user.role, parseInt(outfitNumber), data);
+  }
+
+  /**
+   * Upload Bild für Outfit
+   */
+  @Post('male-outfits/:outfitNumber/image')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const uploadPath = './uploads/outfits';
+          // Erstelle Verzeichnis wenn nicht vorhanden
+          if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+          }
+          cb(null, uploadPath);
+        },
+        filename: (req, file, cb) => {
+          const outfitNumber = req.params.outfitNumber;
+          const ext = extname(file.originalname);
+          cb(null, `outfit-${outfitNumber}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          cb(new BadRequestException('Nur Bilddateien erlaubt'), false);
+        } else {
+          cb(null, true);
+        }
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+    }),
+  )
+  async uploadOutfitImage(
+    @Request() req,
+    @Param('outfitNumber') outfitNumber: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Keine Datei hochgeladen');
+    }
+    
+    return this.clothingService.updateOutfitImage(
+      req.user.role,
+      parseInt(outfitNumber),
+      file.filename,
+    );
   }
 }

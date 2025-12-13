@@ -28,6 +28,7 @@ import { CasaModule } from './casa/casa.module';
 import { SicarioModule } from './sicario/sicario.module';
 import { FamilyContactsModule } from './family-contacts/family-contacts.module';
 import { MapAnnotationsModule } from './map-annotations/map-annotations.module';
+import { AttendanceModule } from './attendance/attendance.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -69,6 +70,7 @@ import { AppService } from './app.service';
     SicarioModule,
     FamilyContactsModule,
     MapAnnotationsModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

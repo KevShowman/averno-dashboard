@@ -121,6 +121,7 @@ const navGroups: NavGroup[] = [
       { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
       { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
       { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
+      { name: 'Anwesenheitsliste', href: '/anwesenheit', icon: CalendarCheck },
     ]
   },
   {

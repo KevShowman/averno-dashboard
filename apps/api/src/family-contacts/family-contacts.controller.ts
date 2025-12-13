@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { FamilyContactsService } from './family-contacts.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -43,6 +43,7 @@ export class FamilyContactsController {
       contact2Phone?: string;
       leadershipInfo?: string;
       notes?: string;
+      isKeyFamily?: boolean;
     },
   ) {
     return this.familyContactsService.create(user, data);
@@ -64,9 +65,20 @@ export class FamilyContactsController {
       contact2Phone?: string;
       leadershipInfo?: string;
       notes?: string;
+      isKeyFamily?: boolean;
     },
   ) {
     return this.familyContactsService.update(user, id, data);
+  }
+
+  // Als veraltet markieren - für ALLE User zugänglich
+  @Patch(':id/mark-outdated')
+  markOutdated(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() data: { isOutdated: boolean },
+  ) {
+    return this.familyContactsService.markOutdated(user, id, data.isOutdated);
   }
 
   @Delete(':id')

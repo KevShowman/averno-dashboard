@@ -56,6 +56,11 @@ model User {
   sicarioAufstellungResponses   SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
   mapAnnotationsCreated         MapAnnotation[]                @relation("map_annotation_created_by")
   mapAreasCreated               MapArea[]                      @relation("map_area_created_by")
+  familyContactsOutdatedMarked  FamilyContact[]                @relation("family_contact_outdated_by")
+  dailyAttendanceMarked         DailyAttendance[]              @relation("attendance_marked_by")
+  dailyAttendanceReceived       DailyAttendance[]              @relation("attendance_user")
+  attendancePermissionsGranted  AttendancePermission[]         @relation("attendance_permission_granted_by")
+  attendancePermissionsReceived AttendancePermission[]         @relation("attendance_permission_user")
 
   @@map("users")
 }
@@ -778,6 +783,12 @@ model FamilyContact {
   // Kontaktdaten Patron / Führung
   leadershipInfo      String?             // Kann Vorname, Nachname oder Telefonnummer sein
   notes               String?             @db.Text // Zusätzliche Notizen
+  // Schlüsselfamilie & Veraltet-Status
+  isKeyFamily         Boolean             @default(false) // Offizielle Schlüsselfamilie
+  isOutdated          Boolean             @default(false) // Information veraltet
+  outdatedMarkedAt    DateTime?           // Wann als veraltet markiert
+  outdatedMarkedById  String?             // Wer hat als veraltet markiert
+  outdatedMarkedBy    User?               @relation("family_contact_outdated_by", fields: [outdatedMarkedById], references: [id])
   createdById         String
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
@@ -832,6 +843,61 @@ model MapArea {
   updatedAt       DateTime        @updatedAt
 
   @@map("map_areas")
+}
+
+// Tägliche Anwesenheitsliste
+model DailyAttendance {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date // Datum der Anwesenheit
+  userId      String   // Wer war anwesend
+  user        User     @relation("attendance_user", fields: [userId], references: [id], onDelete: Cascade)
+  markedById  String   // Wer hat die Anwesenheit eingetragen
+  markedBy    User     @relation("attendance_marked_by", fields: [markedById], references: [id])
+  markedAt    DateTime @default(now()) // Wann wurde eingetragen
+  createdAt   DateTime @default(now())
+
+  @@unique([date, userId]) // Pro Tag und User nur ein Eintrag
+  @@map("daily_attendance")
+}
+
+// Anwesenheits-Berechtigungen (wer darf Anwesenheiten eintragen)
+model AttendancePermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("attendance_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String   // Wer hat die Berechtigung erteilt
+  grantedBy   User     @relation("attendance_permission_granted_by", fields: [grantedById], references: [id])
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("attendance_permissions")
+}
+
+// Männer-Outfits (5 vordefinierte Outfits)
+model MaleOutfit {
+  id              String   @id @default(cuid())
+  outfitNumber    Int      @unique // 1-5
+  name            String   // Name des Outfits
+  imagePath       String?  // Pfad zum Bild (relativ zu /uploads/outfits/)
+  // Kleidungsstücke
+  maskItem        Int?
+  maskVariation   Int?
+  torsoItem       Int?
+  torsoVariation  Int?
+  tshirtItem      Int?
+  tshirtVariation Int?
+  vesteItem       Int?
+  vesteVariation  Int?
+  hoseItem        Int?
+  hoseVariation   Int?
+  schuheItem      Int?
+  schuheVariation Int?
+  rucksackItem    Int?
+  rucksackVariation Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("male_outfits")
 }
 
 // Discord Role Mappings

@@ -455,8 +455,8 @@ export class ClothingService {
 
   /**
    * Holt die Kleidung für einen User basierend auf Rang + Geschlecht
-   * Funktionsrollen werden ignoriert - nimmt den HÖCHSTEN Rang
-   * AUSNAHME: Sicarios erhalten BEIDE Kleidungen (Sicario + Rang)
+   * NEU: Männer bekommen 5 vordefinierte Outfits, Frauen haben freie Wahl
+   * AUSNAHME: Sicarios erhalten BEIDE Kleidungen (Sicario + Rank/Outfits)
    */
   async getUserClothing(userId: string): Promise<any> {
     // User, Rolle und Geschlecht holen
@@ -474,51 +474,37 @@ export class ClothingService {
     
     // Prüfe ob User ein Sicario ist
     const isSicario = allRoles.includes(Role.SICARIO);
-    
-    // Rang-Hierarchie (höchste zuerst)
-    const rankHierarchy = [
-      // Leaderschaft
-      Role.EL_PATRON,
-      Role.DON_CAPITAN,
-      Role.DON_COMANDANTE,
-      Role.EL_MANO_DERECHA,
-      // Ränge 7-9
-      Role.EL_CUSTODIO,
-      Role.EL_MENTOR,
-      Role.EL_ENCARGADO,
-      // Ränge 4-6
-      Role.EL_TENIENTE,
-      Role.SOLDADO,
-      Role.EL_PREFECTO,
-      // Ränge 1-3
-      Role.EL_CONFIDENTE,
-      Role.EL_PROTECTOR,
-      Role.EL_NOVATO,
-    ];
-    
-    // Finde den HÖCHSTEN Rang des Users (erste Match in Hierarchie)
-    const userRank = rankHierarchy.find(r => allRoles.includes(r)) || user.role;
 
-    // Rang-Gruppe ermitteln
-    const rankGroup = this.getRankGroup(userRank as Role);
-
-    // Template für die Rang-Gruppe holen
-    const template = await this.getTemplateByRankGroup(rankGroup);
-    const rankClothing = this.flattenTemplateForGender(template, user.gender || Gender.MALE);
-
-    // Wenn User ein Sicario ist, hole auch die Sicario-Kleidung
-    if (isSicario) {
-      const sicarioTemplate = await this.getTemplateByRankGroup('SICARIO');
-      const sicarioClothing = this.flattenTemplateForGender(sicarioTemplate, user.gender || Gender.MALE);
-      
-      return {
-        rank: rankClothing,
-        sicario: sicarioClothing,
+    // Frauen: Freie Klamottenwahl
+    if (user.gender === Gender.FEMALE) {
+      const result: any = {
+        type: 'free_choice',
+        message: 'Freie Klamottenwahl',
       };
+
+      // Wenn Sicario, füge Sicario-Kleidung hinzu
+      if (isSicario) {
+        const sicarioTemplate = await this.getTemplateByRankGroup('SICARIO');
+        result.sicario = this.flattenTemplateForGender(sicarioTemplate, Gender.FEMALE);
+      }
+
+      return result;
     }
 
-    // Geschlecht-spezifisches Template zurückgeben
-    return rankClothing;
+    // Männer: 5 vordefinierte Outfits
+    const outfits = await this.getAllMaleOutfits();
+    const result: any = {
+      type: 'outfits',
+      outfits,
+    };
+
+    // Wenn Sicario, füge Sicario-Kleidung hinzu
+    if (isSicario) {
+      const sicarioTemplate = await this.getTemplateByRankGroup('SICARIO');
+      result.sicario = this.flattenTemplateForGender(sicarioTemplate, Gender.MALE);
+    }
+
+    return result;
   }
 
   /**
@@ -598,5 +584,96 @@ export class ClothingService {
         colorFemale: template.rucksackColorFemale,
       },
     };
+  }
+
+  // ============ MALE OUTFITS ============
+
+  /**
+   * Holt alle 5 Männer-Outfits
+   */
+  async getAllMaleOutfits() {
+    const outfits = await this.prisma.maleOutfit.findMany({
+      orderBy: { outfitNumber: 'asc' },
+    });
+
+    // Wenn noch keine Outfits existieren, erstelle sie
+    if (outfits.length === 0) {
+      const created = await Promise.all(
+        [1, 2, 3, 4, 5].map((num) =>
+          this.prisma.maleOutfit.create({
+            data: {
+              outfitNumber: num,
+              name: `Outfit ${num}`,
+            },
+          })
+        )
+      );
+      return created;
+    }
+
+    return outfits;
+  }
+
+  /**
+   * Holt ein einzelnes Outfit
+   */
+  async getMaleOutfit(outfitNumber: number) {
+    const outfit = await this.prisma.maleOutfit.findUnique({
+      where: { outfitNumber },
+    });
+
+    if (!outfit) {
+      throw new NotFoundException(`Outfit ${outfitNumber} nicht gefunden`);
+    }
+
+    return outfit;
+  }
+
+  /**
+   * Aktualisiert ein Männer-Outfit (nur Leadership)
+   */
+  async updateMaleOutfit(
+    userRole: Role,
+    outfitNumber: number,
+    data: {
+      name?: string;
+      maskItem?: number | null;
+      maskVariation?: number | null;
+      torsoItem?: number | null;
+      torsoVariation?: number | null;
+      tshirtItem?: number | null;
+      tshirtVariation?: number | null;
+      vesteItem?: number | null;
+      vesteVariation?: number | null;
+      hoseItem?: number | null;
+      hoseVariation?: number | null;
+      schuheItem?: number | null;
+      schuheVariation?: number | null;
+      rucksackItem?: number | null;
+      rucksackVariation?: number | null;
+    }
+  ) {
+    if (!this.isLeadership(userRole)) {
+      throw new ForbiddenException('Nur die Leaderschaft darf Outfits bearbeiten');
+    }
+
+    return this.prisma.maleOutfit.update({
+      where: { outfitNumber },
+      data,
+    });
+  }
+
+  /**
+   * Aktualisiert das Bild für ein Outfit
+   */
+  async updateOutfitImage(userRole: Role, outfitNumber: number, filename: string) {
+    if (!this.isLeadership(userRole)) {
+      throw new ForbiddenException('Nur die Leaderschaft darf Outfit-Bilder hochladen');
+    }
+
+    return this.prisma.maleOutfit.update({
+      where: { outfitNumber },
+      data: { imagePath: filename },
+    });
   }
 }

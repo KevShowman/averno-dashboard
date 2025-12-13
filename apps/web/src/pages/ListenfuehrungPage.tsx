@@ -38,6 +38,8 @@ import {
   XCircle,
   AlertCircle,
   HelpCircle,
+  Key,
+  Clock,
 } from 'lucide-react'
 
 type FamilyContactStatus = 'UNKNOWN' | 'ACTIVE' | 'ENDANGERED' | 'DISSOLVED'
@@ -55,6 +57,15 @@ interface FamilyContact {
   contact2Phone?: string
   leadershipInfo?: string
   notes?: string
+  isKeyFamily: boolean
+  isOutdated: boolean
+  outdatedMarkedAt?: string
+  outdatedMarkedBy?: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+  }
   createdAt: string
   updatedAt: string
 }
@@ -90,6 +101,7 @@ export default function ListenfuehrungPage() {
     contact2Phone: '',
     leadershipInfo: '',
     notes: '',
+    isKeyFamily: false,
   })
 
   const canManage = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'CONTACTO'])
@@ -140,6 +152,18 @@ export default function ListenfuehrungPage() {
     },
   })
 
+  const markOutdatedMutation = useMutation({
+    mutationFn: ({ id, isOutdated }: { id: string; isOutdated: boolean }) => 
+      api.patch(`/family-contacts/${id}/mark-outdated`, { isOutdated }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['family-contacts'] })
+      toast.success('Status erfolgreich aktualisiert')
+    },
+    onError: () => {
+      toast.error('Fehler beim Aktualisieren des Status')
+    },
+  })
+
   const resetForm = () => {
     setFormData({
       familyName: '',
@@ -153,6 +177,7 @@ export default function ListenfuehrungPage() {
       contact2Phone: '',
       leadershipInfo: '',
       notes: '',
+      isKeyFamily: false,
     })
   }
 
@@ -170,6 +195,7 @@ export default function ListenfuehrungPage() {
       contact2Phone: contact.contact2Phone || '',
       leadershipInfo: contact.leadershipInfo || '',
       notes: contact.notes || '',
+      isKeyFamily: contact.isKeyFamily || false,
     })
     setIsEditDialogOpen(true)
   }
@@ -303,10 +329,22 @@ export default function ListenfuehrungPage() {
                       <Building2 className="h-5 w-5 text-amber-400" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg text-white group-hover:text-amber-300 transition-colors">
+                      <CardTitle className="text-lg text-white group-hover:text-amber-300 transition-colors flex items-center gap-2">
                         {contact.familyName}
+                        {/* Schlüsselfamilie Badge */}
+                        {contact.isKeyFamily && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Schlüsselfamilie">
+                            <Key className="h-3 w-3" />
+                          </span>
+                        )}
+                        {/* Veraltet Badge */}
+                        {contact.isOutdated && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30" title="Information veraltet">
+                            <Clock className="h-3 w-3" />
+                          </span>
+                        )}
                       </CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         {/* Status Badge */}
                         {(() => {
                           const config = statusConfig[contact.status] || statusConfig.UNKNOWN
@@ -328,26 +366,39 @@ export default function ListenfuehrungPage() {
                       </div>
                     </div>
                   </div>
-                  {canManage && (
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => openEditDialog(contact)}
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-amber-400"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => openDeleteDialog(contact)}
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-400"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    {/* Als veraltet markieren Button - für alle */}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => markOutdatedMutation.mutate({ id: contact.id, isOutdated: !contact.isOutdated })}
+                      disabled={markOutdatedMutation.isPending}
+                      className={`h-8 w-8 p-0 ${contact.isOutdated ? 'text-orange-400 hover:text-orange-300' : 'text-gray-400 hover:text-orange-400 opacity-0 group-hover:opacity-100'} transition-all`}
+                      title={contact.isOutdated ? 'Als aktuell markieren' : 'Als veraltet markieren'}
+                    >
+                      <Clock className="h-4 w-4" />
+                    </Button>
+                    {canManage && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditDialog(contact)}
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openDeleteDialog(contact)}
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -412,6 +463,19 @@ export default function ListenfuehrungPage() {
                       <span>Notizen</span>
                     </div>
                     <p className="text-gray-400 text-sm line-clamp-2">{contact.notes}</p>
+                  </div>
+                )}
+
+                {/* Veraltet-Info */}
+                {contact.isOutdated && contact.outdatedMarkedBy && (
+                  <div className="pt-2 border-t border-gray-800">
+                    <div className="flex items-center gap-2 text-xs text-orange-400/70">
+                      <Clock className="h-3 w-3" />
+                      <span>
+                        Als veraltet markiert von {contact.outdatedMarkedBy.icFirstName || contact.outdatedMarkedBy.username}
+                        {contact.outdatedMarkedAt && ` am ${new Date(contact.outdatedMarkedAt).toLocaleDateString('de-DE')}`}
+                      </span>
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -631,6 +695,29 @@ export default function ListenfuehrungPage() {
                 className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50 min-h-[80px]"
               />
             </div>
+
+            {/* Schlüsselfamilie Toggle - nur für Berechtigte */}
+            {canManage && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, isKeyFamily: !formData.isKeyFamily })}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
+                    formData.isKeyFamily
+                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+                      : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                  }`}
+                >
+                  <Key className={`h-5 w-5 ${formData.isKeyFamily ? 'text-amber-400' : 'text-gray-500'}`} />
+                  <div className="text-left">
+                    <div className="font-medium">Schlüsselfamilie</div>
+                    <div className="text-xs opacity-70">
+                      {formData.isKeyFamily ? 'Diese Familie ist als offizielle Schlüsselfamilie markiert' : 'Als offizielle Schlüsselfamilie markieren'}
+                    </div>
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

@@ -28,12 +28,32 @@ export class FamilyContactsService {
   async findAll() {
     return this.prisma.familyContact.findMany({
       orderBy: { familyName: 'asc' },
+      include: {
+        outdatedMarkedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
     });
   }
 
   async findOne(id: string) {
     const contact = await this.prisma.familyContact.findUnique({
       where: { id },
+      include: {
+        outdatedMarkedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
     });
 
     if (!contact) {
@@ -55,6 +75,7 @@ export class FamilyContactsService {
     contact2Phone?: string;
     leadershipInfo?: string;
     notes?: string;
+    isKeyFamily?: boolean;
   }) {
     if (!this.canManageContacts(user)) {
       throw new ForbiddenException('Nur Contactos und Leadership können Kontakte verwalten');
@@ -64,6 +85,16 @@ export class FamilyContactsService {
       data: {
         ...data,
         createdById: user.id,
+      },
+      include: {
+        outdatedMarkedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
       },
     });
   }
@@ -80,6 +111,7 @@ export class FamilyContactsService {
     contact2Phone?: string;
     leadershipInfo?: string;
     notes?: string;
+    isKeyFamily?: boolean;
   }) {
     if (!this.canManageContacts(user)) {
       throw new ForbiddenException('Nur Contactos und Leadership können Kontakte verwalten');
@@ -96,6 +128,46 @@ export class FamilyContactsService {
     return this.prisma.familyContact.update({
       where: { id },
       data,
+      include: {
+        outdatedMarkedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Als veraltet markieren - für ALLE User zugänglich
+  async markOutdated(user: any, id: string, isOutdated: boolean) {
+    const contact = await this.prisma.familyContact.findUnique({
+      where: { id },
+    });
+
+    if (!contact) {
+      throw new NotFoundException('Familien-Kontakt nicht gefunden');
+    }
+
+    return this.prisma.familyContact.update({
+      where: { id },
+      data: {
+        isOutdated,
+        outdatedMarkedAt: isOutdated ? new Date() : null,
+        outdatedMarkedById: isOutdated ? user.id : null,
+      },
+      include: {
+        outdatedMarkedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
     });
   }
 

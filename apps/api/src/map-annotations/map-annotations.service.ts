@@ -46,6 +46,9 @@ export class MapAnnotationsService {
             contact2LastName: true,
             contact2Phone: true,
             leadershipInfo: true,
+            isKeyFamily: true,
+            isOutdated: true,
+            outdatedMarkedAt: true,
           },
         },
         createdBy: {
@@ -246,6 +249,8 @@ export class MapAnnotationsService {
         familyName: true,
         status: true,
         propertyZip: true,
+        isKeyFamily: true,
+        isOutdated: true,
       },
       orderBy: { familyName: 'asc' },
     });

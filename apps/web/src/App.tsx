@@ -35,6 +35,7 @@ import BotschaftPage from './pages/BotschaftPage'
 import SicarioPage from './pages/SicarioPage'
 import ListenfuehrungPage from './pages/ListenfuehrungPage'
 import KartePage from './pages/KartePage'
+import AttendancePage from './pages/AttendancePage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -272,6 +273,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <KartePage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/anwesenheit" element={
+          <ProtectedRoute>
+            <Layout>
+              <AttendancePage />
             </Layout>
           </ProtectedRoute>
         } />
