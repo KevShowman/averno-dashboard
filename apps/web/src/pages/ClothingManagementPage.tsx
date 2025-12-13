@@ -40,7 +40,8 @@ interface ClothingItemData {
   color: string | null
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+// Use relative path for API - works in both dev and prod
+const API_BASE = '/api'
 
 const clothingParts = [
   { id: 'mask', label: 'Maske', itemKey: 'maskItem', varKey: 'maskVariation' },

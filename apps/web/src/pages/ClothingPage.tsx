@@ -45,7 +45,8 @@ interface ClothingDisplay {
   color: string | null
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+// Use relative path for API - works in both dev and prod
+const API_BASE = '/api'
 
 export default function ClothingPage() {
   const { user } = useAuthStore()
