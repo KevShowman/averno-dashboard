@@ -2,12 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../common/prisma/prisma.service';
 import { AufstellungResponseStatus, Role } from '@prisma/client';
 import { DiscordService } from '../discord/discord.service';
+import { AbmeldungService } from '../abmeldung/abmeldung.service';
 
 @Injectable()
 export class SicarioService {
   constructor(
     private prisma: PrismaService,
     private discordService: DiscordService,
+    private abmeldungService: AbmeldungService,
   ) {}
 
   // Alle Sicarios holen (User mit SICARIO Rolle)
@@ -105,10 +107,49 @@ export class SicarioService {
       },
     });
 
+    // Automatisch NOT_COMING für abgemeldete Sicarios setzen
+    await this.autoSetAbgemeldetResponses(aufstellung.id, date);
+
     // Discord DM an alle Sicarios senden
     await this.notifySicarios(aufstellung);
 
     return aufstellung;
+  }
+
+  // Automatisch NOT_COMING für abgemeldete Sicarios setzen
+  private async autoSetAbgemeldetResponses(aufstellungId: string, aufstellungDate: Date) {
+    const sicarios = await this.getSicarioUsers();
+
+    for (const sicario of sicarios) {
+      const isAbgemeldet = await this.abmeldungService.isUserAbgemeldet(sicario.id, aufstellungDate);
+      
+      if (isAbgemeldet) {
+        // Prüfen ob bereits eine Antwort existiert
+        const existingResponse = await this.prisma.sicarioAufstellungResponse.findUnique({
+          where: {
+            aufstellungId_userId: {
+              aufstellungId,
+              userId: sicario.id,
+            },
+          },
+        });
+
+        if (!existingResponse) {
+          await this.prisma.sicarioAufstellungResponse.create({
+            data: {
+              aufstellungId,
+              userId: sicario.id,
+              status: AufstellungResponseStatus.NOT_COMING,
+            },
+          });
+        } else if (existingResponse.status !== AufstellungResponseStatus.NOT_COMING) {
+          await this.prisma.sicarioAufstellungResponse.update({
+            where: { id: existingResponse.id },
+            data: { status: AufstellungResponseStatus.NOT_COMING },
+          });
+        }
+      }
+    }
   }
 
   // Discord DM an alle Sicarios senden

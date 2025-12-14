@@ -36,6 +36,7 @@ import SicarioPage from './pages/SicarioPage'
 import ListenfuehrungPage from './pages/ListenfuehrungPage'
 import KartePage from './pages/KartePage'
 import AttendancePage from './pages/AttendancePage'
+import SlangPage from './pages/SlangPage'
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -280,6 +281,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <AttendancePage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/slang" element={
+          <ProtectedRoute>
+            <Layout>
+              <SlangPage />
             </Layout>
           </ProtectedRoute>
         } />

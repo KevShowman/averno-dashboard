@@ -283,7 +283,8 @@ function MapClickHandler({
       e.originalEvent.preventDefault()
       e.originalEvent.stopPropagation()
       
-      if (!canEdit || isDrawingMode) return
+      // Block right-click only in drawing mode, but allow for all users (they can submit suggestions)
+      if (isDrawingMode) return
       
       // Use the known map bounds for calculation (not current view bounds)
       const boundsArray = mapBounds as [[number, number], [number, number]]
@@ -312,6 +313,17 @@ function FitBounds({ bounds }: { bounds: L.LatLngBoundsExpression }) {
       hasInitialized.current = true
     }
   }, [map, bounds])
+  
+  return null
+}
+
+// Component to capture map ref
+function MapRefSetter({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null> }) {
+  const map = useMap()
+  
+  useEffect(() => {
+    mapRef.current = map
+  }, [map, mapRef])
   
   return null
 }
@@ -353,12 +365,22 @@ export default function KartePage() {
   const [isSuggestionsPanelOpen, setIsSuggestionsPanelOpen] = useState(false)
   const [rejectNote, setRejectNote] = useState('')
   const [rejectingSuggestionId, setRejectingSuggestionId] = useState<string | null>(null)
+  const [previewSuggestion, setPreviewSuggestion] = useState<MapSuggestion | null>(null)
+  const mapRef = useRef<L.Map | null>(null)
   
   // Permission check
-  const canManage = hasRole(user, [
-    'EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA',
-    'CONTACTO', 'INTELIGENCIA'
-  ])
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isContacto = hasRole(user, ['CONTACTO'])
+  const isInteligencia = hasRole(user, ['INTELIGENCIA'])
+  const canManage = isLeadership || isContacto || isInteligencia
+  
+  // Users who can view family contact details (Leadership, Contacto, or with ListPermission)
+  const { data: listPermissions = [] } = useQuery({
+    queryKey: ['list-permissions-check'],
+    queryFn: () => api.get('/family-contacts/permissions/list').then(res => res.data),
+  })
+  const hasListPermission = listPermissions.some((p: any) => p.userId === user?.id)
+  const canViewContactDetails = isLeadership || isContacto || hasListPermission
   
   // Fetch annotations for current map
   const { data: annotations = [], isLoading } = useQuery({
@@ -509,6 +531,7 @@ export default function KartePage() {
       queryClient.invalidateQueries({ queryKey: ['map-annotations'] })
       queryClient.invalidateQueries({ queryKey: ['map-suggestions'] })
       queryClient.invalidateQueries({ queryKey: ['map-suggestions-count'] })
+      setPreviewSuggestion(null)
       toast.success('Vorschlag genehmigt und Markierung erstellt')
     },
     onError: () => {
@@ -524,6 +547,7 @@ export default function KartePage() {
       queryClient.invalidateQueries({ queryKey: ['map-suggestions-count'] })
       setRejectingSuggestionId(null)
       setRejectNote('')
+      setPreviewSuggestion(null)
       toast.success('Vorschlag abgelehnt')
     },
     onError: () => {
@@ -632,6 +656,25 @@ export default function KartePage() {
   const toMapCoords = (x: number, y: number): [number, number] => {
     return [mapHeight - (y * mapHeight), x * mapWidth]
   }
+
+  // Preview a suggestion by focusing on its location
+  const handlePreviewSuggestion = (suggestion: MapSuggestion) => {
+    setPreviewSuggestion(suggestion)
+    
+    // Focus the map on the suggestion location
+    if (mapRef.current) {
+      const coords = toMapCoords(suggestion.x, suggestion.y)
+      mapRef.current.setView(coords, 2, { animate: true })
+    }
+  }
+
+  // Clear preview when closing panel
+  const handleCloseSuggestionsPanel = () => {
+    setIsSuggestionsPanelOpen(false)
+    setPreviewSuggestion(null)
+    setRejectingSuggestionId(null)
+    setRejectNote('')
+  }
   
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-6">
@@ -675,42 +718,76 @@ export default function KartePage() {
         {/* Instructions & Drawing Tools */}
         <div className="mb-4 flex flex-wrap gap-3">
           {canManage && isDrawingMode ? (
-              <>
-                <div className="flex-1 p-3 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-sm flex items-center gap-2">
-                  <Hexagon className="h-4 w-4" />
-                  <span>
-                    Klicke auf die Karte um Punkte zu setzen ({drawingPoints.length} Punkte)
-                    {drawingPoints.length >= 3 && ' - Bereit zum Abschließen'}
-                  </span>
-                </div>
-                <div className="flex gap-2">
+            <>
+              <div className="flex-1 p-3 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-sm flex items-center gap-2">
+                <Hexagon className="h-4 w-4" />
+                <span>
+                  Klicke auf die Karte um Punkte zu setzen ({drawingPoints.length} Punkte)
+                  {drawingPoints.length >= 3 && ' - Bereit zum Abschließen'}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleUndoPoint}
+                  disabled={drawingPoints.length === 0}
+                  variant="outline"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                >
+                  <RotateCcw className="h-4 w-4 mr-1" />
+                  Rückgängig
+                </Button>
+                <Button
+                  onClick={handleFinishDrawing}
+                  disabled={drawingPoints.length < 3}
+                  className="bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30"
+                >
+                  <Check className="h-4 w-4 mr-1" />
+                  Fertig
+                </Button>
+                <Button
+                  onClick={handleCancelDrawing}
+                  variant="outline"
+                  className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Abbrechen
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex-1 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                <span>
+                  {canManage 
+                    ? 'Rechtsklick auf die Karte, um eine neue Markierung zu setzen'
+                    : 'Rechtsklick auf die Karte, um einen Vorschlag einzureichen'}
+                </span>
+              </div>
+              {canManage && (
+                <>
                   <Button
-                    onClick={handleUndoPoint}
-                    disabled={drawingPoints.length === 0}
-                    variant="outline"
-                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    onClick={handleStartDrawing}
+                    className="bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30"
                   >
-                    <RotateCcw className="h-4 w-4 mr-1" />
-                    Rückgängig
+                    <Hexagon className="h-4 w-4 mr-2" />
+                    Gebiet zeichnen
                   </Button>
                   <Button
-                    onClick={handleFinishDrawing}
-                    disabled={drawingPoints.length < 3}
-                    className="bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30"
+                    onClick={() => setIsSuggestionsPanelOpen(!isSuggestionsPanelOpen)}
+                    className="bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30 relative"
                   >
-                    <Check className="h-4 w-4 mr-1" />
-                    Fertig
+                    <Lightbulb className="h-4 w-4 mr-2" />
+                    Vorschläge
+                    {pendingSuggestionsCount > 0 && (
+                      <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 min-w-[20px] h-5">
+                        {pendingSuggestionsCount}
+                      </Badge>
+                    )}
                   </Button>
-                  <Button
-                    onClick={handleCancelDrawing}
-                    variant="outline"
-                    className="border-red-500/30 text-red-400 hover:bg-red-500/20"
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    Abbrechen
-                  </Button>
-                </div>
-              </>
+                </>
+              )}
+            </>
           )}
         </div>
         
@@ -725,7 +802,7 @@ export default function KartePage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsSuggestionsPanelOpen(false)}
+                onClick={handleCloseSuggestionsPanel}
                 className="text-cyan-400 hover:text-cyan-300"
               >
                 <X className="h-4 w-4" />
@@ -740,9 +817,20 @@ export default function KartePage() {
             ) : (
               <div className="space-y-3 max-h-[300px] overflow-y-auto">
                 {suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').map((suggestion: MapSuggestion) => (
-                  <div key={suggestion.id} className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
-                    <div className="flex items-start justify-between">
-                      <div>
+                  <div 
+                    key={suggestion.id} 
+                    className={`p-3 rounded-lg border transition-all ${
+                      previewSuggestion?.id === suggestion.id 
+                        ? 'bg-cyan-500/20 border-cyan-500' 
+                        : 'bg-gray-800/50 border-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div 
+                        className="flex-1 cursor-pointer hover:opacity-80"
+                        onClick={() => handlePreviewSuggestion(suggestion)}
+                        title="Klicken um Position auf Karte anzuzeigen"
+                      >
                         <p className="text-white font-medium">
                           {ICON_OPTIONS.find(i => i.value === suggestion.icon)?.label || suggestion.icon}
                           {suggestion.label && `: ${suggestion.label}`}
@@ -755,23 +843,36 @@ export default function KartePage() {
                           {' • '}
                           {new Date(suggestion.createdAt).toLocaleDateString('de-DE')}
                         </p>
+                        <p className="text-cyan-400/60 text-xs mt-1 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          Klicken für Vorschau
+                        </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={() => handlePreviewSuggestion(suggestion)}
+                          className={`${previewSuggestion?.id === suggestion.id ? 'bg-cyan-500 text-white' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
+                          title="Position anzeigen"
+                        >
+                          <MapPin className="h-4 w-4" />
+                        </Button>
                         <Button
                           size="sm"
                           onClick={() => approveSuggestionMutation.mutate(suggestion.id)}
                           disabled={approveSuggestionMutation.isPending}
                           className="bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                          title="Genehmigen"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
                         {rejectingSuggestionId === suggestion.id ? (
                           <div className="flex gap-1">
                             <Input
-                              placeholder="Grund (optional)"
+                              placeholder="Grund"
                               value={rejectNote}
                               onChange={(e) => setRejectNote(e.target.value)}
-                              className="h-8 w-32 bg-gray-700 border-gray-600 text-sm"
+                              className="h-8 w-24 bg-gray-700 border-gray-600 text-sm"
                             />
                             <Button
                               size="sm"
@@ -794,6 +895,7 @@ export default function KartePage() {
                             size="sm"
                             onClick={() => setRejectingSuggestionId(suggestion.id)}
                             className="bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                            title="Ablehnen"
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -832,6 +934,7 @@ export default function KartePage() {
               easeLinearity={0.25}
             >
               <FitBounds bounds={bounds} />
+              <MapRefSetter mapRef={mapRef} />
               
               {/* Map Image - Using tile URL pattern */}
               <ImageOverlay
@@ -912,6 +1015,35 @@ export default function KartePage() {
                 </>
               )}
               
+              {/* Ghost Marker for Preview Suggestion */}
+              {previewSuggestion && (
+                <Marker
+                  position={toMapCoords(previewSuggestion.x, previewSuggestion.y)}
+                  icon={L.divIcon({
+                    html: `
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 40" width="32" height="40" style="overflow: visible; filter: drop-shadow(0 0 8px #22d3ee);">
+                        <circle cx="16" cy="16" r="14" fill="#22d3ee" fill-opacity="0.4" stroke="#22d3ee" stroke-width="3" stroke-dasharray="4 2">
+                          <animate attributeName="stroke-dashoffset" values="0;12" dur="1s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="16" cy="16" r="6" fill="#22d3ee"/>
+                        <path d="M16 30 L16 38" stroke="#22d3ee" stroke-width="2"/>
+                        <circle cx="16" cy="40" r="2" fill="#22d3ee"/>
+                      </svg>
+                    `,
+                    className: 'preview-marker-icon',
+                    iconSize: [32, 40],
+                    iconAnchor: [16, 40],
+                  })}
+                >
+                  <Tooltip direction="top" offset={[0, -40]} opacity={1} permanent>
+                    <div className="text-sm font-bold text-cyan-500">
+                      📍 Vorschlag: {ICON_OPTIONS.find(i => i.value === previewSuggestion.icon)?.label || previewSuggestion.icon}
+                      {previewSuggestion.label && ` - ${previewSuggestion.label}`}
+                    </div>
+                  </Tooltip>
+                </Marker>
+              )}
+
               {/* Markers */}
               {annotations.map((annotation: MapAnnotation) => (
                 <Marker
@@ -991,43 +1123,52 @@ export default function KartePage() {
                             </div>
                           )}
                           
-                          {(annotation.familyContact.contact1FirstName || annotation.familyContact.contact1Phone) && (
-                            <div className="border-t pt-2 mt-2">
-                              <div className="text-xs text-gray-500 mb-1">Ansprechpartner 1:</div>
-                              <div className="text-sm">
-                                {annotation.familyContact.contact1FirstName} {annotation.familyContact.contact1LastName}
-                              </div>
-                              {annotation.familyContact.contact1Phone && (
-                                <div className="flex items-center gap-1 text-xs text-gray-500">
-                                  <Phone className="h-3 w-3" />
-                                  {annotation.familyContact.contact1Phone}
+                          {/* Contact details only for authorized users */}
+                          {canViewContactDetails ? (
+                            <>
+                              {(annotation.familyContact.contact1FirstName || annotation.familyContact.contact1Phone) && (
+                                <div className="border-t pt-2 mt-2">
+                                  <div className="text-xs text-gray-500 mb-1">Ansprechpartner 1:</div>
+                                  <div className="text-sm">
+                                    {annotation.familyContact.contact1FirstName} {annotation.familyContact.contact1LastName}
+                                  </div>
+                                  {annotation.familyContact.contact1Phone && (
+                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                      <Phone className="h-3 w-3" />
+                                      {annotation.familyContact.contact1Phone}
+                                    </div>
+                                  )}
                                 </div>
                               )}
-                            </div>
-                          )}
-                          
-                          {(annotation.familyContact.contact2FirstName || annotation.familyContact.contact2Phone) && (
-                            <div className="border-t pt-2">
-                              <div className="text-xs text-gray-500 mb-1">Ansprechpartner 2:</div>
-                              <div className="text-sm">
-                                {annotation.familyContact.contact2FirstName} {annotation.familyContact.contact2LastName}
-                              </div>
-                              {annotation.familyContact.contact2Phone && (
-                                <div className="flex items-center gap-1 text-xs text-gray-500">
-                                  <Phone className="h-3 w-3" />
-                                  {annotation.familyContact.contact2Phone}
+                              
+                              {(annotation.familyContact.contact2FirstName || annotation.familyContact.contact2Phone) && (
+                                <div className="border-t pt-2">
+                                  <div className="text-xs text-gray-500 mb-1">Ansprechpartner 2:</div>
+                                  <div className="text-sm">
+                                    {annotation.familyContact.contact2FirstName} {annotation.familyContact.contact2LastName}
+                                  </div>
+                                  {annotation.familyContact.contact2Phone && (
+                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                      <Phone className="h-3 w-3" />
+                                      {annotation.familyContact.contact2Phone}
+                                    </div>
+                                  )}
                                 </div>
                               )}
-                            </div>
-                          )}
-                          
-                          {annotation.familyContact.leadershipInfo && (
-                            <div className="border-t pt-2">
-                              <div className="text-xs text-gray-500 mb-1">Führung:</div>
-                              <div className="text-sm flex items-center gap-1">
-                                <Crown className="h-3 w-3 text-amber-500" />
-                                {annotation.familyContact.leadershipInfo}
-                              </div>
+                              
+                              {annotation.familyContact.leadershipInfo && (
+                                <div className="border-t pt-2">
+                                  <div className="text-xs text-gray-500 mb-1">Führung:</div>
+                                  <div className="text-sm flex items-center gap-1">
+                                    <Crown className="h-3 w-3 text-amber-500" />
+                                    {annotation.familyContact.leadershipInfo}
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="border-t pt-2 mt-2 text-xs text-gray-500 italic">
+                              Kontaktdetails nur für Berechtigte sichtbar
                             </div>
                           )}
                         </div>
@@ -1094,11 +1235,13 @@ export default function KartePage() {
         <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-amber-400">
-              <Plus className="h-5 w-5" />
-              Neue Markierung
+              {canManage ? <Plus className="h-5 w-5" /> : <Lightbulb className="h-5 w-5" />}
+              {canManage ? 'Neue Markierung' : 'Vorschlag einreichen'}
             </DialogTitle>
             <DialogDescription className="text-gray-400">
-              Position: X: {newMarkerPosition?.x.toFixed(3)}, Y: {newMarkerPosition?.y.toFixed(3)}
+              {canManage 
+                ? `Position: X: ${newMarkerPosition?.x.toFixed(3)}, Y: ${newMarkerPosition?.y.toFixed(3)}`
+                : 'Dein Vorschlag wird von einem Berechtigten überprüft.'}
             </DialogDescription>
           </DialogHeader>
           
@@ -1170,10 +1313,12 @@ export default function KartePage() {
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={createMutation.isPending}
-              className="bg-amber-500 hover:bg-amber-600 text-black"
+              disabled={createMutation.isPending || createSuggestionMutation.isPending}
+              className={canManage ? "bg-amber-500 hover:bg-amber-600 text-black" : "bg-cyan-500 hover:bg-cyan-600 text-black"}
             >
-              {createMutation.isPending ? 'Erstelle...' : 'Erstellen'}
+              {(createMutation.isPending || createSuggestionMutation.isPending) 
+                ? (canManage ? 'Erstelle...' : 'Sende...') 
+                : (canManage ? 'Erstellen' : 'Vorschlag senden')}
             </Button>
           </DialogFooter>
         </DialogContent>
