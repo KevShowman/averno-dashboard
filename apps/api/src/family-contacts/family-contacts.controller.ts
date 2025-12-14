@@ -76,14 +76,37 @@ export class FamilyContactsController {
   markOutdated(
     @CurrentUser() user: any,
     @Param('id') id: string,
-    @Body() data: { isOutdated: boolean },
+    @Body() data: { isOutdated: boolean; comment?: string },
   ) {
-    return this.familyContactsService.markOutdated(user, id, data.isOutdated);
+    return this.familyContactsService.markOutdated(user, id, data.isOutdated, data.comment);
   }
 
   @Delete(':id')
   delete(@CurrentUser() user: any, @Param('id') id: string) {
     return this.familyContactsService.delete(user, id);
+  }
+
+  // ============ PERMISSION MANAGEMENT ============
+
+  @Get('permissions/list')
+  getListPermissions() {
+    return this.familyContactsService.getListPermissions();
+  }
+
+  @Post('permissions/list')
+  addListPermission(
+    @CurrentUser() user: any,
+    @Body() data: { userId: string },
+  ) {
+    return this.familyContactsService.addListPermission(user, data.userId);
+  }
+
+  @Delete('permissions/list/:userId')
+  removeListPermission(
+    @CurrentUser() user: any,
+    @Param('userId') userId: string,
+  ) {
+    return this.familyContactsService.removeListPermission(user, userId);
   }
 }
 

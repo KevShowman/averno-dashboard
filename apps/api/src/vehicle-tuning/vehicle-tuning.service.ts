@@ -41,10 +41,10 @@ export class VehicleTuningService {
         secondaryType: 'Matte',
       },
       lights: {
-        xenon: 'Goldene Dusche',
+        xenon: 'Minzgrün',
         neon: {
           from: 'oben links',
-          right: 2,
+          right: 10,
           down: 9,
         },
       },

@@ -5,8 +5,8 @@ import { PrismaService } from '../common/prisma/prisma.service';
 export class FamilyContactsService {
   constructor(private prisma: PrismaService) {}
 
-  // Prüft ob User Contacto oder Leadership ist
-  private canManageContacts(user: any): boolean {
+  // Prüft ob User Contacto oder Leadership ist ODER eine ListPermission hat
+  private async canManageContacts(user: any): Promise<boolean> {
     const allowedRoles = [
       'EL_PATRON',
       'DON_CAPITAN', 
@@ -22,7 +22,32 @@ export class FamilyContactsService {
     
     // Prüfe zusätzliche Rollen
     const allRoles = user.allRoles || [];
-    return allRoles.some((role: string) => allowedRoles.includes(role));
+    if (allRoles.some((role: string) => allowedRoles.includes(role))) {
+      return true;
+    }
+
+    // Prüfe ListPermission
+    const permission = await this.prisma.listPermission.findUnique({
+      where: { userId: user.id },
+    });
+    return !!permission;
+  }
+
+  // Prüft ob User Leadership ist (für Berechtigungsverwaltung)
+  private isLeadership(user: any): boolean {
+    const leadershipRoles = [
+      'EL_PATRON',
+      'DON_CAPITAN',
+      'DON_COMANDANTE',
+      'EL_MANO_DERECHA',
+    ];
+    
+    if (leadershipRoles.includes(user.role)) {
+      return true;
+    }
+    
+    const allRoles = user.allRoles || [];
+    return allRoles.some((role: string) => leadershipRoles.includes(role));
   }
 
   async findAll() {
@@ -77,7 +102,7 @@ export class FamilyContactsService {
     notes?: string;
     isKeyFamily?: boolean;
   }) {
-    if (!this.canManageContacts(user)) {
+    if (!(await this.canManageContacts(user))) {
       throw new ForbiddenException('Nur Contactos und Leadership können Kontakte verwalten');
     }
 
@@ -113,7 +138,7 @@ export class FamilyContactsService {
     notes?: string;
     isKeyFamily?: boolean;
   }) {
-    if (!this.canManageContacts(user)) {
+    if (!(await this.canManageContacts(user))) {
       throw new ForbiddenException('Nur Contactos und Leadership können Kontakte verwalten');
     }
 
@@ -142,7 +167,7 @@ export class FamilyContactsService {
   }
 
   // Als veraltet markieren - für ALLE User zugänglich
-  async markOutdated(user: any, id: string, isOutdated: boolean) {
+  async markOutdated(user: any, id: string, isOutdated: boolean, comment?: string) {
     const contact = await this.prisma.familyContact.findUnique({
       where: { id },
     });
@@ -157,6 +182,7 @@ export class FamilyContactsService {
         isOutdated,
         outdatedMarkedAt: isOutdated ? new Date() : null,
         outdatedMarkedById: isOutdated ? user.id : null,
+        outdatedComment: isOutdated ? (comment || null) : null,
       },
       include: {
         outdatedMarkedBy: {
@@ -172,7 +198,7 @@ export class FamilyContactsService {
   }
 
   async delete(user: any, id: string) {
-    if (!this.canManageContacts(user)) {
+    if (!(await this.canManageContacts(user))) {
       throw new ForbiddenException('Nur Contactos und Leadership können Kontakte verwalten');
     }
 
@@ -187,6 +213,110 @@ export class FamilyContactsService {
     return this.prisma.familyContact.delete({
       where: { id },
     });
+  }
+
+  // ============ PERMISSION MANAGEMENT ============
+
+  // Alle List-Berechtigungen abrufen
+  async getListPermissions() {
+    return this.prisma.listPermission.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            role: true,
+          },
+        },
+        grantedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+      orderBy: { grantedAt: 'desc' },
+    });
+  }
+
+  // List-Berechtigung hinzufügen
+  async addListPermission(grantedBy: any, userId: string) {
+    if (!this.isLeadership(grantedBy)) {
+      throw new ForbiddenException('Nur Leadership kann Berechtigungen verwalten');
+    }
+
+    // Prüfe ob User existiert
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('Benutzer nicht gefunden');
+    }
+
+    // Prüfe ob bereits vorhanden
+    const existing = await this.prisma.listPermission.findUnique({
+      where: { userId },
+    });
+    if (existing) {
+      throw new ForbiddenException('Benutzer hat bereits eine Berechtigung');
+    }
+
+    return this.prisma.listPermission.create({
+      data: {
+        userId,
+        grantedById: grantedBy.id,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            role: true,
+          },
+        },
+        grantedBy: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  // List-Berechtigung entfernen
+  async removeListPermission(user: any, userId: string) {
+    if (!this.isLeadership(user)) {
+      throw new ForbiddenException('Nur Leadership kann Berechtigungen verwalten');
+    }
+
+    const permission = await this.prisma.listPermission.findUnique({
+      where: { userId },
+    });
+
+    if (!permission) {
+      throw new NotFoundException('Berechtigung nicht gefunden');
+    }
+
+    return this.prisma.listPermission.delete({
+      where: { userId },
+    });
+  }
+
+  // Prüfe ob User eine Berechtigung hat (für Frontend)
+  async hasListPermission(userId: string): Promise<boolean> {
+    const permission = await this.prisma.listPermission.findUnique({
+      where: { userId },
+    });
+    return !!permission;
   }
 
   async exportToCSV() {

@@ -110,5 +110,89 @@ export class MapAnnotationsController {
   deleteArea(@CurrentUser() user: any, @Param('id') id: string) {
     return this.mapAnnotationsService.deleteArea(user, id);
   }
+
+  // ============ PERMISSION MANAGEMENT ============
+
+  @Get('permissions/map')
+  getMapPermissions() {
+    return this.mapAnnotationsService.getMapPermissions();
+  }
+
+  @Post('permissions/map')
+  addMapPermission(
+    @CurrentUser() user: any,
+    @Body() data: { userId: string },
+  ) {
+    return this.mapAnnotationsService.addMapPermission(user, data.userId);
+  }
+
+  @Delete('permissions/map/:userId')
+  removeMapPermission(
+    @CurrentUser() user: any,
+    @Param('userId') userId: string,
+  ) {
+    return this.mapAnnotationsService.removeMapPermission(user, userId);
+  }
+
+  // ============ SUGGESTIONS ============
+
+  @Get('suggestions')
+  getAllSuggestions(
+    @CurrentUser() user: any,
+    @Query('map') mapName?: MapName,
+  ) {
+    return this.mapAnnotationsService.getAllSuggestions(user, mapName);
+  }
+
+  @Get('suggestions/my')
+  getMySuggestions(@CurrentUser() user: any) {
+    return this.mapAnnotationsService.getMySuggestions(user.id);
+  }
+
+  @Get('suggestions/pending-count')
+  getPendingSuggestionsCount() {
+    return this.mapAnnotationsService.getPendingSuggestionsCount();
+  }
+
+  @Post('suggestions')
+  createSuggestion(
+    @CurrentUser() user: any,
+    @Body()
+    data: {
+      mapName: MapName;
+      x: number;
+      y: number;
+      icon?: string;
+      label?: string;
+      familyContactId?: string;
+    },
+  ) {
+    return this.mapAnnotationsService.createSuggestion(user, data);
+  }
+
+  @Post('suggestions/:id/approve')
+  approveSuggestion(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+  ) {
+    return this.mapAnnotationsService.approveSuggestion(user, id);
+  }
+
+  @Post('suggestions/:id/reject')
+  rejectSuggestion(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() data: { reviewNote?: string },
+  ) {
+    return this.mapAnnotationsService.rejectSuggestion(user, id, data.reviewNote);
+  }
+
+  @Delete('suggestions/:id')
+  deleteSuggestion(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+  ) {
+    return this.mapAnnotationsService.deleteSuggestion(user, id);
+  }
 }
 

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -9,7 +9,7 @@ import { Badge } from '../components/ui/badge'
 import { useAuthStore } from '../stores/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { toast } from 'sonner'
-import { Loader2, Shirt, Save, Settings, Upload, Image as ImageIcon, User, Crosshair } from 'lucide-react'
+import { Loader2, Shirt, Save, Settings, User, Crosshair } from 'lucide-react'
 import { api } from '../lib/api'
 
 interface MaleOutfit {
@@ -40,9 +40,6 @@ interface ClothingItemData {
   color: string | null
 }
 
-// Use relative path for API - works in both dev and prod
-const API_BASE = '/api'
-
 const clothingParts = [
   { id: 'mask', label: 'Maske', itemKey: 'maskItem', varKey: 'maskVariation' },
   { id: 'torso', label: 'Torso', itemKey: 'torsoItem', varKey: 'torsoVariation' },
@@ -61,7 +58,6 @@ export default function ClothingManagementPage() {
   const [selectedOutfit, setSelectedOutfit] = useState<number>(1)
   const [outfitForm, setOutfitForm] = useState<Partial<MaleOutfit>>({})
   const [sicarioForm, setSicarioForm] = useState<Record<string, ClothingItemData>>({})
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Fetch male outfits
   const { data: outfits = [], isLoading: outfitsLoading } = useQuery<MaleOutfit[]>({
@@ -92,24 +88,6 @@ export default function ClothingManagementPage() {
     },
   })
 
-  // Upload image mutation
-  const uploadImageMutation = useMutation({
-    mutationFn: async ({ outfitNumber, file }: { outfitNumber: number; file: File }) => {
-      const formData = new FormData()
-      formData.append('image', file)
-      return api.post(`/clothing/male-outfits/${outfitNumber}/image`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['male-outfits'] })
-      toast.success('Bild erfolgreich hochgeladen!')
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Hochladen')
-    },
-  })
-
   // Save sicario template mutation
   const saveSicarioMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -133,13 +111,6 @@ export default function ClothingManagementPage() {
       outfitNumber: selectedOutfit,
       data: outfitForm,
     })
-  }
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      uploadImageMutation.mutate({ outfitNumber: selectedOutfit, file })
-    }
   }
 
   const handleSaveSicario = () => {
@@ -296,17 +267,14 @@ export default function ClothingManagementPage() {
                           : 'border-gray-700 bg-gray-800/30 hover:border-gray-600'
                       }`}
                     >
-                      {outfit?.imagePath ? (
-                        <img
-                          src={`${API_BASE}/uploads/outfits/${outfit.imagePath}`}
-                          alt={outfit.name}
-                          className="w-full h-20 object-cover rounded-lg mb-2"
-                        />
-                      ) : (
-                        <div className="w-full h-20 bg-gray-700/50 rounded-lg mb-2 flex items-center justify-center">
-                          <ImageIcon className="h-8 w-8 text-gray-500" />
-                        </div>
-                      )}
+                      <img
+                        src={`/outfit-images/outfit-${num}.png`}
+                        alt={outfit?.name || `Outfit ${num}`}
+                        className="w-full h-20 object-cover rounded-lg mb-2"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
                       <p className="text-white font-medium text-sm truncate">
                         {outfit?.name || `Outfit ${num}`}
                       </p>
@@ -338,7 +306,7 @@ export default function ClothingManagementPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4 space-y-6">
-                {/* Name & Image */}
+                {/* Name & Image Preview */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-gray-300">Outfit Name</Label>
@@ -352,34 +320,20 @@ export default function ClothingManagementPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-gray-300">Outfit Bild</Label>
-                    <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadImageMutation.isPending}
-                        className="border-gray-700 hover:bg-gray-800"
-                      >
-                        {uploadImageMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Upload className="h-4 w-4 mr-2" />
-                        )}
-                        Bild hochladen
-                      </Button>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
+                    <div className="flex gap-3 items-center">
+                      <img
+                        src={`/outfit-images/outfit-${selectedOutfit}.png`}
+                        alt={`Outfit ${selectedOutfit}`}
+                        className="h-20 w-20 rounded-lg object-cover border border-gray-700"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
                       />
-                      {currentOutfit?.imagePath && (
-                        <img
-                          src={`${API_BASE}/uploads/outfits/${currentOutfit.imagePath}`}
-                          alt="Preview"
-                          className="h-10 w-10 rounded object-cover"
-                        />
-                      )}
+                      <p className="text-gray-500 text-sm">
+                        Bilder werden statisch über<br />
+                        <code className="text-amber-400">/outfit-images/outfit-{selectedOutfit}.png</code><br />
+                        bereitgestellt.
+                      </p>
                     </div>
                   </div>
                 </div>

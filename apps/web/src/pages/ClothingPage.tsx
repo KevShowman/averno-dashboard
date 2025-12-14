@@ -201,22 +201,78 @@ export default function ClothingPage() {
 
       {/* Main Content */}
       {isFreeChoice ? (
-        // Free Choice Display (Women)
+        // Free Choice Display (Women) - mit Farbvorgaben und Pflichtkleidung
         <Card className="bg-gray-900/50 border-green-500/30 overflow-hidden">
           <CardHeader className="border-b border-green-500/20">
             <CardTitle className="text-white flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-green-400" />
-              Freie Klamottenwahl
+              Damenkleidung
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center mb-6">
-                <Check className="h-12 w-12 text-green-400" />
+          <CardContent className="p-6 space-y-6">
+            {/* Farbvorgabe */}
+            <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-2">Farbvorgabe</h3>
+              <p className="text-gray-300">
+                <span className="text-white font-medium">Schwarz</span> und <span className="text-white font-medium">elegant</span>.
+                In Ausnahmefällen sind <span className="text-gray-400">graue Elemente</span> erlaubt.
+              </p>
+            </div>
+
+            {/* Vorgeschriebene Kleidung */}
+            <div className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/30">
+              <h3 className="text-lg font-semibold text-amber-300 mb-3">Vorgeschriebene Kleidung</h3>
+              <div className="grid gap-3">
+                <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                  <span className="text-white font-medium">Maske</span>
+                  <div className="flex gap-4">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-amber-400">310</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-amber-400">15</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                  <span className="text-white font-medium">Weste</span>
+                  <div className="flex gap-4">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-amber-400">140</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-amber-400">23</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                  <span className="text-white font-medium">Hose</span>
+                  <div className="flex gap-4">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-amber-400">368</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-amber-400">4</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Du hast freie Klamottenwahl!</h2>
-              <p className="text-gray-400 max-w-md">
-                Als Frau kannst du deine Kleidung frei wählen. Es gibt keine vorgegebenen Outfits.
+            </div>
+
+            {/* Freie Wahl Info */}
+            <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Check className="h-5 w-5 text-green-400" />
+                <h3 className="text-lg font-semibold text-green-300">Freie Wahl</h3>
+              </div>
+              <p className="text-green-200/80">
+                Alle anderen Kleidungsstücke (Torso, T-Shirt, Schuhe, etc.) sowie <span className="text-green-300 font-medium">Accessoires</span> sind frei wählbar.
               </p>
             </div>
           </CardContent>
@@ -242,17 +298,14 @@ export default function ClothingPage() {
               <SelectTrigger className="w-full h-16 bg-gray-800/50 border-gray-700">
                 <SelectValue>
                   <div className="flex items-center gap-3">
-                    {currentOutfit?.imagePath ? (
-                      <img
-                        src={`${API_BASE}/uploads/outfits/${currentOutfit.imagePath}`}
-                        alt={currentOutfit.name}
-                        className="h-10 w-10 rounded object-cover"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded bg-gray-700 flex items-center justify-center">
-                        <ImageIcon className="h-5 w-5 text-gray-500" />
-                      </div>
-                    )}
+                    <img
+                      src={`/outfit-images/outfit-${selectedOutfit}.png`}
+                      alt={currentOutfit?.name || `Outfit ${selectedOutfit}`}
+                      className="h-10 w-10 rounded object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
                     <span className="text-white font-medium">{currentOutfit?.name || `Outfit ${selectedOutfit}`}</span>
                   </div>
                 </SelectValue>
@@ -261,17 +314,14 @@ export default function ClothingPage() {
                 {outfits.map((outfit) => (
                   <SelectItem key={outfit.outfitNumber} value={String(outfit.outfitNumber)}>
                     <div className="flex items-center gap-3">
-                      {outfit.imagePath ? (
-                        <img
-                          src={`${API_BASE}/uploads/outfits/${outfit.imagePath}`}
-                          alt={outfit.name}
-                          className="h-10 w-10 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded bg-gray-700 flex items-center justify-center">
-                          <ImageIcon className="h-5 w-5 text-gray-500" />
-                        </div>
-                      )}
+                      <img
+                        src={`/outfit-images/outfit-${outfit.outfitNumber}.png`}
+                        alt={outfit.name}
+                        className="h-10 w-10 rounded object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
                       <span>{outfit.name}</span>
                     </div>
                   </SelectItem>
@@ -283,20 +333,15 @@ export default function ClothingPage() {
             <div className="flex gap-6 items-center">
               {/* Left: Outfit Preview Image */}
               <div className="flex-shrink-0">
-                {currentOutfit?.imagePath ? (
-                  <img
-                    src={`${API_BASE}/uploads/outfits/${currentOutfit.imagePath}`}
-                    alt={currentOutfit.name}
-                    className="w-64 h-auto rounded-xl border border-gray-700 object-cover"
-                  />
-                ) : (
-                  <div className="w-64 h-80 rounded-xl border border-gray-700 bg-gray-800/50 flex items-center justify-center">
-                    <div className="text-center">
-                      <ImageIcon className="h-16 w-16 text-gray-600 mx-auto mb-2" />
-                      <span className="text-gray-500 text-sm">Kein Bild</span>
-                    </div>
-                  </div>
-                )}
+                <img
+                  src={`/outfit-images/outfit-${selectedOutfit}.png`}
+                  alt={currentOutfit?.name || `Outfit ${selectedOutfit}`}
+                  className="w-64 h-auto rounded-xl border border-gray-700 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = ''
+                    e.currentTarget.alt = 'Bild nicht verfügbar'
+                  }}
+                />
               </div>
 
               {/* Right: Clothing Parts Table */}
@@ -322,6 +367,14 @@ export default function ClothingPage() {
                 </div>
               ))}
               </div>
+            </div>
+
+            {/* Accessoires Info */}
+            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-start gap-3">
+              <Check className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-green-300">
+                <span className="font-medium">Accessoires</span> (Uhren, Ketten, Brillen, etc.) sind frei wählbar!
+              </p>
             </div>
 
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex items-start gap-3">

@@ -61,6 +61,12 @@ model User {
   dailyAttendanceReceived       DailyAttendance[]              @relation("attendance_user")
   attendancePermissionsGranted  AttendancePermission[]         @relation("attendance_permission_granted_by")
   attendancePermissionsReceived AttendancePermission[]         @relation("attendance_permission_user")
+  listPermissionsGranted        ListPermission[]               @relation("list_permission_granted_by")
+  listPermissionsReceived       ListPermission[]               @relation("list_permission_user")
+  mapPermissionsGranted         MapPermission[]                @relation("map_permission_granted_by")
+  mapPermissionsReceived        MapPermission[]                @relation("map_permission_user")
+  mapSuggestionsCreated         MapSuggestion[]                @relation("map_suggestion_created_by")
+  mapSuggestionsReviewed        MapSuggestion[]                @relation("map_suggestion_reviewed_by")
 
   @@map("users")
 }
@@ -789,12 +795,14 @@ model FamilyContact {
   outdatedMarkedAt    DateTime?           // Wann als veraltet markiert
   outdatedMarkedById  String?             // Wer hat als veraltet markiert
   outdatedMarkedBy    User?               @relation("family_contact_outdated_by", fields: [outdatedMarkedById], references: [id])
+  outdatedComment     String?             @db.Text // Kommentar wieso veraltet
   createdById         String
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 
   // Relations
   mapAnnotations      MapAnnotation[]     @relation("map_annotation_family")
+  mapSuggestions      MapSuggestion[]     @relation("map_suggestion_family")
 
   @@map("family_contacts")
 }
@@ -898,6 +906,61 @@ model MaleOutfit {
   updatedAt       DateTime @updatedAt
 
   @@map("male_outfits")
+}
+
+// Listenführung-Berechtigungen (wer darf Familienkontakte bearbeiten)
+model ListPermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("list_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String   // Wer hat die Berechtigung erteilt
+  grantedBy   User     @relation("list_permission_granted_by", fields: [grantedById], references: [id])
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("list_permissions")
+}
+
+// Karten-Berechtigungen (wer darf Map-Annotationen bearbeiten)
+model MapPermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("map_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String   // Wer hat die Berechtigung erteilt
+  grantedBy   User     @relation("map_permission_granted_by", fields: [grantedById], references: [id])
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("map_permissions")
+}
+
+// Karten-Änderungsvorschläge (für User ohne Berechtigungen)
+model MapSuggestion {
+  id              String           @id @default(cuid())
+  mapName         MapName          // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  x               Float            // Normalisierte X-Koordinate (0.0 - 1.0)
+  y               Float            // Normalisierte Y-Koordinate (0.0 - 1.0)
+  icon            String           @default("home") // Icon: home, building, warehouse, skull, etc.
+  label           String?          // Optionaler Kurztext
+  familyContactId String?          // Optional: Verknüpfung mit Familie
+  familyContact   FamilyContact?   @relation("map_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  status          SuggestionStatus @default(PENDING)
+  createdById     String           // Wer hat den Vorschlag erstellt
+  createdBy       User             @relation("map_suggestion_created_by", fields: [createdById], references: [id])
+  reviewedById    String?          // Wer hat den Vorschlag überprüft
+  reviewedBy      User?            @relation("map_suggestion_reviewed_by", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?        // Wann wurde überprüft
+  reviewNote      String?          @db.Text // Kommentar bei Ablehnung
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("map_suggestions")
+}
+
+enum SuggestionStatus {
+  PENDING  // Offen
+  APPROVED // Genehmigt
+  REJECTED // Abgelehnt
 }
 
 // Discord Role Mappings

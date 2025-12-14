@@ -3,11 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Textarea } from '../components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select'
 import { toast } from 'sonner'
 import { hasRole } from '../lib/utils'
 import {
@@ -40,6 +48,10 @@ import {
   HelpCircle,
   Key,
   Clock,
+  Shield,
+  UserPlus,
+  Loader2,
+  Info,
 } from 'lucide-react'
 
 type FamilyContactStatus = 'UNKNOWN' | 'ACTIVE' | 'ENDANGERED' | 'DISSOLVED'
@@ -66,8 +78,28 @@ interface FamilyContact {
     icFirstName?: string
     icLastName?: string
   }
+  outdatedComment?: string
   createdAt: string
   updatedAt: string
+}
+
+interface ListPermission {
+  id: string
+  userId: string
+  user: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+    role: string
+  }
+  grantedBy: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+  }
+  grantedAt: string
 }
 
 const statusConfig: Record<FamilyContactStatus, { label: string; color: string; bgColor: string; icon: typeof Circle }> = {
@@ -82,11 +114,15 @@ export default function ListenfuehrungPage() {
   usePageTitle('Listenführung')
   const queryClient = useQueryClient()
   
+  const [activeTab, setActiveTab] = useState<'liste' | 'berechtigungen'>('liste')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isOutdatedDialogOpen, setIsOutdatedDialogOpen] = useState(false)
+  const [outdatedComment, setOutdatedComment] = useState('')
   const [selectedContact, setSelectedContact] = useState<FamilyContact | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedNewPermissionUser, setSelectedNewPermissionUser] = useState('')
   
   // Form state
   const [formData, setFormData] = useState({
@@ -104,7 +140,31 @@ export default function ListenfuehrungPage() {
     isKeyFamily: false,
   })
 
-  const canManage = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'CONTACTO'])
+  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const hasContactRole = hasRole(user, ['CONTACTO'])
+
+  // Fetch list permissions
+  const { data: listPermissions = [], isLoading: permissionsLoading } = useQuery<ListPermission[]>({
+    queryKey: ['list-permissions'],
+    queryFn: () => api.get('/family-contacts/permissions/list').then(res => res.data),
+    enabled: isLeadership, // Only fetch for leadership
+  })
+
+  // Check if user has a list permission
+  const hasListPermission = listPermissions.some(p => p.userId === user?.id)
+  
+  // User can manage if they are Leadership, Contacto, or have a ListPermission
+  const canManage = isLeadership || hasContactRole || hasListPermission
+  
+  // Only Leadership and Contacto can see full contact details
+  const canViewDetails = isLeadership || hasContactRole || hasListPermission
+
+  // Fetch all users for permission dropdown
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['all-users-for-permissions'],
+    queryFn: () => api.get('/users').then(res => res.data),
+    enabled: isLeadership,
+  })
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['family-contacts'],
@@ -153,14 +213,42 @@ export default function ListenfuehrungPage() {
   })
 
   const markOutdatedMutation = useMutation({
-    mutationFn: ({ id, isOutdated }: { id: string; isOutdated: boolean }) => 
-      api.patch(`/family-contacts/${id}/mark-outdated`, { isOutdated }),
+    mutationFn: ({ id, isOutdated, comment }: { id: string; isOutdated: boolean; comment?: string }) => 
+      api.patch(`/family-contacts/${id}/mark-outdated`, { isOutdated, comment }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['family-contacts'] })
       toast.success('Status erfolgreich aktualisiert')
+      setIsOutdatedDialogOpen(false)
+      setOutdatedComment('')
+      setSelectedContact(null)
     },
     onError: () => {
       toast.error('Fehler beim Aktualisieren des Status')
+    },
+  })
+
+  // Add list permission mutation
+  const addListPermissionMutation = useMutation({
+    mutationFn: (userId: string) => api.post('/family-contacts/permissions/list', { userId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['list-permissions'] })
+      toast.success('Berechtigung erfolgreich hinzugefügt')
+      setSelectedNewPermissionUser('')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Hinzufügen der Berechtigung')
+    },
+  })
+
+  // Remove list permission mutation
+  const removeListPermissionMutation = useMutation({
+    mutationFn: (userId: string) => api.delete(`/family-contacts/permissions/list/${userId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['list-permissions'] })
+      toast.success('Berechtigung erfolgreich entfernt')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Entfernen der Berechtigung')
     },
   })
 
@@ -275,26 +363,56 @@ export default function ListenfuehrungPage() {
         </div>
       </div>
 
-      {/* Search & Stats */}
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Suche nach Familie, Kontakt..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-          />
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-          <Users className="h-4 w-4 text-amber-400" />
-          <span className="text-gray-400">
-            <span className="text-white font-medium">{filteredContacts.length}</span> Familien
-          </span>
-        </div>
-      </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+        <TabsList className="bg-gray-800/50 border border-gray-700">
+          <TabsTrigger value="liste" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
+            <BookOpen className="h-4 w-4 mr-2" />
+            Familienliste
+          </TabsTrigger>
+          {isLeadership && (
+            <TabsTrigger value="berechtigungen" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
+              <Shield className="h-4 w-4 mr-2" />
+              Berechtigungen
+            </TabsTrigger>
+          )}
+        </TabsList>
 
-      {/* Contacts Grid */}
+        <TabsContent value="liste" className="space-y-6 mt-6">
+          {/* Search & Stats */}
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                placeholder="Suche nach Familie, Kontakt..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+              />
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+              <Users className="h-4 w-4 text-amber-400" />
+              <span className="text-gray-400">
+                <span className="text-white font-medium">{filteredContacts.length}</span> Familien
+              </span>
+            </div>
+          </div>
+
+          {/* Info for non-manage users */}
+          {!canViewDetails && (
+            <Card className="bg-blue-500/10 border-blue-500/30">
+              <CardContent className="p-4 flex items-start gap-3">
+                <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-blue-300 text-sm">
+                    Du siehst nur die Familiennamen. Kontaktdaten sind nur für berechtigte Mitglieder sichtbar.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Contacts Grid */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
@@ -371,7 +489,17 @@ export default function ListenfuehrungPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => markOutdatedMutation.mutate({ id: contact.id, isOutdated: !contact.isOutdated })}
+                      onClick={() => {
+                        if (contact.isOutdated) {
+                          // Directly unmark as outdated
+                          markOutdatedMutation.mutate({ id: contact.id, isOutdated: false })
+                        } else {
+                          // Open dialog for comment
+                          setSelectedContact(contact)
+                          setOutdatedComment('')
+                          setIsOutdatedDialogOpen(true)
+                        }
+                      }}
                       disabled={markOutdatedMutation.isPending}
                       className={`h-8 w-8 p-0 ${contact.isOutdated ? 'text-red-400 hover:text-red-300' : 'text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100'} transition-all`}
                       title={contact.isOutdated ? 'Als aktuell markieren' : 'Als veraltet markieren'}
@@ -402,79 +530,93 @@ export default function ListenfuehrungPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {/* Ansprechpartner 1 */}
-                {(contact.contact1FirstName || contact.contact1LastName || contact.contact1Phone) && (
-                  <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <div className="flex items-center gap-2 text-xs text-amber-400/70 mb-2">
-                      <User className="h-3 w-3" />
-                      <span>Ansprechpartner 1</span>
-                    </div>
-                    {formatContactName(contact.contact1FirstName, contact.contact1LastName) && (
-                      <p className="text-white text-sm font-medium">
-                        {formatContactName(contact.contact1FirstName, contact.contact1LastName)}
-                      </p>
-                    )}
-                    {contact.contact1Phone && (
-                      <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
-                        <Phone className="h-3 w-3" />
-                        <span>{contact.contact1Phone}</span>
+                {canViewDetails ? (
+                  <>
+                    {/* Ansprechpartner 1 */}
+                    {(contact.contact1FirstName || contact.contact1LastName || contact.contact1Phone) && (
+                      <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                        <div className="flex items-center gap-2 text-xs text-amber-400/70 mb-2">
+                          <User className="h-3 w-3" />
+                          <span>Ansprechpartner 1</span>
+                        </div>
+                        {formatContactName(contact.contact1FirstName, contact.contact1LastName) && (
+                          <p className="text-white text-sm font-medium">
+                            {formatContactName(contact.contact1FirstName, contact.contact1LastName)}
+                          </p>
+                        )}
+                        {contact.contact1Phone && (
+                          <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
+                            <Phone className="h-3 w-3" />
+                            <span>{contact.contact1Phone}</span>
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
-                )}
 
-                {/* Ansprechpartner 2 */}
-                {(contact.contact2FirstName || contact.contact2LastName || contact.contact2Phone) && (
-                  <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <div className="flex items-center gap-2 text-xs text-amber-400/70 mb-2">
-                      <User className="h-3 w-3" />
-                      <span>Ansprechpartner 2</span>
-                    </div>
-                    {formatContactName(contact.contact2FirstName, contact.contact2LastName) && (
-                      <p className="text-white text-sm font-medium">
-                        {formatContactName(contact.contact2FirstName, contact.contact2LastName)}
-                      </p>
-                    )}
-                    {contact.contact2Phone && (
-                      <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
-                        <Phone className="h-3 w-3" />
-                        <span>{contact.contact2Phone}</span>
+                    {/* Ansprechpartner 2 */}
+                    {(contact.contact2FirstName || contact.contact2LastName || contact.contact2Phone) && (
+                      <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                        <div className="flex items-center gap-2 text-xs text-amber-400/70 mb-2">
+                          <User className="h-3 w-3" />
+                          <span>Ansprechpartner 2</span>
+                        </div>
+                        {formatContactName(contact.contact2FirstName, contact.contact2LastName) && (
+                          <p className="text-white text-sm font-medium">
+                            {formatContactName(contact.contact2FirstName, contact.contact2LastName)}
+                          </p>
+                        )}
+                        {contact.contact2Phone && (
+                          <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
+                            <Phone className="h-3 w-3" />
+                            <span>{contact.contact2Phone}</span>
+                          </div>
+                        )}
                       </div>
                     )}
+
+                    {/* Führung/Patron */}
+                    {contact.leadershipInfo && (
+                      <div className="p-3 bg-amber-500/5 rounded-lg border border-amber-500/20">
+                        <div className="flex items-center gap-2 text-xs text-amber-400 mb-1">
+                          <Crown className="h-3 w-3" />
+                          <span>Führung / Patron</span>
+                        </div>
+                        <p className="text-amber-200 text-sm">{contact.leadershipInfo}</p>
+                      </div>
+                    )}
+
+                    {/* Notizen */}
+                    {contact.notes && (
+                      <div className="pt-2 border-t border-gray-800">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                          <FileText className="h-3 w-3" />
+                          <span>Notizen</span>
+                        </div>
+                        <p className="text-gray-400 text-sm line-clamp-2">{contact.notes}</p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-4 text-gray-500 text-sm">
+                    Keine Berechtigung für Kontaktdetails
                   </div>
                 )}
 
-                {/* Führung/Patron */}
-                {contact.leadershipInfo && (
-                  <div className="p-3 bg-amber-500/5 rounded-lg border border-amber-500/20">
-                    <div className="flex items-center gap-2 text-xs text-amber-400 mb-1">
-                      <Crown className="h-3 w-3" />
-                      <span>Führung / Patron</span>
-                    </div>
-                    <p className="text-amber-200 text-sm">{contact.leadershipInfo}</p>
-                  </div>
-                )}
-
-                {/* Notizen */}
-                {contact.notes && (
+                {/* Veraltet-Info - für alle sichtbar */}
+                {contact.isOutdated && (
                   <div className="pt-2 border-t border-gray-800">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                      <FileText className="h-3 w-3" />
-                      <span>Notizen</span>
-                    </div>
-                    <p className="text-gray-400 text-sm line-clamp-2">{contact.notes}</p>
-                  </div>
-                )}
-
-                {/* Veraltet-Info */}
-                {contact.isOutdated && contact.outdatedMarkedBy && (
-                  <div className="pt-2 border-t border-gray-800">
-                    <div className="flex items-center gap-2 text-xs text-red-400/70">
-                      <Clock className="h-3 w-3" />
-                      <span>
-                        Als veraltet markiert von {contact.outdatedMarkedBy.icFirstName || contact.outdatedMarkedBy.username}
-                        {contact.outdatedMarkedAt && ` am ${new Date(contact.outdatedMarkedAt).toLocaleDateString('de-DE')}`}
-                      </span>
+                    <div className="flex flex-col gap-1 text-xs text-red-400/70">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3 w-3" />
+                        <span>
+                          Als veraltet markiert
+                          {contact.outdatedMarkedBy && ` von ${contact.outdatedMarkedBy.icFirstName || contact.outdatedMarkedBy.username}`}
+                          {contact.outdatedMarkedAt && ` am ${new Date(contact.outdatedMarkedAt).toLocaleDateString('de-DE')}`}
+                        </span>
+                      </div>
+                      {contact.outdatedComment && (
+                        <p className="text-red-300/70 italic ml-5">"{contact.outdatedComment}"</p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -483,6 +625,161 @@ export default function ListenfuehrungPage() {
           ))}
         </div>
       )}
+        </TabsContent>
+
+        {/* Permissions Tab */}
+        {isLeadership && (
+          <TabsContent value="berechtigungen" className="space-y-6 mt-6">
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-amber-400" />
+                  Listenführung-Berechtigungen
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Verwalte wer Zugriff auf die Familienkontakte hat und bearbeiten darf.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Add new permission */}
+                <div className="flex gap-3">
+                  <Select value={selectedNewPermissionUser} onValueChange={setSelectedNewPermissionUser}>
+                    <SelectTrigger className="flex-1 bg-gray-800/50 border-gray-700">
+                      <SelectValue placeholder="Benutzer auswählen..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      {allUsers
+                        .filter((u: any) => 
+                          !listPermissions.some(p => p.userId === u.id) &&
+                          !hasRole(u, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'CONTACTO'])
+                        )
+                        .map((u: any) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            {u.icFirstName && u.icLastName 
+                              ? `${u.icFirstName} ${u.icLastName}` 
+                              : u.username} ({u.role})
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={() => selectedNewPermissionUser && addListPermissionMutation.mutate(selectedNewPermissionUser)}
+                    disabled={!selectedNewPermissionUser || addListPermissionMutation.isPending}
+                    className="bg-amber-600 hover:bg-amber-500"
+                  >
+                    {addListPermissionMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <UserPlus className="h-4 w-4 mr-2" />
+                    )}
+                    Hinzufügen
+                  </Button>
+                </div>
+
+                {/* Existing permissions */}
+                {permissionsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                  </div>
+                ) : listPermissions.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Keine zusätzlichen Berechtigungen vergeben.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {listPermissions.map((permission) => (
+                      <div key={permission.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
+                            <User className="h-4 w-4 text-amber-400" />
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">
+                              {permission.user.icFirstName && permission.user.icLastName
+                                ? `${permission.user.icFirstName} ${permission.user.icLastName}`
+                                : permission.user.username}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Hinzugefügt von {permission.grantedBy.icFirstName || permission.grantedBy.username}
+                              {' • '}
+                              {new Date(permission.grantedAt).toLocaleDateString('de-DE')}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeListPermissionMutation.mutate(permission.userId)}
+                          disabled={removeListPermissionMutation.isPending}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+      </Tabs>
+
+      {/* Outdated Dialog */}
+      <Dialog open={isOutdatedDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsOutdatedDialogOpen(false)
+          setOutdatedComment('')
+          setSelectedContact(null)
+        }
+      }}>
+        <DialogContent className="bg-gray-900 border-red-500/30">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Clock className="h-5 w-5 text-red-400" />
+              Als veraltet markieren
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Markiere "{selectedContact?.familyName}" als veraltet. Du kannst optional einen Kommentar hinzufügen.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label className="text-gray-300">Kommentar (optional)</Label>
+            <Textarea
+              placeholder="z.B. Telefonnummer nicht mehr erreichbar..."
+              value={outdatedComment}
+              onChange={(e) => setOutdatedComment(e.target.value)}
+              className="mt-2 bg-gray-800/50 border-gray-700 focus:border-red-500/50"
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsOutdatedDialogOpen(false)}
+              className="border-gray-700"
+            >
+              Abbrechen
+            </Button>
+            <Button
+              onClick={() => selectedContact && markOutdatedMutation.mutate({
+                id: selectedContact.id,
+                isOutdated: true,
+                comment: outdatedComment || undefined,
+              })}
+              disabled={markOutdatedMutation.isPending}
+              className="bg-red-600 hover:bg-red-500"
+            >
+              {markOutdatedMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Clock className="h-4 w-4 mr-2" />
+              )}
+              Als veraltet markieren
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Create/Edit Dialog */}
       <Dialog open={isCreateDialogOpen || isEditDialogOpen} onOpenChange={(open) => {

@@ -51,7 +51,12 @@ import {
   Palette,
   Check,
   RotateCcw,
+  Lightbulb,
+  Loader2,
+  MessageSquare,
 } from 'lucide-react'
+import { Textarea } from '../components/ui/textarea'
+import { Badge } from '../components/ui/badge'
 
 // Map Types
 type MapName = 'NARCO_CITY' | 'ROXWOOD' | 'CAYO_PERICO'
@@ -88,6 +93,33 @@ interface MapAnnotation {
     icFirstName?: string
     icLastName?: string
   }
+  createdAt: string
+}
+
+interface MapSuggestion {
+  id: string
+  mapName: MapName
+  x: number
+  y: number
+  icon: string
+  label?: string
+  familyContactId?: string
+  familyContact?: FamilyContact
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  reviewNote?: string
+  createdBy: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+  }
+  reviewedBy?: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+  }
+  reviewedAt?: string
   createdAt: string
 }
 
@@ -145,49 +177,58 @@ const statusConfig: Record<FamilyContactStatus, { label: string; color: string; 
   DISSOLVED: { label: 'Aufgelöst', color: '#ef4444', icon: XCircle },
 }
 
-// Create custom marker icon with optional secondary badge
+// Create custom marker icon with optional secondary badges (supports both key and outdated)
 const createMarkerIcon = (iconName: string, status?: FamilyContactStatus, isKeyFamily?: boolean, isOutdated?: boolean) => {
   const statusColor = status ? statusConfig[status].color : '#f59e0b'
   
-  // Determine secondary badge
-  let secondaryBadge = ''
+  // Build badges - can have both Key and Clock
+  const badges: string[] = []
+  let badgeCount = 0
+  
   if (isKeyFamily) {
-    // Key icon for Schlüsselfamilie - gold background, larger and bolder
-    secondaryBadge = `
-      <g transform="translate(14, 0)">
+    // Key icon for Schlüsselfamilie - gold background
+    badges.push(`
+      <g transform="translate(${14 + badgeCount * 16}, 0)">
         <circle cx="8" cy="8" r="9" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
         <g fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(3, 3) scale(0.42)">
           <path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>
         </g>
       </g>
-    `
-  } else if (isOutdated) {
-    // Clock icon for veraltet - RED background, larger and bolder
-    secondaryBadge = `
-      <g transform="translate(14, 0)">
+    `)
+    badgeCount++
+  }
+  
+  if (isOutdated) {
+    // Clock icon for veraltet - RED background
+    badges.push(`
+      <g transform="translate(${14 + badgeCount * 16}, 0)">
         <circle cx="8" cy="8" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
         <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(3, 3) scale(0.42)">
           <circle cx="12" cy="12" r="10"/>
           <polyline points="12,6 12,12 16,14"/>
         </g>
       </g>
-    `
+    `)
+    badgeCount++
   }
   
+  const hasBadges = badgeCount > 0
+  const totalWidth = 24 + (badgeCount * 16) + (hasBadges ? 2 : 0)
+  
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${secondaryBadge ? '32' : '24'} 24" width="${secondaryBadge ? '32' : '20'}" height="24" style="overflow: visible;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalWidth} 24" width="${hasBadges ? totalWidth - 4 : 20}" height="24" style="overflow: visible;">
       <circle cx="12" cy="12" r="11" fill="${statusColor}" stroke="#1f2937" stroke-width="2"/>
       <g fill="white" transform="translate(5, 5) scale(0.58)">
         ${getIconPath(iconName)}
       </g>
-      ${secondaryBadge}
+      ${badges.join('')}
     </svg>
   `
   
   return L.divIcon({
     html: iconSvg,
     className: 'custom-marker-icon',
-    iconSize: [secondaryBadge ? 32 : 20, 24],
+    iconSize: [hasBadges ? totalWidth - 4 : 20, 24],
     iconAnchor: [10, 12],
     popupAnchor: [0, -12],
   })
@@ -307,11 +348,16 @@ export default function KartePage() {
     label: '',
     color: '#f59e0b',
   })
+
+  // Suggestion state
+  const [isSuggestionsPanelOpen, setIsSuggestionsPanelOpen] = useState(false)
+  const [rejectNote, setRejectNote] = useState('')
+  const [rejectingSuggestionId, setRejectingSuggestionId] = useState<string | null>(null)
   
   // Permission check
   const canManage = hasRole(user, [
     'EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA',
-    'CONTACTO', 'INTELLIGENCIA'
+    'CONTACTO', 'INTELIGENCIA'
   ])
   
   // Fetch annotations for current map
@@ -330,6 +376,20 @@ export default function KartePage() {
   const { data: areas = [] } = useQuery({
     queryKey: ['map-areas', activeMap],
     queryFn: () => api.get(`/map-annotations/areas/list?map=${activeMap}`).then(res => res.data),
+  })
+
+  // Fetch pending suggestions count
+  const { data: pendingSuggestionsCount = 0 } = useQuery({
+    queryKey: ['map-suggestions-count'],
+    queryFn: () => api.get('/map-annotations/suggestions/pending-count').then(res => res.data),
+    enabled: canManage,
+  })
+
+  // Fetch suggestions for current map
+  const { data: suggestions = [], isLoading: suggestionsLoading } = useQuery<MapSuggestion[]>({
+    queryKey: ['map-suggestions', activeMap],
+    queryFn: () => api.get(`/map-annotations/suggestions?map=${activeMap}`).then(res => res.data),
+    enabled: canManage && isSuggestionsPanelOpen,
   })
   
   // Mutations
@@ -427,6 +487,49 @@ export default function KartePage() {
       toast.error('Fehler beim Löschen')
     },
   })
+
+  // Suggestion Mutations
+  const createSuggestionMutation = useMutation({
+    mutationFn: (data: { mapName: MapName; x: number; y: number; icon: string; label?: string; familyContactId?: string }) =>
+      api.post('/map-annotations/suggestions', data),
+    onSuccess: () => {
+      setIsCreateDialogOpen(false)
+      setNewMarkerPosition(null)
+      resetForm()
+      toast.success('Vorschlag eingereicht! Er wird von einem Berechtigten überprüft.')
+    },
+    onError: () => {
+      toast.error('Fehler beim Einreichen des Vorschlags')
+    },
+  })
+
+  const approveSuggestionMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/map-annotations/suggestions/${id}/approve`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['map-annotations'] })
+      queryClient.invalidateQueries({ queryKey: ['map-suggestions'] })
+      queryClient.invalidateQueries({ queryKey: ['map-suggestions-count'] })
+      toast.success('Vorschlag genehmigt und Markierung erstellt')
+    },
+    onError: () => {
+      toast.error('Fehler beim Genehmigen')
+    },
+  })
+
+  const rejectSuggestionMutation = useMutation({
+    mutationFn: ({ id, reviewNote }: { id: string; reviewNote?: string }) => 
+      api.post(`/map-annotations/suggestions/${id}/reject`, { reviewNote }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['map-suggestions'] })
+      queryClient.invalidateQueries({ queryKey: ['map-suggestions-count'] })
+      setRejectingSuggestionId(null)
+      setRejectNote('')
+      toast.success('Vorschlag abgelehnt')
+    },
+    onError: () => {
+      toast.error('Fehler beim Ablehnen')
+    },
+  })
   
   // Handle drawing mode
   const handleStartDrawing = () => {
@@ -484,18 +587,24 @@ export default function KartePage() {
     })
   }
   
-  // Handle create submit
+  // Handle create submit - creates annotation if user can manage, otherwise creates suggestion
   const handleCreate = () => {
     if (!newMarkerPosition) return
     
-    createMutation.mutate({
+    const data = {
       mapName: activeMap,
       x: newMarkerPosition.x,
       y: newMarkerPosition.y,
       icon: formData.icon,
       label: formData.label || undefined,
       familyContactId: formData.familyContactId || undefined,
-    })
+    }
+
+    if (canManage) {
+      createMutation.mutate(data)
+    } else {
+      createSuggestionMutation.mutate(data)
+    }
   }
   
   // Handle update submit
@@ -564,23 +673,8 @@ export default function KartePage() {
         </div>
         
         {/* Instructions & Drawing Tools */}
-        {canManage && (
-          <div className="mb-4 flex flex-wrap gap-3">
-            {!isDrawingMode ? (
-              <>
-                <div className="flex-1 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  <span>Rechtsklick auf die Karte, um eine neue Markierung zu setzen</span>
-                </div>
-                <Button
-                  onClick={handleStartDrawing}
-                  className="bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30"
-                >
-                  <Hexagon className="h-4 w-4 mr-2" />
-                  Gebiet zeichnen
-                </Button>
-              </>
-            ) : (
+        <div className="mb-4 flex flex-wrap gap-3">
+          {canManage && isDrawingMode ? (
               <>
                 <div className="flex-1 p-3 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-sm flex items-center gap-2">
                   <Hexagon className="h-4 w-4" />
@@ -617,6 +711,98 @@ export default function KartePage() {
                   </Button>
                 </div>
               </>
+          )}
+        </div>
+        
+        {/* Suggestions Panel */}
+        {isSuggestionsPanelOpen && canManage && (
+          <div className="mb-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-cyan-300 flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                Offene Vorschläge ({suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').length})
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSuggestionsPanelOpen(false)}
+                className="text-cyan-400 hover:text-cyan-300"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            {suggestionsLoading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
+              </div>
+            ) : suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').length === 0 ? (
+              <p className="text-cyan-400/70 text-center py-4">Keine offenen Vorschläge</p>
+            ) : (
+              <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                {suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').map((suggestion: MapSuggestion) => (
+                  <div key={suggestion.id} className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-white font-medium">
+                          {ICON_OPTIONS.find(i => i.value === suggestion.icon)?.label || suggestion.icon}
+                          {suggestion.label && `: ${suggestion.label}`}
+                        </p>
+                        {suggestion.familyContact && (
+                          <p className="text-amber-400 text-sm">→ {suggestion.familyContact.familyName}</p>
+                        )}
+                        <p className="text-gray-500 text-xs mt-1">
+                          von {suggestion.createdBy.icFirstName || suggestion.createdBy.username}
+                          {' • '}
+                          {new Date(suggestion.createdAt).toLocaleDateString('de-DE')}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => approveSuggestionMutation.mutate(suggestion.id)}
+                          disabled={approveSuggestionMutation.isPending}
+                          className="bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        {rejectingSuggestionId === suggestion.id ? (
+                          <div className="flex gap-1">
+                            <Input
+                              placeholder="Grund (optional)"
+                              value={rejectNote}
+                              onChange={(e) => setRejectNote(e.target.value)}
+                              className="h-8 w-32 bg-gray-700 border-gray-600 text-sm"
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => rejectSuggestionMutation.mutate({ id: suggestion.id, reviewNote: rejectNote || undefined })}
+                              disabled={rejectSuggestionMutation.isPending}
+                              className="bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                            >
+                              <Check className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => { setRejectingSuggestionId(null); setRejectNote(''); }}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => setRejectingSuggestionId(suggestion.id)}
+                            className="bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}
