@@ -145,8 +145,8 @@ COPY assets/logo.png /usr/share/nginx/html/logo.png
 # Kopiere Casa-Bilder direkt aus dem Build-Kontext
 COPY assets/casa/ /usr/share/nginx/html/casa/
 
-# Kopiere Outfit-Bilder
-COPY public/outfit-images/ /usr/share/nginx/html/outfit-images/
+# Kopiere Outfit-Bilder (aus assets/, wie Casa-Bilder)
+COPY assets/outfit-images/ /usr/share/nginx/html/outfit-images/
 
 # Kopiere Map-Tiles für interaktive Karte
 COPY assets/map-tiles/ /usr/share/nginx/html/map-tiles/
