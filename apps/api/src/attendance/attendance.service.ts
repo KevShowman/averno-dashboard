@@ -423,6 +423,16 @@ export class AttendanceService {
 
     // Berechne Statistiken pro User
     const now = new Date();
+    
+    // German timezone offset calculation
+    // Create a date in German timezone to determine if it's past 17:00
+    const germanTimeFormatter = new Intl.DateTimeFormat('de-DE', {
+      timeZone: 'Europe/Berlin',
+      hour: 'numeric',
+      hour12: false,
+    });
+    const germanHour = parseInt(germanTimeFormatter.format(now));
+    
     const userStats = users.map(user => {
       // Finde Blood Record für diesen User (case-insensitive name matching)
       const bloodRecord = bloodRecords.find(br => 
@@ -438,8 +448,15 @@ export class AttendanceService {
       let daysSinceTrackingOrBloodIn = 0;
       let attendancePercentage = 0;
       
+      // "Today" only counts as a full day after 17:00 German time
+      // Before 17:00, we consider the day as not yet started for statistics
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      
+      // If before 17:00 German time, don't count today in the statistics yet
+      if (germanHour < 17) {
+        today.setDate(today.getDate() - 1);
+      }
       
       // Determine effective start date
       let effectiveStartDate = TRACKING_START_DATE;
@@ -491,32 +508,33 @@ export class AttendanceService {
       }
 
       // Berechne letzte 7 Tage (but not before tracking start)
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      // Also respects the 17:00 cutoff via the adjusted 'today'
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // -6 because today is already counted
       sevenDaysAgo.setHours(0, 0, 0, 0);
       const effectiveSevenDaysAgo = sevenDaysAgo > TRACKING_START_DATE ? sevenDaysAgo : TRACKING_START_DATE;
       const last7DaysCount = attendanceDates.filter(d => {
         const date = new Date(d);
         date.setHours(0, 0, 0, 0);
-        return date >= effectiveSevenDaysAgo;
+        return date >= effectiveSevenDaysAgo && date <= today;
       }).length;
       
-      // Calculate actual days in last 7 days period (capped at tracking start)
-      const actualLast7Days = Math.min(7, Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+      // Calculate actual days in last 7 days period (capped at tracking start and adjusted for 17:00 cutoff)
+      const actualLast7Days = Math.max(0, Math.min(7, Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1));
 
       // Berechne letzte 30 Tage (but not before tracking start)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29); // -29 because today is already counted
       thirtyDaysAgo.setHours(0, 0, 0, 0);
       const effectiveThirtyDaysAgo = thirtyDaysAgo > TRACKING_START_DATE ? thirtyDaysAgo : TRACKING_START_DATE;
       const last30DaysCount = attendanceDates.filter(d => {
         const date = new Date(d);
         date.setHours(0, 0, 0, 0);
-        return date >= effectiveThirtyDaysAgo;
+        return date >= effectiveThirtyDaysAgo && date <= today;
       }).length;
       
-      // Calculate actual days in last 30 days period (capped at tracking start)
-      const actualLast30Days = Math.min(30, Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+      // Calculate actual days in last 30 days period (capped at tracking start and adjusted for 17:00 cutoff)
+      const actualLast30Days = Math.max(0, Math.min(30, Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1));
 
       return {
         user,
@@ -556,10 +574,14 @@ export class AttendanceService {
       : 0;
     const avgLast7Days = Math.round(userStats.reduce((sum, s) => sum + s.last7Days, 0) / totalUsers * 10) / 10;
 
-    // Calculate days since tracking started
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const daysSinceTrackingStart = Math.floor((today.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    // Calculate days since tracking started (with 17:00 cutoff)
+    const overviewToday = new Date();
+    overviewToday.setHours(0, 0, 0, 0);
+    // Apply same 17:00 cutoff rule
+    if (germanHour < 17) {
+      overviewToday.setDate(overviewToday.getDate() - 1);
+    }
+    const daysSinceTrackingStart = Math.max(0, Math.floor((overviewToday.getTime() - TRACKING_START_DATE.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 
     return {
       userStats,

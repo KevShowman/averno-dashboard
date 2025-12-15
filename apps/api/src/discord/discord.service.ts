@@ -147,10 +147,38 @@ export class DiscordService {
             await tx.memberFileEntry.deleteMany({ where: { createdById: user.id } });
             await tx.memberFile.deleteMany({ where: { userId: user.id } });
             
-            // 11. Action Logs (zuletzt, da diese Audit-Trail sind)
+            // 11. Sicario Aufstellungen (Responses zuerst, dann Aufstellungen)
+            await tx.sicarioAufstellungResponse.deleteMany({ where: { userId: user.id } });
+            await tx.sicarioAufstellung.deleteMany({ where: { createdById: user.id } });
+            
+            // 12. Daily Attendance (Anwesenheiten)
+            await tx.dailyAttendance.deleteMany({ where: { userId: user.id } });
+            await tx.dailyAttendance.deleteMany({ where: { markedById: user.id } });
+            
+            // 13. Permissions (Attendance, List, Map)
+            await tx.attendancePermission.deleteMany({ where: { userId: user.id } });
+            await tx.attendancePermission.deleteMany({ where: { grantedById: user.id } });
+            await tx.listPermission.deleteMany({ where: { userId: user.id } });
+            await tx.listPermission.deleteMany({ where: { grantedById: user.id } });
+            await tx.mapPermission.deleteMany({ where: { userId: user.id } });
+            await tx.mapPermission.deleteMany({ where: { grantedById: user.id } });
+            
+            // 14. Map Annotations, Areas und Suggestions
+            await tx.mapAnnotation.deleteMany({ where: { createdById: user.id } });
+            await tx.mapArea.deleteMany({ where: { createdById: user.id } });
+            await tx.mapSuggestion.deleteMany({ where: { createdById: user.id } });
+            await tx.mapSuggestion.deleteMany({ where: { reviewedById: user.id } });
+            
+            // 15. Family Contacts (outdatedMarkedById ist optional Foreign Key)
+            await tx.familyContact.updateMany({ 
+              where: { outdatedMarkedById: user.id },
+              data: { outdatedMarkedById: null }
+            });
+            
+            // 16. Action Logs (zuletzt, da diese Audit-Trail sind)
             await tx.actionLog.deleteMany({ where: { userId: user.id } });
             
-            // 12. Jetzt den User löschen
+            // 17. Jetzt den User löschen
             await tx.user.delete({ where: { id: user.id } });
           });
           

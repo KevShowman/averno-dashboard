@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
@@ -52,14 +52,23 @@ export default function ClothingPage() {
   const { user } = useAuthStore()
   usePageTitle('Meine Kleidung')
   const queryClient = useQueryClient()
-  const [selectedGender, setSelectedGender] = useState<'MALE' | 'FEMALE'>('MALE')
+  
+  // Initialize gender from user only once on mount, track if we've initialized
+  const initializedRef = useRef(false)
+  const [selectedGender, setSelectedGender] = useState<'MALE' | 'FEMALE'>(() => {
+    // Initial state from user if available
+    return (user?.gender as 'MALE' | 'FEMALE') || 'MALE'
+  })
   const [selectedOutfit, setSelectedOutfit] = useState<number>(1)
 
-  useEffect(() => {
-    if (user?.gender) {
+  // Only sync from user once on initial load if not yet initialized
+  if (!initializedRef.current && user?.gender) {
+    initializedRef.current = true
+    // Only update if different from current state (prevents re-render)
+    if (selectedGender !== user.gender) {
       setSelectedGender(user.gender as 'MALE' | 'FEMALE')
     }
-  }, [user])
+  }
 
   // Fetch clothing data
   const { data: clothingData, isLoading } = useQuery({
@@ -73,15 +82,27 @@ export default function ClothingPage() {
     },
     onSuccess: () => {
       toast.success('Geschlecht erfolgreich aktualisiert!')
-      queryClient.invalidateQueries({ queryKey: ['auth'] })
+      // Don't invalidate auth immediately - the local state is already correct
+      // This prevents the flickering from user state changing
       queryClient.invalidateQueries({ queryKey: ['clothing-my-template'] })
+      // Silently update auth in background without triggering re-render race
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['auth'] })
+      }, 500)
     },
     onError: (error: any) => {
+      // Revert to previous gender on error
+      const previousGender = user?.gender as 'MALE' | 'FEMALE' || 'MALE'
+      setSelectedGender(previousGender)
       toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Geschlechts')
     },
   })
 
   const handleGenderChange = (gender: 'MALE' | 'FEMALE') => {
+    // Don't do anything if already selected or mutation is pending
+    if (gender === selectedGender || updateGenderMutation.isPending) return
+    
+    // Optimistically update the UI immediately
     setSelectedGender(gender)
     updateGenderMutation.mutate(gender)
   }

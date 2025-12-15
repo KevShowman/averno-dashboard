@@ -55,11 +55,28 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Toaster 
           theme="dark" 
           position="top-right"
+          richColors
           toastOptions={{
             style: {
-              background: '#16161A',
+              background: 'linear-gradient(135deg, #1a1a1e 0%, #16161a 100%)',
               color: '#fff',
-              border: '1px solid #6A1F2B',
+              border: '1px solid rgba(251, 191, 36, 0.3)',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
+              padding: '16px',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+            classNames: {
+              toast: 'backdrop-blur-xl',
+              title: 'font-semibold',
+              description: 'text-gray-400 text-sm',
+              success: 'border-green-500/40 bg-gradient-to-r from-green-950/80 to-gray-900/80',
+              error: 'border-red-500/40 bg-gradient-to-r from-red-950/80 to-gray-900/80',
+              info: 'border-amber-500/40 bg-gradient-to-r from-amber-950/80 to-gray-900/80',
+              warning: 'border-yellow-500/40 bg-gradient-to-r from-yellow-950/80 to-gray-900/80',
+              actionButton: 'bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold rounded-lg px-3 py-1.5',
+              cancelButton: 'bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-3 py-1.5',
             },
           }}
         />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth'
 import { 
@@ -274,8 +274,43 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const { user, logout, isAuthenticated } = useAuthStore()
+  
+  // Refs for scroll preservation
+  const desktopNavRef = useRef<HTMLElement>(null)
+  const mobileNavRef = useRef<HTMLElement>(null)
+  const scrollPositionRef = useRef<number>(0)
 
   const isActive = (href: string) => location.pathname === href
+
+  // Save scroll position before navigation
+  const saveScrollPosition = useCallback(() => {
+    const navElement = desktopNavRef.current || mobileNavRef.current
+    if (navElement) {
+      scrollPositionRef.current = navElement.scrollTop
+      sessionStorage.setItem('sidebar-scroll-position', String(navElement.scrollTop))
+    }
+  }, [])
+
+  // Restore scroll position after navigation
+  const restoreScrollPosition = useCallback(() => {
+    // Small delay to ensure DOM has updated
+    requestAnimationFrame(() => {
+      const savedPosition = sessionStorage.getItem('sidebar-scroll-position')
+      const scrollPos = savedPosition ? parseInt(savedPosition) : scrollPositionRef.current
+      
+      if (desktopNavRef.current) {
+        desktopNavRef.current.scrollTop = scrollPos
+      }
+      if (mobileNavRef.current) {
+        mobileNavRef.current.scrollTop = scrollPos
+      }
+    })
+  }, [])
+
+  // Restore scroll position when location changes
+  useEffect(() => {
+    restoreScrollPosition()
+  }, [location.pathname, restoreScrollPosition])
 
   // Initialize expanded groups - open groups that have the active item or are default open
   const getInitialExpandedGroups = () => {
@@ -314,11 +349,18 @@ export default function Layout({ children }: LayoutProps) {
     return <div className="min-h-screen bg-gray-900">{children}</div>
   }
 
-  const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => (
+  const SidebarContent = ({ onLinkClick, navRef }: { onLinkClick?: () => void; navRef?: React.RefObject<HTMLElement> }) => {
+    // Handle link click with scroll position save
+    const handleLinkClick = () => {
+      saveScrollPosition()
+      onLinkClick?.()
+    }
+
+    return (
     <>
       {/* Logo */}
       <div className="p-5 border-b border-white/5">
-        <Link to="/app" className="flex items-center gap-3 group" onClick={onLinkClick}>
+        <Link to="/app" className="flex items-center gap-3 group" onClick={handleLinkClick}>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/40 to-amber-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
             <div className="relative w-14 h-14 flex items-center justify-center">
@@ -337,14 +379,17 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1 sidebar-scrollbar">
+      <nav 
+        ref={navRef as React.RefObject<HTMLDivElement>}
+        className="flex-1 overflow-y-auto p-3 space-y-1 sidebar-scrollbar"
+      >
         {navGroups.map((group) => (
           <NavGroupComponent
             key={group.name}
             group={group}
             user={user}
             isActive={isActive}
-            onLinkClick={onLinkClick}
+            onLinkClick={handleLinkClick}
             isOpen={expandedGroups.includes(group.name)}
             onToggle={() => toggleGroup(group.name)}
           />
@@ -415,7 +460,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       )}
     </>
-  )
+  )}
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -444,14 +489,14 @@ export default function Layout({ children }: LayoutProps) {
             <X className="h-5 w-5" />
           </Button>
           
-          <SidebarContent onLinkClick={() => setSidebarOpen(false)} />
+          <SidebarContent onLinkClick={() => setSidebarOpen(false)} navRef={mobileNavRef} />
         </div>
       </div>
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-72">
         <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5">
-          <SidebarContent />
+          <SidebarContent navRef={desktopNavRef} />
         </div>
       </div>
 
