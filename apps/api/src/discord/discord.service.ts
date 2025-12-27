@@ -151,23 +151,19 @@ export class DiscordService {
             await tx.sicarioAufstellungResponse.deleteMany({ where: { userId: user.id } });
             await tx.sicarioAufstellung.deleteMany({ where: { createdById: user.id } });
             
-            // 12. Daily Attendance (Anwesenheiten)
+            // 12. Daily Attendance - nur userId explizit löschen
+            // markedById wird automatisch auf NULL gesetzt (onDelete: SetNull im Schema)
             await tx.dailyAttendance.deleteMany({ where: { userId: user.id } });
-            await tx.dailyAttendance.deleteMany({ where: { markedById: user.id } });
             
-            // 13. Permissions (Attendance, List, Map)
+            // 13. Permissions - userId explizit löschen (onDelete: Cascade)
+            // grantedById wird automatisch auf NULL gesetzt (onDelete: SetNull)
             await tx.attendancePermission.deleteMany({ where: { userId: user.id } });
-            await tx.attendancePermission.deleteMany({ where: { grantedById: user.id } });
             await tx.listPermission.deleteMany({ where: { userId: user.id } });
-            await tx.listPermission.deleteMany({ where: { grantedById: user.id } });
             await tx.mapPermission.deleteMany({ where: { userId: user.id } });
-            await tx.mapPermission.deleteMany({ where: { grantedById: user.id } });
             
-            // 14. Map Annotations, Areas und Suggestions
-            await tx.mapAnnotation.deleteMany({ where: { createdById: user.id } });
-            await tx.mapArea.deleteMany({ where: { createdById: user.id } });
-            await tx.mapSuggestion.deleteMany({ where: { createdById: user.id } });
-            await tx.mapSuggestion.deleteMany({ where: { reviewedById: user.id } });
+            // 14. Map Suggestions - werden automatisch gelöscht (onDelete: Cascade auf createdById)
+            // MapAnnotation und MapArea createdById werden automatisch auf NULL gesetzt (onDelete: SetNull)
+            // reviewedById wird automatisch auf NULL gesetzt (onDelete: SetNull)
             
             // 15. Family Contacts (outdatedMarkedById ist optional Foreign Key)
             await tx.familyContact.updateMany({ 

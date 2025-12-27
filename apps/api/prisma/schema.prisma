@@ -824,8 +824,8 @@ model MapAnnotation {
   label           String?         // Optionaler Kurztext für Tooltip
   familyContactId String?
   familyContact   FamilyContact?  @relation("map_annotation_family", fields: [familyContactId], references: [id], onDelete: SetNull)
-  createdById     String
-  createdBy       User            @relation("map_annotation_created_by", fields: [createdById], references: [id])
+  createdById     String?         // Optional für historische Daten wenn Ersteller gelöscht
+  createdBy       User?           @relation("map_annotation_created_by", fields: [createdById], references: [id], onDelete: SetNull)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -845,8 +845,8 @@ model MapArea {
   points          Json            // Array von {x, y} Koordinaten (normalisiert 0-1)
   label           String          // Gebietsname
   color           String          @default("#f59e0b") // Hex-Farbe
-  createdById     String
-  createdBy       User            @relation("map_area_created_by", fields: [createdById], references: [id])
+  createdById     String?         // Optional für historische Daten wenn Ersteller gelöscht
+  createdBy       User?           @relation("map_area_created_by", fields: [createdById], references: [id], onDelete: SetNull)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -859,8 +859,8 @@ model DailyAttendance {
   date        DateTime @db.Date // Datum der Anwesenheit
   userId      String   // Wer war anwesend
   user        User     @relation("attendance_user", fields: [userId], references: [id], onDelete: Cascade)
-  markedById  String   // Wer hat die Anwesenheit eingetragen
-  markedBy    User     @relation("attendance_marked_by", fields: [markedById], references: [id])
+  markedById  String?  // Wer hat die Anwesenheit eingetragen (optional für historische Daten)
+  markedBy    User?    @relation("attendance_marked_by", fields: [markedById], references: [id], onDelete: SetNull)
   markedAt    DateTime @default(now()) // Wann wurde eingetragen
   createdAt   DateTime @default(now())
 
@@ -873,8 +873,8 @@ model AttendancePermission {
   id          String   @id @default(cuid())
   userId      String   @unique // Wer hat die Berechtigung
   user        User     @relation("attendance_permission_user", fields: [userId], references: [id], onDelete: Cascade)
-  grantedById String   // Wer hat die Berechtigung erteilt
-  grantedBy   User     @relation("attendance_permission_granted_by", fields: [grantedById], references: [id])
+  grantedById String?  // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedBy   User?    @relation("attendance_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
   grantedAt   DateTime @default(now())
   createdAt   DateTime @default(now())
 
@@ -913,8 +913,8 @@ model ListPermission {
   id          String   @id @default(cuid())
   userId      String   @unique // Wer hat die Berechtigung
   user        User     @relation("list_permission_user", fields: [userId], references: [id], onDelete: Cascade)
-  grantedById String   // Wer hat die Berechtigung erteilt
-  grantedBy   User     @relation("list_permission_granted_by", fields: [grantedById], references: [id])
+  grantedById String?  // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedBy   User?    @relation("list_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
   grantedAt   DateTime @default(now())
   createdAt   DateTime @default(now())
 
@@ -926,8 +926,8 @@ model MapPermission {
   id          String   @id @default(cuid())
   userId      String   @unique // Wer hat die Berechtigung
   user        User     @relation("map_permission_user", fields: [userId], references: [id], onDelete: Cascade)
-  grantedById String   // Wer hat die Berechtigung erteilt
-  grantedBy   User     @relation("map_permission_granted_by", fields: [grantedById], references: [id])
+  grantedById String?  // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedBy   User?    @relation("map_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
   grantedAt   DateTime @default(now())
   createdAt   DateTime @default(now())
 
@@ -946,9 +946,9 @@ model MapSuggestion {
   familyContact   FamilyContact?   @relation("map_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
   status          SuggestionStatus @default(PENDING)
   createdById     String           // Wer hat den Vorschlag erstellt
-  createdBy       User             @relation("map_suggestion_created_by", fields: [createdById], references: [id])
+  createdBy       User             @relation("map_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
   reviewedById    String?          // Wer hat den Vorschlag überprüft
-  reviewedBy      User?            @relation("map_suggestion_reviewed_by", fields: [reviewedById], references: [id])
+  reviewedBy      User?            @relation("map_suggestion_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
   reviewedAt      DateTime?        // Wann wurde überprüft
   reviewNote      String?          @db.Text // Kommentar bei Ablehnung
   createdAt       DateTime         @default(now())
