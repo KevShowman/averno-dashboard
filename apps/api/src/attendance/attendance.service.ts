@@ -1,9 +1,13 @@
 import { Injectable, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AttendanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   // Leadership-Rollen
   private readonly leadershipRoles = [
@@ -167,8 +171,26 @@ export class AttendanceService {
       })
     );
     
+    const createdCount = results.filter(r => r !== null).length;
+
+    // Audit Log (nur wenn tatsächlich Einträge erstellt wurden)
+    if (createdCount > 0) {
+      await this.auditService.log({
+        userId: user.id,
+        action: 'ATTENDANCE_MARKED',
+        entity: 'DailyAttendance',
+        entityId: data.date,
+        meta: {
+          date: data.date,
+          userIds: data.userIds,
+          createdCount,
+          skippedCount: results.filter(r => r === null).length,
+        },
+      });
+    }
+
     return {
-      created: results.filter(r => r !== null).length,
+      created: createdCount,
       skipped: results.filter(r => r === null).length,
     };
   }
@@ -189,6 +211,21 @@ export class AttendanceService {
         date: dateObj,
       },
     });
+
+    // Audit Log (nur wenn tatsächlich Einträge gelöscht wurden)
+    if (result.count > 0) {
+      await this.auditService.log({
+        userId: user.id,
+        action: 'ATTENDANCE_REMOVED',
+        entity: 'DailyAttendance',
+        entityId: data.date,
+        meta: {
+          date: data.date,
+          userIds: data.userIds,
+          deletedCount: result.count,
+        },
+      });
+    }
     
     return { deleted: result.count };
   }
@@ -316,7 +353,7 @@ export class AttendanceService {
       throw new BadRequestException('User nicht gefunden');
     }
     
-    return this.prisma.attendancePermission.create({
+    const permission = await this.prisma.attendancePermission.create({
       data: {
         userId,
         grantedById: user.id,
@@ -332,6 +369,20 @@ export class AttendanceService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'ATTENDANCE_PERMISSION_GRANTED',
+      entity: 'AttendancePermission',
+      entityId: permission.id,
+      meta: {
+        targetUserId: userId,
+        targetUsername: targetUser.username,
+      },
+    });
+
+    return permission;
   }
 
   // Berechtigung entziehen
@@ -339,10 +390,36 @@ export class AttendanceService {
     if (!this.isLeadership(user)) {
       throw new ForbiddenException('Nur Leadership kann Berechtigungen entziehen');
     }
+
+    // Hole Permission für Audit-Log
+    const permission = await this.prisma.attendancePermission.findUnique({
+      where: { userId },
+      include: {
+        user: {
+          select: { username: true },
+        },
+      },
+    });
     
-    return this.prisma.attendancePermission.delete({
+    const result = await this.prisma.attendancePermission.delete({
       where: { userId },
     });
+
+    // Audit Log
+    if (permission) {
+      await this.auditService.log({
+        userId: user.id,
+        action: 'ATTENDANCE_PERMISSION_REVOKED',
+        entity: 'AttendancePermission',
+        entityId: permission.id,
+        meta: {
+          targetUserId: userId,
+          targetUsername: permission.user?.username,
+        },
+      });
+    }
+
+    return result;
   }
 
   // Hilfsfunktion: Berechne Wochendaten

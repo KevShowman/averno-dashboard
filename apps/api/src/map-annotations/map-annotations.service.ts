@@ -1,10 +1,14 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { MapName } from '@prisma/client';
 
 @Injectable()
 export class MapAnnotationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   // Prüft ob User Annotationen verwalten darf (Leadership, Contacto, Intelligencia oder MapPermission)
   private async canManageAnnotations(user: any): Promise<boolean> {
@@ -144,7 +148,7 @@ export class MapAnnotationsService {
       }
     }
 
-    return this.prisma.mapAnnotation.create({
+    const annotation = await this.prisma.mapAnnotation.create({
       data: {
         mapName: data.mapName,
         x: data.x,
@@ -173,6 +177,22 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_MARKER_CREATED',
+      entity: 'MapAnnotation',
+      entityId: annotation.id,
+      meta: {
+        mapName: data.mapName,
+        label: data.label || null,
+        icon: data.icon || 'home',
+        familyContactId: data.familyContactId || null,
+      },
+    });
+
+    return annotation;
   }
 
   async update(
@@ -218,7 +238,7 @@ export class MapAnnotationsService {
       }
     }
 
-    return this.prisma.mapAnnotation.update({
+    const updated = await this.prisma.mapAnnotation.update({
       where: { id },
       data: {
         ...data,
@@ -244,6 +264,19 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_MARKER_UPDATED',
+      entity: 'MapAnnotation',
+      entityId: id,
+      meta: {
+        changes: data,
+      },
+    });
+
+    return updated;
   }
 
   async delete(user: any, id: string) {
@@ -261,9 +294,24 @@ export class MapAnnotationsService {
       throw new NotFoundException('Annotation nicht gefunden');
     }
 
-    return this.prisma.mapAnnotation.delete({
+    await this.prisma.mapAnnotation.delete({
       where: { id },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_MARKER_DELETED',
+      entity: 'MapAnnotation',
+      entityId: id,
+      meta: {
+        mapName: annotation.mapName,
+        label: annotation.label,
+        icon: annotation.icon,
+      },
+    });
+
+    return { success: true };
   }
 
   // Hole alle verfügbaren FamilyContacts für Dropdown
@@ -329,7 +377,7 @@ export class MapAnnotationsService {
       }
     }
 
-    return this.prisma.mapArea.create({
+    const area = await this.prisma.mapArea.create({
       data: {
         mapName: data.mapName,
         points: data.points,
@@ -348,6 +396,22 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_AREA_CREATED',
+      entity: 'MapArea',
+      entityId: area.id,
+      meta: {
+        mapName: data.mapName,
+        label: data.label,
+        color: data.color || '#f59e0b',
+        pointsCount: data.points.length,
+      },
+    });
+
+    return area;
   }
 
   async updateArea(
@@ -385,7 +449,7 @@ export class MapAnnotationsService {
       }
     }
 
-    return this.prisma.mapArea.update({
+    const updatedArea = await this.prisma.mapArea.update({
       where: { id },
       data,
       include: {
@@ -399,6 +463,19 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_AREA_UPDATED',
+      entity: 'MapArea',
+      entityId: id,
+      meta: {
+        changes: data,
+      },
+    });
+
+    return updatedArea;
   }
 
   async deleteArea(user: any, id: string) {
@@ -416,9 +493,23 @@ export class MapAnnotationsService {
       throw new NotFoundException('Gebiet nicht gefunden');
     }
 
-    return this.prisma.mapArea.delete({
+    await this.prisma.mapArea.delete({
       where: { id },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_AREA_DELETED',
+      entity: 'MapArea',
+      entityId: id,
+      meta: {
+        mapName: area.mapName,
+        label: area.label,
+      },
+    });
+
+    return { success: true };
   }
 
   // ============ PERMISSION MANAGEMENT ============
@@ -471,7 +562,7 @@ export class MapAnnotationsService {
       throw new ForbiddenException('Benutzer hat bereits eine Berechtigung');
     }
 
-    return this.prisma.mapPermission.create({
+    const permission = await this.prisma.mapPermission.create({
       data: {
         userId,
         grantedById: grantedBy.id,
@@ -496,6 +587,20 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: grantedBy.id,
+      action: 'MAP_PERMISSION_GRANTED',
+      entity: 'MapPermission',
+      entityId: permission.id,
+      meta: {
+        targetUserId: userId,
+        targetUsername: user.username,
+      },
+    });
+
+    return permission;
   }
 
   // Map-Berechtigung entfernen
@@ -512,9 +617,22 @@ export class MapAnnotationsService {
       throw new NotFoundException('Berechtigung nicht gefunden');
     }
 
-    return this.prisma.mapPermission.delete({
+    await this.prisma.mapPermission.delete({
       where: { userId },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_PERMISSION_REVOKED',
+      entity: 'MapPermission',
+      entityId: permission.id,
+      meta: {
+        targetUserId: userId,
+      },
+    });
+
+    return { success: true };
   }
 
   // Prüfe ob User eine Map-Berechtigung hat (für Frontend)
@@ -618,7 +736,7 @@ export class MapAnnotationsService {
       }
     }
 
-    return this.prisma.mapSuggestion.create({
+    const suggestion = await this.prisma.mapSuggestion.create({
       data: {
         mapName: data.mapName,
         x: data.x,
@@ -646,6 +764,21 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_SUGGESTION_CREATED',
+      entity: 'MapSuggestion',
+      entityId: suggestion.id,
+      meta: {
+        mapName: data.mapName,
+        label: data.label || null,
+        icon: data.icon || 'home',
+      },
+    });
+
+    return suggestion;
   }
 
   // Vorschlag genehmigen (erstellt eine echte Annotation)
@@ -680,7 +813,7 @@ export class MapAnnotationsService {
     });
 
     // Aktualisiere den Vorschlag-Status
-    return this.prisma.mapSuggestion.update({
+    const approved = await this.prisma.mapSuggestion.update({
       where: { id },
       data: {
         status: 'APPROVED',
@@ -713,6 +846,21 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_SUGGESTION_APPROVED',
+      entity: 'MapSuggestion',
+      entityId: id,
+      meta: {
+        mapName: suggestion.mapName,
+        label: suggestion.label,
+        createdById: suggestion.createdById,
+      },
+    });
+
+    return approved;
   }
 
   // Vorschlag ablehnen
@@ -733,7 +881,7 @@ export class MapAnnotationsService {
       throw new ForbiddenException('Vorschlag wurde bereits bearbeitet');
     }
 
-    return this.prisma.mapSuggestion.update({
+    const rejected = await this.prisma.mapSuggestion.update({
       where: { id },
       data: {
         status: 'REJECTED',
@@ -767,6 +915,22 @@ export class MapAnnotationsService {
         },
       },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_SUGGESTION_REJECTED',
+      entity: 'MapSuggestion',
+      entityId: id,
+      meta: {
+        mapName: suggestion.mapName,
+        label: suggestion.label,
+        createdById: suggestion.createdById,
+        reviewNote: reviewNote || null,
+      },
+    });
+
+    return rejected;
   }
 
   // Vorschlag löschen (nur eigene oder als Berechtigter)
@@ -785,9 +949,24 @@ export class MapAnnotationsService {
       throw new ForbiddenException('Keine Berechtigung');
     }
 
-    return this.prisma.mapSuggestion.delete({
+    await this.prisma.mapSuggestion.delete({
       where: { id },
     });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: 'MAP_SUGGESTION_DELETED',
+      entity: 'MapSuggestion',
+      entityId: id,
+      meta: {
+        mapName: suggestion.mapName,
+        label: suggestion.label,
+        wasOwnSuggestion: suggestion.createdById === user.id,
+      },
+    });
+
+    return { success: true };
   }
 
   // Anzahl offener Vorschläge (für Badge im UI)

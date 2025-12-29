@@ -336,13 +336,27 @@ export default function Layout({ children }: LayoutProps) {
     })
   }, [location.pathname])
 
-  const toggleGroup = (groupName: string) => {
+  const toggleGroup = useCallback((groupName: string) => {
+    // Save scroll position before state change
+    const desktopScroll = desktopNavRef.current?.scrollTop || 0
+    const mobileScroll = mobileNavRef.current?.scrollTop || 0
+    
     setExpandedGroups(prev => 
       prev.includes(groupName) 
         ? prev.filter(name => name !== groupName)
         : [...prev, groupName]
     )
-  }
+    
+    // Restore scroll position after re-render
+    requestAnimationFrame(() => {
+      if (desktopNavRef.current) {
+        desktopNavRef.current.scrollTop = desktopScroll
+      }
+      if (mobileNavRef.current) {
+        mobileNavRef.current.scrollTop = mobileScroll
+      }
+    })
+  }, [])
 
   // Don't render navigation if not authenticated
   if (!isAuthenticated) {

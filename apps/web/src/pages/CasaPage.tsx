@@ -17,10 +17,11 @@ interface CasaInfo {
 }
 
 const CASA_IMAGES = [
-  { id: '1', filename: 'default-aussen-einfahrt.png', alt: 'Außen - Einfahrt' },
-  { id: '2', filename: 'default-aussen-terasseundpool.png', alt: 'Außen - Terrasse und Pool' },
-  { id: '3', filename: 'default-innen-barbereich.png', alt: 'Innen - Bar-Bereich' },
-  { id: '4', filename: 'default-innen-wohnzimmer.png', alt: 'Innen - Wohnzimmer' },
+  { id: '1', filename: 'einfahrt-rundfahrt.png', alt: 'Einfahrt zu La Fuente Blanca' },
+  { id: '2', filename: 'blood-pool.png', alt: 'Blood Pool' },
+  { id: '3', filename: 'bar-pool.png', alt: 'Outdoor-Bar am Pool' },
+  { id: '4', filename: 'wohnzimmer.png', alt: 'Wohnzimmer' },
+  { id: '5', filename: 'besprechungs-circulo.png', alt: 'Besprechungs-Circulo' },
 ]
 
 export default function CasaPage() {
@@ -91,7 +92,7 @@ export default function CasaPage() {
             La Casa
           </h1>
           <p className="text-muted-foreground mt-1">
-            Unsere Villa in Grapeseed – Ein Ort der Sicherheit und Macht
+            La Fuente Blanca – Der weiße Brunnen in den Vinewood Hills
           </p>
         </div>
       </div>
@@ -107,26 +108,28 @@ export default function CasaPage() {
         <CardContent className="space-y-4">
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-300 leading-relaxed">
-              Hoch in den Bergen von Grapeseed, fernab der neugierigen Blicke der Stadt, thront unsere Villa – 
-              La Casa de La Santa Calavera. Ein Ort, der Sicherheit und Macht vereint.
+              An der Senora Road in den Vinewood Hills liegt unser Anwesen – La Fuente Blanca, der weiße Brunnen. 
+              Ein legendärer Ort, der einst Organizazia als Hauptquartier diente. Heute gehört er uns – 
+              La Santa Calavera.
             </p>
             <p className="text-gray-300 leading-relaxed flex items-start gap-2">
               <Shield className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
               <span>
-                Die abgelegene Lage bietet uns natürlichen Schutz. Umgeben von steilen Hängen und dichten Wäldern 
-                ist die Zufahrt leicht zu kontrollieren. Nur wer eingeladen ist, findet den Weg zu uns.
+                Das weitläufige Gelände bietet alles, was ein Kartell braucht: Der ikonische weiße Brunnen am Eingang 
+                markiert den Weg zu unserem Reich. Der Blood Pool – rot wie das Blut unserer Feinde – ist das Herzstück 
+                des Anwesens. Umgeben von Palmen und bewacht von unserem Adler.
               </span>
             </p>
             <p className="text-gray-300 leading-relaxed flex items-start gap-2">
               <Key className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
               <span>
-                Die Villa selbst ist modern und geräumig – mit großzügigen Wohn- und Geschäftsbereichen, 
-                einer voll ausgestatteten Bar für wichtige Gespräche und einem Pool-Bereich für die ruhigen Momente. 
-                Hier werden Entscheidungen getroffen, Strategien geschmiedet und Loyalität belohnt.
+                Der Besprechungs-Circulo mit dem eingebrannten Calavera-Logo ist der Ort, an dem Entscheidungen 
+                getroffen werden. Die überdachte Outdoor-Bar lädt zu Verhandlungen bei einem kühlen Drink ein. 
+                Im eleganten Wohnzimmer werden Geschäfte besiegelt und Allianzen geschmiedet.
               </span>
             </p>
             <p className="text-gray-300 leading-relaxed italic text-sm border-l-2 border-primary/50 pl-4 mt-4">
-              "In den Bergen geboren, durch Blut verbunden – La Santa Calavera."
+              "La Fuente Blanca – wo der weiße Brunnen das Blut unserer Feinde wäscht."
             </p>
           </div>
         </CardContent>
@@ -302,23 +305,29 @@ export default function CasaPage() {
         <CardHeader>
           <CardTitle className="text-primary">Impressionen</CardTitle>
           <CardDescription>
-            Bilder unserer Casa in Grapeseed
+            Bilder von La Fuente Blanca
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {CASA_IMAGES.map((image) => (
-              <div key={image.id} className="relative group">
-                <img
-                  src={`/casa/${image.filename}`}
-                  alt={image.alt}
-                  className="w-full h-64 object-cover rounded-lg border border-gray-700 hover:border-primary/50 transition-colors"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 rounded-b-lg">
-                  <p className="text-white text-sm font-medium">{image.alt}</p>
+            {CASA_IMAGES.map((image, index) => {
+              const isLastAndOdd = index === CASA_IMAGES.length - 1 && CASA_IMAGES.length % 2 === 1
+              return (
+                <div 
+                  key={image.id} 
+                  className={`relative group ${isLastAndOdd ? 'md:col-span-2' : ''}`}
+                >
+                  <img
+                    src={`/casa/${image.filename}`}
+                    alt={image.alt}
+                    className={`w-full object-cover rounded-lg border border-gray-700 hover:border-primary/50 transition-colors ${isLastAndOdd ? 'h-[28rem]' : 'h-96'}`}
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 rounded-b-lg">
+                    <p className="text-white text-sm font-medium">{image.alt}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </CardContent>
       </Card>

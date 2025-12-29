@@ -197,7 +197,7 @@ export default function AbmeldungenPage() {
     onSelect: (date: Date) => void; 
     minDate?: Date | null;
   }) => (
-    <div className="absolute z-50 mt-2 w-full bg-gray-800 border border-amber-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 p-4">
+    <div className="absolute z-[100] mt-2 w-full bg-gray-800 border border-amber-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 p-4">
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-4">
         <Button
@@ -562,12 +562,12 @@ export default function AbmeldungenPage() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-16 p-4 z-50 animate-in fade-in duration-200 overflow-y-auto">
           <div className="w-full max-w-md relative">
             {/* Glow Effect */}
             <div className="absolute -inset-2 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
             
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl shadow-cyan-500/10 rounded-2xl overflow-hidden">
+            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl shadow-cyan-500/10 rounded-2xl overflow-visible">
               {/* Header mit Gradient */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
