@@ -47,6 +47,8 @@ export class OrganigrammService {
     [Role.QUARTIERMEISTER]: 'funktionsleiter-logistica',
     [Role.MITGLIED]: 'ranks-1-3',
     [Role.GAST]: 'ranks-1-3',
+    // Partner (nicht im Organigramm)
+    [Role.PARTNER]: 'external',
   };
 
   constructor(private prisma: PrismaService) {}

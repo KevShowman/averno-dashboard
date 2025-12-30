@@ -16,12 +16,37 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
       callbackURL: configService.get<string>('DISCORD_REDIRECT_URI'),
       scope: ['identify', 'email'],
       passReqToCallback: true, // Enables access to the request object
+      // Note: state is passed manually via URL, not via passport state handling
     });
   }
 
   async validate(req: any, accessToken: string, refreshToken: string, profile: any) {
-    // Store rememberMe state from query parameter
-    req.rememberMe = req.query.state === 'remember_me';
+    // Get state from cookie (set before Discord redirect)
+    const state = req.cookies?.auth_state || '';
+    
+    console.log('[DiscordStrategy] State from cookie:', state);
+    console.log('[DiscordStrategy] Profile:', profile?.id, profile?.username);
+    
+    // Check if this is a partner login
+    if (state === 'partner_login') {
+      console.log('[DiscordStrategy] Partner login detected - skipping role validation');
+      req.isPartnerLogin = true;
+      
+      // Return the profile directly for partner processing in controller
+      // NO Discord role validation for partners!
+      return {
+        discordId: profile.id,
+        username: profile.username,
+        avatarUrl: profile.avatar 
+          ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` 
+          : null,
+        email: profile.email || null,
+        isPartnerLogin: true,
+      };
+    }
+    
+    // Store rememberMe state from cookie
+    req.rememberMe = state === 'remember_me';
     return this.authService.validateDiscordUser(profile);
   }
 }

@@ -62,6 +62,7 @@ const getRoleDisplayName = (role: string) => {
     'LOGISTICA': 'Logística',
     'SICARIO': 'Sicario',
     'FUTURO': 'Futuro',
+    'PARTNER': 'Partner',
   }
   return roleMap[role] || role
 }
@@ -72,6 +73,9 @@ const getRoleBadgeColor = (role: string) => {
   }
   if (role === 'SICARIO') {
     return 'bg-red-500/20 text-red-300 border-red-500/30'
+  }
+  if (role === 'PARTNER') {
+    return 'bg-blue-500/20 text-blue-300 border-blue-500/30'
   }
   return 'bg-gray-500/20 text-gray-300 border-gray-500/30'
 }
@@ -175,7 +179,22 @@ const navGroups: NavGroup[] = [
     icon: Cog,
     items: [
       { name: 'Audit-Log', href: '/audit', icon: FileText },
+      { name: 'Partner-Verwaltung', href: '/partner-management', icon: Users, leadershipOnly: true },
       { name: 'Einstellungen', href: '/settings', icon: Settings },
+    ]
+  },
+]
+
+// Eingeschränkte Navigation für Partner
+const partnerNavGroups: NavGroup[] = [
+  {
+    name: 'Partner-Bereich',
+    icon: LayoutDashboard,
+    defaultOpen: true,
+    items: [
+      { name: 'Übersicht', href: '/app/partner', icon: LayoutDashboard },
+      { name: 'Interaktive Karte', href: '/karte', icon: Map },
+      { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen },
     ]
   },
 ]
@@ -370,11 +389,15 @@ export default function Layout({ children }: LayoutProps) {
       onLinkClick?.()
     }
 
+    // Bestimme welche Navigation verwendet werden soll
+    const isPartnerUser = user?.isPartner && user?.role === 'PARTNER'
+    const navigationGroups = isPartnerUser ? partnerNavGroups : navGroups
+
     return (
     <>
       {/* Logo */}
       <div className="p-5 border-b border-white/5">
-        <Link to="/app" className="flex items-center gap-3 group" onClick={handleLinkClick}>
+        <Link to={isPartnerUser ? "/app/partner" : "/app"} className="flex items-center gap-3 group" onClick={handleLinkClick}>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/40 to-amber-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
             <div className="relative w-14 h-14 flex items-center justify-center">
@@ -388,6 +411,11 @@ export default function Layout({ children }: LayoutProps) {
           <div>
             <h1 className="text-lg font-bold text-white tracking-tight">La Santa</h1>
             <p className="text-xs text-amber-400/80 font-medium -mt-0.5">Calavera</p>
+            {isPartnerUser && (
+              <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-gray-700/50 text-gray-400 border border-gray-600/30">
+                Partner-Zugang
+              </span>
+            )}
           </div>
         </Link>
       </div>
@@ -397,7 +425,7 @@ export default function Layout({ children }: LayoutProps) {
         ref={navRef as React.RefObject<HTMLDivElement>}
         className="flex-1 overflow-y-auto p-3 space-y-1 sidebar-scrollbar"
       >
-        {navGroups.map((group) => (
+        {navigationGroups.map((group) => (
           <NavGroupComponent
             key={group.name}
             group={group}

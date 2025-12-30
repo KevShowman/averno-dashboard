@@ -29,6 +29,7 @@ import { SicarioModule } from './sicario/sicario.module';
 import { FamilyContactsModule } from './family-contacts/family-contacts.module';
 import { MapAnnotationsModule } from './map-annotations/map-annotations.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { PartnerModule } from './partner/partner.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -71,6 +72,7 @@ import { AppService } from './app.service';
     FamilyContactsModule,
     MapAnnotationsModule,
     AttendanceModule,
+    PartnerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

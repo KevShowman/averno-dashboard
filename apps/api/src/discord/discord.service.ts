@@ -85,15 +85,18 @@ export class DiscordService {
           username: true,
           icFirstName: true,
           icLastName: true,
+          isPartner: true,
         },
       });
 
       console.log(`📊 DB Users: ${dbUsers.length}`);
 
-      // Finde User die nicht mehr im Discord sind
-      const usersToDelete = dbUsers.filter(user => !discordIds.has(user.discordId));
+      // Finde User die nicht mehr im Discord sind (aber KEINE Partner - die müssen nicht im Server sein)
+      const usersToDelete = dbUsers.filter(user => 
+        !discordIds.has(user.discordId) && !user.isPartner
+      );
 
-      console.log(`🗑️  User zum Löschen: ${usersToDelete.length}`);
+      console.log(`🗑️  User zum Löschen: ${usersToDelete.length} (Partner werden übersprungen)`);
 
       // Lösche Ghost Users (mit CASCADE delete aller abhängigen Datensätze)
       let deletedCount = 0;
@@ -1249,11 +1252,14 @@ export class DiscordService {
           discordId: true,
           username: true,
           role: true,
+          isPartner: true,
         }
       });
       
-      // User die nicht mehr im Discord sind
-      const usersToRemove = allDbUsers.filter(user => !discordMemberIds.has(user.discordId));
+      // User die nicht mehr im Discord sind (aber KEINE Partner - die müssen nicht im Server sein)
+      const usersToRemove = allDbUsers.filter(user => 
+        !discordMemberIds.has(user.discordId) && !user.isPartner
+      );
       
       let removedCount = 0;
       const removedUsers = [];
@@ -1298,6 +1304,61 @@ export class DiscordService {
     } catch (error) {
       console.error('Fehler bei der Discord-User-Synchronisierung:', error);
       throw error;
+    }
+  }
+
+  // Partner-Anfrage Benachrichtigung an Leadership senden
+  async sendPartnerRequestNotification(
+    username: string, 
+    familyName: string, 
+    reason: string, 
+    isReRequest: boolean = false
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      
+      if (!webhookUrl) {
+        console.warn('DISCORD_PARTNER_WEBHOOK_URL nicht konfiguriert - keine Benachrichtigung gesendet');
+        return;
+      }
+
+      const embed = {
+        title: isReRequest ? '🔄 Neue Partner-Anfrage (erneut)' : '📨 Neue Partner-Zugangsanfrage',
+        color: isReRequest ? 0xFFA500 : 0x5865F2, // Orange für Re-Request, Discord Blau für neu
+        fields: [
+          {
+            name: 'Discord Benutzer',
+            value: username,
+            inline: true,
+          },
+          {
+            name: 'Familie',
+            value: familyName,
+            inline: true,
+          },
+          {
+            name: 'Begründung',
+            value: reason.substring(0, 1000) || 'Keine Begründung angegeben',
+            inline: false,
+          },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: 'LSC Partner-System',
+        },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [embed],
+        }),
+      });
+
+      console.log(`✅ Partner-Anfrage Benachrichtigung gesendet für ${username}`);
+    } catch (error) {
+      console.error('Fehler beim Senden der Partner-Anfrage Benachrichtigung:', error);
     }
   }
 }

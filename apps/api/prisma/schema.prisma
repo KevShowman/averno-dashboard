@@ -26,47 +26,54 @@ model User {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  actions                       ActionLog[]
-  moneyTxCreated                MoneyTransaction[]             @relation("tx_created_by")
-  moneyTxApproved               MoneyTransaction[]             @relation("tx_approved_by")
-  stockMovements                StockMovement[]                @relation("movement_created_by")
-  stockMovementsApproved        StockMovement[]                @relation("movement_approved_by")
-  packageDeposits               PackageDeposit[]               @relation("deposit_created_by")
-  packageConfirmations          PackageDeposit[]               @relation("deposit_confirmed_by")
-  packageRejections             PackageDeposit[]               @relation("deposit_rejected_by")
-  weeklyDeliveries              WeeklyDelivery[]               @relation("delivery_created_by")
-  weeklyDeliveryConfirmations   WeeklyDelivery[]               @relation("delivery_confirmed_by")
-  sanctionsCreated              Sanction[]                     @relation("sanction_created_by")
-  sanctionsReceived             Sanction[]                     @relation("sanction_received_by")
-  exclusionsReceived            WeeklyDeliveryExclusion[]      @relation("exclusion_user")
-  exclusionsCreated             WeeklyDeliveryExclusion[]      @relation("exclusion_created_by")
-  archivesCreated               WeeklyDeliveryArchive[]        @relation("archive_created_by")
-  aufstellungenCreated          Aufstellung[]                  @relation("aufstellung_created_by")
-  aufstellungResponses          AufstellungResponse[]          @relation("aufstellung_responses")
-  aufstellungExclusionsReceived AufstellungExclusion[]         @relation("aufstellung_exclusion_user")
-  aufstellungExclusionsCreated  AufstellungExclusion[]         @relation("aufstellung_exclusion_created_by")
-  abmeldungenCreated            Abmeldung[]                    @relation("abmeldung_user")
-  familiensammelnParticipations FamiliensammelnParticipation[] @relation("familiensammeln_participations")
-  organigrammAssignments        OrganigrammAssignment[]        @relation("organigramm_assignments")
-  processors                    FamiliensammelnProcessor[]     @relation("processor_user")
-  processorsCompleted           FamiliensammelnProcessor[]     @relation("processor_completed_by")
-  memberFile                    MemberFile?                    @relation("member_files")
-  fileEntriesCreated            MemberFileEntry[]              @relation("file_entries_created")
-  sicarioAufstellungenCreated   SicarioAufstellung[]           @relation("sicario_aufstellung_created_by")
-  sicarioAufstellungResponses   SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
-  mapAnnotationsCreated         MapAnnotation[]                @relation("map_annotation_created_by")
-  mapAreasCreated               MapArea[]                      @relation("map_area_created_by")
-  familyContactsOutdatedMarked  FamilyContact[]                @relation("family_contact_outdated_by")
-  dailyAttendanceMarked         DailyAttendance[]              @relation("attendance_marked_by")
-  dailyAttendanceReceived       DailyAttendance[]              @relation("attendance_user")
-  attendancePermissionsGranted  AttendancePermission[]         @relation("attendance_permission_granted_by")
-  attendancePermissionsReceived AttendancePermission[]         @relation("attendance_permission_user")
-  listPermissionsGranted        ListPermission[]               @relation("list_permission_granted_by")
-  listPermissionsReceived       ListPermission[]               @relation("list_permission_user")
-  mapPermissionsGranted         MapPermission[]                @relation("map_permission_granted_by")
-  mapPermissionsReceived        MapPermission[]                @relation("map_permission_user")
-  mapSuggestionsCreated         MapSuggestion[]                @relation("map_suggestion_created_by")
-  mapSuggestionsReviewed        MapSuggestion[]                @relation("map_suggestion_reviewed_by")
+  actions                          ActionLog[]
+  moneyTxCreated                   MoneyTransaction[]             @relation("tx_created_by")
+  moneyTxApproved                  MoneyTransaction[]             @relation("tx_approved_by")
+  stockMovements                   StockMovement[]                @relation("movement_created_by")
+  stockMovementsApproved           StockMovement[]                @relation("movement_approved_by")
+  packageDeposits                  PackageDeposit[]               @relation("deposit_created_by")
+  packageConfirmations             PackageDeposit[]               @relation("deposit_confirmed_by")
+  packageRejections                PackageDeposit[]               @relation("deposit_rejected_by")
+  weeklyDeliveries                 WeeklyDelivery[]               @relation("delivery_created_by")
+  weeklyDeliveryConfirmations      WeeklyDelivery[]               @relation("delivery_confirmed_by")
+  sanctionsCreated                 Sanction[]                     @relation("sanction_created_by")
+  sanctionsReceived                Sanction[]                     @relation("sanction_received_by")
+  exclusionsReceived               WeeklyDeliveryExclusion[]      @relation("exclusion_user")
+  exclusionsCreated                WeeklyDeliveryExclusion[]      @relation("exclusion_created_by")
+  archivesCreated                  WeeklyDeliveryArchive[]        @relation("archive_created_by")
+  aufstellungenCreated             Aufstellung[]                  @relation("aufstellung_created_by")
+  aufstellungResponses             AufstellungResponse[]          @relation("aufstellung_responses")
+  aufstellungExclusionsReceived    AufstellungExclusion[]         @relation("aufstellung_exclusion_user")
+  aufstellungExclusionsCreated     AufstellungExclusion[]         @relation("aufstellung_exclusion_created_by")
+  abmeldungenCreated               Abmeldung[]                    @relation("abmeldung_user")
+  familiensammelnParticipations    FamiliensammelnParticipation[] @relation("familiensammeln_participations")
+  organigrammAssignments           OrganigrammAssignment[]        @relation("organigramm_assignments")
+  processors                       FamiliensammelnProcessor[]     @relation("processor_user")
+  processorsCompleted              FamiliensammelnProcessor[]     @relation("processor_completed_by")
+  memberFile                       MemberFile?                    @relation("member_files")
+  fileEntriesCreated               MemberFileEntry[]              @relation("file_entries_created")
+  sicarioAufstellungenCreated      SicarioAufstellung[]           @relation("sicario_aufstellung_created_by")
+  sicarioAufstellungResponses      SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
+  mapAnnotationsCreated            MapAnnotation[]                @relation("map_annotation_created_by")
+  mapAreasCreated                  MapArea[]                      @relation("map_area_created_by")
+  familyContactsOutdatedMarked     FamilyContact[]                @relation("family_contact_outdated_by")
+  dailyAttendanceMarked            DailyAttendance[]              @relation("attendance_marked_by")
+  dailyAttendanceReceived          DailyAttendance[]              @relation("attendance_user")
+  attendancePermissionsGranted     AttendancePermission[]         @relation("attendance_permission_granted_by")
+  attendancePermissionsReceived    AttendancePermission[]         @relation("attendance_permission_user")
+  listPermissionsGranted           ListPermission[]               @relation("list_permission_granted_by")
+  listPermissionsReceived          ListPermission[]               @relation("list_permission_user")
+  mapPermissionsGranted            MapPermission[]                @relation("map_permission_granted_by")
+  mapPermissionsReceived           MapPermission[]                @relation("map_permission_user")
+  mapSuggestionsCreated            MapSuggestion[]                @relation("map_suggestion_created_by")
+  mapSuggestionsReviewed           MapSuggestion[]                @relation("map_suggestion_reviewed_by")
+  // Partner System
+  isPartner                        Boolean                        @default(false) // Kennzeichnet Partner-User
+  partnerRequestsReviewed          PartnerAccessRequest[]         @relation("partner_request_reviewed_by")
+  partnerPermissionsGranted        PartnerManagementPermission[]  @relation("partner_permission_granted_by")
+  partnerPermissionsReceived       PartnerManagementPermission[]  @relation("partner_permission_user")
+  partnerFamilySuggestionsCreated  PartnerFamilySuggestion[]      @relation("partner_family_suggestion_created_by")
+  partnerFamilySuggestionsReviewed PartnerFamilySuggestion[]      @relation("partner_family_suggestion_reviewed_by")
 
   @@map("users")
 }
@@ -103,6 +110,8 @@ enum Role {
   // Legacy Rollen (deprecated)
   ROUTENVERWALTUNG // Alte Routenverwaltung
   FUTURO // Anwärter, niedrigste Rolle, nur lesen
+  // Partner (externe Benutzer)
+  PARTNER // 🤝 - Partner (eingeschränkter Zugriff auf Karte & Listen)
 }
 
 model Module {
@@ -774,60 +783,61 @@ model SicarioAufstellungResponse {
 
 // Listenführung - Familien-Kontakte
 model FamilyContact {
-  id                  String              @id @default(cuid())
-  familyName          String              // Familienname
-  status              FamilyContactStatus @default(UNKNOWN) // Status der Familie
-  propertyZip         String?             // Anwesen PLZ (max 6 Stellen)
+  id                 String              @id @default(cuid())
+  familyName         String // Familienname
+  status             FamilyContactStatus @default(UNKNOWN) // Status der Familie
+  propertyZip        String? // Anwesen PLZ (max 6 Stellen)
   // Ansprechpartner 1
-  contact1FirstName   String?
-  contact1LastName    String?
-  contact1Phone       String?             // IC Rufnummer
+  contact1FirstName  String?
+  contact1LastName   String?
+  contact1Phone      String? // IC Rufnummer
   // Ansprechpartner 2
-  contact2FirstName   String?
-  contact2LastName    String?
-  contact2Phone       String?             // IC Rufnummer
+  contact2FirstName  String?
+  contact2LastName   String?
+  contact2Phone      String? // IC Rufnummer
   // Kontaktdaten Patron / Führung
-  leadershipInfo      String?             // Kann Vorname, Nachname oder Telefonnummer sein
-  notes               String?             @db.Text // Zusätzliche Notizen
+  leadershipInfo     String? // Kann Vorname, Nachname oder Telefonnummer sein
+  notes              String?             @db.Text // Zusätzliche Notizen
   // Schlüsselfamilie & Veraltet-Status
-  isKeyFamily         Boolean             @default(false) // Offizielle Schlüsselfamilie
-  isOutdated          Boolean             @default(false) // Information veraltet
-  outdatedMarkedAt    DateTime?           // Wann als veraltet markiert
-  outdatedMarkedById  String?             // Wer hat als veraltet markiert
-  outdatedMarkedBy    User?               @relation("family_contact_outdated_by", fields: [outdatedMarkedById], references: [id])
-  outdatedComment     String?             @db.Text // Kommentar wieso veraltet
-  createdById         String
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  isKeyFamily        Boolean             @default(false) // Offizielle Schlüsselfamilie
+  isOutdated         Boolean             @default(false) // Information veraltet
+  outdatedMarkedAt   DateTime? // Wann als veraltet markiert
+  outdatedMarkedById String? // Wer hat als veraltet markiert
+  outdatedMarkedBy   User?               @relation("family_contact_outdated_by", fields: [outdatedMarkedById], references: [id])
+  outdatedComment    String?             @db.Text // Kommentar wieso veraltet
+  createdById        String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   // Relations
-  mapAnnotations      MapAnnotation[]     @relation("map_annotation_family")
-  mapSuggestions      MapSuggestion[]     @relation("map_suggestion_family")
+  mapAnnotations     MapAnnotation[]           @relation("map_annotation_family")
+  mapSuggestions     MapSuggestion[]           @relation("map_suggestion_family")
+  partnerSuggestions PartnerFamilySuggestion[] @relation("partner_suggestion_family")
 
   @@map("family_contacts")
 }
 
 enum FamilyContactStatus {
-  UNKNOWN    // Unbekannt
-  ACTIVE     // Aktiv
+  UNKNOWN // Unbekannt
+  ACTIVE // Aktiv
   ENDANGERED // Gefährdet
-  DISSOLVED  // Aufgelöst
+  DISSOLVED // Aufgelöst
 }
 
 // Interaktive Karte - Map Annotationen
 model MapAnnotation {
-  id              String          @id @default(cuid())
-  mapName         MapName         // NARCO_CITY, ROXWOOD, CAYO_PERICO
-  x               Float           // Normalisierte X-Koordinate (0.0 - 1.0)
-  y               Float           // Normalisierte Y-Koordinate (0.0 - 1.0)
-  icon            String          @default("home") // Icon: home, building, warehouse, skull, etc.
-  label           String?         // Optionaler Kurztext für Tooltip
+  id              String         @id @default(cuid())
+  mapName         MapName // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  x               Float // Normalisierte X-Koordinate (0.0 - 1.0)
+  y               Float // Normalisierte Y-Koordinate (0.0 - 1.0)
+  icon            String         @default("home") // Icon: home, building, warehouse, skull, etc.
+  label           String? // Optionaler Kurztext für Tooltip
   familyContactId String?
-  familyContact   FamilyContact?  @relation("map_annotation_family", fields: [familyContactId], references: [id], onDelete: SetNull)
-  createdById     String?         // Optional für historische Daten wenn Ersteller gelöscht
-  createdBy       User?           @relation("map_annotation_created_by", fields: [createdById], references: [id], onDelete: SetNull)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  familyContact   FamilyContact? @relation("map_annotation_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  createdById     String? // Optional für historische Daten wenn Ersteller gelöscht
+  createdBy       User?          @relation("map_annotation_created_by", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@map("map_annotations")
 }
@@ -840,29 +850,29 @@ enum MapName {
 
 // Interaktive Karte - Gebiete/Bereiche
 model MapArea {
-  id              String          @id @default(cuid())
-  mapName         MapName         // NARCO_CITY, ROXWOOD, CAYO_PERICO
-  points          Json            // Array von {x, y} Koordinaten (normalisiert 0-1)
-  label           String          // Gebietsname
-  color           String          @default("#f59e0b") // Hex-Farbe
-  createdById     String?         // Optional für historische Daten wenn Ersteller gelöscht
-  createdBy       User?           @relation("map_area_created_by", fields: [createdById], references: [id], onDelete: SetNull)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id          String   @id @default(cuid())
+  mapName     MapName // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  points      Json // Array von {x, y} Koordinaten (normalisiert 0-1)
+  label       String // Gebietsname
+  color       String   @default("#f59e0b") // Hex-Farbe
+  createdById String? // Optional für historische Daten wenn Ersteller gelöscht
+  createdBy   User?    @relation("map_area_created_by", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("map_areas")
 }
 
 // Tägliche Anwesenheitsliste
 model DailyAttendance {
-  id          String   @id @default(cuid())
-  date        DateTime @db.Date // Datum der Anwesenheit
-  userId      String   // Wer war anwesend
-  user        User     @relation("attendance_user", fields: [userId], references: [id], onDelete: Cascade)
-  markedById  String?  // Wer hat die Anwesenheit eingetragen (optional für historische Daten)
-  markedBy    User?    @relation("attendance_marked_by", fields: [markedById], references: [id], onDelete: SetNull)
-  markedAt    DateTime @default(now()) // Wann wurde eingetragen
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  date       DateTime @db.Date // Datum der Anwesenheit
+  userId     String // Wer war anwesend
+  user       User     @relation("attendance_user", fields: [userId], references: [id], onDelete: Cascade)
+  markedById String? // Wer hat die Anwesenheit eingetragen (optional für historische Daten)
+  markedBy   User?    @relation("attendance_marked_by", fields: [markedById], references: [id], onDelete: SetNull)
+  markedAt   DateTime @default(now()) // Wann wurde eingetragen
+  createdAt  DateTime @default(now())
 
   @@unique([date, userId]) // Pro Tag und User nur ein Eintrag
   @@map("daily_attendance")
@@ -873,7 +883,7 @@ model AttendancePermission {
   id          String   @id @default(cuid())
   userId      String   @unique // Wer hat die Berechtigung
   user        User     @relation("attendance_permission_user", fields: [userId], references: [id], onDelete: Cascade)
-  grantedById String?  // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedById String? // Wer hat die Berechtigung erteilt (optional für historische Daten)
   grantedBy   User?    @relation("attendance_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
   grantedAt   DateTime @default(now())
   createdAt   DateTime @default(now())
@@ -883,27 +893,27 @@ model AttendancePermission {
 
 // Männer-Outfits (5 vordefinierte Outfits)
 model MaleOutfit {
-  id              String   @id @default(cuid())
-  outfitNumber    Int      @unique // 1-5
-  name            String   // Name des Outfits
-  imagePath       String?  // Pfad zum Bild (relativ zu /uploads/outfits/)
+  id                String   @id @default(cuid())
+  outfitNumber      Int      @unique // 1-5
+  name              String // Name des Outfits
+  imagePath         String? // Pfad zum Bild (relativ zu /uploads/outfits/)
   // Kleidungsstücke
-  maskItem        Int?
-  maskVariation   Int?
-  torsoItem       Int?
-  torsoVariation  Int?
-  tshirtItem      Int?
-  tshirtVariation Int?
-  vesteItem       Int?
-  vesteVariation  Int?
-  hoseItem        Int?
-  hoseVariation   Int?
-  schuheItem      Int?
-  schuheVariation Int?
-  rucksackItem    Int?
+  maskItem          Int?
+  maskVariation     Int?
+  torsoItem         Int?
+  torsoVariation    Int?
+  tshirtItem        Int?
+  tshirtVariation   Int?
+  vesteItem         Int?
+  vesteVariation    Int?
+  hoseItem          Int?
+  hoseVariation     Int?
+  schuheItem        Int?
+  schuheVariation   Int?
+  rucksackItem      Int?
   rucksackVariation Int?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@map("male_outfits")
 }
@@ -913,7 +923,7 @@ model ListPermission {
   id          String   @id @default(cuid())
   userId      String   @unique // Wer hat die Berechtigung
   user        User     @relation("list_permission_user", fields: [userId], references: [id], onDelete: Cascade)
-  grantedById String?  // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedById String? // Wer hat die Berechtigung erteilt (optional für historische Daten)
   grantedBy   User?    @relation("list_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
   grantedAt   DateTime @default(now())
   createdAt   DateTime @default(now())
@@ -926,7 +936,7 @@ model MapPermission {
   id          String   @id @default(cuid())
   userId      String   @unique // Wer hat die Berechtigung
   user        User     @relation("map_permission_user", fields: [userId], references: [id], onDelete: Cascade)
-  grantedById String?  // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedById String? // Wer hat die Berechtigung erteilt (optional für historische Daten)
   grantedBy   User?    @relation("map_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
   grantedAt   DateTime @default(now())
   createdAt   DateTime @default(now())
@@ -937,19 +947,19 @@ model MapPermission {
 // Karten-Änderungsvorschläge (für User ohne Berechtigungen)
 model MapSuggestion {
   id              String           @id @default(cuid())
-  mapName         MapName          // NARCO_CITY, ROXWOOD, CAYO_PERICO
-  x               Float            // Normalisierte X-Koordinate (0.0 - 1.0)
-  y               Float            // Normalisierte Y-Koordinate (0.0 - 1.0)
+  mapName         MapName // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  x               Float // Normalisierte X-Koordinate (0.0 - 1.0)
+  y               Float // Normalisierte Y-Koordinate (0.0 - 1.0)
   icon            String           @default("home") // Icon: home, building, warehouse, skull, etc.
-  label           String?          // Optionaler Kurztext
-  familyContactId String?          // Optional: Verknüpfung mit Familie
+  label           String? // Optionaler Kurztext
+  familyContactId String? // Optional: Verknüpfung mit Familie
   familyContact   FamilyContact?   @relation("map_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
   status          SuggestionStatus @default(PENDING)
-  createdById     String           // Wer hat den Vorschlag erstellt
+  createdById     String // Wer hat den Vorschlag erstellt
   createdBy       User             @relation("map_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
-  reviewedById    String?          // Wer hat den Vorschlag überprüft
+  reviewedById    String? // Wer hat den Vorschlag überprüft
   reviewedBy      User?            @relation("map_suggestion_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
-  reviewedAt      DateTime?        // Wann wurde überprüft
+  reviewedAt      DateTime? // Wann wurde überprüft
   reviewNote      String?          @db.Text // Kommentar bei Ablehnung
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -958,9 +968,91 @@ model MapSuggestion {
 }
 
 enum SuggestionStatus {
-  PENDING  // Offen
+  PENDING // Offen
   APPROVED // Genehmigt
   REJECTED // Abgelehnt
+}
+
+// ============ PARTNER SYSTEM ============
+
+// Partner-Zugangsanfragen
+model PartnerAccessRequest {
+  id           String              @id @default(cuid())
+  discordId    String              @unique // Discord-ID des Partners
+  username     String // Discord-Username
+  avatarUrl    String? // Avatar
+  familyName   String? // Von welcher Familie ist der Partner
+  reason       String?             @db.Text // Warum möchte der Partner Zugang
+  status       PartnerAccessStatus @default(PENDING)
+  reviewedById String? // Wer hat die Anfrage bearbeitet
+  reviewedBy   User?               @relation("partner_request_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+  reviewNote   String?             @db.Text // Kommentar bei Ablehnung
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@map("partner_access_requests")
+}
+
+enum PartnerAccessStatus {
+  PENDING // Ausstehend
+  APPROVED // Genehmigt
+  REJECTED // Abgelehnt
+}
+
+// Berechtigung zur Partner-Verwaltung (wer darf Partner-Anfragen bearbeiten)
+model PartnerManagementPermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("partner_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String? // Wer hat die Berechtigung erteilt
+  grantedBy   User?    @relation("partner_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("partner_management_permissions")
+}
+
+// Partner-Vorschläge für Familienkontakte
+model PartnerFamilySuggestion {
+  id               String                @id @default(cuid())
+  type             PartnerSuggestionType // CREATE, UPDATE
+  familyContactId  String? // Falls UPDATE: Referenz zur bestehenden Familie
+  familyContact    FamilyContact?        @relation("partner_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  // Vorgeschlagene Daten
+  familyName       String // Familienname
+  familyStatus     FamilyContactStatus? // Status der Familie
+  propertyZip      String? // Anwesen PLZ
+  // Kontaktdaten (von Partner eingepflegt, aber nicht einsehbar für Partner)
+  contact1FirstName String? // Kontakt 1 Vorname
+  contact1LastName  String? // Kontakt 1 Nachname
+  contact1Phone     String? // Kontakt 1 Telefon
+  contact2FirstName String? // Kontakt 2 Vorname
+  contact2LastName  String? // Kontakt 2 Nachname
+  contact2Phone     String? // Kontakt 2 Telefon
+  notes            String?               @db.Text // Notizen
+  // Map-Koordinaten (optional)
+  mapName          MapName? // Karte
+  mapX             Float? // X-Koordinate
+  mapY             Float? // Y-Koordinate
+  mapIcon          String? // Icon
+  // Review-Status
+  suggestionStatus SuggestionStatus      @default(PENDING)
+  createdById      String // Partner der den Vorschlag erstellt hat
+  createdBy        User                  @relation("partner_family_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  reviewedById     String? // Wer hat den Vorschlag überprüft
+  reviewedBy       User?                 @relation("partner_family_suggestion_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt       DateTime?
+  reviewNote       String?               @db.Text // Kommentar bei Ablehnung
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@map("partner_family_suggestions")
+}
+
+enum PartnerSuggestionType {
+  CREATE // Neue Familie vorschlagen
+  UPDATE // Bestehende Familie aktualisieren
 }
 
 // Discord Role Mappings

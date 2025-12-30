@@ -60,6 +60,8 @@ export class ClothingService {
     [Role.QUARTIERMEISTER]: '4-6',
     [Role.MITGLIED]: '1-3',
     [Role.GAST]: '1-3',
+    // Partner (kein Kleidungszugang)
+    [Role.PARTNER]: '1-3',
   };
 
   // Leaderschaft-Rollen (dürfen Kleidung bearbeiten)

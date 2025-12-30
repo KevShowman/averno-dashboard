@@ -37,6 +37,23 @@ import ListenfuehrungPage from './pages/ListenfuehrungPage'
 import KartePage from './pages/KartePage'
 import AttendancePage from './pages/AttendancePage'
 import SlangPage from './pages/SlangPage'
+import PartnerPendingPage from './pages/PartnerPendingPage'
+import PartnerRequestedPage from './pages/PartnerRequestedPage'
+import PartnerRequestPage from './pages/PartnerRequestPage'
+import PartnerManagementPage from './pages/PartnerManagementPage'
+import PartnerDashboardPage from './pages/PartnerDashboardPage'
+import PartnerListenfuehrungPage from './pages/PartnerListenfuehrungPage'
+
+// Wrapper to show different Listenführung based on user type
+function ListenfuehrungWrapper() {
+  const { user } = useAuthStore()
+  
+  if (user?.isPartner) {
+    return <PartnerListenfuehrungPage />
+  }
+  
+  return <ListenfuehrungPage />
+}
 
 function App() {
   const { checkAuth, isLoading, user, isAuthenticated, setQueryClient } = useAuthStore()
@@ -52,9 +69,11 @@ function App() {
   }, [queryClient, setQueryClient])
 
   useEffect(() => {
-    // Don't check auth on error pages or login page
+    // Don't check auth on error pages, login page, or partner request pages
     const path = window.location.pathname;
-    if (path !== '/discord-error' && path !== '/login') {
+    const unprotectedPaths = ['/discord-error', '/login', '/partner-request', '/partner-pending', '/partner-requested'];
+    
+    if (!unprotectedPaths.includes(path)) {
       checkAuth();
     } else {
       // Set loading to false for unprotected routes
@@ -75,9 +94,17 @@ function App() {
   }, [isAuthenticated, user])
 
   // Show IC name modal if user is authenticated but has no IC name
+  // Don't show for partners - they don't need IC names
   useEffect(() => {
-    if (user && !user.icFirstName && !user.icLastName) {
+    if (user && !user.icFirstName && !user.icLastName && !user.isPartner) {
       setShowIcNameModal(true)
+    }
+  }, [user])
+  
+  // Redirect partners to partner area if they try to access main app
+  useEffect(() => {
+    if (user?.isPartner && window.location.pathname === '/app') {
+      window.location.href = '/app/partner'
     }
   }, [user])
 
@@ -95,6 +122,9 @@ function App() {
         {/* Unprotected Routes - always accessible */}
         <Route path="/discord-error" element={<DiscordErrorPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/partner-pending" element={<PartnerPendingPage />} />
+        <Route path="/partner-requested" element={<PartnerRequestedPage />} />
+        <Route path="/partner-request" element={<PartnerRequestPage />} />
         <Route path="/app" element={
           <ProtectedRoute>
             <Layout>
@@ -266,7 +296,7 @@ function App() {
         <Route path="/listenfuehrung" element={
           <ProtectedRoute>
             <Layout>
-              <ListenfuehrungPage />
+              <ListenfuehrungWrapper />
             </Layout>
           </ProtectedRoute>
         } />
@@ -288,6 +318,20 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <SlangPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/partner-management" element={
+          <ProtectedRoute>
+            <Layout>
+              <PartnerManagementPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/app/partner" element={
+          <ProtectedRoute>
+            <Layout>
+              <PartnerDashboardPage />
             </Layout>
           </ProtectedRoute>
         } />

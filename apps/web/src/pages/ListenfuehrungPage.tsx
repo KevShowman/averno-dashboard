@@ -807,7 +807,7 @@ export default function ListenfuehrungPage() {
               <div className="space-y-2">
                 <Label className="text-gray-300">Familienname *</Label>
                 <Input
-                  placeholder="z.B. Los Santos Cartel"
+                  placeholder="z.B. Narco City Cartel"
                   value={formData.familyName}
                   onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
                   className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"

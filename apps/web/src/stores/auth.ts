@@ -9,9 +9,10 @@ export interface User {
   icLastName?: string
   avatarUrl?: string
   email?: string
-  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO'
-  allRoles?: ('EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO')[]
+  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER'
+  allRoles?: ('EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER')[]
   gender?: 'MALE' | 'FEMALE'
+  isPartner?: boolean
   createdAt: string
 }
 
@@ -23,6 +24,7 @@ interface AuthState {
   queryClient: QueryClient | null
   setQueryClient: (client: QueryClient) => void
   login: (redirectUrl?: string) => void
+  partnerLogin: () => void
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
 }
@@ -48,6 +50,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Pass rememberMe as state parameter to Discord OAuth
     const state = rememberMe ? 'remember_me' : 'no_remember'
     window.location.href = `/api/auth/discord?state=${state}`
+  },
+
+  partnerLogin: () => {
+    // Redirect to normal OAuth endpoint with partner_login state
+    window.location.href = `/api/auth/discord?state=partner_login`
   },
 
   logout: async () => {
