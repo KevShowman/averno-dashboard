@@ -172,26 +172,35 @@ export default function TafelrundePage() {
     queryFn: () => api.get('/family-contacts').then(res => res.data),
   })
 
-  const { data: permissionsData } = useQuery<TafelrundePermission[]>({
+  const permissionsQuery = useQuery({
     queryKey: ['tafelrunde-permissions'],
-    queryFn: () => api.get('/tafelrunde/permissions/list').then(res => res.data),
+    queryFn: async (): Promise<TafelrundePermission[]> => {
+      const res = await api.get('/tafelrunde/permissions/list')
+      return res.data
+    },
     enabled: isLeadership,
   })
-  const permissions: TafelrundePermission[] = permissionsData ?? []
+  const permissions = (permissionsQuery.data ?? []) as TafelrundePermission[]
 
-  const { data: availableUsersData } = useQuery<UserForPermission[]>({
+  const availableUsersQuery = useQuery({
     queryKey: ['users-for-tafelrunde-permission'],
-    queryFn: () => api.get('/users').then(res => res.data),
+    queryFn: async (): Promise<UserForPermission[]> => {
+      const res = await api.get('/users')
+      return res.data
+    },
     enabled: isLeadership,
   })
-  const availableUsers: UserForPermission[] = availableUsersData ?? []
+  const availableUsers = (availableUsersQuery.data ?? []) as UserForPermission[]
 
-  const { data: permissionCheck } = useQuery<{ hasPermission: boolean }>({
+  const permissionCheckQuery = useQuery({
     queryKey: ['tafelrunde-permission-check'],
-    queryFn: () => api.get('/tafelrunde/permissions/check').then(res => res.data),
+    queryFn: async (): Promise<{ hasPermission: boolean }> => {
+      const res = await api.get('/tafelrunde/permissions/check')
+      return res.data
+    },
   })
 
-  const canManage = isLeadership || permissionCheck?.hasPermission
+  const canManage = isLeadership || permissionCheckQuery.data?.hasPermission === true
 
   // Mutations
   const createMutation = useMutation({
@@ -487,7 +496,7 @@ export default function TafelrundePage() {
                       <TafelrundeCard
                         key={tafelrunde.id}
                         tafelrunde={tafelrunde}
-                        canManage={canManage && !isPartner}
+                        canManage={!!canManage && !isPartner}
                         isPartner={isPartner}
                         onEdit={() => handleEdit(tafelrunde)}
                         onDelete={() => {
@@ -526,7 +535,7 @@ export default function TafelrundePage() {
                       <TafelrundeCard
                         key={tafelrunde.id}
                         tafelrunde={tafelrunde}
-                        canManage={canManage && !isPartner}
+                        canManage={!!canManage && !isPartner}
                         isPartner={isPartner}
                         onEdit={() => handleEdit(tafelrunde)}
                         onDelete={() => {

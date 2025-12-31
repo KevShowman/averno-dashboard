@@ -584,8 +584,8 @@ export default function TaxiDashboardPage() {
                             {/* Treffpunkt/Zielort Marker für Fahrer */}
                             {(() => {
                               // Sammle eindeutige Treffpunkte aus den Zuweisungen
-                              type MeetingPoint = { id: string; title: string; location?: string; x: number; y: number }
-                              const meetingPointsMap = new Map<string, MeetingPoint>()
+                              interface MeetingPoint { id: string; title: string; location?: string; x: number; y: number }
+                              const meetingPointsObj: Record<string, MeetingPoint> = {}
                               
                               myAssignments
                                 .filter(a => 
@@ -595,18 +595,18 @@ export default function TaxiDashboardPage() {
                                 )
                                 .forEach(a => {
                                   const key = a.tafelrunde.id
-                                  if (!meetingPointsMap.has(key)) {
-                                    meetingPointsMap.set(key, {
+                                  if (!meetingPointsObj[key]) {
+                                    meetingPointsObj[key] = {
                                       id: a.tafelrunde.id,
                                       title: a.tafelrunde.title,
                                       location: a.tafelrunde.location,
                                       x: a.tafelrunde.meetingPointX!,
                                       y: a.tafelrunde.meetingPointY!,
-                                    })
+                                    }
                                   }
                                 })
                               
-                              const meetingPoints: MeetingPoint[] = Array.from(meetingPointsMap.values())
+                              const meetingPoints: MeetingPoint[] = Object.values(meetingPointsObj)
                               
                               return meetingPoints.map((mp) => (
                                 <Marker
