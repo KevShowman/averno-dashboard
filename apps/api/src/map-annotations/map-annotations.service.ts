@@ -698,9 +698,7 @@ export class MapAnnotationsService {
       throw new ForbiddenException('Keine Berechtigung');
     }
 
-    const where = mapName 
-      ? { mapName, createdBy: { isNot: null } } 
-      : { createdBy: { isNot: null } }; // Nur Einträge mit existierendem User
+    const where = mapName ? { mapName } : {};
 
     return this.prisma.mapSuggestion.findMany({
       where,
