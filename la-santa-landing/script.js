@@ -1,134 +1,65 @@
 // ==================== //
-// LA SANTA - Enhanced JS   //
+// LA SANTA CALAVERA    //
+// Modern Landing Page  //
 // ==================== //
 
-// Intersection Observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            
-            // Trigger counter animation for stat cards
-            if (entry.target.classList.contains('stat-card-enhanced')) {
-                const statNumber = entry.target.querySelector('.stat-number');
-                if (statNumber && !statNumber.dataset.animated) {
-                    animateCounter(statNumber);
-                    statNumber.dataset.animated = 'true';
-                }
-            }
-        }
-    });
-}, observerOptions);
-
-// Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
-    initializeAnimations();
-    initializeNavigation();
-    initializeScrollEffects();
-    initializeRangCards();
-    createParticles();
-    initializeTooltips();
+    initNavigation();
+    initScrollAnimations();
+    initCounters();
+    initCursorGlow();
+    initSmoothScroll();
+    initImageModal();
+    initGallery();
     
-    console.log('%c🎉 La Santa - Sistema Iniciado 🎉', 'font-size: 20px; color: #D4AF37; font-weight: bold;');
-    console.log('%cLealtad. Honor. Sangre.', 'font-size: 14px; color: #F4E4A7; font-style: italic;');
+    console.log('%c☠ La Santa Calavera ☠', 'font-size: 24px; color: #D4AF37; font-weight: bold; text-shadow: 0 0 10px #D4AF37;');
+    console.log('%cDesde las Sombras', 'font-size: 14px; color: #B8B8B8; font-style: italic;');
 });
 
-// Initialize fade-in animations
-function initializeAnimations() {
-    const fadeElements = document.querySelectorAll('.fade-in');
+// === NAVIGATION ===
+function initNavigation() {
+    const nav = document.querySelector('.navigation');
+    const navLinks = document.querySelectorAll('.nav-link');
     
-    fadeElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
-        observer.observe(el);
+    // Scroll-based navigation styling
+    let lastScroll = 0;
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                handleNavScroll(nav);
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+    
+    // Active section highlighting
+    window.addEventListener('scroll', () => {
+        highlightActiveSection(navLinks);
     });
 }
 
-// Navigation scroll behavior
-function initializeNavigation() {
-    const nav = document.querySelector('.navigation');
-    const navLinks = document.querySelectorAll('.nav-links a');
+function handleNavScroll(nav) {
+    const scrollY = window.scrollY;
     
-    // Smooth scroll for anchor links
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                const navHeight = nav.offsetHeight;
-                const targetPosition = targetSection.offsetTop - navHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-    
-    // Navigation background on scroll
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        
-        if (currentScroll > 100) {
-            nav.classList.add('scrolled');
-        } else {
-            nav.classList.remove('scrolled');
-        }
-        
-        lastScroll = currentScroll;
-    });
-    
-    // Scroll indicator click
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    if (scrollIndicator) {
-        scrollIndicator.addEventListener('click', () => {
-            const historiaSection = document.querySelector('#historia');
-            if (historiaSection) {
-                historiaSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+    if (scrollY > 100) {
+        nav.classList.add('scrolled');
+    } else {
+        nav.classList.remove('scrolled');
     }
 }
 
-// Parallax and scroll effects
-function initializeScrollEffects() {
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        
-        // Parallax for hero
-        const hero = document.querySelector('.hero');
-        if (hero) {
-            hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-            hero.style.opacity = 1 - (scrolled / 1000);
-        }
-        
-        // Active section highlighting in nav
-        highlightActiveSection();
-    });
-}
-
-// Highlight active section in navigation
-function highlightActiveSection() {
+function highlightActiveSection(navLinks) {
     const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const scrollPosition = window.scrollY + 200;
     
     let current = '';
-    const scrollPosition = window.pageYOffset + 200;
     
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
+        const sectionHeight = section.offsetHeight;
         
         if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
             current = section.getAttribute('id');
@@ -136,220 +67,163 @@ function highlightActiveSection() {
     });
     
     navLinks.forEach(link => {
-        link.style.color = '';
+        link.classList.remove('active');
         if (link.getAttribute('href') === `#${current}`) {
-            link.style.color = 'var(--gold-primary)';
+            link.classList.add('active');
         }
     });
 }
 
-// Rang cards hover effects
-function initializeRangCards() {
-    const rangCards = document.querySelectorAll('.rang-detailed, .rang-compact, .valor-card, .sistema-card');
+// === SCROLL ANIMATIONS ===
+function initScrollAnimations() {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -100px 0px',
+        threshold: 0.1
+    };
     
-    rangCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            // Golden glow effect on headers
-            const header = this.querySelector('h3, h4');
-            if (header) {
-                header.style.textShadow = '0 0 20px rgba(212, 175, 55, 0.8)';
-            }
-            
-            // Icon animation
-            const icon = this.querySelector('.rang-icon, .valor-icon, .sistema-icon');
-            if (icon) {
-                icon.style.transform = 'scale(1.1) rotate(5deg)';
-                icon.style.transition = 'transform 0.3s ease';
-            }
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            const header = this.querySelector('h3, h4');
-            if (header) {
-                header.style.textShadow = '';
-            }
-            
-            const icon = this.querySelector('.rang-icon, .valor-icon, .sistema-icon');
-            if (icon) {
-                icon.style.transform = '';
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                
+                // Trigger counter animation if it's a stat card
+                if (entry.target.classList.contains('stat-card')) {
+                    const counter = entry.target.querySelector('.stat-number');
+                    if (counter && !counter.dataset.animated) {
+                        animateCounter(counter);
+                        counter.dataset.animated = 'true';
+                    }
+                }
             }
         });
+    }, observerOptions);
+    
+    // Observe all fade-in elements
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
     });
 }
 
-// Counter animation for statistics
+// === COUNTER ANIMATION ===
+function initCounters() {
+    // Counters will be triggered by scroll animation
+}
+
 function animateCounter(element) {
-    const target = parseInt(element.dataset.target) || parseInt(element.textContent);
-    const duration = 2000; // 2 seconds
-    const fps = 60;
-    const increment = target / (duration / (1000 / fps));
-    let current = 0;
+    const target = parseInt(element.dataset.target);
+    if (isNaN(target)) return;
     
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            element.textContent = target;
-            clearInterval(timer);
+    const duration = 2000;
+    const startTime = performance.now();
+    const startValue = 0;
+    
+    function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentValue = Math.floor(startValue + (target - startValue) * easeOutQuart);
+        
+        element.textContent = currentValue;
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
         } else {
-            element.textContent = Math.floor(current);
+            element.textContent = target;
         }
-    }, 1000 / fps);
-}
-
-// Golden particles effect in hero
-function createParticles() {
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
-    
-    const particleCount = 30;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
-        const size = Math.random() * 3 + 1;
-        const startX = Math.random() * 100;
-        const startY = Math.random() * 100;
-        const duration = Math.random() * 10 + 5;
-        const delay = Math.random() * 5;
-        const drift = Math.random() * 100 - 50;
-        
-        particle.style.cssText = `
-            position: absolute;
-            width: ${size}px;
-            height: ${size}px;
-            background: rgba(212, 175, 55, ${Math.random() * 0.5 + 0.3});
-            border-radius: 50%;
-            pointer-events: none;
-            left: ${startX}%;
-            top: ${startY}%;
-            animation: floatParticle ${duration}s linear infinite;
-            animation-delay: ${delay}s;
-            box-shadow: 0 0 ${size * 2}px rgba(212, 175, 55, 0.5);
-        `;
-        
-        hero.appendChild(particle);
     }
     
-    // Add float animation dynamically
-    if (!document.querySelector('#particle-animation')) {
-        const style = document.createElement('style');
-        style.id = 'particle-animation';
-        style.textContent = `
-            @keyframes floatParticle {
-                0% {
-                    transform: translateY(0) translateX(0);
-                    opacity: 0;
-                }
-                10% {
-                    opacity: 1;
-                }
-                90% {
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(-100vh) translateX(${Math.random() * 100 - 50}px);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    requestAnimationFrame(updateCounter);
 }
 
-// Tooltips for interactive elements
-function initializeTooltips() {
-    const tooltipElements = document.querySelectorAll('[data-tooltip]');
+// === CURSOR GLOW ===
+function initCursorGlow() {
+    const cursorGlow = document.querySelector('.cursor-glow');
+    if (!cursorGlow) return;
     
-    tooltipElements.forEach(el => {
-        el.addEventListener('mouseenter', function(e) {
-            const tooltip = document.createElement('div');
-            tooltip.className = 'custom-tooltip';
-            tooltip.textContent = this.dataset.tooltip;
-            tooltip.style.cssText = `
-                position: absolute;
-                background: var(--dark-accent);
-                color: var(--gold-light);
-                padding: 8px 15px;
-                border-radius: 5px;
-                font-size: 0.9rem;
-                pointer-events: none;
-                z-index: 10000;
-                border: 1px solid var(--gold-dark);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            `;
-            document.body.appendChild(tooltip);
-            
-            const rect = this.getBoundingClientRect();
-            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
-            tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + window.pageYOffset + 'px';
-            
-            this.tooltipElement = tooltip;
-        });
+    let mouseX = 0;
+    let mouseY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+    
+    function animateCursor() {
+        // Smooth follow with lerp
+        currentX += (mouseX - currentX) * 0.1;
+        currentY += (mouseY - currentY) * 0.1;
         
-        el.addEventListener('mouseleave', function() {
-            if (this.tooltipElement) {
-                this.tooltipElement.remove();
-                this.tooltipElement = null;
-            }
+        cursorGlow.style.left = currentX + 'px';
+        cursorGlow.style.top = currentY + 'px';
+        
+        requestAnimationFrame(animateCursor);
+    }
+    
+    animateCursor();
+}
+
+// === SMOOTH SCROLL ===
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (!targetElement) return;
+            
+            const navHeight = document.querySelector('.navigation').offsetHeight;
+            const targetPosition = targetElement.offsetTop - navHeight - 20;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
         });
     });
-}
-
-// Timeline marker pulse effect
-function initializeTimelineMarkers() {
-    const markers = document.querySelectorAll('.timeline-marker');
     
-    markers.forEach((marker, index) => {
-        setTimeout(() => {
-            marker.style.animation = 'pulse 2s ease-in-out infinite';
-        }, index * 200);
-    });
-}
-
-// Smooth reveal for timeline items
-const timelineObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateX(0)';
-        }
-    });
-}, { threshold: 0.3 });
-
-document.querySelectorAll('.timeline-item').forEach((item, index) => {
-    item.style.opacity = '0';
-    item.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-    
-    if (index % 2 === 0) {
-        item.style.transform = 'translateX(-50px)';
-    } else {
-        item.style.transform = 'translateX(50px)';
+    // Hero CTA button
+    const heroCta = document.querySelector('.hero-cta');
+    if (heroCta) {
+        heroCta.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector('#historia');
+            if (target) {
+                const navHeight = document.querySelector('.navigation').offsetHeight;
+                window.scrollTo({
+                    top: target.offsetTop - navHeight - 20,
+                    behavior: 'smooth'
+                });
+            }
+        });
     }
-    
-    timelineObserver.observe(item);
-});
+}
 
-// Sistema cards reveal animation
-const sistemaObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-            setTimeout(() => {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }, index * 50);
-        }
+// === NEGOCIO CARD INTERACTIONS ===
+document.querySelectorAll('.negocio-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.zIndex = '10';
     });
-}, { threshold: 0.2 });
-
-document.querySelectorAll('.sistema-card').forEach(card => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    sistemaObserver.observe(card);
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.zIndex = '1';
+    });
 });
 
-// Keyboard shortcuts (easter egg)
+// === TIMELINE MARKERS ===
+const timelineMarkers = document.querySelectorAll('.timeline-marker');
+timelineMarkers.forEach((marker, index) => {
+    marker.style.animationDelay = `${index * 0.2}s`;
+});
+
+// === EASTER EGGS ===
 let konamiCode = [];
 const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
@@ -358,148 +232,293 @@ document.addEventListener('keydown', (e) => {
     konamiCode = konamiCode.slice(-10);
     
     if (konamiCode.join('') === konamiSequence.join('')) {
-        activateKonamiEasterEgg();
-    }
-    
-    // Secret key: 'L' for Lealtad
-    if (e.key === 'l' && e.ctrlKey) {
-        activateLealtadMode();
+        activateGoldMode();
     }
 });
 
-function activateKonamiEasterEgg() {
-    const body = document.body;
+function activateGoldMode() {
+    document.body.style.transition = 'filter 1s ease';
+    document.body.style.filter = 'sepia(50%) saturate(150%)';
     
-    // Rainbow hue rotation
-    body.style.transition = 'filter 2s ease';
-    body.style.filter = 'hue-rotate(180deg) saturate(150%)';
-    
-    // Confetti effect
-    createConfetti();
-    
-    setTimeout(() => {
-        body.style.filter = 'none';
-    }, 5000);
-    
-    console.log('%c🎉 KONAMI CODE ACTIVATED! 🎉', 'font-size: 24px; color: #FFD700; font-weight: bold; text-shadow: 0 0 10px #D4AF37;');
-    console.log('%cLealtad. Honor. Sangre.', 'font-size: 16px; color: #F4E4A7; font-style: italic;');
-}
-
-function activateLealtadMode() {
-    const allText = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, a, li');
-    
-    allText.forEach(el => {
-        el.style.transition = 'all 0.5s ease';
-        el.style.color = 'var(--gold-primary)';
-    });
+    // Create gold particles
+    for (let i = 0; i < 30; i++) {
+        createGoldParticle();
+    }
     
     setTimeout(() => {
-        allText.forEach(el => {
-            el.style.color = '';
-        });
+        document.body.style.filter = 'none';
     }, 3000);
     
-    console.log('%c⚡ LEALTAD MODE ACTIVATED! ⚡', 'font-size: 20px; color: #D4AF37; font-weight: bold;');
+    console.log('%c🎉 GOLD MODE ACTIVATED! 🎉', 'font-size: 20px; color: #FFD700; font-weight: bold;');
 }
 
-function createConfetti() {
-    const colors = ['#D4AF37', '#F4E4A7', '#FFD700', '#B8941E'];
-    const confettiCount = 50;
+function createGoldParticle() {
+    const particle = document.createElement('div');
+    particle.style.cssText = `
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #D4AF37;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 10000;
+        left: ${Math.random() * 100}vw;
+        top: -20px;
+        animation: particleFall ${2 + Math.random() * 2}s linear forwards;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+    `;
     
-    for (let i = 0; i < confettiCount; i++) {
-        const confetti = document.createElement('div');
-        confetti.style.cssText = `
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: ${colors[Math.floor(Math.random() * colors.length)]};
-            left: ${Math.random() * 100}%;
-            top: -20px;
+    document.body.appendChild(particle);
+    
+    setTimeout(() => particle.remove(), 4000);
+}
+
+// Add particle animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes particleFall {
+        0% {
+            transform: translateY(0) rotate(0deg);
             opacity: 1;
-            pointer-events: none;
-            z-index: 10000;
-            animation: confettiFall ${Math.random() * 3 + 2}s linear forwards;
-            transform: rotate(${Math.random() * 360}deg);
-        `;
-        document.body.appendChild(confetti);
-        
-        setTimeout(() => confetti.remove(), 5000);
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// === IMAGE MODAL ===
+function initImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (!modal) return;
+    
+    const backdrop = modal.querySelector('.modal-backdrop');
+    const closeBtn = modal.querySelector('.modal-close');
+    const prevBtn = modal.querySelector('.modal-prev');
+    const nextBtn = modal.querySelector('.modal-next');
+    const gallery = modal.querySelector('.modal-gallery');
+    const counter = modal.querySelector('.modal-counter');
+    const title = modal.querySelector('.modal-title');
+    
+    let currentImages = [];
+    let currentIndex = 0;
+    
+    // Close modal
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        currentImages = [];
+        currentIndex = 0;
     }
     
-    // Add confetti animation
-    if (!document.querySelector('#confetti-animation')) {
-        const style = document.createElement('style');
-        style.id = 'confetti-animation';
-        style.textContent = `
-            @keyframes confettiFall {
-                to {
-                    transform: translateY(100vh) rotate(720deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-}
-
-// Log version info
-console.log('%cLa Santa - Landing Page v2.0', 'color: #D4AF37; font-size: 16px; font-weight: bold;');
-console.log('%cDesde las Sombras', 'color: #B8B8B8; font-style: italic;');
-console.log('%c25 Hermanos | 9 Meses | 16 Sistemas | 1 Familia', 'color: #F4E4A7;');
-
-// Performance monitoring
-if (window.performance && window.performance.timing) {
-    window.addEventListener('load', () => {
-        const perfData = window.performance.timing;
-        const loadTime = perfData.loadEventEnd - perfData.navigationStart;
-        console.log(`%c⚡ Page loaded in ${loadTime}ms`, 'color: #2D5016; font-weight: bold;');
-    });
-}
-
-// Smooth scroll polyfill for older browsers
-if (!('scrollBehavior' in document.documentElement.style)) {
-    const scrollToElement = (element) => {
-        const targetPosition = element.offsetTop - 80;
-        const startPosition = window.pageYOffset;
-        const distance = targetPosition - startPosition;
-        const duration = 1000;
-        let start = null;
+    // Open modal with images
+    window.openImageModal = function(images, titleText, startIndex = 0) {
+        currentImages = images;
+        currentIndex = startIndex;
+        title.textContent = titleText;
         
-        const animation = (currentTime) => {
-            if (start === null) start = currentTime;
-            const timeElapsed = currentTime - start;
-            const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-            window.scrollTo(0, run);
-            if (timeElapsed < duration) requestAnimationFrame(animation);
-        };
+        // Build gallery with subtitles
+        gallery.innerHTML = images.map(img => 
+            `<div class="modal-slide">
+                <img src="${img.src}" alt="${img.alt || ''}" loading="lazy">
+                <div class="modal-slide-info">
+                    <span class="modal-slide-title">${img.alt || ''}</span>
+                    ${img.subtitle ? `<span class="modal-slide-subtitle">${img.subtitle}</span>` : ''}
+                </div>
+            </div>`
+        ).join('');
         
-        const easeInOutQuad = (t, b, c, d) => {
-            t /= d / 2;
-            if (t < 1) return c / 2 * t * t + b;
-            t--;
-            return -c / 2 * (t * (t - 2) - 1) + b;
-        };
-        
-        requestAnimationFrame(animation);
+        updateModalView();
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     };
     
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) scrollToElement(target);
-        });
+    // Update view
+    function updateModalView() {
+        gallery.style.transform = `translateX(-${currentIndex * 100}%)`;
+        counter.textContent = `${currentIndex + 1} / ${currentImages.length}`;
+        
+        prevBtn.style.opacity = currentIndex === 0 ? '0.3' : '1';
+        nextBtn.style.opacity = currentIndex === currentImages.length - 1 ? '0.3' : '1';
+    }
+    
+    // Navigation
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateModalView();
+        }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < currentImages.length - 1) {
+            currentIndex++;
+            updateModalView();
+        }
+    });
+    
+    // Close handlers
+    closeBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', closeModal);
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('active')) return;
+        
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+            currentIndex--;
+            updateModalView();
+        }
+        if (e.key === 'ArrowRight' && currentIndex < currentImages.length - 1) {
+            currentIndex++;
+            updateModalView();
+        }
     });
 }
 
-// Initialize timeline markers after DOM load
-setTimeout(initializeTimelineMarkers, 500);
+// === GALLERY INITIALIZATION ===
+function initGallery() {
+    // Casa gallery items
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    galleryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const img = item.querySelector('img');
+            const titleEl = item.querySelector('h4');
+            
+            // Get all images from casa gallery for slideshow
+            const allImages = Array.from(document.querySelectorAll('.casa-gallery .gallery-item')).map(el => ({
+                src: el.querySelector('img').src,
+                alt: el.querySelector('h4')?.textContent || ''
+            }));
+            
+            // Find current index
+            const currentSrc = img.src;
+            const startIndex = allImages.findIndex(i => i.src === currentSrc);
+            
+            window.openImageModal(allImages, 'La Fuente Blanca', startIndex >= 0 ? startIndex : 0);
+        });
+    });
+    
+    // Negocio gallery buttons (prepared for future images)
+    const galleryBtns = document.querySelectorAll('.negocio-gallery-btn');
+    
+    galleryBtns.forEach(btn => {
+        const galleryId = btn.dataset.gallery;
+        
+        // Check if images exist for this gallery
+        if (window.negocioGalleries && window.negocioGalleries[galleryId]) {
+            btn.disabled = false;
+            btn.querySelector('.btn-text').textContent = 'Bilder anzeigen';
+            
+            btn.addEventListener('click', () => {
+                const galleryData = window.negocioGalleries[galleryId];
+                window.openImageModal(galleryData.images, galleryData.title);
+            });
+        }
+    });
+}
 
-// Visibility change handler
+// Gallery data storage - mit detaillierten Untertiteln basierend auf Dateinamen
+window.negocioGalleries = {
+    taxi: {
+        title: 'El Servicio de Taxi',
+        images: [
+            { src: 'images/taxi/driver-overview.png', alt: 'Fahrerübersicht', subtitle: 'Alle aktiven Fahrer auf einen Blick' },
+            { src: 'images/taxi/taxi-management-tour-view.png', alt: 'Touren Management', subtitle: 'Verwaltung aller laufenden Touren' },
+            { src: 'images/taxi/assign-driver-view.png', alt: 'Fahrer Zuweisung', subtitle: 'Fahrer zu Touren zuweisen' },
+            { src: 'images/taxi/zielort-view.png', alt: 'Zielorte Verwaltung', subtitle: 'Alle verfügbaren Zielorte' },
+            { src: 'images/taxi/destination-detail-view.png', alt: 'Zielort Details', subtitle: 'Detailansicht eines Zielortes' },
+            { src: 'images/taxi/key-creation-view.png', alt: 'Schlüssel Erstellung', subtitle: 'Neue Zugangsschlüssel generieren' },
+            { src: 'images/taxi/access-key-view.png', alt: 'Zugangsschlüssel', subtitle: 'Übersicht der Zugangsschlüssel' }
+        ]
+    },
+    weekly: {
+        title: 'Las Entregas Semanales',
+        images: [
+            { src: 'images/weekly/wochenabgabe-view.png', alt: 'Wochenabgabe Hauptansicht', subtitle: 'Zentrale Übersicht aller Wochenabgaben' },
+            { src: 'images/weekly/weekly-stats.png', alt: 'Wochenstatistiken', subtitle: 'Statistische Auswertung der Woche' },
+            { src: 'images/weekly/overall-stats.png', alt: 'Gesamtstatistiken', subtitle: 'Langzeitstatistiken im Überblick' },
+            { src: 'images/weekly/family-sammeln-overview.png', alt: 'Sammelabgaben Übersicht', subtitle: 'Familienweite Sammeleingaben' },
+            { src: 'images/weekly/family-sammeln-entry-step1.png', alt: 'Sammelabgabe Eingabe', subtitle: 'Neue Sammelabgabe erfassen' },
+            { src: 'images/weekly/family-sammeln-entry-post.png', alt: 'Sammelabgabe Bestätigung', subtitle: 'Erfolgreiche Abgabebestätigung' },
+            { src: 'images/weekly/family-adjust-tours-view.png', alt: 'Touren Anpassung', subtitle: 'Familientouren bearbeiten' },
+            { src: 'images/weekly/verarbeiter-tracking-view.png', alt: 'Verarbeiter Tracking', subtitle: 'Verfolgung der Verarbeitungsprozesse' }
+        ]
+    },
+    tafelrunde: {
+        title: 'La Mesa Redonda',
+        images: [
+            { src: 'images/tafelrunde/main.png', alt: 'Tafelrunden Übersicht', subtitle: 'Alle aktiven Tafelrunden im Blick' },
+            { src: 'images/tafelrunde/management.png', alt: 'Tafelrunden Management', subtitle: 'Verwaltung und Koordination' },
+            { src: 'images/tafelrunde/erstellen-1.png', alt: 'Erstellen – Schritt 1', subtitle: 'Neue Tafelrunde anlegen' },
+            { src: 'images/tafelrunde/erstellen-2.png', alt: 'Erstellen – Schritt 2', subtitle: 'Details und Teilnehmer festlegen' }
+        ]
+    },
+    partner: {
+        title: 'La Red de Socios',
+        images: [
+            { src: 'images/partner/partner-dashboard.png', alt: 'Partner Dashboard', subtitle: 'Persönliche Übersicht für Partner' },
+            { src: 'images/partner/login.png', alt: 'Partner Login', subtitle: 'Sicherer Zugang zum System' },
+            { src: 'images/partner/request-access.png', alt: 'Zugang beantragen', subtitle: 'Partnerschaft anfragen' },
+            { src: 'images/partner/request-submitted.png', alt: 'Antrag eingereicht', subtitle: 'Bestätigung der Anfrage' },
+            { src: 'images/partner/submitted-request-partner.png', alt: 'Eingereichte Anfrage', subtitle: 'Status der Partneranfrage' },
+            { src: 'images/partner/partner-management-requestmanagement.png', alt: 'Anfragen Management', subtitle: 'Verwaltung eingehender Anfragen' },
+            { src: 'images/partner/request-management-internal.png', alt: 'Interne Verwaltung', subtitle: 'Internes Anfragen-Processing' },
+            { src: 'images/partner/listenfuehrung-vorschlag-partner.png', alt: 'Listenführungs-Vorschlag', subtitle: 'Partner-Vorschläge für Listen' },
+            { src: 'images/partner/map-vorschlag-partner.png', alt: 'Kartenvorschlag', subtitle: 'POI-Vorschlag einreichen' },
+            { src: 'images/partner/map-delete-vorschlag-partner.png', alt: 'Vorschlag löschen', subtitle: 'Vorschlag zurückziehen' },
+            { src: 'images/partner/tafelrunde-access-partner.png', alt: 'Tafelrunden-Zugang', subtitle: 'Partner-Zugriff auf Tafelrunden' }
+        ]
+    },
+    map: {
+        title: 'El Mapa Interactivo',
+        images: [
+            { src: 'images/map/map-overview-with-details.png', alt: 'Kartenübersicht', subtitle: 'Vollständige Kartenansicht mit Details' },
+            { src: 'images/map/map-roxwood.png', alt: 'Roxwood Gebiet', subtitle: 'Detailkarte der Roxwood Region' },
+            { src: 'images/map/map-cayo.png', alt: 'Cayo Perico', subtitle: 'Die Insel im Überblick' },
+            { src: 'images/map/new-poi-creation.png', alt: 'POI erstellen', subtitle: 'Neuen Point of Interest anlegen' },
+            { src: 'images/map/poi-created.png', alt: 'POI erstellt', subtitle: 'Erfolgreiche POI-Erstellung' },
+            { src: 'images/map/polygon-marker-showcase-step1.png', alt: 'Polygon – Schritt 1', subtitle: 'Gebietsmarkierung beginnen' },
+            { src: 'images/map/polygon-marker-showcase-step2.png', alt: 'Polygon – Schritt 2', subtitle: 'Gebietsgrenzen definieren' },
+            { src: 'images/map/polygon-marker-showcase-created.png', alt: 'Polygon erstellt', subtitle: 'Fertige Gebietsmarkierung' },
+            { src: 'images/map/map-vorschlag-view.png', alt: 'Vorschläge verwalten', subtitle: 'Eingereichte Kartenvorschläge' }
+        ]
+    },
+    bloodlist: {
+        title: 'La Lista de Sangre',
+        images: [
+            { src: 'images/bloodlist/overview.png', alt: 'Blutliste Übersicht', subtitle: 'Alle Mitglieder auf einen Blick' },
+            { src: 'images/bloodlist/bloodin-view.png', alt: 'Blood In Zeremonie', subtitle: 'Aufnahme neuer Familienmitglieder' },
+            { src: 'images/bloodlist/bloodout-view.png', alt: 'Blood Out Zeremonie', subtitle: 'Ausscheiden aus der Familie' },
+            { src: 'images/bloodlist/history.png', alt: 'Blutliste Historie', subtitle: 'Chronik aller Zeremonien' }
+        ]
+    },
+    roster: {
+        title: 'La Organización',
+        images: [
+            { src: 'images/roster/main-view.png', alt: 'Aufstellungssystem', subtitle: 'Hierarchie und Struktur der Familie' },
+            { src: 'images/abmeldung/main-view.png', alt: 'Abmeldungssystem', subtitle: 'Verwaltung von Abwesenheiten' }
+        ]
+    }
+};
+
+// === VISIBILITY CHANGE ===
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        console.log('%cHasta luego, Hermano...', 'color: #B8B8B8; font-style: italic;');
+        document.title = '¡Vuelve pronto! | La Santa Calavera';
     } else {
-        console.log('%c¡Bienvenido de vuelta!', 'color: #D4AF37; font-weight: bold;');
+        document.title = 'La Santa Calavera | Desde las Sombras';
+    }
+});
+
+// === PERFORMANCE LOG ===
+window.addEventListener('load', () => {
+    if (window.performance && window.performance.timing) {
+        const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+        console.log(`%c⚡ Page loaded in ${loadTime}ms`, 'color: #4A8522; font-weight: bold;');
     }
 });

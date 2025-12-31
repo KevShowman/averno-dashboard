@@ -8,6 +8,10 @@ RUN apk add --no-cache gzip
 COPY index.html /usr/share/nginx/html/
 COPY styles.css /usr/share/nginx/html/
 COPY script.js /usr/share/nginx/html/
+COPY logo-og-removebg-preview.png /usr/share/nginx/html/
+
+# Copy images
+COPY images/ /usr/share/nginx/html/images/
 
 # Pre-compress files for better performance
 RUN gzip -k /usr/share/nginx/html/styles.css && \

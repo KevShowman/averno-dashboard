@@ -3,560 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Santa Calavera</title>
+    <title>La Santa Calavera | Desde las Sombras</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Cursor Glow Effect -->
+    <div class="cursor-glow"></div>
+    
     <!-- Navigation -->
     <nav class="navigation">
         <div class="nav-content">
-            <div class="nav-logo">
+            <a href="#" class="nav-logo">
                 <img src="logo-og-removebg-preview.png" alt="La Santa Calavera" class="logo-img">
-                <span>LA SANTA CALAVERA</span>
-            </div>
-            <nav class="nav-links">
+                <div class="logo-text">
+                    <span class="logo-main">LA SANTA</span>
+                    <span class="logo-sub">CALAVERA</span>
+                </div>
+            </a>
+            <div class="nav-links">
                 <a href="#historia" class="nav-link">Historia</a>
-                <a href="#valores" class="nav-link">Valores</a>
+                <a href="#negocios" class="nav-link">Negocios</a>
                 <a href="#jerarquia" class="nav-link">Jerarquía</a>
+                <a href="#valores" class="nav-link">Valores</a>
                 <a href="#casa" class="nav-link">Casa</a>
-                <a href="#vehiculos" class="nav-link">Vehículos</a>
-                <a href="#kleidung" class="nav-link">Vestimenta</a>
                 <a href="#familia" class="nav-link">Familia</a>
-            </nav>
+            </div>
+            <button class="nav-menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-bg-pattern"></div>
+    <!-- Hero Section - Cinematic -->
+    <section class="hero" id="hero">
+        <div class="hero-video-overlay"></div>
+        <div class="hero-noise"></div>
+        <div class="hero-gradient"></div>
+        
         <div class="hero-content">
-            <div class="logo-container">
-                <img src="logo-og-removebg-preview.png" alt="La Santa Calavera" class="hero-logo">
-                <h1 class="main-title">LA SANTA CALAVERA</h1>
-                <div class="subtitle">25 Hermanos • Eine Familie • Eine Legende</div>
-                <div class="hero-divider"></div>
+            <div class="hero-badge">
+                <span class="badge-icon">☠</span>
+                <span class="badge-text">EST. 2025</span>
             </div>
+            
+            <h1 class="hero-title">
+                <span class="title-line title-line-1">LA SANTA</span>
+                <span class="title-line title-line-2">CALAVERA</span>
+            </h1>
+            
+            <div class="hero-tagline">
+                <span class="tagline-decorator">—</span>
+                <span class="tagline-text">Desde las Sombras</span>
+                <span class="tagline-decorator">—</span>
+            </div>
+            
+            <p class="hero-description">
+                25 Hermanos. Eine Familie. Eine Legende.<br>
+                <em>Aus dem Verrat geboren. In Blut geschmiedet. Für immer vereint.</em>
+            </p>
+            
             <div class="hero-stats">
                 <div class="hero-stat">
-                    <div class="stat-num">9</div>
-                    <div class="stat-text">Monate</div>
+                    <span class="stat-value">25</span>
+                    <span class="stat-label">Hermanos</span>
                 </div>
+                <div class="hero-stat-divider"></div>
                 <div class="hero-stat">
-                    <div class="stat-num">25</div>
-                    <div class="stat-text">Hermanos</div>
+                    <span class="stat-value">10</span>
+                    <span class="stat-label">Monate</span>
                 </div>
+                <div class="hero-stat-divider"></div>
                 <div class="hero-stat">
-                    <div class="stat-num">∞</div>
-                    <div class="stat-text">Lealtad</div>
+                    <span class="stat-value">2</span>
+                    <span class="stat-label">Verräter überlebt</span>
                 </div>
             </div>
+            
+            <a href="#historia" class="hero-cta">
+                <span>Unsere Geschichte</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                </svg>
+            </a>
         </div>
-        <div class="scroll-indicator">
-            <span>↓</span>
-            <span class="scroll-text">Entdecke unsere Geschichte</span>
+        
+        <div class="hero-scroll-indicator">
+            <div class="scroll-line"></div>
+            <span class="scroll-text">SCROLL</span>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="hero-float hero-float-1">☠</div>
+        <div class="hero-float hero-float-2">⚔</div>
+        <div class="hero-float hero-float-3">🔥</div>
+    </section>
+
+    <!-- Historia Section - Cinematic Timeline -->
+    <section id="historia" class="historia">
+        <div class="section-header">
+            <span class="section-number">01</span>
+            <h2 class="section-title">La Historia</h2>
+            <p class="section-subtitle">Von den Straßen Kolumbiens zu den Schatten der Stadt</p>
+        </div>
+        
+        <div class="historia-container">
+            <!-- Opening Cinematic Text -->
+            <div class="historia-intro fade-in">
+                <p class="intro-text">
+                    <span class="intro-year">Februar 2025.</span>
+                    Ein Mann namens <em>Fernando Banderas</em> versammelt 25 verlorene Seelen. 
+                    Er verspricht ihnen Familie. Schutz. Macht. Er nennt es <strong>"Cartel Renacido"</strong> – 
+                    die Wiedergeborenen.
+                </p>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item fade-in" data-aos="fade-right">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-date">FEB - JUL 2025</span>
+                            <span class="timeline-chapter">Kapitel I</span>
+                        </div>
+                        <h3>Die Wiedergeborenen</h3>
+                        <p>
+                            Fünf Monate des Aufbaus. Wir glaubten an Fernando. Wir bauten Strukturen, 
+                            eroberten Territorien, vergossen Blut für seine Vision. 25 Menschen gaben alles – 
+                            ihre Zeit, ihr Geld, ihre Loyalität.
+                        </p>
+                        <div class="timeline-quote">
+                            "Er war wie ein Vater für uns. Wir hätten alles für ihn getan."
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-item-right fade-in" data-aos="fade-left">
+                    <div class="timeline-marker timeline-marker-danger"></div>
+                    <div class="timeline-content timeline-content-dark">
+                        <div class="timeline-header">
+                            <span class="timeline-date danger">JULI 2025</span>
+                            <span class="timeline-chapter">Kapitel II</span>
+                        </div>
+                        <h3>Der Verrat</h3>
+                        <p>
+                            Eine schwüle Julinacht. Fernando Banderas verschwindet – mit <strong>allem</strong>. 
+                            Die Kasse. Die Kontakte. Die Pläne. Fünf Monate Arbeit, weggewischt in einer Nacht. 
+                            25 Menschen sitzen im Dunkeln. Betrogen. Verlassen. Gebrochen.
+                        </p>
+                        <div class="betrayal-stats">
+                            <div class="betrayal-stat">
+                                <span class="betrayal-number">5</span>
+                                <span class="betrayal-label">Monate gestohlen</span>
+                            </div>
+                            <div class="betrayal-stat">
+                                <span class="betrayal-number">∞</span>
+                                <span class="betrayal-label">Vertrauen zerstört</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in" data-aos="fade-right">
+                    <div class="timeline-marker timeline-marker-gold"></div>
+                    <div class="timeline-content timeline-content-gold">
+                        <div class="timeline-header">
+                            <span class="timeline-date gold">ENDE JULI 2025</span>
+                            <span class="timeline-chapter">Kapitel III</span>
+                        </div>
+                        <h3>Die Entscheidung</h3>
+                        <p>
+                            Die Überlebenden versammeln sich. <em>Gideon Russell</em> steht auf und stellt 
+                            eine Frage: <strong>"Lassen wir uns von diesem Verrat definieren, oder zeigen wir, 
+                            wer wir wirklich sind?"</strong>
+                        </p>
+                        <p>
+                            <em>Jones Banderas</em>, der Bruder des Verräters, schwört, den Namen seiner 
+                            Familie neu zu schreiben. 25 Stimmen, eine Antwort: <strong>Wir bleiben.</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-item-right fade-in" data-aos="fade-left">
+                    <div class="timeline-marker timeline-marker-rebirth"></div>
+                    <div class="timeline-content timeline-content-rebirth">
+                        <div class="timeline-header">
+                            <span class="timeline-date rebirth">AUGUST 2025</span>
+                            <span class="timeline-chapter">Kapitel IV</span>
+                        </div>
+                        <h3>La Santa Calavera</h3>
+                        <p>
+                            Ein neuer Name wird geboren: <strong>La Santa Calavera</strong> – 
+                            Der heilige Totenschädel. Tod und Wiedergeburt vereint in einem Symbol.
+                        </p>
+                        <div class="rebirth-leadership">
+                            <div class="leader-card">
+                                <span class="leader-icon">👑</span>
+                                <span class="leader-name">Gideon Russell</span>
+                                <span class="leader-title">El Patrón</span>
+                            </div>
+                            <div class="leader-card">
+                                <span class="leader-icon">⚔️</span>
+                                <span class="leader-name">Jones Banderas</span>
+                                <span class="leader-title">Don Capitán</span>
+                            </div>
+                            <div class="leader-card">
+                                <span class="leader-icon">🤝</span>
+                                <span class="leader-name">Hailey Brooke</span>
+                                <span class="leader-title">Mano Derecha</span>
+                            </div>
+                        </div>
+                        <div class="timeline-quote gold">
+                            "Keine Diktatur mehr. Eine gewählte Führung. Eine echte Familie."
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in" data-aos="fade-right">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-date">AUG - OKT 2025</span>
+                            <span class="timeline-chapter">Kapitel V</span>
+                        </div>
+                        <h3>Der Aufbau</h3>
+                        <p>
+                            Drei Monate harter Arbeit. Unter der Führung von Gideon, Jones und Hailey 
+                            wächst La Santa Calavera. Neue Strukturen, neue Geschäfte, neue Hoffnung. 
+                            Alles scheint gut zu laufen.
+                        </p>
+                        <div class="present-achievements">
+                            <span class="achievement">✓ Erste eigene Casa</span>
+                            <span class="achievement">✓ Geschäftsaufbau</span>
+                            <span class="achievement">✓ Teambildung</span>
+                            <span class="achievement">✓ Territorium gesichert</span>
+                        </div>
+                        <div class="timeline-quote">
+                            "Die dunklen Tage schienen hinter uns zu liegen. Wir waren naiv."
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-item-right fade-in" data-aos="fade-left">
+                    <div class="timeline-marker timeline-marker-danger"></div>
+                    <div class="timeline-content timeline-content-dark">
+                        <div class="timeline-header">
+                            <span class="timeline-date danger">NOVEMBER 2025</span>
+                            <span class="timeline-chapter">Kapitel VI</span>
+                        </div>
+                        <h3>Der zweite Verrat</h3>
+                        <p>
+                            <em>Jones Banderas.</em> Der Mann, der geschworen hatte, den Namen seiner Familie 
+                            neu zu schreiben. Der Mann, dem wir vertrauten. Er war doch wie sein Vater.
+                        </p>
+                        <p>
+                            In einer kalten Novembernacht verschwand er – und mit ihm der letzte Rest 
+                            Naivität. <strong>Blut ist dicker als Wasser?</strong> Nicht immer. Manchmal 
+                            ist Blut nur ein Fluch, der sich weitervererbt.
+                        </p>
+                        <div class="betrayal-stats">
+                            <div class="betrayal-stat">
+                                <span class="betrayal-number">2</span>
+                                <span class="betrayal-label">Banderas-Verräter</span>
+                            </div>
+                            <div class="betrayal-stat">
+                                <span class="betrayal-number">0</span>
+                                <span class="betrayal-label">Überraschungen mehr</span>
+                            </div>
+                        </div>
+                        <div class="timeline-quote">
+                            "Der Apfel fällt nicht weit vom Stamm. Aber wir sind keine Äpfel – wir sind Felsen."
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in" data-aos="fade-right">
+                    <div class="timeline-marker timeline-marker-rebirth"></div>
+                    <div class="timeline-content timeline-content-rebirth">
+                        <div class="timeline-header">
+                            <span class="timeline-date rebirth">DEZEMBER 2025</span>
+                            <span class="timeline-chapter">Kapitel VII</span>
+                        </div>
+                        <h3>La Fuente Blanca</h3>
+                        <p>
+                            Aus der Asche des zweiten Verrats erhebt sich La Santa Calavera – <strong>stärker 
+                            als je zuvor</strong>. Wir ziehen um. Weg von den alten Schatten, hin zu neuem Land.
+                        </p>
+                        <p>
+                            <em>La Fuente Blanca</em> – die Weiße Quelle. Eine Pferderanch am Rande der Stadt. 
+                            Hier beginnen wir von vorne. Aber diesmal wissen wir, wer wir sind. Diesmal 
+                            vertrauen wir nur noch denen, die es verdient haben.
+                        </p>
+                        <div class="fuente-features">
+                            <div class="fuente-feature">
+                                <span class="fuente-icon">🐎</span>
+                                <span class="fuente-text">Pferderanch</span>
+                            </div>
+                            <div class="fuente-feature">
+                                <span class="fuente-icon">🏡</span>
+                                <span class="fuente-text">Neues Hauptquartier</span>
+                            </div>
+                            <div class="fuente-feature">
+                                <span class="fuente-icon">💪</span>
+                                <span class="fuente-text">Stärker denn je</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-item-right fade-in" data-aos="fade-left">
+                    <div class="timeline-marker timeline-marker-present"></div>
+                    <div class="timeline-content timeline-content-present">
+                        <div class="timeline-header">
+                            <span class="timeline-date present">HEUTE</span>
+                            <span class="timeline-chapter">Kapitel VIII</span>
+                        </div>
+                        <h3>Unzerbrechlich</h3>
+                        <p>
+                            Zwei Verräter. Zwei Banderas. Beide weg. Und wir? Wir stehen noch. 
+                            <strong>Stärker.</strong> <em>Weiser.</em> Unzerbrechlich.
+                        </p>
+                        <p>
+                            La Fuente Blanca ist mehr als ein Ort – es ist ein Symbol. Ein Symbol dafür, 
+                            dass wahre Familie nicht durch Blut definiert wird, sondern durch Loyalität.
+                        </p>
+                        <div class="present-achievements">
+                            <span class="achievement">✓ La Fuente Blanca</span>
+                            <span class="achievement">✓ Gehärtete Führung</span>
+                            <span class="achievement">✓ Unerschütterliche Loyalität</span>
+                            <span class="achievement">✓ Keine Banderas mehr</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Closing Quote -->
+            <div class="historia-closing fade-in">
+                <blockquote>
+                    <p>"Zwei Verräter haben uns nur stärker gemacht.</p>
+                    <p>Fernando Banderas. Jones Banderas. Beide Geschichte.</p>
+                    <p>Wir sind La Santa Calavera. Wir sind die Zukunft."</p>
+                    <cite>— El Patrón Gideon Russell, La Fuente Blanca</cite>
+                </blockquote>
+            </div>
         </div>
     </section>
 
-    <!-- Historia Section - BLOCKBUSTER -->
-    <section id="historia" class="historia">
-        <div class="container">
-            <h2 class="section-title">Die Geschichte</h2>
-            <p class="section-subtitle">Von den Straßen Kolumbiens zu den Schatten der Stadt</p>
-            
-            <div class="historia-grid">
-                <!-- Chapter Cards in modern Grid -->
-                <div class="chapter-card fade-in" data-chapter="1">
-                    <div class="chapter-number">01</div>
-                    <div class="chapter-badge">Feb - Juli 2025</div>
-                    <h3>Die Wiedergeborenen</h3>
-                    <p>Fernando Banderas verspricht uns eine Familie. "Cartel Renacido", die Wiedergeborenen. 25 Seelen glauben ihm. 5 Monate bauen wir auf - Strukturen, Territorien, Vertrauen.</p>
-                    <div class="chapter-tag">Der Anfang</div>
-                </div>
+    <!-- Negocios Section - Business Operations -->
+    <section id="negocios" class="negocios">
+        <div class="section-header">
+            <span class="section-number">02</span>
+            <h2 class="section-title">Los Negocios</h2>
+            <p class="section-subtitle">Unsere Geschäftszweige – Präzision trifft Tradition</p>
+        </div>
 
-                <div class="chapter-card fade-in" data-chapter="2">
-                    <div class="chapter-number">02</div>
-                    <div class="chapter-badge danger">Juli 2025</div>
-                    <h3>Der Verrat</h3>
-                    <p>Eine schwüle Julinacht. Fernando verschwindet - mit allem. Kasse, Kontakte, Pläne, Vertrauen. 25 Menschen sitzen betrogen da. Der Patrón ist ein Feigling.</p>
-                    <div class="chapter-tag danger">Die Nacht</div>
-                </div>
+        <div class="negocios-intro fade-in">
+            <p>
+                La Santa Calavera operiert nicht im Chaos. Jeder Geschäftszweig ist durchdacht, 
+                jede Operation dokumentiert, jeder Hermano weiß genau, was zu tun ist. 
+                <em>Professionell. Effizient. Unaufhaltsam.</em>
+            </p>
+        </div>
 
-                <div class="chapter-card fade-in" data-chapter="3">
-                    <div class="chapter-number">03</div>
-                    <div class="chapter-badge">Ende Juli 2025</div>
-                    <h3>Die Entscheidung</h3>
-                    <p>Gideon Russell stellt eine Frage: "Lassen wir uns definieren oder zeigen wir, wer wir sind?" Jones Banderas schwört, seinen Namen neu zu schreiben. 25 Stimmen, eine Antwort.</p>
-                    <div class="chapter-tag">Der Moment</div>
-                </div>
-
-                <div class="chapter-card fade-in" data-chapter="4">
-                    <div class="chapter-number">04</div>
-                    <div class="chapter-badge gold">August 2025</div>
-                    <h3>La Santa Calavera</h3>
-                    <p>Der Name wird geboren: Die heilige Totenschädel - Tod und Wiedergeburt vereint. Gideon wird zum Patrón gewählt, Jones zum Don Capitán, Hailey zur rechten Hand. Keine Diktatur - eine gewählte Führung.</p>
-                    <div class="chapter-tag gold">Die Geburt</div>
-                </div>
-
-                <div class="chapter-card fade-in" data-chapter="5">
-                    <div class="chapter-number">05</div>
-                    <div class="chapter-badge">Aug - Okt 2025</div>
-                    <h3>Der Aufbau</h3>
-                    <div class="milestone-compact">
-                        <span>✓ Basis-Ops</span>
-                        <span>✓ Casa gefunden</span>
-                        <span>✓ Strukturen</span>
-                        <span>✓ Novatos</span>
+        <div class="negocios-grid">
+            <!-- Taxi Operations -->
+            <div class="negocio-card fade-in" data-negocio="taxi">
+                <div class="negocio-icon">🚖</div>
+                <div class="negocio-content">
+                    <h3>El Servicio de Taxi</h3>
+                    <p class="negocio-subtitle">Tourenmanagement & Partnerschaft</p>
+                    <p>
+                        Wir haben dem Taxi-Unternehmen ein vollständiges System bereitgestellt. 
+                        Jede Tour wird erfasst, verfolgt und dokumentiert – in Echtzeit synchronisiert 
+                        mit unserem Tafelrunden-System, an dem auch unsere Partner aktiv mitarbeiten.
+                    </p>
+                    <p>
+                        Ein <em>dreistufiges Partnersystem</em>: Wir führen das Listengeschäft, unsere 
+                        Partner beschaffen die Daten, und Taxi erhält alle Informationen – Tafelrunden-Termine, 
+                        Abholzeiten, Zuweisung der Fahrer. Jede Abholung wird getrackt, jeder Fahrer bewertet. 
+                        Drei Ebenen, ein Ziel – <strong>perfekte Koordination</strong>.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">📊 Touren-Tracking</span>
+                        <span class="feature">🔄 Live-Sync</span>
+                        <span class="feature">🤝 3-Stufen-Partner</span>
                     </div>
-                    <p>Die ersten Wochen sind hart. Aber wir bauen. Schritt für Schritt. Deal für Deal. Hermano für Hermano.</p>
-                    <div class="chapter-tag">Die Arbeit</div>
+                    <button class="negocio-gallery-btn" data-gallery="taxi">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
                 </div>
-
-                <div class="chapter-card fade-in" data-chapter="6">
-                    <div class="chapter-number">06</div>
-                    <div class="chapter-badge success">November 2025</div>
-                    <h3>Die Gegenwart</h3>
-                    <p>9 Monate später. 25 Hermanos. Eine Hacienda. Ein Territorium. Respekt auf den Straßen. Wir sind keine Legende mehr - wir sind Realität. Unzerbrechlich durch Vertrauen.</p>
-                    <div class="chapter-tag success">Jetzt</div>
-                </div>
-
-                <div class="chapter-card fade-in full-width" data-chapter="7">
-                    <div class="chapter-number">07</div>
-                    <div class="chapter-badge future">Die Zukunft</div>
-                    <h3>La Vision</h3>
-                    <p class="chapter-vision">Wir blicken vorwärts. Nicht zurück zu Fernando. Nicht zurück zum Verrat. Sondern nach vorne - zu dem, was wir werden können.</p>
-                    <div class="vision-grid">
-                        <div class="vision-item">
-                            <span class="vision-icon">🏛️</span>
-                            <h4>Expansion</h4>
-                            <p>Neue Territorien. Neue Möglichkeiten. Aber immer mit dem gleichen Prinzip: Familia über alles.</p>
-                        </div>
-                        <div class="vision-item">
-                            <span class="vision-icon">🤝</span>
-                            <h4>Allianzen</h4>
-                            <p>Nicht allein. Respektvolle Partnerschaften mit denen, die unsere Werte teilen.</p>
-                        </div>
-                        <div class="vision-item">
-                            <span class="vision-icon">👥</span>
-                            <h4>Nachwuchs</h4>
-                            <p>Neue Novatos werden kommen. Wir werden sie formen. Nicht wie Fernando - sondern wie Familia.</p>
-                        </div>
-                        <div class="vision-item">
-                            <span class="vision-icon">💎</span>
-                            <h4>Legacy</h4>
-                            <p>In 6 Monaten wird man von La Santa Calavera sprechen. Nicht als Kartell - als Legende.</p>
-                        </div>
-                    </div>
-                    <div class="chapter-quote-vision">
-                        "Fernando wollte ein Imperium. Wir wollen eine Familie. Und Familien überleben Imperien."
-                        <span class="quote-author-vision">- El Patrón Gideon Russell</span>
-                    </div>
-                    <div class="chapter-tag future">Para Siempre</div>
-                </div>
+                <div class="negocio-glow"></div>
             </div>
 
-            <div class="historia-principles">
-                <h3>Was uns vereint</h3>
-                <div class="principles-grid">
-                    <div class="principle">
-                        <div class="principle-icon">🤝</div>
-                        <strong>Lealtad</strong>
-                        <span>Loyalität ist nicht verhandelbar. Ein Hermano verlässt niemals einen Hermano.</span>
+            <!-- Tafelrunde -->
+            <div class="negocio-card fade-in" data-negocio="tafelrunde">
+                <div class="negocio-icon">🏛️</div>
+                <div class="negocio-content">
+                    <h3>La Mesa Redonda</h3>
+                    <p class="negocio-subtitle">Tafelrunden & Diplomatie</p>
+                    <p>
+                        Wir regieren nicht durch Gewalt allein. Die Tafelrunde ist unser diplomatisches 
+                        Zentrum – hier werden Allianzen geschmiedet, Konflikte gelöst und die Zukunft 
+                        der Stadt geformt.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">🤝 Diplomatie</span>
+                        <span class="feature">⚖️ Konfliktlösung</span>
+                        <span class="feature">📜 Verträge & Abkommen</span>
                     </div>
-                    <div class="principle">
-                        <div class="principle-icon">⚔️</div>
-                        <strong>Honor</strong>
-                        <span>Unser Wort ist unser Bond. Was wir sagen, das tun wir.</span>
-                    </div>
-                    <div class="principle">
-                        <div class="principle-icon">👁️</div>
-                        <strong>Respeto</strong>
-                        <span>Respekt wird verdient, nicht verlangt. Jeder hat eine Stimme.</span>
-                    </div>
-                    <div class="principle">
-                        <div class="principle-icon">🩸</div>
-                        <strong>Sangre</strong>
-                        <span>Blut ist dicker als Wasser. Wir sind mehr als Kollegen - wir sind Familie.</span>
-                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="tafelrunde">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
                 </div>
+                <div class="negocio-glow"></div>
             </div>
+
+            <!-- Partner Network -->
+            <div class="negocio-card fade-in" data-negocio="partner">
+                <div class="negocio-icon">🤝</div>
+                <div class="negocio-content">
+                    <h3>La Red de Socios</h3>
+                    <p class="negocio-subtitle">Partner & Allianzen</p>
+                    <p>
+                        Kein Kartell steht allein. Unsere Partner sind sorgfältig ausgewählt – 
+                        Händler, Informanten, befreundete Organisationen. Jede Partnerschaft 
+                        bringt Vorteile für beide Seiten.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">🔗 Handelspartner</span>
+                        <span class="feature">🕵️ Informanten-Netz</span>
+                        <span class="feature">⚔️ Militärallianzen</span>
+                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="partner">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
+                </div>
+                <div class="negocio-glow"></div>
+            </div>
+
+            <!-- Bloodlist / Territory Control -->
+            <div class="negocio-card fade-in" data-negocio="territory">
+                <div class="negocio-icon">🩸</div>
+                <div class="negocio-content">
+                    <h3>La Lista de Sangre</h3>
+                    <p class="negocio-subtitle">Territorium & Feinde</p>
+                    <p>
+                        Wer uns verrät, landet auf der Liste. Wer unser Territorium angreift, 
+                        bereut es. Die Blutliste ist unsere Erinnerung – sie vergisst nie, 
+                        und wir vergeben selten.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">🎯 Feindverfolgung</span>
+                        <span class="feature">🗺️ Gebietskontrolle</span>
+                        <span class="feature">⚔️ Vergeltungsops</span>
+                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="bloodlist">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
+                </div>
+                <div class="negocio-glow"></div>
+            </div>
+
+            <!-- Interactive Map -->
+            <div class="negocio-card negocio-card-wide fade-in" data-negocio="map">
+                <div class="negocio-icon">🗺️</div>
+                <div class="negocio-content">
+                    <h3>El Mapa Interactivo</h3>
+                    <p class="negocio-subtitle">Strategische Übersicht</p>
+                    <p>
+                        Unsere interaktive Karte zeigt alles: Sichere Häuser, Operationsgebiete, 
+                        feindliche Territorien, Treffpunkte. Jeder Hermano hat Zugang – Wissen ist Macht, 
+                        und bei uns teilen wir diese Macht.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">📍 Live-Markierungen</span>
+                        <span class="feature">🏠 Sichere Häuser</span>
+                        <span class="feature">⚠️ Gefahrenzonen</span>
+                        <span class="feature">🎯 Operationsgebiete</span>
+                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="map">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
+                </div>
+                <div class="negocio-glow"></div>
+            </div>
+
+            <!-- Weekly Operations -->
+            <div class="negocio-card fade-in" data-negocio="weekly">
+                <div class="negocio-icon">📅</div>
+                <div class="negocio-content">
+                    <h3>Las Entregas Semanales</h3>
+                    <p class="negocio-subtitle">Wöchentliche Abgaben</p>
+                    <p>
+                        Jeder Hermano trägt bei. Die wöchentlichen Abgaben finanzieren unsere 
+                        Operationen, unsere Ausrüstung, unsere Zukunft. Transparent, fair, 
+                        für alle nachvollziehbar.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">💰 Gemeinsame Kasse</span>
+                        <span class="feature">📊 Transparente Abrechnung</span>
+                        <span class="feature">🔄 Regelmäßige Updates</span>
+                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="weekly">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
+                </div>
+                <div class="negocio-glow"></div>
+            </div>
+
+            <!-- Sicarios -->
+            <div class="negocio-card fade-in" data-negocio="sicarios">
+                <div class="negocio-icon">🔫</div>
+                <div class="negocio-content">
+                    <h3>Los Sicarios</h3>
+                    <p class="negocio-subtitle">Spezialeinheit</p>
+                    <p>
+                        Unsere Elite. Die Sicarios sind für die gefährlichsten Aufträge 
+                        zuständig. Präzise, schnell, lautlos. Wenn sie kommen, ist es bereits 
+                        zu spät.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">🎯 Präzisionsarbeit</span>
+                        <span class="feature">🔕 Diskrete Ops</span>
+                        <span class="feature">⚡ Schnelle Reaktion</span>
+                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="sicarios" disabled>
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder folgen</span>
+                    </button>
+                </div>
+                <div class="negocio-glow"></div>
+            </div>
+
+            <!-- Attendance & Roster -->
+            <div class="negocio-card fade-in" data-negocio="roster">
+                <div class="negocio-icon">📋</div>
+                <div class="negocio-content">
+                    <h3>La Organización</h3>
+                    <p class="negocio-subtitle">Aufstellung & Anwesenheit</p>
+                    <p>
+                        Wir wissen immer, wer wo ist. Anwesenheitslisten, Aufstellungen 
+                        für Operationen, Abmeldungen – alles dokumentiert. Organisation 
+                        ist der Schlüssel zum Erfolg.
+                    </p>
+                    <div class="negocio-features">
+                        <span class="feature">✅ Anwesenheits-Tracking</span>
+                        <span class="feature">📝 Aufstellungsplanung</span>
+                        <span class="feature">🗓️ Abmeldungssystem</span>
+                    </div>
+                    <button class="negocio-gallery-btn" data-gallery="roster">
+                        <span class="btn-icon">📸</span>
+                        <span class="btn-text">Bilder anzeigen</span>
+                    </button>
+                </div>
+                <div class="negocio-glow"></div>
+            </div>
+        </div>
+
+        <!-- Sistema Overview -->
+        <div class="negocios-summary fade-in">
+            <div class="summary-icon">⚙️</div>
+            <h3>Ein System. Grenzenlose Möglichkeiten.</h3>
+            <p>
+                Jeder dieser Geschäftszweige ist Teil eines größeren Ganzen. 
+                Sie greifen ineinander, unterstützen sich gegenseitig, machen uns unaufhaltsam. 
+                <em>Das ist der Unterschied zwischen einem Kartell und einer Familie.</em>
+            </p>
         </div>
     </section>
 
     <!-- Valores Section -->
     <section id="valores" class="valores">
-        <div class="container">
+        <div class="section-header">
+            <span class="section-number">03</span>
             <h2 class="section-title">Nuestros Valores</h2>
-            <p class="section-intro">
-                Unsere Werte sind keine leeren Worte. Sie sind die Fundamente, auf denen <em>La Santa</em> steht. 
-                Jeder <em>Hermano</em>, vom <em>Patrón</em> bis zum <em>Novato</em>, lebt nach diesen Prinzipien.
-            </p>
-            
-            <div class="valores-grid">
-                <div class="valor-card major fade-in">
-                    <div class="valor-icon">🤝</div>
-                    <h3>Lealtad - Loyalität</h3>
-                    <div class="valor-motto">"Ein Hermano verlässt niemals seinen Hermano"</div>
-                    <p>
-                        Loyalität ist das Herzblut von La Santa. Wir haben durch Verrat gelernt, wie kostbar 
-                        wahre Treue ist. Fernando Banderas lehrte uns durch sein Versagen, dass ein Kartell 
-                        ohne Loyalität nur eine Illusion ist.
-                    </p>
-                    <p>
-                        Heute schwören wir nicht einem Mann Treue, sondern einander. Jeder <em>Hermano</em> 
-                        weiß: Wenn er fällt, werden 24 andere ihn aufheben. Wenn er in Gefahr ist, 
-                        werden 24 andere für ihn kämpfen.
-                    </p>
-                    <div class="valor-principle">
-                        <strong>Das Prinzip:</strong> Die Familie kommt vor allem. Vor Geld. Vor Ego. Vor persönlichem Gewinn.
-                    </div>
-                </div>
+            <p class="section-subtitle">Die Säulen unserer Familie</p>
+        </div>
 
-                <div class="valor-card major fade-in">
-                    <div class="valor-icon">⚔️</div>
-                    <h3>Honor - Ehre</h3>
-                    <div class="valor-motto">"Unser Wort ist unser Bond"</div>
-                    <p>
-                        In einer Welt von Schatten und Täuschung ist Ehre unser Leuchtturm. Was wir versprechen, 
-                        das halten wir. Wen wir beschützen, den beschützen wir mit unserem Leben.
-                    </p>
-                    <p>
-                        Ehre bedeutet nicht Schwäche. Es bedeutet, dass unsere Feinde wissen: Wenn La Santa 
-                        ein Versprechen macht - ob Schutz oder Vergeltung - wird es eingehalten.
-                    </p>
-                    <div class="valor-principle">
-                        <strong>Das Prinzip:</strong> Unser Ruf ist unser Kapital. Ein Mann ohne Ehre ist kein Mann.
-                    </div>
-                </div>
+        <div class="valores-grid">
+            <div class="valor-card valor-card-main fade-in">
+                <div class="valor-icon">🤝</div>
+                <h3>Lealtad</h3>
+                <p class="valor-motto">"Ein Hermano verlässt niemals seinen Hermano"</p>
+                <p>
+                    Loyalität ist unser Herzblut. Fernando lehrte uns durch seinen Verrat, 
+                    wie kostbar echte Treue ist. Heute schwören wir nicht einem Mann Treue – 
+                    wir schwören einander.
+                </p>
+            </div>
 
-                <div class="valor-card major fade-in">
-                    <div class="valor-icon">👁️</div>
-                    <h3>Respeto - Respekt</h3>
-                    <div class="valor-motto">"Respekt wird verdient, nicht verlangt"</div>
-                    <p>
-                        In unserer <em>Jerarquía</em> hat jeder seinen Platz - vom <em>Patrón</em> bis zum 
-                        <em>Novato</em>. Aber Respekt fließt nicht nur nach oben. Der <em>Patrón</em> 
-                        respektiert den <em>Novato</em>, denn jeder trägt zu unserer Stärke bei.
-                    </p>
-                    <p>
-                        Fernando Banderas verlangte blinden Gehorsam. Wir verlangen gegenseitigen Respekt. 
-                        Deine Stimme zählt, deine Meinung wird gehört, dein Beitrag wird anerkannt.
-                    </p>
-                    <div class="valor-principle">
-                        <strong>Das Prinzip:</strong> Hierarchie bedeutet Verantwortung, nicht Tyrannei.
-                    </div>
-                </div>
+            <div class="valor-card valor-card-main fade-in">
+                <div class="valor-icon">⚔️</div>
+                <h3>Honor</h3>
+                <p class="valor-motto">"Unser Wort ist unser Bond"</p>
+                <p>
+                    Was wir versprechen, halten wir. Wen wir beschützen, beschützen wir 
+                    mit unserem Leben. Unsere Feinde wissen: Ein Versprechen von La Santa – 
+                    ob Schutz oder Vergeltung – wird eingehalten.
+                </p>
+            </div>
 
-                <div class="valor-card major fade-in">
-                    <div class="valor-icon">🩸</div>
-                    <h3>Sangre - Blut</h3>
-                    <div class="valor-motto">"Blut bindet stärker als Gold"</div>
-                    <p>
-                        Wir sind nicht nur Kollegen. Nicht nur Kameraden. Wir sind <em>Familia</em>. 
-                        Blut ist nicht nur das, was wir teilen - es ist das, was wir bereit sind zu vergießen, 
-                        füreinander.
-                    </p>
-                    <p>
-                        Jeder von uns trägt die Narben der Familie. Jeder hat sein Blut für die <em>Hermanos</em> 
-                        vergossen. Und jeder weiß: Wenn dein Blut fließt, fließt das Blut der ganzen Familia.
-                    </p>
-                    <div class="valor-principle">
-                        <strong>Das Prinzip:</strong> Familie ist nicht, wer dich geboren hat, sondern wer für dich sterben würde.
-                    </div>
-                </div>
+            <div class="valor-card valor-card-main fade-in">
+                <div class="valor-icon">👁️</div>
+                <h3>Respeto</h3>
+                <p class="valor-motto">"Respekt wird verdient, nicht verlangt"</p>
+                <p>
+                    Vom Patrón bis zum Novato – jeder hat seine Stimme. 
+                    Fernando verlangte blinden Gehorsam. Wir verlangen gegenseitigen Respekt.
+                </p>
+            </div>
 
-                <div class="valor-card fade-in">
-                    <div class="valor-icon">⚖️</div>
-                    <h3>Justicia - Gerechtigkeit</h3>
-                    <p>
-                        Wir operieren außerhalb des Gesetzes, aber nicht außerhalb der Gerechtigkeit. 
-                        Unser <em>Sanktionssystem</em> ist klar, fair, transparent. Keine Willkür mehr.
-                    </p>
-                </div>
+            <div class="valor-card valor-card-main fade-in">
+                <div class="valor-icon">🩸</div>
+                <h3>Sangre</h3>
+                <p class="valor-motto">"Blut bindet stärker als Gold"</p>
+                <p>
+                    Wir sind Familia. Blut ist nicht nur, was wir teilen – 
+                    es ist, was wir bereit sind füreinander zu vergießen.
+                </p>
+            </div>
+        </div>
 
-                <div class="valor-card fade-in">
-                    <div class="valor-icon">🎯</div>
-                    <h3>Disciplina - Disziplin</h3>
-                    <p>
-                        Ohne Disziplin ist ein Kartell Chaos. Unsere <em>Sistemas</em> - von der <em>Wochenabgabe</em> 
-                        bis zur <em>Aufstellung</em> - existieren, um Ordnung zu schaffen.
-                    </p>
-                </div>
-
-                <div class="valor-card fade-in">
-                    <div class="valor-icon">🛡️</div>
-                    <h3>Protección - Schutz</h3>
-                    <p>
-                        Die <em>Hacienda</em> ist unsere Zuflucht. Jeder <em>Hermano</em> findet dort Sicherheit. 
-                        Jeder Feind, der unsere Tore bedroht, findet dort sein Ende.
-                    </p>
-                </div>
-
-                <div class="valor-card fade-in">
-                    <div class="valor-icon">💎</div>
-                    <h3>Excelencia - Exzellenz</h3>
-                    <p>
-                        Wir streben nicht nach Mittelmaß. Jedes System, jede Operation, jeder Auftrag - 
-                        wir erwarten Exzellenz. Nicht Perfektion, aber Hingabe.
-                    </p>
-                </div>
+        <div class="valores-secondary">
+            <div class="valor-mini fade-in">
+                <span class="valor-mini-icon">⚖️</span>
+                <h4>Justicia</h4>
+                <p>Klare Regeln, faire Konsequenzen</p>
+            </div>
+            <div class="valor-mini fade-in">
+                <span class="valor-mini-icon">🎯</span>
+                <h4>Disciplina</h4>
+                <p>Ordnung schafft Stärke</p>
+            </div>
+            <div class="valor-mini fade-in">
+                <span class="valor-mini-icon">🛡️</span>
+                <h4>Protección</h4>
+                <p>Wir beschützen die Unseren</p>
+            </div>
+            <div class="valor-mini fade-in">
+                <span class="valor-mini-icon">💎</span>
+                <h4>Excelencia</h4>
+                <p>Nur das Beste ist gut genug</p>
             </div>
         </div>
     </section>
 
     <!-- Jerarquía Section -->
     <section id="jerarquia" class="jerarquia">
-        <div class="container">
+        <div class="section-header">
+            <span class="section-number">04</span>
             <h2 class="section-title">La Jerarquía</h2>
-            <p class="section-intro">
-                Vom Patrón bis zum Novato - jeder hat seinen Platz, seine Rolle, seine Verantwortung. 
-                Nicht durch Willkür, sondern durch Vertrauen und bewiesene Loyalität. Dies ist unsere Struktur.
-            </p>
+            <p class="section-subtitle">Struktur durch Vertrauen, Macht durch Verdienst</p>
+        </div>
 
-            <!-- Modern Rang Cards Grid -->
-            <div class="jerarquia-modern">
-                <!-- Leadership Cards -->
-                <div class="rang-category">
-                    <h3 class="category-title">
-                        <span class="category-badge leadership">LEADERSHIP</span>
-                    </h3>
-                    
-                    <!-- El Patrón - Allein an der Spitze -->
-                    <div class="patron-solo-tier">
-                        <div class="rang-card patron-card fade-in">
-                            <div class="rang-card-header">
-                                <span class="rang-number">12</span>
-                                <div class="rang-badge gold">El Patrón</div>
-                            </div>
-                            <div class="rang-avatar">👑</div>
-                            <h4>Gideon Russell</h4>
-                            <p class="rang-desc">Der Kopf der Familie. Gewählt, nicht ernannt. Letzte Entscheidungsinstanz, Schutz aller Hermanos.</p>
-                            <div class="rang-stats">
-                                <span class="stat-item">🎯 Vision</span>
-                                <span class="stat-item">⚖️ Justiz</span>
-                                <span class="stat-item">🛡️ Schutz</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Zweite Reihe: Die 3 Top-Kommandanten -->
-                    <div class="rang-grid leadership-grid leadership-second-tier">
-                        <div class="rang-card fade-in">
-                            <div class="rang-card-header">
-                                <span class="rang-number">11</span>
-                                <div class="rang-badge">Don Capitán</div>
-                            </div>
-                            <div class="rang-avatar">⚔️</div>
-                            <h4>Jones Banderas</h4>
-                            <p class="rang-desc">Der Stratege. Operative Leitung, Koordination der Operationen, Krisenmanagement.</p>
-                            <div class="rang-stats">
-                                <span class="stat-item">📊 Strategie</span>
-                                <span class="stat-item">⚡ Ops</span>
-                            </div>
-                        </div>
-
-                        <div class="rang-card vacant fade-in">
-                            <div class="rang-card-header">
-                                <span class="rang-number">11</span>
-                                <div class="rang-badge vacant-badge">El Comandante</div>
-                            </div>
-                            <div class="rang-avatar">🛡️</div>
-                            <h4>Vakant</h4>
-                            <p class="rang-desc">Der Beschützer. Verantwortlich für Sicherheit, Schutz der Familia und Führung der Sicarios.</p>
-                            <div class="rang-stats">
-                                <span class="stat-item">🔫 Sicarios</span>
-                                <span class="stat-item">🛡️ Security</span>
-                                <span class="stat-item">⚔️ Combat</span>
-                            </div>
-                            <div class="vacant-overlay">
-                                <span class="vacant-text">Position offen</span>
-                            </div>
-                        </div>
-
-                        <div class="rang-card fade-in">
-                            <div class="rang-card-header">
-                                <span class="rang-number">10</span>
-                                <div class="rang-badge">El Mano Derecha</div>
-                            </div>
-                            <div class="rang-avatar">🤝</div>
-                            <h4>Hailey Brooke</h4>
-                            <p class="rang-desc">Die rechte Hand. Beratung, interne Kommunikation, Vertrauensperson für alle Hermanos.</p>
-                            <div class="rang-stats">
-                                <span class="stat-item">💬 Kommunikation</span>
-                                <span class="stat-item">🤲 Mentoring</span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="jerarquia-pyramid">
+            <!-- El Patrón -->
+            <div class="pyramid-tier pyramid-tier-1 fade-in">
+                <div class="rang-card rang-patron">
+                    <div class="rang-number">12</div>
+                    <div class="rang-icon">👑</div>
+                    <h3>El Patrón</h3>
+                    <p class="rang-holder">Gideon Russell</p>
+                    <p class="rang-desc">Gewählt, nicht ernannt. Letzte Instanz. Schutz aller Hermanos.</p>
                 </div>
+            </div>
 
-                <!-- Hohe Ränge -->
-                <div class="rang-category">
-                    <h3 class="category-title">
-                        <span class="category-badge high">HOHE RÄNGE</span>
-                    </h3>
-                    <div class="rang-grid">
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🔒</span>
-                                <div>
-                                    <h4>El Custodio</h4>
-                                    <span class="rang-level">Rang 9</span>
-                                </div>
-                            </div>
-                            <p>Sicherheitsbegleitung, Wachposten, Hacienda-Schutz</p>
-                        </div>
-
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">📚</span>
-                                <div>
-                                    <h4>El Mentor</h4>
-                                    <span class="rang-level">Rang 8</span>
-                                </div>
-                            </div>
-                            <p>Ausbildung der Novatos, Training, Bewertung von Fortschritten</p>
-                        </div>
-
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🧰</span>
-                                <div>
-                                    <h4>El Encargado</h4>
-                                    <span class="rang-level">Rang 7</span>
-                                </div>
-                            </div>
-                            <p>Koordination von Operationen, Ressourcenmanagement</p>
-                        </div>
-                    </div>
+            <!-- High Command -->
+            <div class="pyramid-tier pyramid-tier-2 fade-in">
+                <div class="rang-card rang-traitor">
+                    <div class="rang-number">11</div>
+                    <div class="rang-icon">💀</div>
+                    <h3>Don Capitán</h3>
+                    <p class="rang-holder traitor-name">Jones Banderas</p>
+                    <p class="rang-desc">VERRÄTER - Nov. 2025</p>
+                    <span class="traitor-badge">Verraten</span>
                 </div>
-
-                <!-- Mittlere Ränge -->
-                <div class="rang-category">
-                    <h3 class="category-title">
-                        <span class="category-badge mid">MITTLERE RÄNGE</span>
-                    </h3>
-                    <div class="rang-grid">
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">⭐</span>
-                                <div>
-                                    <h4>El Teniente</h4>
-                                    <span class="rang-level">Rang 6 · 2 Hermanos</span>
-                                </div>
-                            </div>
-                            <p>Bereichsverantwortliche, Team-Management, Reporting</p>
-                        </div>
-
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🧭</span>
-                                <div>
-                                    <h4>Soldado</h4>
-                                    <span class="rang-level">Rang 5 · 5 Hermanos</span>
-                                </div>
-                            </div>
-                            <p>Das Herz der Familia. Vollwertige Mitglieder</p>
-                        </div>
-
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🐍</span>
-                                <div>
-                                    <h4>El Prefecto</h4>
-                                    <span class="rang-level">Rang 4 · 1 Hermano</span>
-                                </div>
-                            </div>
-                            <p>Operationsüberwachung, Qualitätssicherung</p>
-                        </div>
-                    </div>
+                <div class="rang-card rang-vacant">
+                    <div class="rang-number">11</div>
+                    <div class="rang-icon">🛡️</div>
+                    <h3>El Comandante</h3>
+                    <p class="rang-holder">Vakant</p>
+                    <p class="rang-desc">Sicario-Führung & Sicherheit</p>
+                    <span class="vacant-badge">Position offen</span>
                 </div>
-
-                <!-- Niedere Ränge -->
-                <div class="rang-category">
-                    <h3 class="category-title">
-                        <span class="category-badge low">NIEDERE RÄNGE</span>
-                    </h3>
-                    <div class="rang-grid">
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🫢</span>
-                                <div>
-                                    <h4>El Confidente</h4>
-                                    <span class="rang-level">Rang 3 · 1 Hermano</span>
-                                </div>
-                            </div>
-                            <p>Vertrauensperson, Informationsbeschaffung, Intelligence</p>
-                        </div>
-
-                        <div class="rang-card compact fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🐢</span>
-                                <div>
-                                    <h4>El Protector</h4>
-                                    <span class="rang-level">Rang 2 · 1 Hermano</span>
-                                </div>
-                            </div>
-                            <p>Personenschutz erweitert, Bedrohungserkennung</p>
-                        </div>
-
-                        <div class="rang-card compact highlight fade-in">
-                            <div class="rang-compact-header">
-                                <span class="rang-icon-small">🌱</span>
-                                <div>
-                                    <h4>El Novato</h4>
-                                    <span class="rang-level">Rang 1 · 8 Hermanos</span>
-                                </div>
-                            </div>
-                            <p>Der Anfang. Hier beginnt jede Geschichte in La Santa Calavera.</p>
-                        </div>
-                    </div>
+                <div class="rang-card">
+                    <div class="rang-number">10</div>
+                    <div class="rang-icon">🤝</div>
+                    <h3>Mano Derecha</h3>
+                    <p class="rang-holder">Hailey Brooke</p>
+                    <p class="rang-desc">Beratung & Mentoring</p>
                 </div>
+            </div>
 
-                <!-- Funktionsrollen -->
-                <div class="rang-category">
-                    <h3 class="category-title">
-                        <span class="category-badge special">FUNKTIONSROLLEN</span>
-                    </h3>
-                    <div class="functional-roles-modern">
-                        <div class="func-card fade-in">
-                            <span class="func-icon">🧘</span>
-                            <h4>Consejero</h4>
-                            <p>Strategische Beratung</p>
-                        </div>
-                        <div class="func-card fade-in">
-                            <span class="func-icon">📦</span>
-                            <h4>Logística</h4>
-                            <p>Lagerverwaltung</p>
-                        </div>
-                        <div class="func-card fade-in">
-                            <span class="func-icon">🚛</span>
-                            <h4>Rutas</h4>
-                            <p>Transportwege</p>
-                        </div>
-                        <div class="func-card fade-in">
-                            <span class="func-icon">🧠</span>
-                            <h4>Inteligencia</h4>
-                            <p>Nachrichtendienst</p>
-                        </div>
-                        <div class="func-card fade-in func-row-2">
-                            <span class="func-icon">🎓</span>
-                            <h4>Formación</h4>
-                            <p>Ausbildung & Training</p>
-                        </div>
-                        <div class="func-card fade-in func-row-2">
-                            <span class="func-icon">🔫</span>
-                            <h4>Sicario</h4>
-                            <p>Spezialkräfte · 4</p>
-                        </div>
-                        <div class="func-card fade-in func-row-2">
-                            <span class="func-icon">📞</span>
-                            <h4>Contacto</h4>
-                            <p>Externe Beziehungen</p>
-                        </div>
-                    </div>
+            <!-- Officers -->
+            <div class="pyramid-tier pyramid-tier-3 fade-in">
+                <div class="rang-mini">
+                    <span class="rang-mini-number">9</span>
+                    <span class="rang-mini-icon">🔒</span>
+                    <span class="rang-mini-name">El Custodio</span>
+                </div>
+                <div class="rang-mini">
+                    <span class="rang-mini-number">8</span>
+                    <span class="rang-mini-icon">📚</span>
+                    <span class="rang-mini-name">El Mentor</span>
+                </div>
+                <div class="rang-mini">
+                    <span class="rang-mini-number">7</span>
+                    <span class="rang-mini-icon">🧰</span>
+                    <span class="rang-mini-name">El Encargado</span>
+                </div>
+            </div>
+
+            <!-- Mid Ranks -->
+            <div class="pyramid-tier pyramid-tier-4 fade-in">
+                <div class="rang-mini">
+                    <span class="rang-mini-number">6</span>
+                    <span class="rang-mini-icon">⭐</span>
+                    <span class="rang-mini-name">El Teniente</span>
+                    <span class="rang-count">2</span>
+                </div>
+                <div class="rang-mini">
+                    <span class="rang-mini-number">5</span>
+                    <span class="rang-mini-icon">🧭</span>
+                    <span class="rang-mini-name">Soldado</span>
+                    <span class="rang-count">5</span>
+                </div>
+                <div class="rang-mini">
+                    <span class="rang-mini-number">4</span>
+                    <span class="rang-mini-icon">🐍</span>
+                    <span class="rang-mini-name">El Prefecto</span>
+                    <span class="rang-count">1</span>
+                </div>
+            </div>
+
+            <!-- Lower Ranks -->
+            <div class="pyramid-tier pyramid-tier-5 fade-in">
+                <div class="rang-mini">
+                    <span class="rang-mini-number">3</span>
+                    <span class="rang-mini-icon">🫢</span>
+                    <span class="rang-mini-name">El Confidente</span>
+                </div>
+                <div class="rang-mini">
+                    <span class="rang-mini-number">2</span>
+                    <span class="rang-mini-icon">🐢</span>
+                    <span class="rang-mini-name">El Protector</span>
+                </div>
+                <div class="rang-mini rang-novato">
+                    <span class="rang-mini-number">1</span>
+                    <span class="rang-mini-icon">🌱</span>
+                    <span class="rang-mini-name">El Novato</span>
+                    <span class="rang-count">8</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Functional Roles -->
+        <div class="functional-roles fade-in">
+            <h3>Funktionsrollen</h3>
+            <div class="func-grid">
+                <div class="func-role">
+                    <span class="func-icon">🧘</span>
+                    <span class="func-name">Consejero</span>
+                </div>
+                <div class="func-role">
+                    <span class="func-icon">📦</span>
+                    <span class="func-name">Logística</span>
+                </div>
+                <div class="func-role">
+                    <span class="func-icon">🚛</span>
+                    <span class="func-name">Rutas</span>
+                </div>
+                <div class="func-role">
+                    <span class="func-icon">🧠</span>
+                    <span class="func-name">Inteligencia</span>
+                </div>
+                <div class="func-role">
+                    <span class="func-icon">🔫</span>
+                    <span class="func-name">Sicario</span>
+                </div>
+                <div class="func-role">
+                    <span class="func-icon">📞</span>
+                    <span class="func-name">Contacto</span>
                 </div>
             </div>
         </div>
@@ -564,434 +804,225 @@
 
     <!-- Casa Section -->
     <section id="casa" class="casa">
-        <div class="container">
-            <h2 class="section-title">Casa de La Santa Calavera</h2>
-            <p class="section-subtitle">Unser Refugium in den Schatten der Stadt</p>
+        <div class="section-header">
+            <span class="section-number">05</span>
+            <h2 class="section-title">La Fuente Blanca</h2>
+            <p class="section-subtitle">Die Weiße Quelle – Unser neues Zuhause</p>
+        </div>
 
-            <div class="casa-intro">
-                <p class="casa-lead">
-                    <em>Casa de La Santa</em> - mehr als ein Anwesen. Es ist unser heiliger Boden, 
-                    unsere Festung, wo Familia zusammenkommt. Versteckt, geschützt durch Loyalität und Blut.
-                </p>
-            </div>
-
-            <div class="casa-features-grid">
-                <div class="casa-feature-card fade-in">
-                    <div class="casa-feature-icon">🏛️</div>
-                    <h3>Die Einfahrt</h3>
-                    <p>Der erste Eindruck. Goldene Akzente auf dunklem Stein. 
-                    Jeder, der hier ankommt, weiß: er betritt etwas Besonderes.</p>
-                </div>
-
-                <div class="casa-feature-card fade-in">
-                    <div class="casa-feature-icon">🌴</div>
-                    <h3>Terrasse & Pool</h3>
-                    <p>Wo Geschäfte unter Sternen gemacht werden. Der Mond reflektiert sich im Wasser. 
-                    Die Stadt liegt zu unseren Füßen.</p>
-                </div>
-
-                <div class="casa-feature-card fade-in">
-                    <div class="casa-feature-icon">🍷</div>
-                    <h3>La Bar</h3>
-                    <p>Der soziale Herzschlag der Familia. Wo Hermanos sich versammeln. 
-                    Wo Pläne geschmiedet werden über einem Glas, in der Dunkelheit.</p>
-                </div>
-
-                <div class="casa-feature-card fade-in">
-                    <div class="casa-feature-icon">🛋️</div>
-                    <h3>Das Wohnzimmer</h3>
-                    <p>Wo Strategien geboren werden. Wo der Patrón seine Entscheidungen trifft. 
-                    Das Machtzentrum von La Santa Calavera.</p>
-                </div>
-
-                <div class="casa-feature-card fade-in">
-                    <div class="casa-feature-icon">🛡️</div>
-                    <h3>Sicherheit</h3>
-                    <p>24/7 bewacht. El Custodio und El Protector wachen über die Tore. 
-                    Niemand betritt die Casa ohne Erlaubnis.</p>
-                </div>
-
-                <div class="casa-feature-card fade-in">
-                    <div class="casa-feature-icon">📍</div>
-                    <h3>Die Lage</h3>
-                    <p>Versteckt in den Schatten. Bekannt nur denen, die es wissen müssen. 
-                    Niemand findet uns, außer wir wollen es.</p>
-                </div>
-            </div>
-
-            <div class="casa-quote">
-                <p class="quote-text">
-                    "Dies ist mehr als ein Ort - es ist unser Symbol. Jeder, der das Privileg hat, 
-                    die Schwelle zu überschreiten, weiß: Hier ist er sicher. Hier ist er Familie. 
-                    Hier ist er <em>La Santa Calavera</em>."
+        <div class="casa-showcase">
+            <div class="casa-text fade-in">
+                <p class="casa-intro">
+                    <em>La Fuente Blanca</em> – die Pferderanch, die unser neues Kapitel einläutet. 
+                    Nach zwei Verrätern haben wir gelernt: Wahre Stärke kommt nicht von einem Ort, 
+                    sondern von den Menschen, die dort stehen.
                 </p>
             </div>
         </div>
-    </section>
 
-    <!-- Vehiculos Section -->
-    <section id="vehiculos" class="vehiculos">
-        <div class="container">
-            <h2 class="section-title">Nuestros Vehículos</h2>
-            <p class="section-subtitle">Dunkel. Gold. Unverwechselbar.</p>
-
-            <div class="vehiculos-grid">
-                <div class="vehiculo-card fade-in">
-                    <div class="vehiculo-icon">🏍️</div>
-                    <h3>Motorräder</h3>
-                    <p>Schnell und tödlich. Für schnelle Bewegungen durch die Stadt.</p>
-                    <div class="vehiculo-specs">
-                        <span>Schwarz-Gold</span>
-                        <span>Modifiziert</span>
-                    </div>
-                </div>
-
-                <div class="vehiculo-card fade-in">
-                    <div class="vehiculo-icon">🚗</div>
-                    <h3>Luxus-Limousinen</h3>
-                    <p>Für den Patrón und besondere Anlässe. Statement von Macht.</p>
-                    <div class="vehiculo-specs">
-                        <span>Premium</span>
-                        <span>Gepanzert</span>
-                    </div>
-                </div>
-
-                <div class="vehiculo-card fade-in">
-                    <div class="vehiculo-icon">🚚</div>
-                    <h3>Transport-Vans</h3>
-                    <p>Für Lieferungen und Logistik. Unauffällig aber effektiv.</p>
-                    <div class="vehiculo-specs">
-                        <span>Diskret</span>
-                        <span>Verstärkt</span>
-                    </div>
+        <!-- Casa Image Gallery -->
+        <div class="casa-gallery fade-in">
+            <div class="gallery-item" data-modal="casa-einfahrt">
+                <img src="images/casa/EINFAHRT-RUNDFAHRT.png" alt="Einfahrt" loading="lazy">
+                <div class="gallery-overlay">
+                    <h4>Die Einfahrt</h4>
+                    <span class="gallery-hint">Klicken zum Vergrößern</span>
                 </div>
             </div>
-
-            <div class="vehiculo-note">
-                <p>Alle Fahrzeuge tragen das La Santa Calavera Branding - subtil aber erkennbar für die, die wissen.</p>
+            <div class="gallery-item" data-modal="casa-wohnzimmer">
+                <img src="images/casa/WOHNZIMMER.png" alt="Wohnzimmer" loading="lazy">
+                <div class="gallery-overlay">
+                    <h4>Das Wohnzimmer</h4>
+                    <span class="gallery-hint">Klicken zum Vergrößern</span>
+                </div>
             </div>
+            <div class="gallery-item" data-modal="casa-bar">
+                <img src="images/casa/BAR-POOL.png" alt="Bar & Pool" loading="lazy">
+                <div class="gallery-overlay">
+                    <h4>Bar & Pool</h4>
+                    <span class="gallery-hint">Klicken zum Vergrößern</span>
+                </div>
+            </div>
+            <div class="gallery-item" data-modal="casa-blood">
+                <img src="images/casa/BLOOD-POOL.png" alt="Blood Pool" loading="lazy">
+                <div class="gallery-overlay">
+                    <h4>Der Pool</h4>
+                    <span class="gallery-hint">Klicken zum Vergrößern</span>
+                </div>
+            </div>
+            <div class="gallery-item" data-modal="casa-besprechung">
+                <img src="images/casa/BESPRECHUNGS-CIRCULO.png" alt="Besprechungsraum" loading="lazy">
+                <div class="gallery-overlay">
+                    <h4>El Círculo</h4>
+                    <span class="gallery-hint">Klicken zum Vergrößern</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="casa-features-grid fade-in">
+            <div class="casa-feature">
+                <span class="feature-icon">🏛️</span>
+                <h4>Die Einfahrt</h4>
+                <p>Goldene Akzente auf dunklem Stein. Der erste Eindruck zählt.</p>
+            </div>
+            <div class="casa-feature">
+                <span class="feature-icon">🛋️</span>
+                <h4>Das Wohnzimmer</h4>
+                <p>Wo Strategien geboren werden und die Führung tagt.</p>
+            </div>
+            <div class="casa-feature">
+                <span class="feature-icon">🍷</span>
+                <h4>La Bar</h4>
+                <p>Der soziale Herzschlag der Familia.</p>
+            </div>
+            <div class="casa-feature">
+                <span class="feature-icon">🌊</span>
+                <h4>Der Pool</h4>
+                <p>Wo unter Sternen Geschäfte gemacht werden.</p>
+            </div>
+            <div class="casa-feature">
+                <span class="feature-icon">⭕</span>
+                <h4>El Círculo</h4>
+                <p>Der Besprechungskreis – hier werden Entscheidungen getroffen.</p>
+            </div>
+        </div>
+
+        <div class="casa-history fade-in">
+            <div class="history-badge">Von der alten Casa zur Ranch</div>
+            <p>
+                Die alte Casa war gut. Aber sie war auch mit Erinnerungen an Verrat behaftet. 
+                <em>La Fuente Blanca</em> ist unser Neuanfang – ein Ort, der nur uns gehört. 
+                Keine Schatten der Banderas. Keine alten Geister. Nur La Santa Calavera.
+            </p>
+        </div>
+
+        <div class="casa-quote fade-in">
+            <blockquote>
+                "Sie haben gedacht, uns zu brechen. Stattdessen haben sie uns befreit. 
+                La Fuente Blanca ist der Beweis: Wir brauchen keine Banderas. 
+                Wir sind La Santa Calavera – und wir reiten weiter."
+            </blockquote>
         </div>
     </section>
 
-    <!-- Simple Divider -->
-    <div class="container">
-        <div class="hero-divider"></div>
-    </div>
+    <!-- Familia Stats Section -->
+    <section id="familia" class="familia">
+        <div class="section-header">
+            <span class="section-number">06</span>
+            <h2 class="section-title">La Familia</h2>
+            <p class="section-subtitle">Zahlen, die eine Geschichte erzählen</p>
+        </div>
 
-    <!-- Kleidung Section -->
-    <section id="kleidung" class="kleidung">
-        <div class="container">
-            <h2 class="section-title">Vestimenta de La Familia</h2>
-            <p class="section-subtitle">Unsere einheitliche Kleidung - erkennbar, stilvoll, legendär.</p>
-
-            <div class="kleidung-grid">
-                <div class="kleidung-card fade-in">
-                    <div class="kleidung-icon">👔</div>
-                    <h3>Hemd</h3>
-                    <p>Elegante Hemden in Schwarz und Gold. Der Stil des Kartells.</p>
-                </div>
-
-                <div class="kleidung-card fade-in">
-                    <div class="kleidung-icon">👖</div>
-                    <h3>Hose</h3>
-                    <p>Stilvolle Anzughosen. Perfekt für jeden Anlass.</p>
-                </div>
-
-                <div class="kleidung-card fade-in">
-                    <div class="kleidung-icon">🧥</div>
-                    <h3>Jacke</h3>
-                    <p>Exklusive Jacken mit La Santa Branding. Macht und Eleganz.</p>
-                </div>
-
-                <div class="kleidung-card fade-in">
-                    <div class="kleidung-icon">👞</div>
-                    <h3>Schuhe</h3>
-                    <p>Premium Lederschuhe. Der perfekte Abschluss des Outfits.</p>
-                </div>
-
-                <div class="kleidung-card fade-in">
-                    <div class="kleidung-icon">🎩</div>
-                    <h3>Kopfbedeckung</h3>
-                    <p>Hüte und Caps für die Familia. Stil trifft Tradition.</p>
-                </div>
-
-                <div class="kleidung-card fade-in">
-                    <div class="kleidung-icon">🎒</div>
-                    <h3>Rucksack</h3>
-                    <p>Speziell angefertigte Rucksäcke. Funktional und stilvoll.</p>
-                </div>
+        <div class="familia-stats">
+            <div class="stat-card fade-in">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" data-target="25">0</div>
+                <div class="stat-label">Hermanos</div>
+                <div class="stat-desc">Eine unzerbrechliche Familia</div>
             </div>
-
-            <div class="kleidung-note">
-                <p>Alle Kleidungsstücke tragen das La Santa Calavera Branding - subtil aber erkennbar für die Familia.</p>
+            <div class="stat-card fade-in">
+                <div class="stat-icon">📅</div>
+                <div class="stat-number" data-target="10">0</div>
+                <div class="stat-label">Monate</div>
+                <div class="stat-desc">Zwei Verräter überlebt</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-icon">🐎</div>
+                <div class="stat-number" data-target="1">0</div>
+                <div class="stat-label">Ranch</div>
+                <div class="stat-desc">La Fuente Blanca</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-icon">💀</div>
+                <div class="stat-number" data-target="2">0</div>
+                <div class="stat-label">Verräter</div>
+                <div class="stat-desc">Banderas-Fluch gebrochen</div>
             </div>
         </div>
-    </section>
 
-    <!-- Simple Divider -->
-    <div class="container">
-        <div class="hero-divider"></div>
-    </div>
+        <div class="familia-message fade-in">
+            <p class="message-lead">
+                Wir sind die Stimme in der Nacht. Die Hand, die hilft. Die Macht, die beschützt.
+            </p>
+            <p class="message-highlight">
+                <strong>Wir sind La Santa Calavera. Wir sind Familia. Wir sind ewig.</strong>
+            </p>
+        </div>
+    </section>
 
     <!-- Acento Section -->
     <section class="acento">
         <div class="container">
-            <h2 class="section-title">Acento de la Familia</h2>
-            <p class="section-subtitle">Kurzer Überblick über unseren sprachlichen Akzent – für die Fraktionsverwaltung und neue Mitglieder.</p>
-
-            <div class="acento-grid-modern">
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Hallo</span>
-                        <span class="espanol-text">Hola</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Haus / Anwesen</span>
-                        <span class="espanol-text">Casa</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">(Funk) Wie bitte?</span>
-                        <span class="espanol-text">¿Cómo?</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">(Funk) Hilfe!</span>
-                        <span class="espanol-text">¡Ayuda!</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Wie geht's?</span>
-                        <span class="espanol-text">¿Cómo estás?</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Gut</span>
-                        <span class="espanol-text">Bien</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Sehr gut</span>
-                        <span class="espanol-text">Muy bien</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Auf Wiedersehen</span>
-                        <span class="espanol-text">Hasta luego</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Tschüss</span>
-                        <span class="espanol-text">Adiós</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Guten Morgen</span>
-                        <span class="espanol-text">Buenos días</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Gute Nacht</span>
-                        <span class="espanol-text">Buenas noches</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Danke</span>
-                        <span class="espanol-text">Gracias</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Die Familie</span>
-                        <span class="espanol-text">La Familia</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Bruder</span>
-                        <span class="espanol-text">Hermano</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Schwester</span>
-                        <span class="espanol-text">Hermana</span>
-                    </div>
-                </div>
-
-                <div class="acento-card-modern fade-in">
-                    <div class="acento-header">
-                        <span class="acento-lang">DEUTSCH</span>
-                        <span class="acento-lang gold">ESPAÑOL</span>
-                    </div>
-                    <div class="acento-pair">
-                        <span class="deutsch-text">Feind</span>
-                        <span class="espanol-text">Enemigo</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="acento-note">
-                <p><strong>Hinweis:</strong> Akzente, Interpunktion und Groß-/Kleinschreibung im Spanischen sind beabsichtigt (z. B. ¿Cómo?, ¡Ayuda!).</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Familia Section -->
-    <section id="familia" class="familia">
-        <div class="container">
-            <h2 class="section-title">Nuestra Familia</h2>
-            <div class="familia-stats-enhanced">
-                <div class="stat-card-enhanced fade-in">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-number" data-target="25">0</div>
-                    <div class="stat-label">Hermanos & Hermanas</div>
-                    <div class="stat-detail">Eine unzerbrechliche Familia</div>
-                </div>
-                <div class="stat-card-enhanced fade-in">
-                    <div class="stat-icon">📅</div>
-                    <div class="stat-number" data-target="9">0</div>
-                    <div class="stat-label">Monate</div>
-                    <div class="stat-detail">Aus der Asche auferstanden</div>
-                </div>
-                <div class="stat-card-enhanced fade-in">
-                    <div class="stat-icon">🏛️</div>
-                    <div class="stat-number" data-target="12">0</div>
-                    <div class="stat-label">Ränge</div>
-                    <div class="stat-detail">Von Novato bis Patrón</div>
-                </div>
-            </div>
-
-            <div class="familia-message">
-                <p class="lead-text">
-                    Wir sind die Stimme in der Nacht. Die Hand, die hilft. Die Macht, die beschützt.
-                </p>
-                <p>
-                    Von <strong>Gideon Russell</strong>, unserem <em>Patrón</em>, der uns aus der Dunkelheit des Verrats 
-                    führte, bis zu unseren jüngsten <em>Novatos</em>, die gerade erst ihre Reise beginnen - 
-                    wir sind mehr als eine Organisation. Mehr als ein Kartell. Mehr als ein Business.
-                </p>
-                <p class="highlight-text">
-                    <strong>Wir sind La Santa Calavera. Wir sind Familia. Wir sind ewig.</strong>
-                </p>
+            <h3 class="acento-title">Acento de la Familia</h3>
+            <div class="acento-grid">
+                <div class="acento-item fade-in"><span class="de">Hallo</span><span class="es">Hola</span></div>
+                <div class="acento-item fade-in"><span class="de">Haus</span><span class="es">Casa</span></div>
+                <div class="acento-item fade-in"><span class="de">Danke</span><span class="es">Gracias</span></div>
+                <div class="acento-item fade-in"><span class="de">Bruder</span><span class="es">Hermano</span></div>
+                <div class="acento-item fade-in"><span class="de">Familie</span><span class="es">Familia</span></div>
+                <div class="acento-item fade-in"><span class="de">Feind</span><span class="es">Enemigo</span></div>
+                <div class="acento-item fade-in"><span class="de">Hilfe!</span><span class="es">¡Ayuda!</span></div>
+                <div class="acento-item fade-in"><span class="de">Auf Wiedersehen</span><span class="es">Hasta luego</span></div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo-section">
-                    <img src="logo-og-removebg-preview.png" alt="Cártel Renacido" class="footer-logo">
-                    <h3>CÁRTEL RENACIDO</h3>
-                    <p class="footer-tagline">Das wiedergeborene Kartell</p>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="logo-og-removebg-preview.png" alt="La Santa Calavera">
+                <div class="footer-brand">
+                    <span class="brand-name">LA SANTA CALAVERA</span>
+                    <span class="brand-tagline">Desde las Sombras</span>
                 </div>
+            </div>
 
-                <div class="footer-quote">
-                    <p>"Wir verändern die Stadt - mit Gold, Respekt und unerschütterlicher Vision"</p>
-                </div>
+            <div class="footer-quote">
+                <p>"Wir verändern die Stadt – mit Gold, Respekt und unerschütterlicher Vision"</p>
+            </div>
 
-                <div class="footer-legal">
-                    <p class="copyright">© 2025 Cártel Renacido. Alle Rechte vorbehalten.</p>
-                    <p class="disclaimer">
-                        Diese Webseite ist eine Fiktion für GTA RP Zwecke. Alle Inhalte sind rein fiktiv und dienen der Unterhaltung. 
-                        "Wir verändern die Stadt" - nur im Spiel, versteht sich.
-                    </p>
-                </div>
+            <div class="footer-info">
+                <p class="copyright">© 2025 La Santa Calavera. Alle Rechte vorbehalten.</p>
+                <p class="disclaimer">
+                    Diese Webseite ist eine Fiktion für GTA RP Zwecke. Alle Inhalte sind rein fiktiv.
+                </p>
+            </div>
 
-                <div class="footer-credit">
-                    <p>Built with ❤️ by LSC | Gideon Russell</p>
-                </div>
+            <div class="footer-credit">
+                <p>Built with 🩸 by LSC | Gideon Russell</p>
             </div>
         </div>
     </footer>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="imageModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Schließen">&times;</button>
+            <div class="modal-header">
+                <h3 class="modal-title"></h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-gallery">
+                    <!-- Images will be inserted here by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-nav">
+                <button class="modal-nav-btn modal-prev" aria-label="Vorheriges Bild">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                <span class="modal-counter">1 / 1</span>
+                <button class="modal-nav-btn modal-next" aria-label="Nächstes Bild">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
