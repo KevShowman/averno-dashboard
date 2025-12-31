@@ -515,6 +515,113 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+// === SPLASH SCREEN & AUDIO CONTROL ===
+(function initSplashAndAudio() {
+    function setup() {
+        const splash = document.getElementById('splashScreen');
+        const enterBtn = document.getElementById('enterBtn');
+        const audio = document.getElementById('bgAudio');
+        const audioBtn = document.getElementById('audioBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        
+        if (!audio || !audioBtn) return;
+        
+        const playIcon = audioBtn.querySelector('.audio-play');
+        const pauseIcon = audioBtn.querySelector('.audio-pause');
+        
+        // Ensure loop is set
+        audio.loop = true;
+        
+        // Set initial volume (low)
+        audio.volume = 0.2;
+        
+        function updateUI(isPlaying) {
+            if (isPlaying) {
+                audioBtn.classList.add('playing');
+                if (playIcon) playIcon.style.display = 'none';
+                if (pauseIcon) pauseIcon.style.display = 'inline';
+            } else {
+                audioBtn.classList.remove('playing');
+                if (playIcon) playIcon.style.display = 'inline';
+                if (pauseIcon) pauseIcon.style.display = 'none';
+            }
+        }
+        
+        function startAudio() {
+            audio.play().then(() => {
+                updateUI(true);
+                console.log('🎵 Audio started');
+            }).catch(err => {
+                console.log('Audio error:', err);
+            });
+        }
+        
+        function hideSplash() {
+            if (splash) {
+                splash.classList.add('hidden');
+                // Start audio after user interaction (click on ENTRAR)
+                startAudio();
+            }
+        }
+        
+        // Enter button click
+        if (enterBtn) {
+            enterBtn.addEventListener('click', hideSplash);
+        }
+        
+        // Also allow Enter key or Space to dismiss splash
+        document.addEventListener('keydown', (e) => {
+            if (splash && !splash.classList.contains('hidden')) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    hideSplash();
+                }
+            }
+        });
+        
+        // Play/Pause toggle (manual control)
+        audioBtn.addEventListener('click', (e) => {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    updateUI(true);
+                    console.log('🎵 Audio playing');
+                }).catch(err => {
+                    console.log('Audio play error:', err);
+                });
+            } else {
+                audio.pause();
+                updateUI(false);
+                console.log('🔇 Audio paused');
+            }
+        });
+        
+        // Volume control
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => {
+                audio.volume = e.target.value / 100;
+            });
+        }
+        
+        // Sync UI with audio state
+        audio.addEventListener('play', () => updateUI(true));
+        audio.addEventListener('pause', () => updateUI(false));
+        audio.addEventListener('ended', () => {
+            // Fallback if loop doesn't work
+            audio.currentTime = 0;
+            audio.play();
+        });
+        
+        console.log('🎵 Audio control initialized');
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setup);
+    } else {
+        setup();
+    }
+})();
+
 // === PERFORMANCE LOG ===
 window.addEventListener('load', () => {
     if (window.performance && window.performance.timing) {

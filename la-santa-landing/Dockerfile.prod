@@ -13,6 +13,9 @@ COPY logo-og-removebg-preview.png /usr/share/nginx/html/
 # Copy images
 COPY images/ /usr/share/nginx/html/images/
 
+# Copy background audio
+COPY background-audio/ /usr/share/nginx/html/background-audio/
+
 # Pre-compress files for better performance
 RUN gzip -k /usr/share/nginx/html/styles.css && \
     gzip -k /usr/share/nginx/html/script.js
