@@ -1055,8 +1055,8 @@ model PartnerFamilySuggestion {
   mapIcon          String? // Icon
   // Review-Status
   suggestionStatus SuggestionStatus      @default(PENDING)
-  createdById      String // Partner der den Vorschlag erstellt hat
-  createdBy        User                  @relation("partner_family_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById      String? // Partner der den Vorschlag erstellt hat (optional falls User gelöscht)
+  createdBy        User?                 @relation("partner_family_suggestion_created_by", fields: [createdById], references: [id], onDelete: SetNull)
   reviewedById     String? // Wer hat den Vorschlag überprüft
   reviewedBy       User?                 @relation("partner_family_suggestion_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
   reviewedAt       DateTime?
