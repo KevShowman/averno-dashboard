@@ -174,30 +174,21 @@ export default function TafelrundePage() {
 
   const permissionsQuery = useQuery({
     queryKey: ['tafelrunde-permissions'],
-    queryFn: async (): Promise<TafelrundePermission[]> => {
-      const res = await api.get('/tafelrunde/permissions/list')
-      return res.data
-    },
+    queryFn: () => api.get('/tafelrunde/permissions/list').then(res => res.data as TafelrundePermission[]),
     enabled: isLeadership,
   })
-  const permissions = (permissionsQuery.data ?? []) as TafelrundePermission[]
+  const permissions = permissionsQuery.data ?? []
 
   const availableUsersQuery = useQuery({
     queryKey: ['users-for-tafelrunde-permission'],
-    queryFn: async (): Promise<UserForPermission[]> => {
-      const res = await api.get('/users')
-      return res.data
-    },
+    queryFn: () => api.get('/users').then(res => res.data as UserForPermission[]),
     enabled: isLeadership,
   })
-  const availableUsers = (availableUsersQuery.data ?? []) as UserForPermission[]
+  const availableUsers = availableUsersQuery.data ?? []
 
   const permissionCheckQuery = useQuery({
     queryKey: ['tafelrunde-permission-check'],
-    queryFn: async (): Promise<{ hasPermission: boolean }> => {
-      const res = await api.get('/tafelrunde/permissions/check')
-      return res.data
-    },
+    queryFn: () => api.get('/tafelrunde/permissions/check').then(res => res.data as { hasPermission: boolean }),
   })
 
   const canManage = isLeadership || permissionCheckQuery.data?.hasPermission === true
