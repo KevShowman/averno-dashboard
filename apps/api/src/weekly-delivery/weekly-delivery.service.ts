@@ -465,6 +465,8 @@ export class WeeklyDeliveryService {
         role: {
           not: 'GAST', // Gäste sind ausgeschlossen
         },
+        isTaxi: false,  // Taxi-User ausschließen
+        isPartner: false, // Partner ausschließen
       },
       select: {
         id: true,

@@ -51,8 +51,12 @@ export class AufstellungService {
 
   // Automatisch abgemeldete User auf "Kommt nicht" setzen
   private async autoSetAbgemeldetUserNotComing(aufstellungId: string, aufstellungDate: Date) {
-    // Hole alle User
+    // Hole alle User (keine Partner/Taxi - nur interne Mitglieder)
     const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
       },

@@ -55,10 +55,12 @@ export class AttendanceService {
     // Berechne Start und Ende der Woche
     const { startDate, endDate } = this.getWeekDates(parseInt(year), weekNumber);
     
-    // Hole alle User (aktive Mitglieder)
+    // Hole alle User (aktive Mitglieder, keine Partner/Taxi)
     const users = await this.prisma.user.findMany({
       where: {
         role: { notIn: ['FUTURO', 'GAST'] },
+        isPartner: false,
+        isTaxi: false,
       },
       select: {
         id: true,

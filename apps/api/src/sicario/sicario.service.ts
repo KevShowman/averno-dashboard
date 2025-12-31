@@ -12,7 +12,7 @@ export class SicarioService {
     private abmeldungService: AbmeldungService,
   ) {}
 
-  // Alle Sicarios holen (User mit SICARIO Rolle)
+  // Alle Sicarios holen (User mit SICARIO Rolle, keine Partner/Taxi)
   private async getSicarioUsers() {
     const users = await this.prisma.user.findMany({
       where: {
@@ -25,6 +25,8 @@ export class SicarioService {
             },
           },
         ],
+        isPartner: false,
+        isTaxi: false,
       },
       select: {
         id: true,

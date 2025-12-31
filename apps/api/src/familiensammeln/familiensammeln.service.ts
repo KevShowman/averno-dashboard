@@ -290,8 +290,12 @@ export class FamiliensammelnService {
       throw new NotFoundException('Woche nicht gefunden');
     }
 
-    // Hole alle aktiven User
+    // Hole alle aktiven User (keine Partner/Taxi - nur interne Mitglieder)
     const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,

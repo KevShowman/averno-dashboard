@@ -45,8 +45,12 @@ export class MemberFilesService {
   }
 
   async getUsersPendingUprank() {
-    // Hole ALLE User aus der Datenbank
+    // Hole alle internen User aus der Datenbank (keine Partner/Taxi)
     const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,

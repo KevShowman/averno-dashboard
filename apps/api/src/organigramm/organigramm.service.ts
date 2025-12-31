@@ -60,8 +60,12 @@ export class OrganigrammService {
    * Gibt alle Rollen-Zuordnungen basierend auf user.allRoles automatisch zurück
    */
   async getAllAssignments(): Promise<Record<string, RoleAssignmentDto[]>> {
-    // Hole alle User mit ihren Rollen
+    // Hole alle User mit ihren Rollen (keine Partner/Taxi - nur interne Mitglieder)
     const users = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,

@@ -6,9 +6,13 @@ import { Role } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // Alle User abrufen
+  // Alle User abrufen (keine Partner/Taxi - nur interne Mitglieder)
   async getAllUsers() {
     return this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,
@@ -139,7 +143,7 @@ export class UsersService {
     });
   }
 
-  // User nach Name/Username suchen
+  // User nach Name/Username suchen (keine Partner/Taxi - nur interne Mitglieder)
   async searchUsers(query: string) {
     if (!query || query.trim().length < 2) {
       return [];
@@ -149,6 +153,8 @@ export class UsersService {
 
     return this.prisma.user.findMany({
       where: {
+        isPartner: false,
+        isTaxi: false,
         OR: [
           { username: { contains: searchTerm } },
           { icFirstName: { contains: searchTerm } },
@@ -200,12 +206,21 @@ export class UsersService {
     ];
   }
 
-  // User-Statistiken
+  // User-Statistiken (nur interne Mitglieder)
   async getUserStats() {
-    const totalUsers = await this.prisma.user.count();
+    const totalUsers = await this.prisma.user.count({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
+    });
     
-    // Hole alle User mit ihren allRoles
+    // Hole alle User mit ihren allRoles (keine Partner/Taxi)
     const users = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         role: true,
