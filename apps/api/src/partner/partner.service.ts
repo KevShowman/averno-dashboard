@@ -655,7 +655,7 @@ export class PartnerService {
     const isPartnerOnly = user.isPartner && !canManage;
     const where = isPartnerOnly 
       ? { createdById: user.id } 
-      : { createdById: { not: null } }; // Nur Einträge mit existierendem User
+      : { createdBy: { isNot: null } }; // Nur Einträge mit existierendem User (Relation-Check)
 
     const suggestions = await this.prisma.partnerFamilySuggestion.findMany({
       where,
@@ -721,7 +721,7 @@ export class PartnerService {
     return this.prisma.partnerFamilySuggestion.findMany({
       where: { 
         suggestionStatus: SuggestionStatus.PENDING,
-        createdById: { not: null }, // Nur Einträge mit existierendem User
+        createdBy: { isNot: null }, // Nur Einträge mit existierendem User (Relation-Check)
       },
       include: {
         familyContact: {
@@ -751,7 +751,7 @@ export class PartnerService {
     return this.prisma.partnerFamilySuggestion.count({
       where: { 
         suggestionStatus: SuggestionStatus.PENDING,
-        createdById: { not: null }, // Nur Einträge mit existierendem User
+        createdBy: { isNot: null }, // Nur Einträge mit existierendem User (Relation-Check)
       },
     });
   }
