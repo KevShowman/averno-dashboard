@@ -172,19 +172,21 @@ export default function TafelrundePage() {
     queryFn: () => api.get('/family-contacts').then(res => res.data),
   })
 
-  const { data: permissions = [] } = useQuery<TafelrundePermission[]>({
+  const { data: permissionsData } = useQuery<TafelrundePermission[]>({
     queryKey: ['tafelrunde-permissions'],
     queryFn: () => api.get('/tafelrunde/permissions/list').then(res => res.data),
     enabled: isLeadership,
   })
+  const permissions: TafelrundePermission[] = permissionsData ?? []
 
-  const { data: availableUsers = [] } = useQuery<UserForPermission[]>({
+  const { data: availableUsersData } = useQuery<UserForPermission[]>({
     queryKey: ['users-for-tafelrunde-permission'],
     queryFn: () => api.get('/users').then(res => res.data),
     enabled: isLeadership,
   })
+  const availableUsers: UserForPermission[] = availableUsersData ?? []
 
-  const { data: permissionCheck } = useQuery({
+  const { data: permissionCheck } = useQuery<{ hasPermission: boolean }>({
     queryKey: ['tafelrunde-permission-check'],
     queryFn: () => api.get('/tafelrunde/permissions/check').then(res => res.data),
   })

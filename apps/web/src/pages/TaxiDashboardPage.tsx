@@ -584,16 +584,19 @@ export default function TaxiDashboardPage() {
                             {/* Treffpunkt/Zielort Marker für Fahrer */}
                             {(() => {
                               // Sammle eindeutige Treffpunkte aus den Zuweisungen
-                              const meetingPoints = myAssignments
+                              type MeetingPoint = { id: string; title: string; location?: string; x: number; y: number }
+                              const meetingPointsMap = new Map<string, MeetingPoint>()
+                              
+                              myAssignments
                                 .filter(a => 
                                   a.tafelrunde?.meetingPointMapName === primaryMap && 
                                   a.tafelrunde?.meetingPointX != null && 
                                   a.tafelrunde?.meetingPointY != null
                                 )
-                                .reduce((acc, a) => {
-                                  const key = `${a.tafelrunde.id}`
-                                  if (!acc.has(key)) {
-                                    acc.set(key, {
+                                .forEach(a => {
+                                  const key = a.tafelrunde.id
+                                  if (!meetingPointsMap.has(key)) {
+                                    meetingPointsMap.set(key, {
                                       id: a.tafelrunde.id,
                                       title: a.tafelrunde.title,
                                       location: a.tafelrunde.location,
@@ -601,10 +604,11 @@ export default function TaxiDashboardPage() {
                                       y: a.tafelrunde.meetingPointY!,
                                     })
                                   }
-                                  return acc
-                                }, new Map<string, { id: string; title: string; location?: string; x: number; y: number }>())
+                                })
                               
-                              return Array.from(meetingPoints.values()).map((mp) => (
+                              const meetingPoints: MeetingPoint[] = Array.from(meetingPointsMap.values())
+                              
+                              return meetingPoints.map((mp) => (
                                 <Marker
                                   key={`meeting-${mp.id}`}
                                   position={toMapCoords(mp.x, mp.y)}

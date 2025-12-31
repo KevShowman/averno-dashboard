@@ -174,7 +174,7 @@ export default function PartnerManagementPage() {
   })
 
   // Permission queries (nur für El Patron)
-  const { data: permissions = [], isLoading: loadingPermissions } = useQuery({
+  const { data: permissionsData, isLoading: loadingPermissions } = useQuery<PartnerManagementPermission[]>({
     queryKey: ['partner-permissions'],
     queryFn: async () => {
       const res = await api.get('/partner/permissions')
@@ -182,8 +182,9 @@ export default function PartnerManagementPage() {
     },
     enabled: isElPatron,
   })
+  const permissions: PartnerManagementPermission[] = permissionsData ?? []
 
-  const { data: availableUsers = [] } = useQuery({
+  const { data: availableUsersData } = useQuery<UserForPermission[]>({
     queryKey: ['users-for-permission'],
     queryFn: async () => {
       const res = await api.get('/users')
@@ -191,6 +192,7 @@ export default function PartnerManagementPage() {
     },
     enabled: isElPatron,
   })
+  const availableUsers: UserForPermission[] = availableUsersData ?? []
 
   // Mutations
   const approveRequestMutation = useMutation({
