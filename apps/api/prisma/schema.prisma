@@ -74,6 +74,18 @@ model User {
   partnerPermissionsReceived       PartnerManagementPermission[]  @relation("partner_permission_user")
   partnerFamilySuggestionsCreated  PartnerFamilySuggestion[]      @relation("partner_family_suggestion_created_by")
   partnerFamilySuggestionsReviewed PartnerFamilySuggestion[]      @relation("partner_family_suggestion_reviewed_by")
+  // Tafelrunde System
+  tafelrundenCreated               Tafelrunde[]                   @relation("tafelrunde_created_by")
+  tafelrundeFamiliesUpdated        TafelrundeFamily[]             @relation("tafelrunde_family_updated_by")
+  tafelrundePermissionsGranted     TafelrundePermission[]         @relation("tafelrunde_permission_granted_by")
+  tafelrundePermissionsReceived    TafelrundePermission[]         @relation("tafelrunde_permission_user")
+  // Taxi System
+  isTaxi                           Boolean                        @default(false) // Kennzeichnet Taxi-User
+  isTaxiLead                       Boolean                        @default(false) // Taxi-Leitungsebene (Master Key)
+  taxiKeysCreated                  TaxiKey[]                      @relation("taxi_key_created_by")
+  taxiKeysUsed                     TaxiKey[]                      @relation("taxi_key_used_by")
+  taxiAssignmentsAssigned          TaxiAssignment[]               @relation("taxi_assignment_driver")
+  taxiAssignmentsCreated           TaxiAssignment[]               @relation("taxi_assignment_created_by")
 
   @@map("users")
 }
@@ -112,6 +124,9 @@ enum Role {
   FUTURO // Anwärter, niedrigste Rolle, nur lesen
   // Partner (externe Benutzer)
   PARTNER // 🤝 - Partner (eingeschränkter Zugriff auf Karte & Listen)
+  // Taxi System
+  TAXI // 🚕 - Taxi-Fahrer (kann zugewiesene Familien sehen)
+  TAXI_LEAD // 🚖 - Taxi-Leitung (kann Fahrer zuweisen, Master Key)
 }
 
 model Module {
@@ -810,9 +825,11 @@ model FamilyContact {
   updatedAt          DateTime            @updatedAt
 
   // Relations
-  mapAnnotations     MapAnnotation[]           @relation("map_annotation_family")
-  mapSuggestions     MapSuggestion[]           @relation("map_suggestion_family")
-  partnerSuggestions PartnerFamilySuggestion[] @relation("partner_suggestion_family")
+  mapAnnotations      MapAnnotation[]           @relation("map_annotation_family")
+  mapSuggestions      MapSuggestion[]           @relation("map_suggestion_family")
+  partnerSuggestions  PartnerFamilySuggestion[] @relation("partner_suggestion_family")
+  tafelrundeInvites   TafelrundeFamily[]        @relation("tafelrunde_family")
+  taxiAssignments     TaxiAssignment[]          @relation("taxi_assignment_family")
 
   @@map("family_contacts")
 }
@@ -1053,6 +1070,153 @@ model PartnerFamilySuggestion {
 enum PartnerSuggestionType {
   CREATE // Neue Familie vorschlagen
   UPDATE // Bestehende Familie aktualisieren
+  DELETE // Löschung vorschlagen (POI oder Familie)
+}
+
+// ============ TAFELRUNDE SYSTEM ============
+
+// Tafelrunde - Ein Meeting/Event bei dem Familien zusammenkommen
+model Tafelrunde {
+  id          String              @id @default(cuid())
+  title       String // Titel der Tafelrunde (z.B. "Bündnis Abstimmung")
+  description String?             @db.Text // Optionale Beschreibung
+  date        DateTime // Datum der Tafelrunde
+  location    String? // Optionaler Treffpunkt (Text-Beschreibung)
+  // Treffpunkt auf der Karte (PFLICHT für Taxi-Zielort)
+  meetingPointMapName String      // Kartenname: NARCO_CITY, ROXWOOD, CAYO_PERICO
+  meetingPointX       Float       // X-Koordinate (normalisiert 0-1)
+  meetingPointY       Float       // Y-Koordinate (normalisiert 0-1)
+  // Zeitplanung
+  pickupStartTime     String?     // Vorgeschlagene Abhol-Startzeit (z.B. "17:30")
+  arrivalDeadline     String?     // Spätestens am Treffpunkt (z.B. "18:00")
+  status      TafelrundeStatus    @default(PLANNED)
+  // Ersteller
+  createdById String
+  createdBy   User                @relation("tafelrunde_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  // Familien die eingeladen sind
+  families    TafelrundeFamily[]
+  // Taxi-Zuweisungen
+  taxiAssignments TaxiAssignment[]
+  // Timestamps
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@map("tafelrunden")
+}
+
+// Verknüpfung zwischen Tafelrunde und Familie mit Anwesenheitsstatus
+model TafelrundeFamily {
+  id              String                    @id @default(cuid())
+  tafelrundeId    String
+  tafelrunde      Tafelrunde                @relation(fields: [tafelrundeId], references: [id], onDelete: Cascade)
+  familyContactId String
+  familyContact   FamilyContact             @relation("tafelrunde_family", fields: [familyContactId], references: [id], onDelete: Cascade)
+  // Anwesenheitsstatus
+  attendanceStatus TafelrundeAttendance     @default(UNKNOWN)
+  // Wer hat den Status zuletzt geändert
+  updatedById     String?
+  updatedBy       User?                     @relation("tafelrunde_family_updated_by", fields: [updatedById], references: [id], onDelete: SetNull)
+  // Notiz (z.B. warum Familie nicht kommt)
+  note            String?
+  // Timestamps
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  @@unique([tafelrundeId, familyContactId])
+  @@map("tafelrunde_families")
+}
+
+// Status einer Tafelrunde
+enum TafelrundeStatus {
+  PLANNED // Geplant
+  ACTIVE // Aktiv/Laufend
+  COMPLETED // Abgeschlossen
+  CANCELLED // Abgesagt
+}
+
+// Anwesenheitsstatus einer Familie bei einer Tafelrunde
+enum TafelrundeAttendance {
+  UNKNOWN // Noch nicht bekannt
+  ATTENDING // Kommt
+  NOT_ATTENDING // Kommt nicht
+  MAYBE // Vielleicht
+}
+
+// Berechtigung zur Tafelrunden-Verwaltung
+model TafelrundePermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation("tafelrunde_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String?
+  grantedBy   User?    @relation("tafelrunde_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@map("tafelrunde_permissions")
+}
+
+// ============ TAXI SYSTEM ============
+
+// Taxi-Zugangsschlüssel
+model TaxiKey {
+  id          String       @id @default(cuid())
+  key         String       @unique // Der eigentliche Zugangsschlüssel
+  type        TaxiKeyType  @default(SINGLE_USE) // Art des Keys
+  isMasterKey Boolean      @default(false) // Master Key = Taxi-Leitungsebene
+  status      TaxiKeyStatus @default(ACTIVE)
+  usedById    String?      // Wer hat den Key verwendet
+  usedBy      User?        @relation("taxi_key_used_by", fields: [usedById], references: [id], onDelete: SetNull)
+  usedAt      DateTime?    // Wann wurde der Key verwendet
+  expiresAt   DateTime?    // Optional: Ablaufdatum
+  createdById String
+  createdBy   User         @relation("taxi_key_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  note        String?      // Optionale Notiz (z.B. "Für Max Mustermann")
+
+  @@map("taxi_keys")
+}
+
+enum TaxiKeyType {
+  SINGLE_USE // Einmalig verwendbar
+  MULTI_USE  // Mehrfach verwendbar (z.B. für Tests)
+  PERMANENT  // Permanent gültig
+}
+
+enum TaxiKeyStatus {
+  ACTIVE     // Aktiv und verwendbar
+  USED       // Bereits verwendet (bei SINGLE_USE)
+  REVOKED    // Widerrufen/Invalidiert
+  EXPIRED    // Abgelaufen
+}
+
+// Taxi-Zuweisung: Welcher Fahrer holt welche Familie ab
+model TaxiAssignment {
+  id              String           @id @default(cuid())
+  tafelrundeId    String
+  tafelrunde      Tafelrunde       @relation(fields: [tafelrundeId], references: [id], onDelete: Cascade)
+  familyContactId String
+  familyContact   FamilyContact    @relation("taxi_assignment_family", fields: [familyContactId], references: [id], onDelete: Cascade)
+  driverId        String?          // Zugewiesener Fahrer (null = noch nicht zugewiesen)
+  driver          User?            @relation("taxi_assignment_driver", fields: [driverId], references: [id], onDelete: SetNull)
+  status          TaxiAssignmentStatus @default(PENDING)
+  pickupNotes     String?          @db.Text // Abholnotizen (Adresse, Hinweise)
+  pickupTime      String?          // Geplante Abholzeit
+  completedAt     DateTime?        // Wann wurde die Abholung abgeschlossen
+  createdById     String
+  createdBy       User             @relation("taxi_assignment_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([tafelrundeId, familyContactId]) // Eine Familie pro Tafelrunde nur einmal
+  @@map("taxi_assignments")
+}
+
+enum TaxiAssignmentStatus {
+  PENDING    // Noch nicht zugewiesen
+  ASSIGNED   // Fahrer zugewiesen
+  EN_ROUTE   // Fahrer unterwegs
+  PICKED_UP  // Familie abgeholt
+  DELIVERED  // Familie abgeliefert
+  CANCELLED  // Abgesagt
 }
 
 // Discord Role Mappings

@@ -49,6 +49,9 @@ export class OrganigrammService {
     [Role.GAST]: 'ranks-1-3',
     // Partner (nicht im Organigramm)
     [Role.PARTNER]: 'external',
+    // Taxi (nicht im Organigramm)
+    [Role.TAXI]: 'external',
+    [Role.TAXI_LEAD]: 'external',
   };
 
   constructor(private prisma: PrismaService) {}

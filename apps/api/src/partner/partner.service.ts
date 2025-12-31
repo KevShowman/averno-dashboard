@@ -663,6 +663,15 @@ export class PartnerService {
             id: true,
             familyName: true,
             status: true,
+            mapAnnotations: {
+              select: {
+                id: true,
+                mapName: true,
+                x: true,
+                y: true,
+              },
+              take: 1, // Nur erste Annotation
+            },
           },
         },
         createdBy: {
@@ -758,8 +767,23 @@ export class PartnerService {
       throw new BadRequestException('Vorschlag wurde bereits bearbeitet');
     }
 
-    // Je nach Typ: CREATE oder UPDATE
-    if (suggestion.type === PartnerSuggestionType.CREATE) {
+    // Je nach Typ: CREATE, UPDATE oder DELETE
+    if (suggestion.type === PartnerSuggestionType.DELETE) {
+      // Löschung durchführen
+      if (!suggestion.familyContactId) {
+        throw new BadRequestException('Keine Familie zum Löschen angegeben');
+      }
+
+      // Zuerst MapAnnotations löschen
+      await this.prisma.mapAnnotation.deleteMany({
+        where: { familyContactId: suggestion.familyContactId },
+      });
+
+      // Dann FamilyContact löschen
+      await this.prisma.familyContact.delete({
+        where: { id: suggestion.familyContactId },
+      });
+    } else if (suggestion.type === PartnerSuggestionType.CREATE) {
       // Neue Familie erstellen
       const newFamily = await this.prisma.familyContact.create({
         data: {

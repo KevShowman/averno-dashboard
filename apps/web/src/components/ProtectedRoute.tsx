@@ -10,6 +10,12 @@ const PARTNER_ALLOWED_ROUTES = [
   '/app/partner',
   '/karte',
   '/listenfuehrung',
+  '/tafelrunde',
+]
+
+// Routes that taxi users are allowed to access
+const TAXI_ALLOWED_ROUTES = [
+  '/taxi',
 ]
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
@@ -28,8 +34,19 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />
   }
 
+  // Taxi access restriction (only taxi routes allowed)
+  if (user.isTaxi && !user.isTaxiLead) {
+    const isAllowed = TAXI_ALLOWED_ROUTES.some(route => 
+      location.pathname === route || location.pathname.startsWith(route + '/')
+    )
+    
+    if (!isAllowed) {
+      return <Navigate to="/taxi" replace />
+    }
+  }
+
   // Partner access restriction
-  if (user.isPartner) {
+  if (user.isPartner && !user.isTaxi) {
     const isAllowed = PARTNER_ALLOWED_ROUTES.some(route => 
       location.pathname === route || location.pathname.startsWith(route + '/')
     )

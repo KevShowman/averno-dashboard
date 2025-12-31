@@ -86,17 +86,18 @@ export class DiscordService {
           icFirstName: true,
           icLastName: true,
           isPartner: true,
+          isTaxi: true,
         },
       });
 
       console.log(`📊 DB Users: ${dbUsers.length}`);
 
-      // Finde User die nicht mehr im Discord sind (aber KEINE Partner - die müssen nicht im Server sein)
+      // Finde User die nicht mehr im Discord sind (aber KEINE Partner oder Taxi-User - die müssen nicht im Server sein)
       const usersToDelete = dbUsers.filter(user => 
-        !discordIds.has(user.discordId) && !user.isPartner
+        !discordIds.has(user.discordId) && !user.isPartner && !user.isTaxi
       );
 
-      console.log(`🗑️  User zum Löschen: ${usersToDelete.length} (Partner werden übersprungen)`);
+      console.log(`🗑️  User zum Löschen: ${usersToDelete.length} (Partner und Taxi-User werden übersprungen)`);
 
       // Lösche Ghost Users (mit CASCADE delete aller abhängigen Datensätze)
       let deletedCount = 0;
@@ -313,8 +314,12 @@ export class DiscordService {
 
   async syncAllUserRoles(): Promise<{ total: number; updated: number; errors: number }> {
     try {
-      // Hole alle User
+      // Hole alle User (außer Partner und Taxi-User - die haben eigene Rollen-Systeme)
       const users = await this.prisma.user.findMany({
+        where: {
+          isPartner: false,
+          isTaxi: false,
+        },
         select: {
           id: true,
           username: true,
@@ -382,6 +387,8 @@ export class DiscordService {
             [Role.QUARTIERMEISTER]: 5,
             [Role.MITGLIED]: 2,
             [Role.GAST]: 0,
+            [Role.TAXI]: 1,
+            [Role.TAXI_LEAD]: 2,
           };
 
           const highestRoleMapping = userRoleMappings.reduce((highest, current) => {
@@ -1359,6 +1366,250 @@ export class DiscordService {
       console.log(`✅ Partner-Anfrage Benachrichtigung gesendet für ${username}`);
     } catch (error) {
       console.error('Fehler beim Senden der Partner-Anfrage Benachrichtigung:', error);
+    }
+  }
+
+  // ============ TAXI-SYSTEM WEBHOOKS ============
+
+  // Neuer Taxi-Key erstellt
+  async sendTaxiKeyCreatedNotification(
+    creatorUsername: string,
+    keyType: string,
+    isMasterKey: boolean,
+    note?: string
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      if (!webhookUrl) return;
+
+      const embed = {
+        title: '🔑 Neuer Taxi-Zugangsschlüssel erstellt',
+        color: isMasterKey ? 0x9333EA : 0xEAB308, // Purple für Master, Gelb für normal
+        fields: [
+          { name: 'Erstellt von', value: creatorUsername, inline: true },
+          { name: 'Typ', value: keyType, inline: true },
+          { name: 'Leitungsebene', value: isMasterKey ? '✅ Ja (Master Key)' : '❌ Nein', inline: true },
+          ...(note ? [{ name: 'Notiz', value: note, inline: false }] : []),
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'LSC Taxi-System' },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+    } catch (error) {
+      console.error('Fehler beim Senden der Taxi-Key Benachrichtigung:', error);
+    }
+  }
+
+  // Neuer Taxi-Fahrer registriert
+  async sendTaxiDriverRegisteredNotification(
+    driverUsername: string,
+    isTaxiLead: boolean
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      if (!webhookUrl) return;
+
+      const embed = {
+        title: isTaxiLead ? '👑 Neue Taxi-Leitung registriert' : '🚕 Neuer Taxi-Fahrer registriert',
+        color: isTaxiLead ? 0x9333EA : 0x22C55E,
+        fields: [
+          { name: 'Benutzer', value: driverUsername, inline: true },
+          { name: 'Rolle', value: isTaxiLead ? 'Taxi-Leitung' : 'Taxi-Fahrer', inline: true },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'LSC Taxi-System' },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+    } catch (error) {
+      console.error('Fehler beim Senden der Taxi-Registrierung Benachrichtigung:', error);
+    }
+  }
+
+  // Fahrer zu Familie zugewiesen
+  async sendTaxiAssignmentNotification(
+    familyName: string,
+    driverUsername: string,
+    tafelrundeTitle: string,
+    assignedByUsername: string
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      if (!webhookUrl) return;
+
+      const embed = {
+        title: '🚗 Taxi-Zuweisung',
+        color: 0xEAB308,
+        fields: [
+          { name: 'Familie', value: familyName, inline: true },
+          { name: 'Fahrer', value: driverUsername, inline: true },
+          { name: 'Tafelrunde', value: tafelrundeTitle, inline: false },
+          { name: 'Zugewiesen von', value: assignedByUsername, inline: true },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'LSC Taxi-System' },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+    } catch (error) {
+      console.error('Fehler beim Senden der Taxi-Zuweisung Benachrichtigung:', error);
+    }
+  }
+
+  // Taxi-Status geändert
+  async sendTaxiStatusChangeNotification(
+    familyName: string,
+    driverUsername: string,
+    oldStatus: string,
+    newStatus: string
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      if (!webhookUrl) return;
+
+      const statusLabels: Record<string, string> = {
+        PENDING: '⏳ Ausstehend',
+        ASSIGNED: '📋 Zugewiesen',
+        EN_ROUTE: '🚗 Unterwegs',
+        PICKED_UP: '✅ Abgeholt',
+        DELIVERED: '🏁 Abgeliefert',
+        CANCELLED: '❌ Abgesagt',
+      };
+
+      const statusColors: Record<string, number> = {
+        PENDING: 0x6B7280,
+        ASSIGNED: 0xEAB308,
+        EN_ROUTE: 0xEA580C,
+        PICKED_UP: 0xA855F7,
+        DELIVERED: 0x22C55E,
+        CANCELLED: 0xEF4444,
+      };
+
+      const embed = {
+        title: '🚕 Taxi-Status aktualisiert',
+        color: statusColors[newStatus] || 0x6B7280,
+        fields: [
+          { name: 'Familie', value: familyName, inline: true },
+          { name: 'Fahrer', value: driverUsername, inline: true },
+          { name: 'Status', value: `${statusLabels[oldStatus] || oldStatus} → ${statusLabels[newStatus] || newStatus}`, inline: false },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'LSC Taxi-System' },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+    } catch (error) {
+      console.error('Fehler beim Senden der Taxi-Status Benachrichtigung:', error);
+    }
+  }
+
+  // ============ TAFELRUNDE-SYSTEM WEBHOOKS ============
+
+  // Neue Tafelrunde erstellt
+  async sendTafelrundeCreatedNotification(
+    title: string,
+    date: Date,
+    time: string,
+    creatorUsername: string,
+    familyCount: number
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      if (!webhookUrl) return;
+
+      const dateStr = date.toLocaleDateString('de-DE', { 
+        weekday: 'long', 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      });
+
+      const embed = {
+        title: '🍽️ Neue Tafelrunde erstellt',
+        color: 0xF59E0B,
+        fields: [
+          { name: 'Titel', value: title, inline: false },
+          { name: 'Datum', value: dateStr, inline: true },
+          { name: 'Uhrzeit', value: time, inline: true },
+          { name: 'Familien', value: `${familyCount} eingeladen`, inline: true },
+          { name: 'Erstellt von', value: creatorUsername, inline: true },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'LSC Tafelrunde-System' },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+    } catch (error) {
+      console.error('Fehler beim Senden der Tafelrunde Benachrichtigung:', error);
+    }
+  }
+
+  // Anwesenheitsstatus geändert
+  async sendTafelrundeAttendanceNotification(
+    tafelrundeTitle: string,
+    familyName: string,
+    attendance: string,
+    updatedByUsername: string
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      if (!webhookUrl) return;
+
+      const attendanceLabels: Record<string, string> = {
+        ATTENDING: '✅ Kommt',
+        NOT_ATTENDING: '❌ Kommt nicht',
+        MAYBE: '❓ Vielleicht',
+        UNKNOWN: '⏳ Unbekannt',
+      };
+
+      const attendanceColors: Record<string, number> = {
+        ATTENDING: 0x22C55E,
+        NOT_ATTENDING: 0xEF4444,
+        MAYBE: 0xEAB308,
+        UNKNOWN: 0x6B7280,
+      };
+
+      const embed = {
+        title: '📋 Tafelrunde-Rückmeldung',
+        color: attendanceColors[attendance] || 0x6B7280,
+        fields: [
+          { name: 'Tafelrunde', value: tafelrundeTitle, inline: false },
+          { name: 'Familie', value: familyName, inline: true },
+          { name: 'Status', value: attendanceLabels[attendance] || attendance, inline: true },
+          { name: 'Aktualisiert von', value: updatedByUsername, inline: true },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'LSC Tafelrunde-System' },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+    } catch (error) {
+      console.error('Fehler beim Senden der Tafelrunde-Rückmeldung Benachrichtigung:', error);
     }
   }
 }

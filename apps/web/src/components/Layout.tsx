@@ -164,6 +164,7 @@ const navGroups: NavGroup[] = [
       { name: 'Botschaft', href: '/botschaft', icon: ScrollText },
       { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen },
       { name: 'Interaktive Karte', href: '/karte', icon: Map },
+      { name: 'Tafelrunde', href: '/tafelrunde', icon: Users },
       { name: 'Akzent / Slang', href: '/slang', icon: Languages },
     ]
   },
@@ -172,6 +173,13 @@ const navGroups: NavGroup[] = [
     icon: Building,
     items: [
       { name: 'La Casa', href: '/la-casa', icon: Home },
+    ]
+  },
+  {
+    name: 'Taxi-System',
+    icon: Car,
+    items: [
+      { name: 'Taxi-Dashboard', href: '/taxi', icon: LayoutDashboard, leadershipOnly: true },
     ]
   },
   {
@@ -195,6 +203,19 @@ const partnerNavGroups: NavGroup[] = [
       { name: 'Übersicht', href: '/app/partner', icon: LayoutDashboard },
       { name: 'Interaktive Karte', href: '/karte', icon: Map },
       { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen },
+      { name: 'Tafelrunde', href: '/tafelrunde', icon: Users },
+    ]
+  },
+]
+
+// Eingeschränkte Navigation für Taxi-Fahrer
+const taxiNavGroups: NavGroup[] = [
+  {
+    name: 'Taxi-Bereich',
+    icon: LayoutDashboard,
+    defaultOpen: true,
+    items: [
+      { name: 'Dashboard', href: '/taxi', icon: LayoutDashboard },
     ]
   },
 ]
@@ -391,13 +412,14 @@ export default function Layout({ children }: LayoutProps) {
 
     // Bestimme welche Navigation verwendet werden soll
     const isPartnerUser = user?.isPartner && user?.role === 'PARTNER'
-    const navigationGroups = isPartnerUser ? partnerNavGroups : navGroups
+    const isTaxiUser = user?.isTaxi && (user?.role === 'TAXI' || user?.role === 'TAXI_LEAD')
+    const navigationGroups = isTaxiUser ? taxiNavGroups : (isPartnerUser ? partnerNavGroups : navGroups)
 
     return (
     <>
       {/* Logo */}
       <div className="p-5 border-b border-white/5">
-        <Link to={isPartnerUser ? "/app/partner" : "/app"} className="flex items-center gap-3 group" onClick={handleLinkClick}>
+        <Link to={isTaxiUser ? "/taxi" : (isPartnerUser ? "/app/partner" : "/app")} className="flex items-center gap-3 group" onClick={handleLinkClick}>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/40 to-amber-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
             <div className="relative w-14 h-14 flex items-center justify-center">
@@ -414,6 +436,11 @@ export default function Layout({ children }: LayoutProps) {
             {isPartnerUser && (
               <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-gray-700/50 text-gray-400 border border-gray-600/30">
                 Partner-Zugang
+              </span>
+            )}
+            {isTaxiUser && (
+              <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                🚕 Taxi{user?.isTaxiLead ? '-Leitung' : '-Fahrer'}
               </span>
             )}
           </div>

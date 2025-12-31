@@ -9,10 +9,12 @@ export interface User {
   icLastName?: string
   avatarUrl?: string
   email?: string
-  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER'
-  allRoles?: ('EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER')[]
+  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER' | 'TAXI' | 'TAXI_LEAD'
+  allRoles?: ('EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER' | 'TAXI' | 'TAXI_LEAD')[]
   gender?: 'MALE' | 'FEMALE'
   isPartner?: boolean
+  isTaxi?: boolean
+  isTaxiLead?: boolean
   createdAt: string
 }
 
@@ -25,6 +27,7 @@ interface AuthState {
   setQueryClient: (client: QueryClient) => void
   login: (redirectUrl?: string) => void
   partnerLogin: () => void
+  taxiLogin: () => void
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
 }
@@ -55,6 +58,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   partnerLogin: () => {
     // Redirect to normal OAuth endpoint with partner_login state
     window.location.href = `/api/auth/discord?state=partner_login`
+  },
+
+  taxiLogin: () => {
+    // Redirect to normal OAuth endpoint with taxi_login state
+    window.location.href = `/api/auth/discord?state=taxi_login`
   },
 
   logout: async () => {

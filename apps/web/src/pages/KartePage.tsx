@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -328,12 +329,57 @@ function MapRefSetter({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null>
   return null
 }
 
+// Component to navigate to URL position
+function UrlPositionNavigator({ 
+  urlX, 
+  urlY, 
+  aspectRatio,
+  onNavigated 
+}: { 
+  urlX: string | null
+  urlY: string | null
+  aspectRatio: number
+  onNavigated: () => void 
+}) {
+  const map = useMap()
+  const hasNavigated = useRef(false)
+  
+  useEffect(() => {
+    if (!hasNavigated.current && urlX && urlY) {
+      const x = parseFloat(urlX)
+      const y = parseFloat(urlY)
+      if (!isNaN(x) && !isNaN(y)) {
+        // Convert normalized coords to map coords (using correct aspect ratio)
+        const mapHeight = 1000
+        const mapWidth = mapHeight * aspectRatio
+        const mapCoords: L.LatLngExpression = [mapHeight - (y * mapHeight), x * mapWidth]
+        
+        // Wait for map to be ready, then zoom
+        setTimeout(() => {
+          map.setView(mapCoords, 2.5, { animate: true })
+          hasNavigated.current = true
+          onNavigated()
+        }, 300)
+      }
+    }
+  }, [urlX, urlY, map, onNavigated, aspectRatio])
+  
+  return null
+}
+
 export default function KartePage() {
   const { user } = useAuthStore()
   usePageTitle('Interaktive Karte')
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useSearchParams()
   
-  const [activeMap, setActiveMap] = useState<MapName>('NARCO_CITY')
+  // URL-Parameter für initiale Karte und Position
+  const urlMap = searchParams.get('map') as MapName | null
+  const urlX = searchParams.get('x')
+  const urlY = searchParams.get('y')
+  const [hasNavigatedToUrlPosition, setHasNavigatedToUrlPosition] = useState(false)
+  
+  const [activeMap, setActiveMap] = useState<MapName>(urlMap || 'NARCO_CITY')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -368,10 +414,16 @@ export default function KartePage() {
   const [previewSuggestion, setPreviewSuggestion] = useState<MapSuggestion | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   
+  // Partner-specific state
+  const [isPartnerDeleteDialogOpen, setIsPartnerDeleteDialogOpen] = useState(false)
+  const [partnerDeleteAnnotation, setPartnerDeleteAnnotation] = useState<MapAnnotation | null>(null)
+  const [partnerDeleteReason, setPartnerDeleteReason] = useState('')
+  
   // Permission check
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const isContacto = hasRole(user, ['CONTACTO'])
   const isInteligencia = hasRole(user, ['INTELIGENCIA'])
+  const isPartner = user?.isPartner === true
   const canManage = isLeadership || isContacto || isInteligencia
   
   // Users who can view family contact details (Leadership, Contacto, or with ListPermission)
@@ -413,6 +465,30 @@ export default function KartePage() {
     queryFn: () => api.get(`/map-annotations/suggestions?map=${activeMap}`).then(res => res.data),
     enabled: canManage && isSuggestionsPanelOpen,
   })
+
+  // Fetch family link statistics
+  const { data: familyStats } = useQuery<{
+    total: number
+    linked: number
+    unlinked: number
+    percentage: number
+  }>({
+    queryKey: ['map-family-stats'],
+    queryFn: () => api.get('/map-annotations/family-stats').then(res => res.data),
+  })
+
+  // Switch to URL map if specified
+  useEffect(() => {
+    if (urlMap && ['NARCO_CITY', 'ROXWOOD', 'CAYO_PERICO'].includes(urlMap) && urlMap !== activeMap) {
+      setActiveMap(urlMap)
+    }
+  }, [urlMap])
+
+  // Callback when URL navigation completes
+  const handleUrlNavigated = () => {
+    setHasNavigatedToUrlPosition(true)
+    setSearchParams({})
+  }
   
   // Mutations
   const createMutation = useMutation({
@@ -525,6 +601,29 @@ export default function KartePage() {
     },
   })
 
+  // Partner delete suggestion mutation
+  const partnerDeleteSuggestionMutation = useMutation({
+    mutationFn: (data: { familyContactId: string; familyName: string; notes: string; mapName: string; mapX: number; mapY: number }) =>
+      api.post('/partner/suggestions', {
+        type: 'DELETE',
+        familyContactId: data.familyContactId,
+        familyName: data.familyName,
+        notes: data.notes,
+        mapName: data.mapName,
+        mapX: data.mapX,
+        mapY: data.mapY,
+      }),
+    onSuccess: () => {
+      setIsPartnerDeleteDialogOpen(false)
+      setPartnerDeleteAnnotation(null)
+      setPartnerDeleteReason('')
+      toast.success('Löschvorschlag eingereicht! Er wird von der Leadership überprüft.')
+    },
+    onError: () => {
+      toast.error('Fehler beim Einreichen des Vorschlags')
+    },
+  })
+
   const approveSuggestionMutation = useMutation({
     mutationFn: (id: string) => api.post(`/map-annotations/suggestions/${id}/approve`),
     onSuccess: () => {
@@ -602,13 +701,23 @@ export default function KartePage() {
   
   // Handle marker click for edit
   const handleMarkerClick = (annotation: MapAnnotation) => {
-    if (!canManage) return
-    setSelectedAnnotation(annotation)
-    setFormData({
-      icon: annotation.icon,
-      label: annotation.label || '',
-      familyContactId: annotation.familyContactId || '',
-    })
+    if (canManage) {
+      setSelectedAnnotation(annotation)
+      setFormData({
+        icon: annotation.icon,
+        label: annotation.label || '',
+        familyContactId: annotation.familyContactId || '',
+      })
+    }
+  }
+  
+  // Handle marker right-click for partner delete suggestion
+  const handleMarkerRightClick = (annotation: MapAnnotation) => {
+    if (isPartner && annotation.familyContactId && annotation.familyContact) {
+      setPartnerDeleteAnnotation(annotation)
+      setPartnerDeleteReason('')
+      setIsPartnerDeleteDialogOpen(true)
+    }
   }
   
   // Handle create submit - creates annotation if user can manage, otherwise creates suggestion
@@ -935,6 +1044,14 @@ export default function KartePage() {
             >
               <FitBounds bounds={bounds} />
               <MapRefSetter mapRef={mapRef} />
+              {!hasNavigatedToUrlPosition && urlX && urlY && (
+                <UrlPositionNavigator 
+                  urlX={urlX} 
+                  urlY={urlY} 
+                  aspectRatio={aspectRatio}
+                  onNavigated={handleUrlNavigated} 
+                />
+              )}
               
               {/* Map Image - Using tile URL pattern */}
               <ImageOverlay
@@ -1057,6 +1174,10 @@ export default function KartePage() {
                   )}
                   eventHandlers={{
                     click: () => handleMarkerClick(annotation),
+                    contextmenu: (e) => {
+                      e.originalEvent.preventDefault()
+                      handleMarkerRightClick(annotation)
+                    },
                   }}
                 >
                   {/* Hover Tooltip */}
@@ -1210,6 +1331,26 @@ export default function KartePage() {
                           </button>
                         </div>
                       )}
+                      
+                      {/* Partner: Löschvorschlag Button */}
+                      {isPartner && !canManage && annotation.familyContactId && annotation.familyContact && (
+                        <div className="mt-3 pt-3 border-t">
+                          <button
+                            onClick={() => {
+                              setPartnerDeleteAnnotation(annotation)
+                              setPartnerDeleteReason('')
+                              setIsPartnerDeleteDialogOpen(true)
+                            }}
+                            className="w-full px-2 py-1.5 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 flex items-center justify-center gap-1"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            Löschvorschlag einreichen
+                          </button>
+                          <p className="text-xs text-gray-500 mt-1 text-center">
+                            Wird von der Leadership geprüft
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </Popup>
                 </Marker>
@@ -1218,15 +1359,45 @@ export default function KartePage() {
           )}
         </div>
         
-        {/* Legend */}
-        <div className="mt-4 flex flex-wrap gap-4 justify-center text-sm text-gray-400">
-          <span className="font-medium text-gray-300">Status:</span>
-          {(Object.entries(statusConfig) as [FamilyContactStatus, typeof statusConfig[FamilyContactStatus]][]).map(([key, config]) => (
-            <div key={key} className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: config.color }} />
-              <span>{config.label}</span>
+        {/* Legend and Stats Row */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+          {/* Legend */}
+          <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+            <span className="font-medium text-gray-300">Status:</span>
+            {(Object.entries(statusConfig) as [FamilyContactStatus, typeof statusConfig[FamilyContactStatus]][]).map(([key, config]) => (
+              <div key={key} className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: config.color }} />
+                <span>{config.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Family Link Stats */}
+          {familyStats && (
+            <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-amber-400" />
+                <span className="text-sm text-gray-300 font-medium">Listenführung:</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  <span className="text-green-400 font-medium">{familyStats.linked}</span>
+                  <span className="text-gray-500">verknüpft</span>
+                </div>
+                <span className="text-gray-600">|</span>
+                <div className="flex items-center gap-1.5">
+                  <AlertCircle className="h-4 w-4 text-orange-400" />
+                  <span className="text-orange-400 font-medium">{familyStats.unlinked}</span>
+                  <span className="text-gray-500">offen</span>
+                </div>
+                <span className="text-gray-600">|</span>
+                <div className="px-2 py-0.5 rounded bg-gray-700 text-gray-300 font-medium">
+                  {familyStats.percentage}%
+                </div>
+              </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
       
@@ -1641,6 +1812,94 @@ export default function KartePage() {
               className="bg-red-500 hover:bg-red-600 text-white"
             >
               {deleteAreaMutation.isPending ? 'Lösche...' : 'Löschen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Partner Delete Suggestion Dialog */}
+      <Dialog open={isPartnerDeleteDialogOpen} onOpenChange={setIsPartnerDeleteDialogOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-red-400 flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Löschvorschlag einreichen
+            </DialogTitle>
+            <DialogDescription>
+              Schlage vor, diesen Eintrag von der Karte zu entfernen
+            </DialogDescription>
+          </DialogHeader>
+          
+          {partnerDeleteAnnotation && (
+            <div className="space-y-4">
+              <div className="p-3 bg-gray-800/50 rounded-lg">
+                <p className="text-sm text-gray-400">Familie:</p>
+                <p className="font-medium text-white">
+                  {partnerDeleteAnnotation.familyContact?.familyName || partnerDeleteAnnotation.label || 'Unbenannt'}
+                </p>
+                {partnerDeleteAnnotation.familyContact?.propertyZip && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    PLZ: {partnerDeleteAnnotation.familyContact.propertyZip}
+                  </p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="partnerDeleteReason" className="text-gray-300">
+                  Begründung für die Löschung <span className="text-red-400">*</span>
+                </Label>
+                <Textarea
+                  id="partnerDeleteReason"
+                  value={partnerDeleteReason}
+                  onChange={(e) => setPartnerDeleteReason(e.target.value)}
+                  placeholder="Warum soll dieser Eintrag entfernt werden?"
+                  rows={3}
+                  className="bg-gray-800 border-gray-600"
+                />
+              </div>
+              
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <div className="flex items-center gap-2 text-amber-400 text-sm">
+                  <AlertTriangle className="h-4 w-4" />
+                  Der Löschvorschlag muss von der Leadership genehmigt werden
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setIsPartnerDeleteDialogOpen(false)
+                setPartnerDeleteAnnotation(null)
+                setPartnerDeleteReason('')
+              }}
+            >
+              Abbrechen
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (partnerDeleteAnnotation?.familyContactId && partnerDeleteAnnotation.familyContact && partnerDeleteReason.trim()) {
+                  partnerDeleteSuggestionMutation.mutate({
+                    familyContactId: partnerDeleteAnnotation.familyContactId,
+                    familyName: partnerDeleteAnnotation.familyContact.familyName,
+                    notes: partnerDeleteReason,
+                    mapName: activeMap,
+                    mapX: partnerDeleteAnnotation.x,
+                    mapY: partnerDeleteAnnotation.y,
+                  })
+                }
+              }}
+              disabled={!partnerDeleteReason.trim() || partnerDeleteSuggestionMutation.isPending}
+            >
+              {partnerDeleteSuggestionMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Trash2 className="h-4 w-4 mr-2" />
+              )}
+              Löschvorschlag einreichen
             </Button>
           </DialogFooter>
         </DialogContent>

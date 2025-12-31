@@ -62,6 +62,9 @@ export class ClothingService {
     [Role.GAST]: '1-3',
     // Partner (kein Kleidungszugang)
     [Role.PARTNER]: '1-3',
+    // Taxi (kein Kleidungszugang)
+    [Role.TAXI]: '1-3',
+    [Role.TAXI_LEAD]: '1-3',
   };
 
   // Leaderschaft-Rollen (dürfen Kleidung bearbeiten)

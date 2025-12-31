@@ -31,6 +31,11 @@ export class MapAnnotationsController {
     return this.mapAnnotationsService.getAvailableFamilyContacts();
   }
 
+  @Get('family-stats')
+  getFamilyLinkStats() {
+    return this.mapAnnotationsService.getFamilyLinkStats();
+  }
+
   // ============ MAP AREAS (Gebiete) ============
 
   @Get('areas/list')

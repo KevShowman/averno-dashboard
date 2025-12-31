@@ -20,7 +20,13 @@ import {
   MapPin,
   FileText,
   Eye,
+  Trash2,
+  Phone,
+  User,
+  ExternalLink,
+  Settings,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 interface PartnerAccessRequest {
   id: string
@@ -50,7 +56,7 @@ interface ActivePartner {
 
 interface PartnerFamilySuggestion {
   id: string
-  type: 'CREATE' | 'UPDATE'
+  type: 'CREATE' | 'UPDATE' | 'DELETE'
   familyName: string
   familyStatus?: string
   propertyZip?: string
@@ -58,11 +64,25 @@ interface PartnerFamilySuggestion {
   mapName?: string
   mapX?: number
   mapY?: number
+  mapIcon?: string
+  // Kontaktdaten (nur für Leadership sichtbar)
+  contact1FirstName?: string
+  contact1LastName?: string
+  contact1Phone?: string
+  contact2FirstName?: string
+  contact2LastName?: string
+  contact2Phone?: string
   suggestionStatus: 'PENDING' | 'APPROVED' | 'REJECTED'
   familyContact?: {
     id: string
     familyName: string
     status: string
+    mapAnnotations?: Array<{
+      id: string
+      mapName: string
+      x: number
+      y: number
+    }>
   }
   createdBy: {
     id: string
@@ -77,18 +97,48 @@ interface PartnerFamilySuggestion {
   createdAt: string
 }
 
+interface PartnerManagementPermission {
+  id: string
+  userId: string
+  user: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+    role: string
+  }
+  grantedBy: {
+    id: string
+    username: string
+    icFirstName?: string
+    icLastName?: string
+  }
+  createdAt: string
+}
+
+interface UserForPermission {
+  id: string
+  username: string
+  icFirstName?: string
+  icLastName?: string
+  role: string
+}
+
 const LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'ADMIN']
 
 export default function PartnerManagementPage() {
   usePageTitle('Partner-Verwaltung')
   const { user } = useAuthStore()
   const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState<'requests' | 'partners' | 'suggestions'>('requests')
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<'requests' | 'partners' | 'suggestions' | 'permissions'>('requests')
   const [expandedSuggestion, setExpandedSuggestion] = useState<string | null>(null)
   const [rejectNote, setRejectNote] = useState('')
   const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState<string>('')
 
   const isLeadership = user && LEADERSHIP_ROLES.includes(user.role)
+  const isElPatron = user && user.role === 'EL_PATRON'
 
   // Queries
   const { data: pendingRequests = [], isLoading: loadingRequests } = useQuery({
@@ -121,6 +171,25 @@ export default function PartnerManagementPage() {
       const res = await api.get('/partner/suggestions/pending')
       return res.data as PartnerFamilySuggestion[]
     },
+  })
+
+  // Permission queries (nur für El Patron)
+  const { data: permissions = [], isLoading: loadingPermissions } = useQuery({
+    queryKey: ['partner-permissions'],
+    queryFn: async () => {
+      const res = await api.get('/partner/permissions')
+      return res.data as PartnerManagementPermission[]
+    },
+    enabled: isElPatron,
+  })
+
+  const { data: availableUsers = [] } = useQuery({
+    queryKey: ['users-for-permission'],
+    queryFn: async () => {
+      const res = await api.get('/users')
+      return res.data as UserForPermission[]
+    },
+    enabled: isElPatron,
   })
 
   // Mutations
@@ -181,6 +250,26 @@ export default function PartnerManagementPage() {
     },
   })
 
+  // Permission mutations
+  const grantPermissionMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await api.post(`/partner/permissions/${userId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-permissions'] })
+      setSelectedUserId('')
+    },
+  })
+
+  const revokePermissionMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await api.delete(`/partner/permissions/${userId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-permissions'] })
+    },
+  })
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -216,6 +305,32 @@ export default function PartnerManagementPage() {
         return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-400">Unbekannt</span>
     }
   }
+
+  const getSuggestionTypeBadge = (type: string) => {
+    switch (type) {
+      case 'CREATE':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Neu</span>
+      case 'UPDATE':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">Änderung</span>
+      case 'DELETE':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">Löschung</span>
+      default:
+        return null
+    }
+  }
+
+  // Zur Karte navigieren mit Koordinaten
+  const navigateToMap = (mapName: string, x?: number, y?: number) => {
+    const mapUrl = `/karte?map=${mapName}${x !== undefined && y !== undefined ? `&x=${x}&y=${y}` : ''}`
+    navigate(mapUrl)
+  }
+
+  // Benutzer die noch keine Berechtigung haben
+  const usersWithoutPermission = availableUsers.filter(u => 
+    !permissions.some(p => p.userId === u.id) &&
+    !LEADERSHIP_ROLES.includes(u.role) &&
+    !u.role.includes('PARTNER')
+  )
 
   return (
     <div className="p-6 space-y-6">
@@ -286,6 +401,21 @@ export default function PartnerManagementPage() {
             )}
           </div>
         </button>
+        {isElPatron && (
+          <button
+            onClick={() => setActiveTab('permissions')}
+            className={`px-4 py-2 rounded-t-lg transition-colors ${
+              activeTab === 'permissions'
+                ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Berechtigungen
+            </div>
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -540,7 +670,7 @@ export default function PartnerManagementPage() {
               Partner-Vorschläge
             </CardTitle>
             <CardDescription>
-              Von Partnern vorgeschlagene Familienkontakte und Änderungen
+              Von Partnern vorgeschlagene Familienkontakte, Änderungen und Löschungen
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -573,17 +703,14 @@ export default function PartnerManagementPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="font-medium text-white">{suggestion.familyName}</p>
-                            <span className={`px-2 py-0.5 text-xs rounded-full ${
-                              suggestion.type === 'CREATE'
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-blue-500/20 text-blue-400'
-                            }`}>
-                              {suggestion.type === 'CREATE' ? 'Neu' : 'Änderung'}
-                            </span>
-                            {getFamilyStatusBadge(suggestion.familyStatus)}
+                            {getSuggestionTypeBadge(suggestion.type)}
+                            {suggestion.type !== 'DELETE' && getFamilyStatusBadge(suggestion.familyStatus)}
                           </div>
                           <p className="text-xs text-gray-500">
                             Von {suggestion.createdBy.username} • {formatDate(suggestion.createdAt)}
+                            {suggestion.mapName && (
+                              <span className="ml-2 text-amber-400">• Hat Kartenstandort</span>
+                            )}
                           </p>
                         </div>
                       </div>
@@ -644,6 +771,18 @@ export default function PartnerManagementPage() {
                     
                     {expandedSuggestion === suggestion.id && (
                       <div className="px-4 pb-4 pt-2 border-t border-gray-700/50 space-y-3">
+                        {suggestion.type === 'DELETE' && (
+                          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                            <div className="flex items-center gap-2 text-red-400">
+                              <Trash2 className="h-4 w-4" />
+                              <span className="font-medium">Löschvorschlag</span>
+                            </div>
+                            <p className="text-sm text-gray-400 mt-1">
+                              Der Partner schlägt vor, diesen Eintrag zu löschen.
+                            </p>
+                          </div>
+                        )}
+                        
                         {suggestion.propertyZip && (
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-gray-500" />
@@ -651,15 +790,76 @@ export default function PartnerManagementPage() {
                             <span className="text-white">{suggestion.propertyZip}</span>
                           </div>
                         )}
-                        {suggestion.mapName && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <MapPin className="h-4 w-4 text-gray-500" />
-                            <span className="text-gray-400">Karte:</span>
-                            <span className="text-white">
-                              {suggestion.mapName.replace('_', ' ')} ({suggestion.mapX?.toFixed(2)}, {suggestion.mapY?.toFixed(2)})
-                            </span>
+                        
+                        {/* Map-Daten: Bei DELETE-Vorschlägen aus der existierenden MapAnnotation laden */}
+                        {(() => {
+                          // Bei DELETE: Koordinaten aus der verbundenen Familie laden
+                          const mapAnnotation = suggestion.type === 'DELETE' && suggestion.familyContact?.mapAnnotations?.[0]
+                            ? suggestion.familyContact.mapAnnotations[0]
+                            : null
+                          const displayMapName = mapAnnotation?.mapName || suggestion.mapName
+                          const displayMapX = mapAnnotation?.x ?? suggestion.mapX
+                          const displayMapY = mapAnnotation?.y ?? suggestion.mapY
+                          // Koordinaten sind normalisiert (0.0-1.0), also prüfen ob sie vorhanden sind
+                          const hasValidCoords = displayMapX !== undefined && displayMapY !== undefined && displayMapX !== null && displayMapY !== null
+                          
+                          if (!displayMapName && !mapAnnotation) return null
+                          
+                          return (
+                            <div className="flex items-center gap-2 text-sm">
+                              <MapPin className="h-4 w-4 text-amber-400" />
+                              <span className="text-gray-400">Karte:</span>
+                              <span className="text-white">
+                                {(displayMapName || 'Unbekannt').replace('_', ' ')}
+                              </span>
+                              {hasValidCoords && displayMapName && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 px-2 text-amber-400 hover:text-amber-300"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    navigateToMap(displayMapName, displayMapX, displayMapY)
+                                  }}
+                                >
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  Zur Karte
+                                </Button>
+                              )}
+                            </div>
+                          )
+                        })()}
+
+                        {/* Kontaktdaten (nur für Leadership) */}
+                        {(suggestion.contact1FirstName || suggestion.contact1Phone || suggestion.contact2FirstName || suggestion.contact2Phone) && (
+                          <div className="p-3 bg-gray-900/50 rounded-lg space-y-2">
+                            <div className="flex items-center gap-2 text-sm font-medium text-gray-300">
+                              <Phone className="h-4 w-4 text-gray-500" />
+                              Kontaktdaten
+                            </div>
+                            {(suggestion.contact1FirstName || suggestion.contact1LastName || suggestion.contact1Phone) && (
+                              <div className="flex items-center gap-2 text-sm pl-6">
+                                <User className="h-3 w-3 text-gray-500" />
+                                <span className="text-gray-400">Kontakt 1:</span>
+                                <span className="text-white">
+                                  {[suggestion.contact1FirstName, suggestion.contact1LastName].filter(Boolean).join(' ')}
+                                  {suggestion.contact1Phone && ` - ${suggestion.contact1Phone}`}
+                                </span>
+                              </div>
+                            )}
+                            {(suggestion.contact2FirstName || suggestion.contact2LastName || suggestion.contact2Phone) && (
+                              <div className="flex items-center gap-2 text-sm pl-6">
+                                <User className="h-3 w-3 text-gray-500" />
+                                <span className="text-gray-400">Kontakt 2:</span>
+                                <span className="text-white">
+                                  {[suggestion.contact2FirstName, suggestion.contact2LastName].filter(Boolean).join(' ')}
+                                  {suggestion.contact2Phone && ` - ${suggestion.contact2Phone}`}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         )}
+
                         {suggestion.notes && (
                           <div className="text-sm">
                             <span className="text-gray-400">Notizen:</span>
@@ -668,7 +868,8 @@ export default function PartnerManagementPage() {
                             </p>
                           </div>
                         )}
-                        {suggestion.type === 'UPDATE' && suggestion.familyContact && (
+                        
+                        {(suggestion.type === 'UPDATE' || suggestion.type === 'DELETE') && suggestion.familyContact && (
                           <div className="text-sm">
                             <span className="text-gray-400">Bezieht sich auf:</span>
                             <p className="text-white">{suggestion.familyContact.familyName}</p>
@@ -682,6 +883,133 @@ export default function PartnerManagementPage() {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Berechtigungen Tab (nur El Patron) */}
+      {activeTab === 'permissions' && isElPatron && (
+        <div className="space-y-4">
+          <Card className="bg-gray-900/50 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Shield className="h-5 w-5 text-amber-500" />
+                Partner-Verwaltungs-Berechtigungen
+              </CardTitle>
+              <CardDescription>
+                Bestimme welche Mitglieder Partner-Anfragen und Vorschläge verwalten dürfen.
+                Leadership (Patron, Don, Asesor) hat automatisch Zugriff.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Neue Berechtigung vergeben */}
+              <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                <h4 className="text-sm font-medium text-gray-300 mb-3">Berechtigung vergeben</h4>
+                <div className="flex gap-2">
+                  <select
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+                  >
+                    <option value="">Mitglied auswählen...</option>
+                    {usersWithoutPermission.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.icFirstName && u.icLastName 
+                          ? `${u.icFirstName} ${u.icLastName} (${u.username})`
+                          : u.username
+                        }
+                      </option>
+                    ))}
+                  </select>
+                  <Button
+                    onClick={() => selectedUserId && grantPermissionMutation.mutate(selectedUserId)}
+                    disabled={!selectedUserId || grantPermissionMutation.isPending}
+                    className="bg-amber-500 hover:bg-amber-600"
+                  >
+                    {grantPermissionMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4 mr-1" />
+                        Berechtigen
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Aktuelle Berechtigungen */}
+              {loadingPermissions ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                </div>
+              ) : permissions.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Shield className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>Keine zusätzlichen Berechtigungen vergeben</p>
+                  <p className="text-sm mt-1">Leadership hat automatisch Zugriff</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-400">Berechtigte Mitglieder</h4>
+                  {permissions.map((permission) => (
+                    <div
+                      key={permission.id}
+                      className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                    >
+                      <div>
+                        <p className="font-medium text-white">
+                          {permission.user.icFirstName && permission.user.icLastName
+                            ? `${permission.user.icFirstName} ${permission.user.icLastName}`
+                            : permission.user.username
+                          }
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Berechtigt von {permission.grantedBy.icFirstName || permission.grantedBy.username} 
+                          {' • '}{formatDate(permission.createdAt)}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        onClick={() => {
+                          if (confirm(`Berechtigung für ${permission.user.username} entziehen?`)) {
+                            revokePermissionMutation.mutate(permission.userId)
+                          }
+                        }}
+                        disabled={revokePermissionMutation.isPending}
+                      >
+                        {revokePermissionMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <X className="h-4 w-4 mr-1" />
+                            Entziehen
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Info-Box */}
+          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
+              <div className="text-sm text-gray-300">
+                <p className="font-medium text-blue-400 mb-1">Hinweis zu Berechtigungen</p>
+                <ul className="list-disc list-inside space-y-1 text-gray-400">
+                  <li>Leadership (El Patron, Don Capitán, Don Comandante, El Mano Derecha) hat automatisch Zugriff</li>
+                  <li>Berechtigte Mitglieder können Partner-Anfragen annehmen/ablehnen</li>
+                  <li>Berechtigte Mitglieder können Partner-Vorschläge prüfen</li>
+                  <li>Nur El Patron kann diese Berechtigungen vergeben</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

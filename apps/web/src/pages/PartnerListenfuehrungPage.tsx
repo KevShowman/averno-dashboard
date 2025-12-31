@@ -28,13 +28,19 @@ import {
   Shield,
   Loader2,
   MapPin,
+  Trash2,
+  ExternalLink,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 type SuggestionStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+type SuggestionType = 'CREATE' | 'UPDATE' | 'DELETE'
 
 interface PartnerSuggestion {
   id: string
+  type?: SuggestionType
   familyName: string
+  familyContactId?: string
   propertyZip?: string
   notes?: string
   status: SuggestionStatus
@@ -46,6 +52,14 @@ interface PartnerSuggestion {
   mapX?: number
   mapY?: number
   mapIcon?: string
+}
+
+interface FamilyContact {
+  id: string
+  familyName: string
+  status: string
+  propertyZip?: string
+  mapAnnotations?: MapAnnotation[]
 }
 
 interface MapAnnotation {
@@ -72,6 +86,11 @@ export default function PartnerListenfuehrungPage() {
   const { user } = useAuthStore()
   usePageTitle('Listenführung - Partner')
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  
+  const [activeTab, setActiveTab] = useState<'create' | 'delete'>('create')
+  const [selectedFamilyForDelete, setSelectedFamilyForDelete] = useState<string>('')
+  const [deleteReason, setDeleteReason] = useState('')
   
   const [formData, setFormData] = useState({
     familyName: '',
@@ -102,7 +121,13 @@ export default function PartnerListenfuehrungPage() {
     enabled: !!formData.mapName,
   })
 
-  // Submit new suggestion
+  // Fetch families for delete suggestions
+  const { data: families = [] } = useQuery<FamilyContact[]>({
+    queryKey: ['partner-families'],
+    queryFn: () => api.get('/partner/families').then(res => res.data),
+  })
+
+  // Submit new suggestion (CREATE)
   const submitMutation = useMutation({
     mutationFn: (data: typeof formData) => api.post('/partner/suggestions', {
       type: 'CREATE',
@@ -115,6 +140,25 @@ export default function PartnerListenfuehrungPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Einreichen des Vorschlags')
+    },
+  })
+
+  // Submit delete suggestion
+  const submitDeleteMutation = useMutation({
+    mutationFn: (data: { familyContactId: string; familyName: string; notes: string }) => api.post('/partner/suggestions', {
+      type: 'DELETE',
+      familyContactId: data.familyContactId,
+      familyName: data.familyName,
+      notes: data.notes,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-suggestions'] })
+      toast.success('Löschvorschlag erfolgreich eingereicht!')
+      setSelectedFamilyForDelete('')
+      setDeleteReason('')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Einreichen des Löschvorschlags')
     },
   })
 
@@ -158,8 +202,47 @@ export default function PartnerListenfuehrungPage() {
 
   // API might return suggestionStatus instead of status
   const getStatus = (s: PartnerSuggestion) => s.status || s.suggestionStatus || 'PENDING'
+  const getType = (s: PartnerSuggestion) => s.type || 'CREATE'
   const pendingSuggestions = suggestions.filter(s => getStatus(s) === 'PENDING')
   const processedSuggestions = suggestions.filter(s => getStatus(s) !== 'PENDING')
+
+  // Navigation zur Karte
+  const navigateToMap = (mapName: string, x?: number, y?: number) => {
+    const mapUrl = `/karte?map=${mapName}${x !== undefined && y !== undefined ? `&x=${x}&y=${y}` : ''}`
+    navigate(mapUrl)
+  }
+
+  // Löschvorschlag einreichen
+  const handleDeleteSubmit = () => {
+    if (!selectedFamilyForDelete) {
+      toast.error('Bitte wähle eine Familie aus')
+      return
+    }
+    if (!deleteReason.trim()) {
+      toast.error('Bitte gib einen Grund für die Löschung an')
+      return
+    }
+    const family = families.find(f => f.id === selectedFamilyForDelete)
+    if (family) {
+      submitDeleteMutation.mutate({
+        familyContactId: family.id,
+        familyName: family.familyName,
+        notes: deleteReason,
+      })
+    }
+  }
+
+  // Type Badge
+  const getTypeBadge = (type: SuggestionType) => {
+    switch (type) {
+      case 'CREATE':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Neu</span>
+      case 'UPDATE':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">Änderung</span>
+      case 'DELETE':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">Löschung</span>
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -192,15 +275,41 @@ export default function PartnerListenfuehrungPage() {
         {/* Submit Form */}
         <Card className="bg-gray-800/50 border-gray-700/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Plus className="h-5 w-5 text-amber-400" />
-              Neuen Kontakt vorschlagen
-            </CardTitle>
+            <div className="flex items-center gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('create')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'create'
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Plus className="h-4 w-4 inline mr-1" />
+                Neuer Kontakt
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('delete')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'delete'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/50'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Trash2 className="h-4 w-4 inline mr-1" />
+                Löschvorschlag
+              </button>
+            </div>
             <CardDescription>
-              Fülle die bekannten Informationen aus
+              {activeTab === 'create' 
+                ? 'Fülle die bekannten Informationen aus'
+                : 'Schlage eine Familie zum Löschen vor'
+              }
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {activeTab === 'create' ? (
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Family Name */}
               <div className="space-y-2">
@@ -375,6 +484,68 @@ export default function PartnerListenfuehrungPage() {
                 )}
               </Button>
             </form>
+            ) : (
+              /* DELETE Tab */
+              <div className="space-y-4">
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    Löschvorschläge müssen von der Leadership genehmigt werden
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Familie auswählen</Label>
+                  <Select
+                    value={selectedFamilyForDelete}
+                    onValueChange={setSelectedFamilyForDelete}
+                  >
+                    <SelectTrigger className="bg-gray-900/50 border-gray-600">
+                      <SelectValue placeholder="Familie auswählen..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {families.map((family) => (
+                        <SelectItem key={family.id} value={family.id}>
+                          {family.familyName}
+                          {family.propertyZip && ` (PLZ: ${family.propertyZip})`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-300">
+                    Begründung für Löschung <span className="text-red-400">*</span>
+                  </Label>
+                  <Textarea
+                    value={deleteReason}
+                    onChange={(e) => setDeleteReason(e.target.value)}
+                    placeholder="Warum soll dieser Eintrag gelöscht werden?"
+                    rows={4}
+                    className="bg-gray-900/50 border-gray-600 resize-none"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleDeleteSubmit}
+                  disabled={submitDeleteMutation.isPending || !selectedFamilyForDelete || !deleteReason.trim()}
+                  className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400"
+                >
+                  {submitDeleteMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Wird eingereicht...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Löschvorschlag einreichen
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -411,10 +582,17 @@ export default function PartnerListenfuehrungPage() {
                   {pendingSuggestions.map((suggestion) => (
                     <div
                       key={suggestion.id}
-                      className="p-3 bg-gray-900/30 rounded-lg border border-gray-700/50"
+                      className={`p-3 bg-gray-900/30 rounded-lg border ${
+                        getType(suggestion) === 'DELETE' 
+                          ? 'border-red-500/30' 
+                          : 'border-gray-700/50'
+                      }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-white">{suggestion.familyName}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-white">{suggestion.familyName}</span>
+                          {getTypeBadge(getType(suggestion))}
+                        </div>
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${statusConfig.PENDING.bgColor} ${statusConfig.PENDING.color}`}>
                           <Clock className="h-3 w-3" />
                           {statusConfig.PENDING.label}
@@ -424,10 +602,19 @@ export default function PartnerListenfuehrungPage() {
                         <p className="text-sm text-gray-500 mt-1">PLZ: {suggestion.propertyZip}</p>
                       )}
                       {suggestion.mapName && (
-                        <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          Karte: {suggestion.mapName === 'NARCO_CITY' ? 'Narco City' : suggestion.mapName === 'ROXWOOD' ? 'Roxwood' : 'Cayo Perico'}
-                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <MapPin className="h-3 w-3 text-amber-400" />
+                          <span className="text-sm text-gray-500">
+                            Karte: {suggestion.mapName === 'NARCO_CITY' ? 'Narco City' : suggestion.mapName === 'ROXWOOD' ? 'Roxwood' : 'Cayo Perico'}
+                          </span>
+                          <button
+                            onClick={() => navigateToMap(suggestion.mapName!, suggestion.mapX, suggestion.mapY)}
+                            className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Anzeigen
+                          </button>
+                        </div>
                       )}
                       <p className="text-xs text-gray-600 mt-2">
                         Eingereicht: {new Date(suggestion.createdAt).toLocaleDateString('de-DE')}
@@ -460,32 +647,67 @@ export default function PartnerListenfuehrungPage() {
                 <div className="space-y-3">
                   {processedSuggestions.map((suggestion) => {
                     const status = getStatus(suggestion)
+                    const type = getType(suggestion)
                     const config = statusConfig[status]
                     const StatusIcon = config.icon
                     return (
                       <div
                         key={suggestion.id}
-                        className="p-3 bg-gray-900/30 rounded-lg border border-gray-700/50"
+                        className={`p-3 bg-gray-900/30 rounded-lg border ${
+                          status === 'REJECTED' ? 'border-red-500/30' : 'border-gray-700/50'
+                        }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-white">{suggestion.familyName}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-white">{suggestion.familyName}</span>
+                            {getTypeBadge(type)}
+                          </div>
                           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${config.bgColor} ${config.color}`}>
                             <StatusIcon className="h-3 w-3" />
                             {config.label}
                           </span>
                         </div>
                         {suggestion.mapName && (
-                          <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            Karte: {suggestion.mapName === 'NARCO_CITY' ? 'Narco City' : suggestion.mapName === 'ROXWOOD' ? 'Roxwood' : 'Cayo Perico'}
-                            {status === 'APPROVED' && <span className="text-green-400 text-xs ml-1">(auf Karte sichtbar)</span>}
-                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <MapPin className="h-3 w-3 text-amber-400" />
+                            <span className="text-sm text-gray-500">
+                              Karte: {suggestion.mapName === 'NARCO_CITY' ? 'Narco City' : suggestion.mapName === 'ROXWOOD' ? 'Roxwood' : 'Cayo Perico'}
+                            </span>
+                            {status === 'APPROVED' && (
+                              <>
+                                <span className="text-green-400 text-xs">(auf Karte sichtbar)</span>
+                                <button
+                                  onClick={() => navigateToMap(suggestion.mapName!, suggestion.mapX, suggestion.mapY)}
+                                  className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                  Anzeigen
+                                </button>
+                              </>
+                            )}
+                          </div>
                         )}
-                        {suggestion.reviewNote && (
+                        
+                        {/* Ablehnungsbegründung prominent anzeigen */}
+                        {status === 'REJECTED' && suggestion.reviewNote && (
+                          <div className="mt-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                            <div className="flex items-center gap-2 text-red-400 text-sm font-medium mb-1">
+                              <XCircle className="h-4 w-4" />
+                              Ablehnungsgrund
+                            </div>
+                            <p className="text-sm text-gray-300">
+                              {suggestion.reviewNote}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* Genehmigungsnotiz */}
+                        {status === 'APPROVED' && suggestion.reviewNote && (
                           <p className="text-sm text-gray-400 mt-2 p-2 bg-gray-800/50 rounded">
                             {suggestion.reviewNote}
                           </p>
                         )}
+                        
                         <p className="text-xs text-gray-600 mt-2">
                           Bearbeitet: {suggestion.reviewedAt 
                             ? new Date(suggestion.reviewedAt).toLocaleDateString('de-DE') 

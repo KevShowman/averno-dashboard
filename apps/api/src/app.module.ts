@@ -30,6 +30,8 @@ import { FamilyContactsModule } from './family-contacts/family-contacts.module';
 import { MapAnnotationsModule } from './map-annotations/map-annotations.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { PartnerModule } from './partner/partner.module';
+import { TafelrundeModule } from './tafelrunde/tafelrunde.module';
+import { TaxiModule } from './taxi/taxi.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -73,6 +75,8 @@ import { AppService } from './app.service';
     MapAnnotationsModule,
     AttendanceModule,
     PartnerModule,
+    TafelrundeModule,
+    TaxiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

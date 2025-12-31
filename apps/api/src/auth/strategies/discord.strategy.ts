@@ -44,6 +44,24 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
         isPartnerLogin: true,
       };
     }
+
+    // Check if this is a taxi login
+    if (state === 'taxi_login') {
+      console.log('[DiscordStrategy] Taxi login detected - skipping role validation');
+      req.isTaxiLogin = true;
+      
+      // Return the profile directly for taxi processing in controller
+      // NO Discord role validation for taxi users!
+      return {
+        discordId: profile.id,
+        username: profile.username,
+        avatarUrl: profile.avatar 
+          ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` 
+          : null,
+        email: profile.email || null,
+        isTaxiLogin: true,
+      };
+    }
     
     // Store rememberMe state from cookie
     req.rememberMe = state === 'remember_me';

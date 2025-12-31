@@ -329,6 +329,53 @@ export class MapAnnotationsService {
     });
   }
 
+  // Statistik: Wie viele Familien sind mit POIs verknüpft
+  async getFamilyLinkStats() {
+    // Gesamtzahl der Familien
+    const totalFamilies = await this.prisma.familyContact.count();
+
+    // Anzahl der Familien mit MapAnnotation (verknüpft)
+    const linkedFamilies = await this.prisma.familyContact.count({
+      where: {
+        mapAnnotations: {
+          some: {},
+        },
+      },
+    });
+
+    // Nicht verknüpfte Familien
+    const unlinkedFamilies = totalFamilies - linkedFamilies;
+
+    // Optional: Aufschlüsselung nach Status
+    const byStatus = await this.prisma.familyContact.groupBy({
+      by: ['status'],
+      _count: true,
+    });
+
+    // Familien mit POI nach Status
+    const linkedByStatus = await this.prisma.familyContact.groupBy({
+      by: ['status'],
+      where: {
+        mapAnnotations: {
+          some: {},
+        },
+      },
+      _count: true,
+    });
+
+    return {
+      total: totalFamilies,
+      linked: linkedFamilies,
+      unlinked: unlinkedFamilies,
+      percentage: totalFamilies > 0 ? Math.round((linkedFamilies / totalFamilies) * 100) : 0,
+      byStatus: byStatus.map((s) => ({
+        status: s.status,
+        total: s._count,
+        linked: linkedByStatus.find((l) => l.status === s.status)?._count || 0,
+      })),
+    };
+  }
+
   // ============ MAP AREAS (Gebiete) ============
 
   async findAllAreas(mapName?: MapName) {

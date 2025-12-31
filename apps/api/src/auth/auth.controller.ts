@@ -24,11 +24,14 @@ export class AuthController {
     const state = (req.query as any).state || 'no_remember';
     const isProduction = process.env.NODE_ENV === 'production';
     
+    console.log('[DiscordLogin] Setting auth_state cookie:', state);
+    
     res.cookie('auth_state', state, {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax',
       maxAge: 10 * 60 * 1000, // 10 minutes
+      path: '/', // Ensure cookie is available for callback
     });
     
     // Build Discord OAuth URL manually
@@ -54,6 +57,11 @@ export class AuthController {
     // Check if this is a partner login
     if ((req as any).isPartnerLogin || (req.user as any)?.isPartnerLogin) {
       return this.handlePartnerCallback(req, res);
+    }
+
+    // Check if this is a taxi login
+    if ((req as any).isTaxiLogin || (req.user as any)?.isTaxiLogin) {
+      return this.handleTaxiCallback(req, res);
     }
     
     const user = req.user as User;
@@ -184,6 +192,80 @@ export class AuthController {
     return res.redirect(redirectUrl);
   }
 
+  // Handle taxi login callback
+  private async handleTaxiCallback(req: Request, res: Response) {
+    const taxiProfile = req.user as { 
+      discordId: string; 
+      username: string; 
+      avatarUrl?: string; 
+      email?: string;
+      isTaxiLogin: boolean;
+    };
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    console.log('[TaxiCallback] Processing taxi login:', taxiProfile.username, taxiProfile.discordId);
+
+    // Prüfe ob bereits ein User mit dieser Discord-ID existiert
+    const existingUser = await this.prisma.user.findUnique({
+      where: { discordId: taxiProfile.discordId },
+    });
+
+    // Wenn der User bereits Taxi ist, direkt einloggen
+    if (existingUser && (existingUser as any).isTaxi) {
+      console.log('[TaxiCallback] Existing taxi user found, logging in');
+      
+      const tokens = await this.authService.generateTokens(existingUser);
+
+      res.cookie('access_token', tokens.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 1000, // 1 hour
+      });
+
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      await this.auditService.log({
+        userId: existingUser.id,
+        action: 'TAXI_LOGIN',
+        entity: 'User',
+        entityId: existingUser.id,
+        meta: { method: 'discord-taxi' },
+      });
+
+      return res.redirect(`${frontendUrl}/taxi`);
+    }
+
+    // User ist noch kein Taxi - speichere Discord-Daten in Cookie für Key-Eingabe
+    // KEINE Tokens ausgeben! User muss erst Key validieren.
+    const taxiRequestData = {
+      discordId: taxiProfile.discordId,
+      username: taxiProfile.username,
+      avatarUrl: taxiProfile.avatarUrl,
+      email: taxiProfile.email,
+    };
+
+    console.log('[TaxiCallback] User is not a taxi yet, redirecting to key page');
+    console.log('[TaxiCallback] Setting cookie with data:', taxiRequestData);
+    
+    // Express encoded automatisch - NICHT zusätzlich encoden!
+    res.cookie('taxi_request_data', JSON.stringify(taxiRequestData), {
+      httpOnly: false, // Frontend muss es lesen können
+      secure: isProduction,
+      sameSite: 'lax',
+      maxAge: 10 * 60 * 1000, // 10 Minuten
+      path: '/',
+    });
+
+    return res.redirect(`${frontendUrl}/taxi-key`);
+  }
+
   @Post('refresh')
   async refresh(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies?.refresh_token;
@@ -251,6 +333,8 @@ export class AuthController {
       allRoles: user.allRoles,
       gender: user.gender,
       isPartner: (user as any).isPartner,
+      isTaxi: (user as any).isTaxi,
+      isTaxiLead: (user as any).isTaxiLead,
       createdAt: user.createdAt,
     };
   }

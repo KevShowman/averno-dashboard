@@ -43,6 +43,9 @@ import PartnerRequestPage from './pages/PartnerRequestPage'
 import PartnerManagementPage from './pages/PartnerManagementPage'
 import PartnerDashboardPage from './pages/PartnerDashboardPage'
 import PartnerListenfuehrungPage from './pages/PartnerListenfuehrungPage'
+import TafelrundePage from './pages/TafelrundePage'
+import TaxiKeyPage from './pages/TaxiKeyPage'
+import TaxiDashboardPage from './pages/TaxiDashboardPage'
 
 // Wrapper to show different Listenführung based on user type
 function ListenfuehrungWrapper() {
@@ -69,9 +72,9 @@ function App() {
   }, [queryClient, setQueryClient])
 
   useEffect(() => {
-    // Don't check auth on error pages, login page, or partner request pages
+    // Don't check auth on error pages, login page, or partner/taxi request pages
     const path = window.location.pathname;
-    const unprotectedPaths = ['/discord-error', '/login', '/partner-request', '/partner-pending', '/partner-requested'];
+    const unprotectedPaths = ['/discord-error', '/login', '/partner-request', '/partner-pending', '/partner-requested', '/taxi-key'];
     
     if (!unprotectedPaths.includes(path)) {
       checkAuth();
@@ -125,6 +128,14 @@ function App() {
         <Route path="/partner-pending" element={<PartnerPendingPage />} />
         <Route path="/partner-requested" element={<PartnerRequestedPage />} />
         <Route path="/partner-request" element={<PartnerRequestPage />} />
+        <Route path="/taxi-key" element={<TaxiKeyPage />} />
+        <Route path="/taxi" element={
+          <ProtectedRoute>
+            <Layout>
+              <TaxiDashboardPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
         <Route path="/app" element={
           <ProtectedRoute>
             <Layout>
@@ -297,6 +308,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <ListenfuehrungWrapper />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/tafelrunde" element={
+          <ProtectedRoute>
+            <Layout>
+              <TafelrundePage />
             </Layout>
           </ProtectedRoute>
         } />
