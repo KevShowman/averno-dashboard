@@ -177,7 +177,7 @@ export default function PartnerManagementPage() {
   const permissionsQuery = useQuery({
     queryKey: ['partner-permissions'],
     queryFn: () => api.get('/partner/permissions').then(res => res.data as PartnerManagementPermission[]),
-    enabled: isElPatron,
+    enabled: !!isElPatron,
   })
   const permissions = permissionsQuery.data ?? []
   const loadingPermissions = permissionsQuery.isLoading
@@ -185,7 +185,7 @@ export default function PartnerManagementPage() {
   const availableUsersQuery = useQuery({
     queryKey: ['users-for-permission'],
     queryFn: () => api.get('/users').then(res => res.data as UserForPermission[]),
-    enabled: isElPatron,
+    enabled: !!isElPatron,
   })
   const availableUsers = availableUsersQuery.data ?? []
 

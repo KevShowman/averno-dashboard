@@ -175,14 +175,14 @@ export default function TafelrundePage() {
   const permissionsQuery = useQuery({
     queryKey: ['tafelrunde-permissions'],
     queryFn: () => api.get('/tafelrunde/permissions/list').then(res => res.data as TafelrundePermission[]),
-    enabled: isLeadership,
+    enabled: !!isLeadership,
   })
   const permissions = permissionsQuery.data ?? []
 
   const availableUsersQuery = useQuery({
     queryKey: ['users-for-tafelrunde-permission'],
     queryFn: () => api.get('/users').then(res => res.data as UserForPermission[]),
-    enabled: isLeadership,
+    enabled: !!isLeadership,
   })
   const availableUsers = availableUsersQuery.data ?? []
 
