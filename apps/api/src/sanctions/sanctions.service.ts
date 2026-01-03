@@ -38,6 +38,16 @@ export class SanctionsService {
     const results = [];
 
     for (const sanction of unpaidSanctions) {
+      // Prüfe ob User Taxi oder Partner ist - diese sollen nicht auto-sanktioniert werden
+      const user = await this.prisma.user.findUnique({
+        where: { id: sanction.userId },
+        select: { isTaxi: true, isPartner: true },
+      });
+
+      if (user?.isTaxi || user?.isPartner) {
+        continue; // Überspringe Taxi/Partner-User
+      }
+
       // Prüfe, ob bereits eine aktive 48h-Sanktion für diesen User existiert
       const existing48hSanction = await this.prisma.sanction.findFirst({
         where: {

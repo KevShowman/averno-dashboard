@@ -562,6 +562,16 @@ export class WeeklyDeliveryService {
     }
 
     for (const delivery of unpaidDeliveries) {
+      // Prüfe ob User Taxi oder Partner ist - diese sollen nicht sanktioniert werden
+      const user = await this.prisma.user.findUnique({
+        where: { id: delivery.userId },
+        select: { isTaxi: true, isPartner: true },
+      });
+
+      if (user?.isTaxi || user?.isPartner) {
+        continue; // Überspringe Taxi/Partner-User
+      }
+
       // Verwende SanctionsService für die Sanktions-Erstellung mit automatischem Level
       const sanction = await this.sanctionsService.createSanctionWithAutoLevel(
         delivery.userId,
@@ -614,6 +624,16 @@ export class WeeklyDeliveryService {
     }
 
     for (const delivery of overdueDeliveries) {
+      // Prüfe ob User Taxi oder Partner ist - diese sollen nicht sanktioniert werden
+      if (delivery.user?.isTaxi || delivery.user?.isPartner) {
+        await this.prisma.weeklyDelivery.update({
+          where: { id: delivery.id },
+          data: { status: WeeklyDeliveryStatus.OVERDUE },
+        });
+        console.log(`⏭️  Überspringe Sanktion für ${delivery.user.username}: Taxi/Partner-User`);
+        continue; // Keine Sanktion für Taxi/Partner-User
+      }
+
       // Prüfe, ob User für diese Woche als abgemeldet markiert wurde (persistent)
       if (delivery.isAbgemeldet) {
         await this.prisma.weeklyDelivery.update({

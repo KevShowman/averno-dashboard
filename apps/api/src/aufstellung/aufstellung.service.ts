@@ -152,8 +152,12 @@ export class AufstellungService {
       throw new NotFoundException('Aufstellung nicht gefunden');
     }
 
-    // Alle User abrufen um zu sehen wer nicht reagiert hat
+    // Alle User abrufen um zu sehen wer nicht reagiert hat (keine Partner/Taxi - nur interne Mitglieder)
     const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,
@@ -268,8 +272,12 @@ export class AufstellungService {
       throw new BadRequestException('Die Deadline wurde noch nicht erreicht');
     }
 
-    // Alle User abrufen
+    // Alle User abrufen (keine Partner/Taxi - nur interne Mitglieder)
     const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,
