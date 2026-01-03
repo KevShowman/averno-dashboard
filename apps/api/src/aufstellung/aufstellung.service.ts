@@ -90,7 +90,7 @@ export class AufstellungService {
 
   // Alle Aufstellungen abrufen
   async getAllAufstellungen() {
-    return this.prisma.aufstellung.findMany({
+    const aufstellungen = await this.prisma.aufstellung.findMany({
       include: {
         createdBy: {
           select: {
@@ -108,6 +108,8 @@ export class AufstellungService {
                 username: true,
                 icFirstName: true,
                 icLastName: true,
+                isTaxi: true,
+                isPartner: true,
               },
             },
           },
@@ -117,6 +119,12 @@ export class AufstellungService {
         date: 'desc',
       },
     });
+
+    // Filtere Responses: Nur interne User (keine Taxi/Partner)
+    return aufstellungen.map(aufstellung => ({
+      ...aufstellung,
+      responses: aufstellung.responses.filter(r => !r.user.isTaxi && !r.user.isPartner),
+    }));
   }
 
   // Einzelne Aufstellung mit Details abrufen
@@ -188,16 +196,21 @@ export class AufstellungService {
     const excludedUserIds = new Set(exclusions.map(e => e.userId));
     usersWithoutResponse = usersWithoutResponse.filter(user => !excludedUserIds.has(user.id));
 
+    // Filtere Responses: Nur interne User (keine Taxi/Partner)
+    const internalUserIds = new Set(allUsers.map(u => u.id));
+    const filteredResponses = aufstellung.responses.filter(r => internalUserIds.has(r.userId));
+
     // Total sollte nur nicht-ausgeschlossene User zählen
     const totalNonExcluded = allUsers.length - excludedUserIds.size;
 
     return {
       ...aufstellung,
+      responses: filteredResponses, // Nur interne User in Responses
       stats: {
         total: totalNonExcluded,
-        coming: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.COMING).length,
-        notComing: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.NOT_COMING).length,
-        unsure: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.UNSURE).length,
+        coming: filteredResponses.filter(r => r.status === AufstellungResponseStatus.COMING).length,
+        notComing: filteredResponses.filter(r => r.status === AufstellungResponseStatus.NOT_COMING).length,
+        unsure: filteredResponses.filter(r => r.status === AufstellungResponseStatus.UNSURE).length,
         noResponse: usersWithoutResponse.length,
       },
       usersWithoutResponse,
@@ -259,7 +272,17 @@ export class AufstellungService {
     const aufstellung = await this.prisma.aufstellung.findUnique({
       where: { id: aufstellungId },
       include: {
-        responses: true,
+        responses: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                isTaxi: true,
+                isPartner: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -286,7 +309,10 @@ export class AufstellungService {
       },
     });
 
-    const respondedUserIds = new Set(aufstellung.responses.map(r => r.userId));
+    // Filtere Responses: Nur interne User (keine Taxi/Partner)
+    const internalUserIds = new Set(allUsers.map(u => u.id));
+    const filteredResponses = aufstellung.responses.filter(r => internalUserIds.has(r.userId));
+    const respondedUserIds = new Set(filteredResponses.map(r => r.userId));
     let usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
 
     // Ausgeschlossene User filtern (die aktive Exclusions haben)
@@ -369,7 +395,7 @@ export class AufstellungService {
 
   // Aktuelle/Kommende Aufstellungen
   async getUpcomingAufstellungen() {
-    return this.prisma.aufstellung.findMany({
+    const aufstellungen = await this.prisma.aufstellung.findMany({
       where: {
         date: {
           gte: new Date(),
@@ -392,6 +418,8 @@ export class AufstellungService {
                 username: true,
                 icFirstName: true,
                 icLastName: true,
+                isTaxi: true,
+                isPartner: true,
               },
             },
           },
@@ -401,6 +429,12 @@ export class AufstellungService {
         date: 'asc',
       },
     });
+
+    // Filtere Responses: Nur interne User (keine Taxi/Partner)
+    return aufstellungen.map(aufstellung => ({
+      ...aufstellung,
+      responses: aufstellung.responses.filter(r => !r.user.isTaxi && !r.user.isPartner),
+    }));
   }
 
   // Meine Aufstellungen (wo ich noch nicht reagiert habe)
