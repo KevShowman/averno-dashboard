@@ -55,6 +55,14 @@ import {
   Lightbulb,
   Loader2,
   MessageSquare,
+  Filter,
+  Link,
+  Unlink,
+  Key,
+  Clock,
+  Eye,
+  EyeOff,
+  ChevronDown,
 } from 'lucide-react'
 import { Textarea } from '../components/ui/textarea'
 import { Badge } from '../components/ui/badge'
@@ -88,6 +96,12 @@ interface MapAnnotation {
   label?: string
   familyContactId?: string
   familyContact?: FamilyContact
+  // Direkte Flags auf POI-Ebene
+  isKeyFamily?: boolean
+  isOutdated?: boolean
+  // Kombinierte effektive Flags (POI OR Familie)
+  effectiveIsKeyFamily?: boolean
+  effectiveIsOutdated?: boolean
   createdBy: {
     id: string
     username: string
@@ -399,6 +413,8 @@ export default function KartePage() {
     icon: 'home',
     label: '',
     familyContactId: '',
+    isKeyFamily: false,
+    isOutdated: false,
   })
   
   // Area form state
@@ -418,6 +434,13 @@ export default function KartePage() {
   const [isPartnerDeleteDialogOpen, setIsPartnerDeleteDialogOpen] = useState(false)
   const [partnerDeleteAnnotation, setPartnerDeleteAnnotation] = useState<MapAnnotation | null>(null)
   const [partnerDeleteReason, setPartnerDeleteReason] = useState('')
+  
+  // Filter state
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [filterLinkStatus, setFilterLinkStatus] = useState<'all' | 'linked' | 'unlinked'>('all')
+  const [filterStatuses, setFilterStatuses] = useState<FamilyContactStatus[]>(['UNKNOWN', 'ACTIVE', 'ENDANGERED', 'DISSOLVED'])
+  const [filterOutdated, setFilterOutdated] = useState<'all' | 'only' | 'exclude'>('all')
+  const [filterKeyFamily, setFilterKeyFamily] = useState<'all' | 'only' | 'exclude'>('all')
   
   // Permission check
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
@@ -466,14 +489,14 @@ export default function KartePage() {
     enabled: canManage && isSuggestionsPanelOpen,
   })
 
-  // Fetch family link statistics
-  const { data: familyStats } = useQuery<{
+  // Fetch POI link statistics
+  const { data: poiStats } = useQuery<{
     total: number
     linked: number
     unlinked: number
     percentage: number
   }>({
-    queryKey: ['map-family-stats'],
+    queryKey: ['map-poi-stats'],
     queryFn: () => api.get('/map-annotations/family-stats').then(res => res.data),
   })
 
@@ -492,7 +515,7 @@ export default function KartePage() {
   
   // Mutations
   const createMutation = useMutation({
-    mutationFn: (data: { mapName: MapName; x: number; y: number; icon: string; label?: string; familyContactId?: string }) =>
+    mutationFn: (data: { mapName: MapName; x: number; y: number; icon: string; label?: string; familyContactId?: string; isKeyFamily?: boolean; isOutdated?: boolean }) =>
       api.post('/map-annotations', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['map-annotations'] })
@@ -507,7 +530,7 @@ export default function KartePage() {
   })
   
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { icon?: string; label?: string; familyContactId?: string | null } }) =>
+    mutationFn: ({ id, data }: { id: string; data: { icon?: string; label?: string; familyContactId?: string | null; isKeyFamily?: boolean; isOutdated?: boolean } }) =>
       api.put(`/map-annotations/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['map-annotations'] })
@@ -535,7 +558,7 @@ export default function KartePage() {
   })
   
   const resetForm = () => {
-    setFormData({ icon: 'home', label: '', familyContactId: '' })
+    setFormData({ icon: 'home', label: '', familyContactId: '', isKeyFamily: false, isOutdated: false })
   }
   
   const resetAreaForm = () => {
@@ -707,6 +730,8 @@ export default function KartePage() {
         icon: annotation.icon,
         label: annotation.label || '',
         familyContactId: annotation.familyContactId || '',
+        isKeyFamily: annotation.isKeyFamily || false,
+        isOutdated: annotation.isOutdated || false,
       })
     }
   }
@@ -731,6 +756,8 @@ export default function KartePage() {
       icon: formData.icon,
       label: formData.label || undefined,
       familyContactId: formData.familyContactId || undefined,
+      isKeyFamily: formData.isKeyFamily,
+      isOutdated: formData.isOutdated,
     }
 
     if (canManage) {
@@ -750,6 +777,8 @@ export default function KartePage() {
         icon: formData.icon,
         label: formData.label || undefined,
         familyContactId: formData.familyContactId || null,
+        isKeyFamily: formData.isKeyFamily,
+        isOutdated: formData.isOutdated,
       },
     })
   }
@@ -765,6 +794,56 @@ export default function KartePage() {
   const toMapCoords = (x: number, y: number): [number, number] => {
     return [mapHeight - (y * mapHeight), x * mapWidth]
   }
+
+  // Filter annotations based on filter settings
+  const filteredAnnotations = annotations.filter((annotation: MapAnnotation) => {
+    // Filter by link status
+    if (filterLinkStatus === 'linked' && !annotation.familyContactId) return false
+    if (filterLinkStatus === 'unlinked' && annotation.familyContactId) return false
+    
+    // Get effective flags (POI flags OR family flags)
+    const effectiveIsKeyFamily = annotation.effectiveIsKeyFamily ?? annotation.isKeyFamily ?? annotation.familyContact?.isKeyFamily ?? false
+    const effectiveIsOutdated = annotation.effectiveIsOutdated ?? annotation.isOutdated ?? annotation.familyContact?.isOutdated ?? false
+    
+    // For linked annotations: apply status filter
+    if (annotation.familyContact) {
+      if (!filterStatuses.includes(annotation.familyContact.status)) return false
+    }
+    
+    // Filter by outdated flag (works for linked AND unlinked POIs with direct flags)
+    if (filterOutdated === 'only' && !effectiveIsOutdated) return false
+    if (filterOutdated === 'exclude' && effectiveIsOutdated) return false
+    
+    // Filter by key family flag (works for linked AND unlinked POIs with direct flags)
+    if (filterKeyFamily === 'only' && !effectiveIsKeyFamily) return false
+    if (filterKeyFamily === 'exclude' && effectiveIsKeyFamily) return false
+    
+    return true
+  })
+
+  // Toggle status in filter
+  const toggleStatusFilter = (status: FamilyContactStatus) => {
+    setFilterStatuses(prev => 
+      prev.includes(status) 
+        ? prev.filter(s => s !== status)
+        : [...prev, status]
+    )
+  }
+
+  // Reset all filters
+  const resetFilters = () => {
+    setFilterLinkStatus('all')
+    setFilterStatuses(['UNKNOWN', 'ACTIVE', 'ENDANGERED', 'DISSOLVED'])
+    setFilterOutdated('all')
+    setFilterKeyFamily('all')
+  }
+
+  // Check if any filter is active
+  const isFilterActive = 
+    filterLinkStatus !== 'all' ||
+    filterStatuses.length !== 4 ||
+    filterOutdated !== 'all' ||
+    filterKeyFamily !== 'all'
 
   // Preview a suggestion by focusing on its location
   const handlePreviewSuggestion = (suggestion: MapSuggestion) => {
@@ -822,6 +901,181 @@ export default function KartePage() {
               </button>
             ))}
           </div>
+        </div>
+        
+        {/* Filter Section */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
+                isFilterActive 
+                  ? 'bg-amber-500/20 border-amber-500/40 text-amber-400' 
+                  : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600'
+              }`}
+            >
+              <Filter className="h-4 w-4" />
+              <span className="font-medium">Filter</span>
+              {isFilterActive && (
+                <Badge className="ml-1 bg-amber-500 text-black text-xs px-1.5">
+                  aktiv
+                </Badge>
+              )}
+              <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {isFilterActive && (
+              <button
+                onClick={resetFilters}
+                className="flex items-center gap-1 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Zurücksetzen
+              </button>
+            )}
+            
+            {/* Quick filter count */}
+            <span className="text-sm text-gray-500 ml-auto">
+              {filteredAnnotations.length} / {annotations.length} POIs sichtbar
+            </span>
+          </div>
+          
+          {/* Filter Panel */}
+          {isFilterOpen && (
+            <div className="mt-3 p-4 rounded-xl bg-gray-800/70 border border-gray-700 space-y-4">
+              {/* Link Status Filter */}
+              <div>
+                <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <Link className="h-4 w-4" />
+                  Verknüpfung
+                </label>
+                <div className="flex gap-2 mt-2">
+                  {[
+                    { value: 'all', label: 'Alle', icon: Eye },
+                    { value: 'linked', label: 'Mit Familie', icon: Link },
+                    { value: 'unlinked', label: 'Ohne Familie', icon: Unlink },
+                  ].map(option => {
+                    const Icon = option.icon
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => setFilterLinkStatus(option.value as typeof filterLinkStatus)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          filterLinkStatus === option.value
+                            ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400'
+                            : 'bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-500'
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        {option.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              
+              {/* Status Filter (only when not filtering for unlinked only) */}
+              {filterLinkStatus !== 'unlinked' && (
+                <div>
+                  <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4" />
+                    Familien-Status
+                  </label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {(Object.entries(statusConfig) as [FamilyContactStatus, typeof statusConfig[FamilyContactStatus]][]).map(([status, config]) => {
+                      const isActive = filterStatuses.includes(status)
+                      const Icon = config.icon
+                      return (
+                        <button
+                          key={status}
+                          onClick={() => toggleStatusFilter(status)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all border ${
+                            isActive
+                              ? 'border-opacity-40'
+                              : 'bg-gray-700/30 border-gray-600 text-gray-500 opacity-50'
+                          }`}
+                          style={isActive ? {
+                            backgroundColor: `${config.color}20`,
+                            borderColor: `${config.color}66`,
+                            color: config.color,
+                          } : {}}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          {config.label}
+                          {isActive ? (
+                            <Eye className="h-3 w-3 ml-1" />
+                          ) : (
+                            <EyeOff className="h-3 w-3 ml-1" />
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Additional Flags Filter - always visible since POIs can have direct flags */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Outdated Filter */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-red-400" />
+                    Veraltet
+                  </label>
+                  <div className="flex gap-2 mt-2">
+                    {[
+                      { value: 'all', label: 'Alle' },
+                      { value: 'only', label: 'Nur veraltete' },
+                      { value: 'exclude', label: 'Ohne veraltete' },
+                    ].map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => setFilterOutdated(option.value as typeof filterOutdated)}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          filterOutdated === option.value
+                            ? option.value === 'only'
+                              ? 'bg-red-500/20 border border-red-500/40 text-red-400'
+                              : 'bg-amber-500/20 border border-amber-500/40 text-amber-400'
+                            : 'bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-500'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Key Family Filter */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                    <Key className="h-4 w-4 text-amber-400" />
+                    Schlüsselfamilien
+                  </label>
+                  <div className="flex gap-2 mt-2">
+                    {[
+                      { value: 'all', label: 'Alle' },
+                      { value: 'only', label: 'Nur Schlüssel' },
+                      { value: 'exclude', label: 'Ohne Schlüssel' },
+                    ].map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => setFilterKeyFamily(option.value as typeof filterKeyFamily)}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          filterKeyFamily === option.value
+                            ? option.value === 'only'
+                              ? 'bg-amber-500/30 border border-amber-500/50 text-amber-300'
+                              : 'bg-amber-500/20 border border-amber-500/40 text-amber-400'
+                            : 'bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-500'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Instructions & Drawing Tools */}
@@ -1162,15 +1416,20 @@ export default function KartePage() {
               )}
 
               {/* Markers */}
-              {annotations.map((annotation: MapAnnotation) => (
+              {filteredAnnotations.map((annotation: MapAnnotation) => {
+                // Effektive Flags (POI OR Familie)
+                const effectiveIsKeyFamily = annotation.effectiveIsKeyFamily ?? annotation.isKeyFamily ?? annotation.familyContact?.isKeyFamily ?? false
+                const effectiveIsOutdated = annotation.effectiveIsOutdated ?? annotation.isOutdated ?? annotation.familyContact?.isOutdated ?? false
+                
+                return (
                 <Marker
                   key={annotation.id}
                   position={toMapCoords(annotation.x, annotation.y)}
                   icon={createMarkerIcon(
                     annotation.icon, 
                     annotation.familyContact?.status,
-                    annotation.familyContact?.isKeyFamily,
-                    annotation.familyContact?.isOutdated
+                    effectiveIsKeyFamily,
+                    effectiveIsOutdated
                   )}
                   eventHandlers={{
                     click: () => handleMarkerClick(annotation),
@@ -1207,7 +1466,7 @@ export default function KartePage() {
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-bold text-lg">{annotation.familyContact.familyName}</span>
                             <div className="flex items-center gap-1">
-                              {annotation.familyContact.isKeyFamily && (
+                              {effectiveIsKeyFamily && (
                                 <span 
                                   className="px-2 py-0.5 rounded-full text-xs font-medium"
                                   style={{ backgroundColor: '#f59e0b20', color: '#f59e0b' }}
@@ -1216,7 +1475,7 @@ export default function KartePage() {
                                   🔑
                                 </span>
                               )}
-                              {annotation.familyContact.isOutdated && (
+                              {effectiveIsOutdated && (
                                 <span 
                                   className="px-2 py-0.5 rounded-full text-xs font-medium"
                                   style={{ backgroundColor: '#ef444420', color: '#ef4444' }}
@@ -1295,7 +1554,29 @@ export default function KartePage() {
                         </div>
                       ) : (
                         <div>
-                          <div className="font-bold">{annotation.label || 'Unbenannte Markierung'}</div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-bold">{annotation.label || 'Unbenannte Markierung'}</span>
+                            <div className="flex items-center gap-1">
+                              {effectiveIsKeyFamily && (
+                                <span 
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  style={{ backgroundColor: '#f59e0b20', color: '#f59e0b' }}
+                                  title="Schlüsselfamilie"
+                                >
+                                  🔑
+                                </span>
+                              )}
+                              {effectiveIsOutdated && (
+                                <span 
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  style={{ backgroundColor: '#ef444420', color: '#ef4444' }}
+                                  title="Information veraltet"
+                                >
+                                  ⏰
+                                </span>
+                              )}
+                            </div>
+                          </div>
                           <div className="text-xs text-gray-500 mt-1">
                             Erstellt von {annotation.createdBy?.icFirstName || annotation.createdBy?.username}
                           </div>
@@ -1311,6 +1592,8 @@ export default function KartePage() {
                                 icon: annotation.icon,
                                 label: annotation.label || '',
                                 familyContactId: annotation.familyContactId || '',
+                                isKeyFamily: annotation.isKeyFamily || false,
+                                isOutdated: annotation.isOutdated || false,
                               })
                               setIsEditDialogOpen(true)
                             }}
@@ -1354,7 +1637,8 @@ export default function KartePage() {
                     </div>
                   </Popup>
                 </Marker>
-              ))}
+              )}
+              )}
             </MapContainer>
           )}
         </div>
@@ -1372,28 +1656,36 @@ export default function KartePage() {
             ))}
           </div>
 
-          {/* Family Link Stats */}
-          {familyStats && (
+          {/* POI Link Stats */}
+          {poiStats && (
             <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-amber-400" />
-                <span className="text-sm text-gray-300 font-medium">Listenführung:</span>
+                <MapPin className="h-4 w-4 text-amber-400" />
+                <span className="text-sm text-gray-300 font-medium">POIs:</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-green-400 font-medium">{familyStats.linked}</span>
+                  <Link className="h-4 w-4 text-green-400" />
+                  <span className="text-green-400 font-medium">{poiStats.linked}</span>
                   <span className="text-gray-500">verknüpft</span>
                 </div>
                 <span className="text-gray-600">|</span>
                 <div className="flex items-center gap-1.5">
-                  <AlertCircle className="h-4 w-4 text-orange-400" />
-                  <span className="text-orange-400 font-medium">{familyStats.unlinked}</span>
-                  <span className="text-gray-500">offen</span>
+                  <Unlink className="h-4 w-4 text-orange-400" />
+                  <span className="text-orange-400 font-medium">{poiStats.unlinked}</span>
+                  <span className="text-gray-500">ohne Familie</span>
                 </div>
                 <span className="text-gray-600">|</span>
                 <div className="px-2 py-0.5 rounded bg-gray-700 text-gray-300 font-medium">
-                  {familyStats.percentage}%
+                  {poiStats.total} gesamt
+                </div>
+                <span className="text-gray-600">|</span>
+                <div className={`px-2 py-0.5 rounded font-medium ${
+                  poiStats.percentage >= 75 ? 'bg-green-500/20 text-green-400' :
+                  poiStats.percentage >= 50 ? 'bg-amber-500/20 text-amber-400' :
+                  'bg-red-500/20 text-red-400'
+                }`}>
+                  {poiStats.percentage}%
                 </div>
               </div>
             </div>
@@ -1468,6 +1760,34 @@ export default function KartePage() {
                 ))}
               </select>
             </div>
+            
+            {/* Direct POI Flags */}
+            {canManage && (
+              <div className="grid grid-cols-2 gap-4">
+                <div 
+                  onClick={() => setFormData({ ...formData, isKeyFamily: !formData.isKeyFamily })}
+                  className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
+                    formData.isKeyFamily
+                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
+                      : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                  }`}
+                >
+                  <Key className="h-4 w-4" />
+                  <span className="text-sm">Schlüsselfamilie</span>
+                </div>
+                <div 
+                  onClick={() => setFormData({ ...formData, isOutdated: !formData.isOutdated })}
+                  className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
+                    formData.isOutdated
+                      ? 'bg-red-500/20 border-red-500/40 text-red-400'
+                      : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                  }`}
+                >
+                  <Clock className="h-4 w-4" />
+                  <span className="text-sm">Veraltet</span>
+                </div>
+              </div>
+            )}
           </div>
           
           <DialogFooter className="gap-2">
@@ -1557,6 +1877,50 @@ export default function KartePage() {
                 ))}
               </select>
             </div>
+            
+            {/* Direct POI Flags */}
+            <div className="grid grid-cols-2 gap-4">
+              <div 
+                onClick={() => setFormData({ ...formData, isKeyFamily: !formData.isKeyFamily })}
+                className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
+                  formData.isKeyFamily
+                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
+                    : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                <Key className="h-4 w-4" />
+                <span className="text-sm">Schlüsselfamilie</span>
+              </div>
+              <div 
+                onClick={() => setFormData({ ...formData, isOutdated: !formData.isOutdated })}
+                className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
+                  formData.isOutdated
+                    ? 'bg-red-500/20 border-red-500/40 text-red-400'
+                    : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                <Clock className="h-4 w-4" />
+                <span className="text-sm">Veraltet</span>
+              </div>
+            </div>
+            
+            {/* Info about combined flags */}
+            {selectedAnnotation?.familyContact && (selectedAnnotation.familyContact.isKeyFamily || selectedAnnotation.familyContact.isOutdated) && (
+              <div className="p-3 bg-gray-700/30 rounded-lg text-xs text-gray-400">
+                <p className="flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  Hinweis: Die verknüpfte Familie hat auch Flags gesetzt:
+                </p>
+                <div className="flex gap-2 mt-1">
+                  {selectedAnnotation.familyContact.isKeyFamily && (
+                    <span className="text-amber-400">🔑 Schlüsselfamilie</span>
+                  )}
+                  {selectedAnnotation.familyContact.isOutdated && (
+                    <span className="text-red-400">⏰ Veraltet</span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           
           <DialogFooter className="gap-2">

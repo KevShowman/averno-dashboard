@@ -851,6 +851,9 @@ model MapAnnotation {
   label           String? // Optionaler Kurztext für Tooltip
   familyContactId String?
   familyContact   FamilyContact? @relation("map_annotation_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  // Direkte Flags (unabhängig von Familie)
+  isKeyFamily     Boolean        @default(false) // Schlüsselfamilie-Badge direkt auf POI
+  isOutdated      Boolean        @default(false) // Veraltet-Badge direkt auf POI
   createdById     String? // Optional für historische Daten wenn Ersteller gelöscht
   createdBy       User?          @relation("map_annotation_created_by", fields: [createdById], references: [id], onDelete: SetNull)
   createdAt       DateTime       @default(now())

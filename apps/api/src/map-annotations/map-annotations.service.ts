@@ -59,7 +59,7 @@ export class MapAnnotationsService {
   async findAll(mapName?: MapName) {
     const where = mapName ? { mapName } : {};
 
-    return this.prisma.mapAnnotation.findMany({
+    const annotations = await this.prisma.mapAnnotation.findMany({
       where,
       include: {
         familyContact: {
@@ -91,6 +91,14 @@ export class MapAnnotationsService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Kombiniere direkte POI-Flags mit Familie-Flags (POI hat Priorität, OR-Verknüpfung)
+    return annotations.map((annotation) => ({
+      ...annotation,
+      // Effektive Flags: POI-Flag ODER Familie-Flag (falls Familie existiert)
+      effectiveIsKeyFamily: annotation.isKeyFamily || annotation.familyContact?.isKeyFamily || false,
+      effectiveIsOutdated: annotation.isOutdated || annotation.familyContact?.isOutdated || false,
+    }));
   }
 
   async findOne(id: string) {
@@ -125,6 +133,8 @@ export class MapAnnotationsService {
       icon?: string;
       label?: string;
       familyContactId?: string;
+      isKeyFamily?: boolean;
+      isOutdated?: boolean;
     },
   ) {
     if (!(await this.canManageAnnotations(user))) {
@@ -156,6 +166,8 @@ export class MapAnnotationsService {
         icon: data.icon || 'home',
         label: data.label,
         familyContactId: data.familyContactId,
+        isKeyFamily: data.isKeyFamily || false,
+        isOutdated: data.isOutdated || false,
         createdById: user.id,
       },
       include: {
@@ -204,6 +216,8 @@ export class MapAnnotationsService {
       icon?: string;
       label?: string;
       familyContactId?: string | null;
+      isKeyFamily?: boolean;
+      isOutdated?: boolean;
     },
   ) {
     if (!(await this.canManageAnnotations(user))) {
@@ -329,50 +343,26 @@ export class MapAnnotationsService {
     });
   }
 
-  // Statistik: Wie viele Familien sind mit POIs verknüpft
+  // Statistik: Wie viele POIs sind mit Familien verknüpft
   async getFamilyLinkStats() {
-    // Gesamtzahl der Familien
-    const totalFamilies = await this.prisma.familyContact.count();
+    // Gesamtzahl der POIs
+    const totalPOIs = await this.prisma.mapAnnotation.count();
 
-    // Anzahl der Familien mit MapAnnotation (verknüpft)
-    const linkedFamilies = await this.prisma.familyContact.count({
+    // Anzahl der POIs mit Familie verknüpft
+    const linkedPOIs = await this.prisma.mapAnnotation.count({
       where: {
-        mapAnnotations: {
-          some: {},
-        },
+        familyContactId: { not: null },
       },
     });
 
-    // Nicht verknüpfte Familien
-    const unlinkedFamilies = totalFamilies - linkedFamilies;
-
-    // Optional: Aufschlüsselung nach Status
-    const byStatus = await this.prisma.familyContact.groupBy({
-      by: ['status'],
-      _count: true,
-    });
-
-    // Familien mit POI nach Status
-    const linkedByStatus = await this.prisma.familyContact.groupBy({
-      by: ['status'],
-      where: {
-        mapAnnotations: {
-          some: {},
-        },
-      },
-      _count: true,
-    });
+    // Nicht verknüpfte POIs
+    const unlinkedPOIs = totalPOIs - linkedPOIs;
 
     return {
-      total: totalFamilies,
-      linked: linkedFamilies,
-      unlinked: unlinkedFamilies,
-      percentage: totalFamilies > 0 ? Math.round((linkedFamilies / totalFamilies) * 100) : 0,
-      byStatus: byStatus.map((s) => ({
-        status: s.status,
-        total: s._count,
-        linked: linkedByStatus.find((l) => l.status === s.status)?._count || 0,
-      })),
+      total: totalPOIs,
+      linked: linkedPOIs,
+      unlinked: unlinkedPOIs,
+      percentage: totalPOIs > 0 ? Math.round((linkedPOIs / totalPOIs) * 100) : 0,
     };
   }
 
