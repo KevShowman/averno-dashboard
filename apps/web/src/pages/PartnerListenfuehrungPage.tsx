@@ -69,11 +69,12 @@ interface MapAnnotation {
   y: number
   icon: string
   label?: string
+  familyContactId?: string | null
   familyContact?: {
     id: string
     familyName: string
     status: string
-  }
+  } | null
 }
 
 const statusConfig: Record<SuggestionStatus, { label: string; color: string; bgColor: string; icon: typeof Clock }> = {
@@ -106,6 +107,9 @@ export default function PartnerListenfuehrungPage() {
     // Map fields
     mapName: '',
     linkedAnnotationId: '', // Link to existing map annotation
+    // Flags
+    isKeyFamily: false,
+    isOutdated: false,
   })
 
   // Fetch partner's own suggestions
@@ -129,9 +133,25 @@ export default function PartnerListenfuehrungPage() {
 
   // Submit new suggestion (CREATE)
   const submitMutation = useMutation({
-    mutationFn: (data: typeof formData) => api.post('/partner/suggestions', {
+    mutationFn: (data: typeof formData & { mapX?: number; mapY?: number; mapIcon?: string }) => api.post('/partner/suggestions', {
       type: 'CREATE',
-      ...data,
+      familyName: data.familyName,
+      familyStatus: data.familyStatus,
+      propertyZip: data.propertyZip,
+      contact1FirstName: data.contact1FirstName,
+      contact1LastName: data.contact1LastName,
+      contact1Phone: data.contact1Phone,
+      contact2FirstName: data.contact2FirstName,
+      contact2LastName: data.contact2LastName,
+      contact2Phone: data.contact2Phone,
+      notes: data.notes,
+      isKeyFamily: data.isKeyFamily,
+      isOutdated: data.isOutdated,
+      mapName: data.mapName || undefined,
+      mapX: data.mapX,
+      mapY: data.mapY,
+      mapIcon: data.mapIcon,
+      linkedMapAnnotationId: data.linkedAnnotationId || undefined,
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partner-suggestions'] })
@@ -176,6 +196,8 @@ export default function PartnerListenfuehrungPage() {
       notes: '',
       mapName: '',
       linkedAnnotationId: '',
+      isKeyFamily: false,
+      isOutdated: false,
     })
   }
 
@@ -187,14 +209,30 @@ export default function PartnerListenfuehrungPage() {
       return
     }
 
+    // POI-Verknüpfung ist Pflicht
+    if (!formData.mapName) {
+      toast.error('Bitte wähle eine Karte aus')
+      return
+    }
+
+    if (!formData.linkedAnnotationId) {
+      toast.error('Bitte wähle einen Standort auf der Karte aus')
+      return
+    }
+
     // Find linked annotation to get coordinates
     const linkedAnnotation = mapAnnotations.find(a => a.id === formData.linkedAnnotationId)
     
+    if (!linkedAnnotation) {
+      toast.error('Ausgewählter Standort nicht gefunden')
+      return
+    }
+    
     const submitData = {
       ...formData,
-      mapX: linkedAnnotation?.x,
-      mapY: linkedAnnotation?.y,
-      mapIcon: linkedAnnotation?.icon,
+      mapX: linkedAnnotation.x,
+      mapY: linkedAnnotation.y,
+      mapIcon: linkedAnnotation.icon,
     }
     
     submitMutation.mutate(submitData)
@@ -344,6 +382,34 @@ export default function PartnerListenfuehrungPage() {
                 </Select>
               </div>
 
+              {/* Flags: isKeyFamily & isOutdated */}
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex items-center gap-3 p-3 bg-gray-900/30 rounded-lg border border-gray-700/50 cursor-pointer hover:border-amber-500/30 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.isKeyFamily}
+                    onChange={(e) => setFormData({ ...formData, isKeyFamily: e.target.checked })}
+                    className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500"
+                  />
+                  <div>
+                    <span className="text-gray-200 text-sm font-medium">🔑 Schlüsselfamilie</span>
+                    <p className="text-xs text-gray-500">Offizielle Partner-Familie</p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 p-3 bg-gray-900/30 rounded-lg border border-gray-700/50 cursor-pointer hover:border-orange-500/30 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.isOutdated}
+                    onChange={(e) => setFormData({ ...formData, isOutdated: e.target.checked })}
+                    className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-orange-500"
+                  />
+                  <div>
+                    <span className="text-gray-200 text-sm font-medium">⚠️ Veraltet</span>
+                    <p className="text-xs text-gray-500">Information nicht aktuell</p>
+                  </div>
+                </label>
+              </div>
+
               {/* Property ZIP */}
               <div className="space-y-2">
                 <Label htmlFor="propertyZip" className="text-gray-300">PLZ / Standort</Label>
@@ -356,14 +422,14 @@ export default function PartnerListenfuehrungPage() {
                 />
               </div>
 
-              {/* Map Location */}
-              <div className="space-y-3 p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+              {/* Map Location - PFLICHTFELD */}
+              <div className="space-y-3 p-4 bg-amber-900/20 rounded-lg border border-amber-500/30">
+                <h4 className="text-sm font-medium text-amber-300 flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-amber-400" />
-                  Karten-Standort (optional)
+                  Karten-Standort <span className="text-red-400">*</span>
                 </h4>
-                <p className="text-xs text-gray-500">
-                  Verknüpfe einen bestehenden Standort auf der Karte mit dieser Familie
+                <p className="text-xs text-gray-400">
+                  Wähle einen bestehenden, unverknüpften Standort auf der Karte aus
                 </p>
                 
                 {/* Map Selection */}
@@ -371,7 +437,7 @@ export default function PartnerListenfuehrungPage() {
                   value={formData.mapName}
                   onValueChange={(value) => setFormData({ ...formData, mapName: value, linkedAnnotationId: '' })}
                 >
-                  <SelectTrigger className="bg-gray-900/50 border-gray-600">
+                  <SelectTrigger className={`bg-gray-900/50 ${!formData.mapName ? 'border-amber-500/50' : 'border-gray-600'}`}>
                     <SelectValue placeholder="Karte auswählen..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -381,25 +447,45 @@ export default function PartnerListenfuehrungPage() {
                   </SelectContent>
                 </Select>
 
-                {/* Existing Annotations */}
+                {/* Existing Annotations - nur unverknüpfte POIs anzeigen */}
                 {formData.mapName && (
-                  <Select
-                    value={formData.linkedAnnotationId || undefined}
-                    onValueChange={(value) => setFormData({ ...formData, linkedAnnotationId: value === 'none' ? '' : value })}
-                  >
-                    <SelectTrigger className="bg-gray-900/50 border-gray-600">
-                      <SelectValue placeholder="Bestehenden Standort verknüpfen..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Keinen Standort verknüpfen</SelectItem>
-                      {mapAnnotations.map((annotation) => (
-                        <SelectItem key={annotation.id} value={annotation.id}>
-                          {annotation.label || annotation.familyContact?.familyName || `Standort ${annotation.id.slice(-6)}`}
-                          {annotation.familyContact && ` (${annotation.familyContact.familyName})`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <>
+                    <Select
+                      value={formData.linkedAnnotationId || undefined}
+                      onValueChange={(value) => setFormData({ ...formData, linkedAnnotationId: value })}
+                    >
+                      <SelectTrigger className={`bg-gray-900/50 ${!formData.linkedAnnotationId ? 'border-amber-500/50' : 'border-green-500/50'}`}>
+                        <SelectValue placeholder="Standort auswählen..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mapAnnotations
+                          .filter(a => !a.familyContactId) // Nur unverknüpfte POIs (nach ID filtern)
+                          .map((annotation) => (
+                            <SelectItem key={annotation.id} value={annotation.id}>
+                              📍 {annotation.label || `Unbenannter Standort`}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    {mapAnnotations.filter(a => !a.familyContactId).length === 0 && (
+                      <p className="text-xs text-red-400 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        Keine unverknüpften Standorte auf dieser Karte verfügbar.
+                      </p>
+                    )}
+                    {formData.linkedAnnotationId && (
+                      <p className="text-xs text-green-400 flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Vorschlag wird mit bestehendem POI verknüpft
+                      </p>
+                    )}
+                    {!formData.linkedAnnotationId && mapAnnotations.filter(a => !a.familyContactId).length > 0 && (
+                      <p className="text-xs text-amber-400 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        Bitte wähle einen Standort aus
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -468,8 +554,8 @@ export default function PartnerListenfuehrungPage() {
 
               <Button
                 type="submit"
-                disabled={submitMutation.isPending}
-                className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400"
+                disabled={submitMutation.isPending || !formData.familyName.trim() || !formData.mapName || !formData.linkedAnnotationId}
+                className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitMutation.isPending ? (
                   <>

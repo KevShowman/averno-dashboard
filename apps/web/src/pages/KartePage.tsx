@@ -611,7 +611,7 @@ export default function KartePage() {
 
   // Suggestion Mutations
   const createSuggestionMutation = useMutation({
-    mutationFn: (data: { mapName: MapName; x: number; y: number; icon: string; label?: string; familyContactId?: string }) =>
+    mutationFn: (data: { mapName: MapName; x: number; y: number; icon: string; label?: string; familyContactId?: string; isKeyFamily?: boolean; isOutdated?: boolean }) =>
       api.post('/map-annotations/suggestions', data),
     onSuccess: () => {
       setIsCreateDialogOpen(false)
@@ -753,7 +753,7 @@ export default function KartePage() {
       mapName: activeMap,
       x: newMarkerPosition.x,
       y: newMarkerPosition.y,
-      icon: formData.icon,
+      icon: isPartner ? 'users' : formData.icon, // Partner können nur "Gruppe" Icon verwenden
       label: formData.label || undefined,
       familyContactId: formData.familyContactId || undefined,
       isKeyFamily: formData.isKeyFamily,
@@ -1709,28 +1709,38 @@ export default function KartePage() {
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* Icon Selection */}
+            {/* Icon Selection - Partner können nur "Gruppe" wählen */}
             <div>
               <Label className="text-gray-300">Icon</Label>
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {ICON_OPTIONS.map(option => {
-                  const Icon = option.icon
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => setFormData({ ...formData, icon: option.value })}
-                      className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
-                        formData.icon === option.value
-                          ? 'border-amber-500 bg-amber-500/20 text-amber-400'
-                          : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-500'
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" />
-                      <span className="text-xs">{option.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
+              {isPartner ? (
+                <div className="mt-2 p-3 bg-gray-700/50 rounded-lg border border-amber-500/30">
+                  <div className="flex items-center gap-2 text-amber-400">
+                    <Users className="h-5 w-5" />
+                    <span className="text-sm font-medium">Gruppe</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Partner können nur das Gruppe-Icon verwenden</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {ICON_OPTIONS.map(option => {
+                    const Icon = option.icon
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => setFormData({ ...formData, icon: option.value })}
+                        className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
+                          formData.icon === option.value
+                            ? 'border-amber-500 bg-amber-500/20 text-amber-400'
+                            : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-500'
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span className="text-xs">{option.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
             
             {/* Label */}

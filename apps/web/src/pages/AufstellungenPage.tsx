@@ -29,6 +29,7 @@ import {
   Sparkles,
   Target,
   Eye,
+  Bell,
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
 import CreateExclusionModal from '../components/CreateExclusionModal'
@@ -151,6 +152,17 @@ export default function AufstellungenPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Sanktionieren')
+    },
+  })
+
+  // Mutation: Reminder senden
+  const reminderMutation = useMutation({
+    mutationFn: aufstellungApi.sendReminder,
+    onSuccess: (data) => {
+      toast.success(data.data.message)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Fehler beim Senden des Reminders')
     },
   })
 
@@ -990,6 +1002,22 @@ export default function AufstellungenPage() {
                         <Shield className="h-5 w-5 text-amber-400" />
                         Admin-Aktionen
                       </h3>
+                      
+                      {/* Reminder Button - nur wenn User ohne Antwort existieren */}
+                      {aufstellungDetails.stats &&
+                        aufstellungDetails.stats.noResponse > 0 && (
+                          <Button
+                            className="w-full h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-lg shadow-amber-500/25 text-white"
+                            onClick={() => reminderMutation.mutate(selectedAufstellung)}
+                            disabled={reminderMutation.isPending}
+                          >
+                            <Bell className="mr-2 h-5 w-5" />
+                            {reminderMutation.isPending 
+                              ? 'Sende Reminder...' 
+                              : `${aufstellungDetails.stats.noResponse} User erinnern`}
+                          </Button>
+                        )}
+
                       {isDeadlinePassed(aufstellungDetails.deadline) &&
                         aufstellungDetails.stats &&
                         aufstellungDetails.stats.noResponse > 0 && (

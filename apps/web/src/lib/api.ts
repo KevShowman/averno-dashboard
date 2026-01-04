@@ -154,6 +154,7 @@ export const aufstellungApi = {
   respond: (id: string, status: 'COMING' | 'NOT_COMING' | 'UNSURE') =>
     api.post(`/aufstellung/${id}/respond`, { status }),
   sanctionNonResponders: (id: string) => api.post(`/aufstellung/${id}/sanction-non-responders`),
+  sendReminder: (id: string) => api.post(`/aufstellung/${id}/send-reminder`),
   delete: (id: string) => api.delete(`/aufstellung/${id}`),
   
   // Exclusions

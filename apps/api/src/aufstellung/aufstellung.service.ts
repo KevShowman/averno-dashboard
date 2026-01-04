@@ -3,6 +3,10 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { AufstellungResponseStatus, Role } from '@prisma/client';
 import { SanctionsService } from '../sanctions/sanctions.service';
 import { AbmeldungService } from '../abmeldung/abmeldung.service';
+import { DiscordService } from '../discord/discord.service';
+
+// Discord Kanal ID für Aufstellungs-Reminder
+const AUFSTELLUNG_REMINDER_CHANNEL_ID = '1431388063195594981';
 
 @Injectable()
 export class AufstellungService {
@@ -11,6 +15,7 @@ export class AufstellungService {
     private sanctionsService: SanctionsService,
     @Inject(forwardRef(() => AbmeldungService))
     private abmeldungService: AbmeldungService,
+    private discordService: DiscordService,
   ) {}
 
   // Erstelle neue Aufstellung
@@ -603,6 +608,169 @@ export class AufstellungService {
     });
 
     return { message: 'Exclusion wurde gelöscht' };
+  }
+
+  // Reminder an Discord-Kanal senden
+  async sendReminder(aufstellungId: string) {
+    const aufstellung = await this.prisma.aufstellung.findUnique({
+      where: { id: aufstellungId },
+      include: {
+        responses: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                isTaxi: true,
+                isPartner: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!aufstellung) {
+      throw new NotFoundException('Aufstellung nicht gefunden');
+    }
+
+    // Alle User abrufen (keine Partner/Taxi - nur interne Mitglieder)
+    const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
+      select: {
+        id: true,
+        username: true,
+        icFirstName: true,
+        icLastName: true,
+        discordId: true,
+      },
+    });
+
+    // Filtere Responses: Nur interne User (keine Taxi/Partner)
+    const internalUserIds = new Set(allUsers.map(u => u.id));
+    const filteredResponses = aufstellung.responses.filter(r => internalUserIds.has(r.userId));
+    const respondedUserIds = new Set(filteredResponses.map(r => r.userId));
+    let usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
+
+    // Ausgeschlossene User filtern (die aktive Exclusions haben)
+    const exclusions = await this.prisma.aufstellungExclusion.findMany({
+      where: {
+        isActive: true,
+        startDate: { lte: aufstellung.date },
+        OR: [
+          { endDate: null },
+          { endDate: { gte: aufstellung.date } },
+        ],
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const excludedUserIds = new Set(exclusions.map(e => e.userId));
+    usersWithoutResponse = usersWithoutResponse.filter(user => !excludedUserIds.has(user.id));
+
+    if (usersWithoutResponse.length === 0) {
+      return {
+        message: 'Alle Mitglieder haben bereits reagiert, kein Reminder nötig.',
+        mentionedCount: 0,
+      };
+    }
+
+    // Discord-IDs sammeln für Mentions
+    const discordMentions = usersWithoutResponse
+      .filter(u => u.discordId)
+      .map(u => `<@${u.discordId}>`)
+      .join(' ');
+
+    // Datum formatieren
+    const dateStr = aufstellung.date.toLocaleDateString('de-DE', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+
+    const timeStr = aufstellung.date.toLocaleTimeString('de-DE', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Berlin',
+    });
+
+    // Kartell-Stil Reminder Messages
+    const reminderTitles = [
+      '🔫 La Familia ruft!',
+      '⚠️ Mensaje de los Jefes',
+      '🌵 Es gibt Arbeit, Hermanos!',
+      '💀 Los Muertos warten nicht...',
+      '🔥 El Cartel braucht Antworten!',
+    ];
+
+    const reminderMessages = [
+      'La Familia hat euch gerufen und erwartet eine Antwort. Wer schweigt, zeigt Respektlosigkeit.',
+      'Die Bosse haben gesprochen - jetzt seid ihr dran. Keine Antwort ist keine Option, compañeros.',
+      'In diesem Geschäft zählt Loyalität. Zeigt sie, indem ihr antwortet.',
+      'El Cartel verlangt eure Präsenz. Meldet euch - oder erklärt euch vor den Jefes.',
+      'Die Familia vergisst nicht. Reagiert, bevor es die Bosse für euch tun müssen.',
+    ];
+
+    const randomIndex = Math.floor(Math.random() * reminderTitles.length);
+
+    // Embed-Nachricht erstellen im Kartell-Stil
+    const embed = {
+      title: reminderTitles[randomIndex],
+      description: reminderMessages[randomIndex],
+      color: 0xDC2626, // Rot/Blut-Farbe
+      fields: [
+        {
+          name: '📅 Aufstellung',
+          value: aufstellung.reason,
+          inline: false,
+        },
+        {
+          name: '🗓️ Datum & Zeit',
+          value: `${dateStr} um ${timeStr} Uhr`,
+          inline: true,
+        },
+        {
+          name: '👥 Ausstehend',
+          value: `${usersWithoutResponse.length} Mitglieder`,
+          inline: true,
+        },
+      ],
+      footer: {
+        text: '🌵 La Santa Cartel - Sistema de Aufstellungen',
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      // Erst das Embed senden
+      await this.discordService.sendChannelEmbed(AUFSTELLUNG_REMINDER_CHANNEL_ID, embed);
+
+      // Dann die Mentions separat (damit sie gepingt werden)
+      if (discordMentions) {
+        await this.discordService.sendChannelMessage(
+          AUFSTELLUNG_REMINDER_CHANNEL_ID,
+          `🚨 **ACHTUNG PENDIENTE:** ${discordMentions}\n\n*Reagiert jetzt auf die Aufstellung - los Jefes beobachten!*`
+        );
+      }
+
+      return {
+        message: `Reminder gesendet! ${usersWithoutResponse.length} Mitglieder wurden erwähnt.`,
+        mentionedCount: usersWithoutResponse.length,
+        mentionedUsers: usersWithoutResponse.map(u => ({
+          name: u.icFirstName && u.icLastName 
+            ? `${u.icFirstName} ${u.icLastName}` 
+            : u.username,
+        })),
+      };
+    } catch (error) {
+      console.error('Fehler beim Senden des Reminders:', error);
+      throw new BadRequestException('Fehler beim Senden des Discord-Reminders');
+    }
   }
 }
 

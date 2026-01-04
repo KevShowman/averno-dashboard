@@ -1369,6 +1369,76 @@ export class DiscordService {
     }
   }
 
+  // Partner-Vorschlag Benachrichtigung (für neue Familien-Vorschläge von Partnern)
+  async sendPartnerSuggestionNotification(
+    partnerUsername: string,
+    suggestionType: 'CREATE' | 'UPDATE' | 'DELETE',
+    familyName: string,
+    hasMapData: boolean,
+    isKeyFamily: boolean,
+    isOutdated: boolean,
+  ): Promise<void> {
+    try {
+      const webhookUrl = this.configService.get<string>('DISCORD_PARTNER_WEBHOOK_URL');
+      
+      if (!webhookUrl) {
+        console.warn('DISCORD_PARTNER_WEBHOOK_URL nicht konfiguriert - keine Benachrichtigung gesendet');
+        return;
+      }
+
+      const typeLabels: Record<string, { emoji: string; label: string; color: number }> = {
+        CREATE: { emoji: '📝', label: 'Neuer Familien-Eintrag', color: 0x22C55E }, // Grün
+        UPDATE: { emoji: '✏️', label: 'Familien-Aktualisierung', color: 0x3B82F6 }, // Blau
+        DELETE: { emoji: '🗑️', label: 'Familien-Löschung', color: 0xEF4444 }, // Rot
+      };
+
+      const typeConfig = typeLabels[suggestionType] || typeLabels.CREATE;
+
+      const flags: string[] = [];
+      if (isKeyFamily) flags.push('🔑 Schlüsselfamilie');
+      if (isOutdated) flags.push('⚠️ Veraltet');
+      if (hasMapData) flags.push('📍 Mit Karten-Standort');
+
+      const embed = {
+        title: `${typeConfig.emoji} Partner-Vorschlag: ${typeConfig.label}`,
+        color: typeConfig.color,
+        fields: [
+          {
+            name: 'Partner',
+            value: partnerUsername,
+            inline: true,
+          },
+          {
+            name: 'Familie',
+            value: familyName,
+            inline: true,
+          },
+          ...(flags.length > 0 ? [{
+            name: 'Flags',
+            value: flags.join(' | '),
+            inline: false,
+          }] : []),
+        ],
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: 'LSC Partner-System • Vorschlag wartet auf Prüfung',
+        },
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [embed],
+        }),
+      });
+
+      console.log(`✅ Partner-Vorschlag Benachrichtigung gesendet: ${suggestionType} für ${familyName}`);
+    } catch (error) {
+      console.error('Fehler beim Senden der Partner-Vorschlag Benachrichtigung:', error);
+    }
+  }
+
   // ============ TAXI-SYSTEM WEBHOOKS ============
 
   // Neuer Taxi-Key erstellt

@@ -167,6 +167,13 @@ export class AufstellungController {
     return this.aufstellungService.sanctionNonResponders(id);
   }
 
+  // Reminder an nicht-reagierende User senden (Leaderschaft)
+  @Post(':id/send-reminder')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async sendReminder(@Param('id') id: string) {
+    return this.aufstellungService.sendReminder(id);
+  }
+
   // Aufstellung löschen (Leaderschaft)
   @Delete(':id')
   @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)

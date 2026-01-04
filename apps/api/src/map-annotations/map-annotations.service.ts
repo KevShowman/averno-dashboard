@@ -756,6 +756,8 @@ export class MapAnnotationsService {
       icon?: string;
       label?: string;
       familyContactId?: string;
+      isKeyFamily?: boolean;
+      isOutdated?: boolean;
     },
   ) {
     // Validiere Koordinaten (0-1)
@@ -781,6 +783,8 @@ export class MapAnnotationsService {
         icon: data.icon || 'home',
         label: data.label,
         familyContactId: data.familyContactId,
+        isKeyFamily: data.isKeyFamily ?? false,
+        isOutdated: data.isOutdated ?? false,
         createdById: user.id,
       },
       include: {
@@ -845,6 +849,8 @@ export class MapAnnotationsService {
         icon: suggestion.icon,
         label: suggestion.label,
         familyContactId: suggestion.familyContactId,
+        isKeyFamily: suggestion.isKeyFamily,
+        isOutdated: suggestion.isOutdated,
         createdById: user.id, // Der genehmigende User wird als Ersteller eingetragen
       },
     });

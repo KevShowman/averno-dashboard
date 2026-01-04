@@ -974,6 +974,9 @@ model MapSuggestion {
   label           String? // Optionaler Kurztext
   familyContactId String? // Optional: Verknüpfung mit Familie
   familyContact   FamilyContact?   @relation("map_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  // Flags für POI
+  isKeyFamily     Boolean          @default(false) // Schlüsselfamilie-Badge
+  isOutdated      Boolean          @default(false) // Veraltet-Badge
   status          SuggestionStatus @default(PENDING)
   createdById     String // Wer hat den Vorschlag erstellt
   createdBy       User             @relation("map_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
@@ -1051,11 +1054,16 @@ model PartnerFamilySuggestion {
   contact2LastName  String? // Kontakt 2 Nachname
   contact2Phone     String? // Kontakt 2 Telefon
   notes            String?               @db.Text // Notizen
-  // Map-Koordinaten (optional)
+  // Schlüsselfamilie & Veraltet-Flags
+  isKeyFamily      Boolean               @default(false) // Vorgeschlagen als Schlüsselfamilie
+  isOutdated       Boolean               @default(false) // Vorgeschlagen als veraltet
+  // Map-Koordinaten (optional - für neue POIs)
   mapName          MapName? // Karte
   mapX             Float? // X-Koordinate
   mapY             Float? // Y-Koordinate
   mapIcon          String? // Icon
+  // Verknüpfung mit bestehendem POI (optional - statt neuen POI zu erstellen)
+  linkedMapAnnotationId String? // Falls gesetzt: Diesen POI mit der neuen Familie verknüpfen
   // Review-Status
   suggestionStatus SuggestionStatus      @default(PENDING)
   createdById      String // Partner der den Vorschlag erstellt hat

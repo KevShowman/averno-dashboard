@@ -570,10 +570,13 @@ export class PartnerService {
     contact2LastName?: string;
     contact2Phone?: string;
     notes?: string;
+    isKeyFamily?: boolean;
+    isOutdated?: boolean;
     mapName?: string;
     mapX?: number;
     mapY?: number;
     mapIcon?: string;
+    linkedMapAnnotationId?: string; // POI an den die neue Familie gebunden werden soll
   }) {
     if (!user.isPartner) {
       throw new ForbiddenException('Nur Partner können Vorschläge erstellen');
@@ -594,6 +597,16 @@ export class PartnerService {
       }
     }
 
+    // Prüfe ob POI existiert (bei linkedMapAnnotationId)
+    if (data.linkedMapAnnotationId) {
+      const poi = await this.prisma.mapAnnotation.findUnique({
+        where: { id: data.linkedMapAnnotationId },
+      });
+      if (!poi) {
+        throw new NotFoundException('POI nicht gefunden');
+      }
+    }
+
     const suggestion = await this.prisma.partnerFamilySuggestion.create({
       data: {
         type: data.type,
@@ -608,10 +621,13 @@ export class PartnerService {
         contact2LastName: data.contact2LastName,
         contact2Phone: data.contact2Phone,
         notes: data.notes,
+        isKeyFamily: data.isKeyFamily ?? false,
+        isOutdated: data.isOutdated ?? false,
         mapName: data.mapName as any,
         mapX: data.mapX,
         mapY: data.mapY,
         mapIcon: data.mapIcon,
+        linkedMapAnnotationId: data.linkedMapAnnotationId,
         createdById: user.id,
       },
       // Don't include contact details in response - partner should not see them again
@@ -640,6 +656,21 @@ export class PartnerService {
         hasContactData: !!(data.contact1FirstName || data.contact1Phone || data.contact2FirstName || data.contact2Phone),
       },
     });
+
+    // Discord Webhook Benachrichtigung
+    try {
+      await this.discordService.sendPartnerSuggestionNotification(
+        user.username,
+        data.type,
+        data.familyName,
+        !!(data.mapName || data.linkedMapAnnotationId),
+        data.isKeyFamily ?? false,
+        data.isOutdated ?? false,
+      );
+    } catch (error) {
+      console.error('Fehler beim Senden der Partner-Vorschlag Benachrichtigung:', error);
+      // Fehler nicht werfen - Vorschlag wurde trotzdem erstellt
+    }
 
     return suggestion;
   }
@@ -796,13 +827,33 @@ export class PartnerService {
           familyName: suggestion.familyName,
           status: suggestion.familyStatus || 'UNKNOWN',
           propertyZip: suggestion.propertyZip,
+          contact1FirstName: suggestion.contact1FirstName,
+          contact1LastName: suggestion.contact1LastName,
+          contact1Phone: suggestion.contact1Phone,
+          contact2FirstName: suggestion.contact2FirstName,
+          contact2LastName: suggestion.contact2LastName,
+          contact2Phone: suggestion.contact2Phone,
           notes: suggestion.notes,
+          isKeyFamily: suggestion.isKeyFamily,
+          isOutdated: suggestion.isOutdated,
           createdById: user.id,
         },
       });
 
-      // Wenn Map-Daten vorhanden, MapAnnotation erstellen
-      if (suggestion.mapName && suggestion.mapX !== null && suggestion.mapY !== null) {
+      // Option A: Bestehenden POI mit neuer Familie verknüpfen
+      if (suggestion.linkedMapAnnotationId) {
+        await this.prisma.mapAnnotation.update({
+          where: { id: suggestion.linkedMapAnnotationId },
+          data: {
+            familyContactId: newFamily.id,
+            label: suggestion.familyName, // Label aktualisieren
+            isKeyFamily: suggestion.isKeyFamily, // Flags auch auf POI setzen
+            isOutdated: suggestion.isOutdated,
+          },
+        });
+      }
+      // Option B: Neuen POI erstellen wenn Map-Daten vorhanden
+      else if (suggestion.mapName && suggestion.mapX !== null && suggestion.mapY !== null) {
         await this.prisma.mapAnnotation.create({
           data: {
             mapName: suggestion.mapName,
@@ -811,6 +862,8 @@ export class PartnerService {
             icon: suggestion.mapIcon || 'home',
             label: suggestion.familyName,
             familyContactId: newFamily.id,
+            isKeyFamily: suggestion.isKeyFamily, // Flags auf neuem POI setzen
+            isOutdated: suggestion.isOutdated,
             createdById: user.id,
           },
         });
@@ -839,7 +892,17 @@ export class PartnerService {
           familyName: suggestion.familyName,
           status: suggestion.familyStatus || undefined,
           propertyZip: suggestion.propertyZip || undefined,
+          // Kontaktdaten nur aktualisieren wenn vorhanden
+          ...(suggestion.contact1FirstName && { contact1FirstName: suggestion.contact1FirstName }),
+          ...(suggestion.contact1LastName && { contact1LastName: suggestion.contact1LastName }),
+          ...(suggestion.contact1Phone && { contact1Phone: suggestion.contact1Phone }),
+          ...(suggestion.contact2FirstName && { contact2FirstName: suggestion.contact2FirstName }),
+          ...(suggestion.contact2LastName && { contact2LastName: suggestion.contact2LastName }),
+          ...(suggestion.contact2Phone && { contact2Phone: suggestion.contact2Phone }),
           notes: updatedNotes,
+          // Flags immer aktualisieren
+          isKeyFamily: suggestion.isKeyFamily,
+          isOutdated: suggestion.isOutdated,
         },
       });
 
@@ -857,6 +920,8 @@ export class PartnerService {
               x: suggestion.mapX,
               y: suggestion.mapY,
               icon: suggestion.mapIcon || existingAnnotation.icon,
+              isKeyFamily: suggestion.isKeyFamily,
+              isOutdated: suggestion.isOutdated,
             },
           });
         } else {
@@ -868,6 +933,8 @@ export class PartnerService {
               icon: suggestion.mapIcon || 'home',
               label: suggestion.familyName,
               familyContactId: suggestion.familyContactId,
+              isKeyFamily: suggestion.isKeyFamily,
+              isOutdated: suggestion.isOutdated,
               createdById: user.id,
             },
           });
@@ -1084,6 +1151,7 @@ export class PartnerService {
         y: true,
         icon: true,
         label: true,
+        familyContactId: true, // Wichtig für Filter nach unverknüpften POIs
         familyContact: {
           select: {
             id: true,

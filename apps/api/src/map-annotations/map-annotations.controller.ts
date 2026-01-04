@@ -130,6 +130,8 @@ export class MapAnnotationsController {
       icon?: string;
       label?: string;
       familyContactId?: string;
+      isKeyFamily?: boolean;
+      isOutdated?: boolean;
     },
   ) {
     return this.mapAnnotationsService.createSuggestion(user, data);
