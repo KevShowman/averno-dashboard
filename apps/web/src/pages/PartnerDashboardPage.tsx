@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Map, List, Users, Shield } from 'lucide-react'
+import { Map, List, Users, Shield, Star } from 'lucide-react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useAuthStore } from '../stores/auth'
 
@@ -20,21 +20,20 @@ export default function PartnerDashboardPage() {
               Willkommen, {user?.username}!
             </h1>
             <p className="text-gray-400 mt-1">
-              Partner-Bereich mit eingeschränktem Zugang
+              Partner-Bereich mit vollem Zugang
             </p>
           </div>
         </div>
       </div>
 
       {/* Info Banner */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <Users className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+          <Star className="h-5 w-5 text-emerald-400 mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-gray-300 text-sm">
-              Als Partner hast du Zugang zur interaktiven Karte und zur Listenführung. 
-              Du kannst Familien-Standorte einsehen und Änderungsvorschläge einreichen, 
-              die von der Leadership geprüft werden.
+              Als Partner hast du vollen Zugang zur interaktiven Karte und zur Listenführung. 
+              Du kannst Standorte direkt erstellen, bearbeiten und Familien-Kontakte verwalten.
             </p>
           </div>
         </div>
@@ -56,8 +55,8 @@ export default function PartnerDashboardPage() {
                 Interaktive Karte
               </h2>
               <p className="text-gray-400 text-sm mt-2">
-                Sieh dir die Standorte aller bekannten Familien auf der Karte an. 
-                Du kannst neue Standorte vorschlagen oder bestehende aktualisieren.
+                Verwalte alle Familien-Standorte auf der Karte. 
+                Erstelle neue Markierungen und bearbeite bestehende Einträge.
               </p>
               <div className="mt-4 flex items-center gap-2 text-amber-400 text-sm font-medium">
                 <span>Zur Karte</span>
@@ -82,7 +81,7 @@ export default function PartnerDashboardPage() {
               </h2>
               <p className="text-gray-400 text-sm mt-2">
                 Verwalte Familien-Kontakte und deren Informationen. 
-                Schlage neue Einträge vor oder aktualisiere bestehende Daten.
+                Erstelle neue Einträge und aktualisiere bestehende Daten.
               </p>
               <div className="mt-4 flex items-center gap-2 text-amber-400 text-sm font-medium">
                 <span>Zur Listenführung</span>
@@ -95,19 +94,23 @@ export default function PartnerDashboardPage() {
 
       {/* Guidelines */}
       <div className="bg-gray-800/30 rounded-2xl border border-gray-700/50 p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Richtlinien für Partner</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Hinweise für Partner</h3>
         <ul className="space-y-3 text-gray-400 text-sm">
           <li className="flex items-start gap-2">
-            <span className="text-amber-400 mt-1">•</span>
-            <span>Alle deine Änderungen müssen von der Leadership genehmigt werden</span>
+            <span className="text-emerald-400 mt-1">✓</span>
+            <span>Du hast vollen Zugang zur Karte und Listenführung</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-400 mt-1">✓</span>
+            <span>Erstelle und bearbeite Standorte direkt auf der Karte</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-400 mt-1">✓</span>
+            <span>Verwalte Familien-Kontakte in der Listenführung</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-amber-400 mt-1">•</span>
-            <span>Du kannst keine Einträge direkt löschen - nur Löschvorschläge einreichen</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-amber-400 mt-1">•</span>
-            <span>Stammdaten und interne Informationen sind nicht sichtbar</span>
+            <span>Kontaktdaten (Telefon, Namen) sind aus Datenschutzgründen nicht sichtbar</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-amber-400 mt-1">•</span>
@@ -118,4 +121,3 @@ export default function PartnerDashboardPage() {
     </div>
   )
 }
-

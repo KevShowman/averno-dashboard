@@ -10,8 +10,11 @@ export class MapAnnotationsService {
     private auditService: AuditService,
   ) {}
 
-  // Prüft ob User Annotationen verwalten darf (Leadership, Contacto, Intelligencia oder MapPermission)
+  // Prüft ob User Annotationen verwalten darf (Leadership, Contacto, Intelligencia, Partner oder MapPermission)
   private async canManageAnnotations(user: any): Promise<boolean> {
+    // Partner haben jetzt vollen Zugriff auf die Karte
+    if (user.isPartner) return true;
+
     const allowedRoles = [
       'EL_PATRON',
       'DON_CAPITAN',

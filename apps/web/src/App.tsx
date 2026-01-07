@@ -42,19 +42,13 @@ import PartnerRequestedPage from './pages/PartnerRequestedPage'
 import PartnerRequestPage from './pages/PartnerRequestPage'
 import PartnerManagementPage from './pages/PartnerManagementPage'
 import PartnerDashboardPage from './pages/PartnerDashboardPage'
-import PartnerListenfuehrungPage from './pages/PartnerListenfuehrungPage'
 import TafelrundePage from './pages/TafelrundePage'
 import TaxiKeyPage from './pages/TaxiKeyPage'
 import TaxiDashboardPage from './pages/TaxiDashboardPage'
 
-// Wrapper to show different Listenführung based on user type
+// Wrapper to show Listenführung - Partner haben jetzt vollen Zugang
 function ListenfuehrungWrapper() {
-  const { user } = useAuthStore()
-  
-  if (user?.isPartner) {
-    return <PartnerListenfuehrungPage />
-  }
-  
+  // Partner haben jetzt vollen Zugang zur normalen Listenführung
   return <ListenfuehrungPage />
 }
 

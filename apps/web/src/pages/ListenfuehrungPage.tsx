@@ -142,6 +142,8 @@ export default function ListenfuehrungPage() {
 
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
   const hasContactRole = hasRole(user, ['CONTACTO'])
+  const isPartner = user?.isPartner === true
+  const partnerCanViewContacts = (user as any)?.partnerCanViewContacts === true
 
   // Fetch list permissions
   const { data: listPermissions = [], isLoading: permissionsLoading } = useQuery<ListPermission[]>({
@@ -153,11 +155,11 @@ export default function ListenfuehrungPage() {
   // Check if user has a list permission
   const hasListPermission = listPermissions.some(p => p.userId === user?.id)
   
-  // User can manage if they are Leadership, Contacto, or have a ListPermission
-  const canManage = isLeadership || hasContactRole || hasListPermission
+  // User can manage if they are Leadership, Contacto, Partner, or have a ListPermission
+  const canManage = isLeadership || hasContactRole || hasListPermission || isPartner
   
-  // Only Leadership and Contacto can see full contact details
-  const canViewDetails = isLeadership || hasContactRole || hasListPermission
+  // Only Leadership, Contacto, ListPermission holders, or Partners with explicit permission can see full contact details
+  const canViewDetails = isLeadership || hasContactRole || hasListPermission || (isPartner && partnerCanViewContacts)
 
   // Fetch all users for permission dropdown
   const { data: allUsers = [] } = useQuery({
@@ -888,96 +890,108 @@ export default function ListenfuehrungPage() {
               <p className="text-xs text-gray-500">Maximal 6-stellige Nummer</p>
             </div>
 
-            {/* Ansprechpartner 1 */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
-                <User className="h-4 w-4" />
-                Ansprechpartner 1
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <Label className="text-gray-400 text-xs">Vorname</Label>
-                  <Input
-                    placeholder="Vorname"
-                    value={formData.contact1FirstName}
-                    onChange={(e) => setFormData({ ...formData, contact1FirstName: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-                  />
+            {/* Kontaktdetails nur für Berechtigte */}
+            {canViewDetails ? (
+              <>
+                {/* Ansprechpartner 1 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                    <User className="h-4 w-4" />
+                    Ansprechpartner 1
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label className="text-gray-400 text-xs">Vorname</Label>
+                      <Input
+                        placeholder="Vorname"
+                        value={formData.contact1FirstName}
+                        onChange={(e) => setFormData({ ...formData, contact1FirstName: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-gray-400 text-xs">Nachname</Label>
+                      <Input
+                        placeholder="Nachname"
+                        value={formData.contact1LastName}
+                        onChange={(e) => setFormData({ ...formData, contact1LastName: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-gray-400 text-xs">IC Rufnummer</Label>
+                      <Input
+                        placeholder="123-4567"
+                        value={formData.contact1Phone}
+                        onChange={(e) => setFormData({ ...formData, contact1Phone: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-400 text-xs">Nachname</Label>
-                  <Input
-                    placeholder="Nachname"
-                    value={formData.contact1LastName}
-                    onChange={(e) => setFormData({ ...formData, contact1LastName: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-400 text-xs">IC Rufnummer</Label>
-                  <Input
-                    placeholder="123-4567"
-                    value={formData.contact1Phone}
-                    onChange={(e) => setFormData({ ...formData, contact1Phone: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-                  />
-                </div>
-              </div>
-            </div>
 
-            {/* Ansprechpartner 2 */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
-                <User className="h-4 w-4" />
-                Ansprechpartner 2
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <Label className="text-gray-400 text-xs">Vorname</Label>
-                  <Input
-                    placeholder="Vorname"
-                    value={formData.contact2FirstName}
-                    onChange={(e) => setFormData({ ...formData, contact2FirstName: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-                  />
+                {/* Ansprechpartner 2 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                    <User className="h-4 w-4" />
+                    Ansprechpartner 2
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label className="text-gray-400 text-xs">Vorname</Label>
+                      <Input
+                        placeholder="Vorname"
+                        value={formData.contact2FirstName}
+                        onChange={(e) => setFormData({ ...formData, contact2FirstName: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-gray-400 text-xs">Nachname</Label>
+                      <Input
+                        placeholder="Nachname"
+                        value={formData.contact2LastName}
+                        onChange={(e) => setFormData({ ...formData, contact2LastName: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-gray-400 text-xs">IC Rufnummer</Label>
+                      <Input
+                        placeholder="123-4567"
+                        value={formData.contact2Phone}
+                        onChange={(e) => setFormData({ ...formData, contact2Phone: e.target.value })}
+                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-400 text-xs">Nachname</Label>
-                  <Input
-                    placeholder="Nachname"
-                    value={formData.contact2LastName}
-                    onChange={(e) => setFormData({ ...formData, contact2LastName: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-400 text-xs">IC Rufnummer</Label>
-                  <Input
-                    placeholder="123-4567"
-                    value={formData.contact2Phone}
-                    onChange={(e) => setFormData({ ...formData, contact2Phone: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-                  />
-                </div>
-              </div>
-            </div>
 
-            {/* Führung/Patron */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Crown className="h-4 w-4 text-amber-400" />
-                <Label className="text-gray-300">Kontaktdaten Patron / Führung</Label>
+                {/* Führung/Patron */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Crown className="h-4 w-4 text-amber-400" />
+                    <Label className="text-gray-300">Kontaktdaten Patron / Führung</Label>
+                  </div>
+                  <Input
+                    placeholder="Name oder Telefonnummer der Führung"
+                    value={formData.leadershipInfo}
+                    onChange={(e) => setFormData({ ...formData, leadershipInfo: e.target.value })}
+                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Kann Vorname, Nachname oder Telefonnummer sein
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+                <p className="text-sm text-gray-500 flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Kontaktdaten sind nur für berechtigte Benutzer sichtbar
+                </p>
               </div>
-              <Input
-                placeholder="Name oder Telefonnummer der Führung"
-                value={formData.leadershipInfo}
-                onChange={(e) => setFormData({ ...formData, leadershipInfo: e.target.value })}
-                className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
-              />
-              <p className="text-xs text-gray-500">
-                Kann Vorname, Nachname oder Telefonnummer sein
-              </p>
-            </div>
+            )}
 
             {/* Notizen */}
             <div className="space-y-2">

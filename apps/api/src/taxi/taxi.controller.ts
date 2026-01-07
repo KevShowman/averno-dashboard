@@ -158,6 +158,29 @@ export class TaxiController {
     return this.taxiService.updateAssignmentStatus(user, id, body.status);
   }
 
+  @Patch('assignments/:id')
+  @UseGuards(JwtAuthGuard)
+  async updateAssignment(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+    @Body() body: {
+      driverId?: string | null;
+      pickupNotes?: string;
+      pickupTime?: string;
+    },
+  ) {
+    return this.taxiService.updateAssignment(user, id, body);
+  }
+
+  @Delete('assignments/:id')
+  @UseGuards(JwtAuthGuard)
+  async removeAssignment(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+  ) {
+    return this.taxiService.removeAssignment(user, id);
+  }
+
   @Get('my-assignments')
   @UseGuards(JwtAuthGuard)
   async getMyAssignments(

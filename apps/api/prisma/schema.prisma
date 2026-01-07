@@ -69,6 +69,7 @@ model User {
   mapSuggestionsReviewed           MapSuggestion[]                @relation("map_suggestion_reviewed_by")
   // Partner System
   isPartner                        Boolean                        @default(false) // Kennzeichnet Partner-User
+  partnerCanViewContacts           Boolean                        @default(false) // Partner kann Kontaktdetails sehen
   partnerRequestsReviewed          PartnerAccessRequest[]         @relation("partner_request_reviewed_by")
   partnerPermissionsGranted        PartnerManagementPermission[]  @relation("partner_permission_granted_by")
   partnerPermissionsReceived       PartnerManagementPermission[]  @relation("partner_permission_user")

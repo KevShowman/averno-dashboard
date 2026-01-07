@@ -335,6 +335,7 @@ export class AuthController {
       isPartner: (user as any).isPartner,
       isTaxi: (user as any).isTaxi,
       isTaxiLead: (user as any).isTaxiLead,
+      partnerCanViewContacts: (user as any).partnerCanViewContacts,
       createdAt: user.createdAt,
     };
   }

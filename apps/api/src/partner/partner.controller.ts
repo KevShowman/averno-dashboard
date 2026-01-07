@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { PartnerService } from './partner.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -91,6 +91,16 @@ export class PartnerController {
     @Param('id') id: string,
   ) {
     return this.partnerService.revokePartnerAccess(user, id);
+  }
+
+  @Patch('active/:id/contacts-permission')
+  @UseGuards(JwtAuthGuard)
+  async toggleContactsPermission(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+    @Body() body: { canView: boolean },
+  ) {
+    return this.partnerService.togglePartnerContactsPermission(user, id, body.canView);
   }
 
   // ============ MANAGEMENT PERMISSIONS ============

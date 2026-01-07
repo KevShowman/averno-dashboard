@@ -207,9 +207,11 @@ export default function TaxiDashboardPage() {
   const [activeTab, setActiveTab] = useState<'assignments' | 'tafelrunden' | 'keys'>(defaultTab)
   const [selectedTafelrunde, setSelectedTafelrunde] = useState<string | null>(null)
   const [selectedMapName, setSelectedMapName] = useState<keyof typeof MAP_CONFIG>('NARCO_CITY')
+  const [driverSelectedMap, setDriverSelectedMap] = useState<keyof typeof MAP_CONFIG | null>(null)
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false)
   const [isKeyDialogOpen, setIsKeyDialogOpen] = useState(false)
   const [selectedFamily, setSelectedFamily] = useState<any>(null)
+  const [editingAssignment, setEditingAssignment] = useState<TaxiAssignment | null>(null)
   const [assignmentData, setAssignmentData] = useState({
     driverId: '',
     pickupNotes: '',
@@ -311,6 +313,32 @@ export default function TaxiDashboardPage() {
       toast.success('Key widerrufen')
     },
     onError: () => toast.error('Fehler beim Widerrufen'),
+  })
+
+  // Zuweisung entfernen (Leitung)
+  const removeAssignmentMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/taxi/assignments/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['taxi-tafelrunde'] })
+      queryClient.invalidateQueries({ queryKey: ['taxi-tafelrunden'] })
+      toast.success('Zuweisung entfernt')
+    },
+    onError: () => toast.error('Fehler beim Entfernen'),
+  })
+
+  // Zuweisung bearbeiten (Leitung)
+  const updateAssignmentMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => 
+      api.patch(`/taxi/assignments/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['taxi-tafelrunde'] })
+      queryClient.invalidateQueries({ queryKey: ['taxi-tafelrunden'] })
+      setIsAssignDialogOpen(false)
+      setSelectedFamily(null)
+      setAssignmentData({ driverId: '', pickupNotes: '', pickupTime: '' })
+      toast.success('Zuweisung aktualisiert')
+    },
+    onError: () => toast.error('Fehler beim Aktualisieren'),
   })
 
   const copyKey = (key: string) => {
@@ -467,9 +495,11 @@ export default function TaxiDashboardPage() {
                         return acc
                       }, {} as Record<keyof typeof MAP_CONFIG, typeof allAnnotations>)
 
-                      // Finde die Karte mit den meisten Einträgen
-                      const primaryMap = Object.entries(mapGroups).sort((a, b) => b[1].length - a[1].length)[0]?.[0] as keyof typeof MAP_CONFIG || 'NARCO_CITY'
-                      const config = MAP_CONFIG[primaryMap]
+                      // Finde die Karte mit den meisten Einträgen als Default
+                      const defaultMap = Object.entries(mapGroups).sort((a, b) => b[1].length - a[1].length)[0]?.[0] as keyof typeof MAP_CONFIG || 'NARCO_CITY'
+                      // Verwende ausgewählte Karte oder Default
+                      const activeMap = driverSelectedMap && mapGroups[driverSelectedMap] ? driverSelectedMap : defaultMap
+                      const config = MAP_CONFIG[activeMap]
                       const aspectRatio = config.width / config.height
                       const mapHeight = 450
                       const mapWidth = mapHeight * aspectRatio
@@ -479,29 +509,30 @@ export default function TaxiDashboardPage() {
                         return [mapHeight - (y * mapHeight), x * mapWidth]
                       }
 
-                      const currentMapAnnotations = mapGroups[primaryMap] || []
+                      const currentMapAnnotations = mapGroups[activeMap] || []
 
                       return (
                         <>
-                          {/* Karten-Tabs wenn es mehrere Karten gibt */}
+                          {/* Karten-Tabs wenn es mehrere Karten gibt - jetzt klickbar */}
                           {Object.keys(mapGroups).length > 1 && (
                             <div className="px-4 py-2 bg-gray-900/50 border-b border-gray-700/50 flex gap-2">
                               {Object.entries(mapGroups).map(([mapName, items]) => (
-                                <span
+                                <button
                                   key={mapName}
-                                  className={`px-2 py-1 rounded text-xs ${
-                                    mapName === primaryMap 
-                                      ? 'bg-yellow-500/20 text-yellow-400' 
-                                      : 'bg-gray-700/50 text-gray-400'
+                                  onClick={() => setDriverSelectedMap(mapName as keyof typeof MAP_CONFIG)}
+                                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                                    mapName === activeMap 
+                                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
+                                      : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50 hover:text-gray-300'
                                   }`}
                                 >
                                   {MAP_CONFIG[mapName as keyof typeof MAP_CONFIG]?.name}: {items.length}
-                                </span>
+                                </button>
                               ))}
                             </div>
                           )}
                           <MapContainer
-                            key={primaryMap}
+                            key={activeMap}
                             center={[mapHeight / 2, mapWidth / 2]}
                             zoom={0}
                             minZoom={-1}
@@ -510,7 +541,7 @@ export default function TaxiDashboardPage() {
                             style={{ height: '450px', width: '100%', background: '#111827' }}
                             attributionControl={false}
                           >
-                            <FitBounds bounds={bounds} mapKey={`driver-${selectedMapName}`} />
+                            <FitBounds bounds={bounds} mapKey={`driver-${activeMap}`} />
                             <ImageOverlay
                               url={`/map-tiles/${config.file}/metadata.json`}
                               bounds={bounds}
@@ -589,7 +620,7 @@ export default function TaxiDashboardPage() {
                               
                               myAssignments
                                 .filter(a => 
-                                  a.tafelrunde?.meetingPointMapName === primaryMap && 
+                                  a.tafelrunde?.meetingPointMapName === activeMap && 
                                   a.tafelrunde?.meetingPointX != null && 
                                   a.tafelrunde?.meetingPointY != null
                                 )
@@ -989,26 +1020,41 @@ export default function TaxiDashboardPage() {
                                         {annotation.assignment.driver.icFirstName || annotation.assignment.driver.username}
                                       </div>
                                     )}
-                                    {isTaxiLead && !annotation.assignment?.driver && (
+                                    {/* Leitung kann Fahrer zuweisen oder ändern */}
+                                    {isTaxiLead && (
                                       <button
                                         onClick={() => {
+                                          if (annotation.assignment) {
+                                            // Bearbeiten einer bestehenden Zuweisung
+                                            setEditingAssignment(annotation.assignment)
+                                            setAssignmentData({
+                                              driverId: annotation.assignment.driver?.id || '',
+                                              pickupTime: annotation.assignment.pickupTime || '',
+                                              pickupNotes: annotation.assignment.pickupNotes || '',
+                                            })
+                                          } else {
+                                            // Neue Zuweisung
+                                            setEditingAssignment(null)
+                                            setAssignmentData({
+                                              driverId: '',
+                                              pickupTime: tafelrundeDetails?.pickupStartTime || '',
+                                              pickupNotes: '',
+                                            })
+                                          }
                                           setSelectedFamily({
                                             familyId: annotation.familyId,
                                             familyName: annotation.familyName,
                                             tafelrundeId: tafelrundeDetails?.id,
                                           })
-                                          // Setze Abholzeit aus Tafelrunde als Vorlage
-                                          setAssignmentData({
-                                            ...assignmentData,
-                                            driverId: '',
-                                            pickupTime: tafelrundeDetails?.pickupStartTime || '',
-                                            pickupNotes: '',
-                                          })
                                           setIsAssignDialogOpen(true)
                                         }}
-                                        className="w-full mt-2 px-3 py-2 text-sm bg-yellow-500 text-gray-900 font-medium rounded-lg hover:bg-yellow-400 transition-colors"
+                                        className={`w-full mt-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                                          annotation.assignment?.driver
+                                            ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30'
+                                            : 'bg-yellow-500 text-gray-900 hover:bg-yellow-400'
+                                        }`}
                                       >
-                                        Fahrer zuweisen
+                                        {annotation.assignment?.driver ? 'Fahrer ändern' : 'Fahrer zuweisen'}
                                       </button>
                                     )}
                                   </div>
@@ -1165,14 +1211,13 @@ export default function TaxiDashboardPage() {
                                 {isTaxiLead && !assignment?.driver && (
                                   <button
                                     onClick={() => {
+                                      setEditingAssignment(null)
                                       setSelectedFamily({
                                         familyId: family.id,
                                         familyName: family.familyName,
                                         tafelrundeId: tafelrundeDetails.id,
                                       })
-                                      // Setze Abholzeit aus Tafelrunde als Vorlage
                                       setAssignmentData({
-                                        ...assignmentData,
                                         driverId: '',
                                         pickupTime: tafelrundeDetails?.pickupStartTime || '',
                                         pickupNotes: '',
@@ -1183,6 +1228,63 @@ export default function TaxiDashboardPage() {
                                   >
                                     Zuweisen
                                   </button>
+                                )}
+                                {/* Bearbeiten/Entfernen für Leitung bei bestehenden Zuweisungen */}
+                                {isTaxiLead && assignment?.driver && (
+                                  <div className="flex gap-1 mt-1">
+                                    <button
+                                      onClick={() => {
+                                        setEditingAssignment(assignment)
+                                        setSelectedFamily({
+                                          familyId: family.id,
+                                          familyName: family.familyName,
+                                          tafelrundeId: tafelrundeDetails.id,
+                                        })
+                                        setAssignmentData({
+                                          driverId: assignment.driver?.id || '',
+                                          pickupTime: assignment.pickupTime || '',
+                                          pickupNotes: assignment.pickupNotes || '',
+                                        })
+                                        setIsAssignDialogOpen(true)
+                                      }}
+                                      className="text-xs text-blue-400 hover:text-blue-300"
+                                    >
+                                      Bearbeiten
+                                    </button>
+                                    <span className="text-gray-600">|</span>
+                                    <button
+                                      onClick={() => {
+                                        if (confirm('Zuweisung wirklich entfernen?')) {
+                                          removeAssignmentMutation.mutate(assignment.id)
+                                        }
+                                      }}
+                                      disabled={removeAssignmentMutation.isPending}
+                                      className="text-xs text-red-400 hover:text-red-300"
+                                    >
+                                      Entfernen
+                                    </button>
+                                  </div>
+                                )}
+                                {/* Status ändern für Leitung */}
+                                {isTaxiLead && assignment && assignment.status !== 'DELIVERED' && assignment.status !== 'CANCELLED' && (
+                                  <select
+                                    value={assignment.status}
+                                    onChange={(e) => {
+                                      updateStatusMutation.mutate({
+                                        id: assignment.id,
+                                        status: e.target.value,
+                                      })
+                                    }}
+                                    disabled={updateStatusMutation.isPending}
+                                    className="mt-1 text-xs bg-gray-800 border border-gray-600 rounded px-1 py-0.5 text-gray-300"
+                                  >
+                                    <option value="PENDING">Ausstehend</option>
+                                    <option value="ASSIGNED">Zugewiesen</option>
+                                    <option value="EN_ROUTE">Unterwegs</option>
+                                    <option value="PICKED_UP">Abgeholt</option>
+                                    <option value="DELIVERED">Abgeliefert</option>
+                                    <option value="CANCELLED">Abgesagt</option>
+                                  </select>
                                 )}
                               </div>
                             </div>
@@ -1291,11 +1393,19 @@ export default function TaxiDashboardPage() {
         </div>
       )}
 
-      {/* Assign Driver Dialog */}
-      <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
+      {/* Assign/Edit Driver Dialog */}
+      <Dialog open={isAssignDialogOpen} onOpenChange={(open) => {
+        setIsAssignDialogOpen(open)
+        if (!open) {
+          setEditingAssignment(null)
+          setSelectedFamily(null)
+        }
+      }}>
         <DialogContent className="bg-gray-900 border-gray-700">
           <DialogHeader>
-            <DialogTitle className="text-yellow-400">Fahrer zuweisen</DialogTitle>
+            <DialogTitle className="text-yellow-400">
+              {editingAssignment ? 'Zuweisung bearbeiten' : 'Fahrer zuweisen'}
+            </DialogTitle>
             <DialogDescription>
               Familie: {selectedFamily?.familyName}
             </DialogDescription>
@@ -1345,12 +1455,27 @@ export default function TaxiDashboardPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsAssignDialogOpen(false)}>
+            <Button variant="ghost" onClick={() => {
+              setIsAssignDialogOpen(false)
+              setEditingAssignment(null)
+              setSelectedFamily(null)
+            }}>
               Abbrechen
             </Button>
             <Button
               onClick={() => {
-                if (selectedFamily && assignmentData.driverId) {
+                if (editingAssignment) {
+                  // Bearbeiten
+                  updateAssignmentMutation.mutate({
+                    id: editingAssignment.id,
+                    data: {
+                      driverId: assignmentData.driverId || null,
+                      pickupNotes: assignmentData.pickupNotes,
+                      pickupTime: assignmentData.pickupTime,
+                    },
+                  })
+                } else if (selectedFamily && assignmentData.driverId) {
+                  // Neu erstellen
                   assignDriverMutation.mutate({
                     tafelrundeId: selectedFamily.tafelrundeId,
                     familyContactId: selectedFamily.familyId,
@@ -1358,11 +1483,11 @@ export default function TaxiDashboardPage() {
                   })
                 }
               }}
-              disabled={!assignmentData.driverId || assignDriverMutation.isPending}
+              disabled={(editingAssignment ? false : !assignmentData.driverId) || assignDriverMutation.isPending || updateAssignmentMutation.isPending}
               className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
             >
-              {assignDriverMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Zuweisen
+              {(assignDriverMutation.isPending || updateAssignmentMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {editingAssignment ? 'Speichern' : 'Zuweisen'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -5,8 +5,11 @@ import { PrismaService } from '../common/prisma/prisma.service';
 export class FamilyContactsService {
   constructor(private prisma: PrismaService) {}
 
-  // Prüft ob User Contacto oder Leadership ist ODER eine ListPermission hat
+  // Prüft ob User Contacto, Leadership, Partner ist ODER eine ListPermission hat
   private async canManageContacts(user: any): Promise<boolean> {
+    // Partner haben jetzt vollen Zugriff auf die Listenführung
+    if (user.isPartner) return true;
+
     const allowedRoles = [
       'EL_PATRON',
       'DON_CAPITAN', 

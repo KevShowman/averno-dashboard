@@ -403,7 +403,51 @@ export class PartnerService {
     return { success: true };
   }
 
-  // Alle aktiven Partner abrufen
+  // Partner Kontaktdetails-Berechtigung umschalten
+  async togglePartnerContactsPermission(user: any, partnerUserId: string, canView: boolean) {
+    const canManage = await this.canManagePartners(user);
+    if (!canManage) {
+      throw new ForbiddenException('Keine Berechtigung zur Partner-Verwaltung');
+    }
+
+    const partnerUser = await this.prisma.user.findUnique({
+      where: { id: partnerUserId },
+    });
+
+    if (!partnerUser) {
+      throw new NotFoundException('Partner nicht gefunden');
+    }
+
+    if (!partnerUser.isPartner) {
+      throw new BadRequestException('Benutzer ist kein Partner');
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: partnerUserId },
+      data: { partnerCanViewContacts: canView },
+      select: {
+        id: true,
+        username: true,
+        partnerCanViewContacts: true,
+      },
+    });
+
+    // Audit Log
+    await this.auditService.log({
+      userId: user.id,
+      action: canView ? 'PARTNER_CONTACTS_PERMISSION_GRANTED' : 'PARTNER_CONTACTS_PERMISSION_REVOKED',
+      entity: 'User',
+      entityId: partnerUserId,
+      meta: {
+        partnerUsername: partnerUser.username,
+        canViewContacts: canView,
+      },
+    });
+
+    return updated;
+  }
+
+  // Alle aktiven Partner und Taxi-User abrufen
   async getActivePartners(user: any) {
     const canManage = await this.canManagePartners(user);
     if (!canManage) {
@@ -411,13 +455,22 @@ export class PartnerService {
     }
 
     return this.prisma.user.findMany({
-      where: { isPartner: true },
+      where: { 
+        OR: [
+          { isPartner: true },
+          { isTaxi: true },
+        ],
+      },
       select: {
         id: true,
         discordId: true,
         username: true,
         avatarUrl: true,
         createdAt: true,
+        partnerCanViewContacts: true,
+        isPartner: true,
+        isTaxi: true,
+        isTaxiLead: true,
       },
       orderBy: { username: 'asc' },
     });

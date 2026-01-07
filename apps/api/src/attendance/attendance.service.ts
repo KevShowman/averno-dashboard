@@ -257,10 +257,14 @@ export class AttendanceService {
       countMap.set(a.userId, (countMap.get(a.userId) || 0) + 1);
     });
     
-    // Hole User-Daten
+    // Hole User-Daten (keine Partner/Taxi)
     const userIds = Array.from(countMap.keys());
     const users = await this.prisma.user.findMany({
-      where: { id: { in: userIds } },
+      where: { 
+        id: { in: userIds },
+        isPartner: false,
+        isTaxi: false,
+      },
       select: {
         id: true,
         username: true,
@@ -281,11 +285,13 @@ export class AttendanceService {
       .filter(s => s.user)
       .sort((a, b) => b.count - a.count);
     
-    // Hole auch alle User ohne Anwesenheiten
+    // Hole auch alle User ohne Anwesenheiten (keine Partner/Taxi)
     const allUsers = await this.prisma.user.findMany({
       where: {
         role: { notIn: ['FUTURO', 'GAST'] },
         id: { notIn: userIds },
+        isPartner: false,
+        isTaxi: false,
       },
       select: {
         id: true,
@@ -455,10 +461,12 @@ export class AttendanceService {
     const TRACKING_START_DATE = new Date('2025-12-13');
     TRACKING_START_DATE.setHours(0, 0, 0, 0);
 
-    // Hole alle aktiven User
+    // Hole alle aktiven User (keine Partner/Taxi)
     const users = await this.prisma.user.findMany({
       where: {
         role: { notIn: ['FUTURO', 'GAST'] },
+        isPartner: false,
+        isTaxi: false,
       },
       select: {
         id: true,

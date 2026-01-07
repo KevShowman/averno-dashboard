@@ -586,7 +586,7 @@ export class TaxiService {
   }
 
   /**
-   * Aktualisiert den Status einer Taxi-Zuweisung (für Fahrer)
+   * Aktualisiert den Status einer Taxi-Zuweisung (für Fahrer und Leitung)
    */
   async updateAssignmentStatus(
     user: any,
@@ -605,8 +605,9 @@ export class TaxiService {
       throw new NotFoundException('Zuweisung nicht gefunden');
     }
 
-    // Nur der zugewiesene Fahrer oder Taxi-Leitung kann Status ändern
-    if (assignment.driverId !== user.id && !user.isTaxiLead && !KEY_CREATOR_ROLES.includes(user.role)) {
+    // Taxi-Leitung kann immer den Status ändern, Fahrer nur für ihre eigenen
+    const isLead = user.isTaxiLead || KEY_CREATOR_ROLES.includes(user.role);
+    if (!isLead && assignment.driverId !== user.id) {
       throw new ForbiddenException('Keine Berechtigung');
     }
 
@@ -650,7 +651,108 @@ export class TaxiService {
   }
 
   /**
+   * Bearbeitet eine bestehende Taxi-Zuweisung (Leitung)
+   */
+  async updateAssignment(
+    user: any,
+    assignmentId: string,
+    data: {
+      driverId?: string | null;
+      pickupNotes?: string;
+      pickupTime?: string;
+    },
+  ) {
+    if (!(await this.canManageAssignments(user))) {
+      throw new ForbiddenException('Keine Berechtigung für Taxi-Zuweisungen');
+    }
+
+    const assignment = await this.prisma.taxiAssignment.findUnique({
+      where: { id: assignmentId },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException('Zuweisung nicht gefunden');
+    }
+
+    // Wenn Fahrer geändert wird, prüfe ob neuer Fahrer gültig
+    if (data.driverId) {
+      const driver = await this.prisma.user.findUnique({
+        where: { id: data.driverId },
+      });
+
+      if (!driver || !driver.isTaxi) {
+        throw new BadRequestException('Ungültiger Fahrer');
+      }
+    }
+
+    const updated = await this.prisma.taxiAssignment.update({
+      where: { id: assignmentId },
+      data: {
+        driverId: data.driverId === null ? null : data.driverId,
+        pickupNotes: data.pickupNotes,
+        pickupTime: data.pickupTime,
+        status: data.driverId ? TaxiAssignmentStatus.ASSIGNED : TaxiAssignmentStatus.PENDING,
+      },
+      include: {
+        driver: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+          },
+        },
+        familyContact: true,
+      },
+    });
+
+    await this.auditService.log({
+      userId: user.id,
+      action: 'TAXI_ASSIGNMENT_EDITED',
+      entity: 'TaxiAssignment',
+      entityId: assignmentId,
+      meta: data,
+    });
+
+    return updated;
+  }
+
+  /**
+   * Entfernt eine Taxi-Zuweisung (Leitung)
+   */
+  async removeAssignment(user: any, assignmentId: string) {
+    if (!(await this.canManageAssignments(user))) {
+      throw new ForbiddenException('Keine Berechtigung für Taxi-Zuweisungen');
+    }
+
+    const assignment = await this.prisma.taxiAssignment.findUnique({
+      where: { id: assignmentId },
+      include: {
+        familyContact: { select: { familyName: true } },
+      },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException('Zuweisung nicht gefunden');
+    }
+
+    await this.prisma.taxiAssignment.delete({
+      where: { id: assignmentId },
+    });
+
+    await this.auditService.log({
+      userId: user.id,
+      action: 'TAXI_ASSIGNMENT_REMOVED',
+      entity: 'TaxiAssignment',
+      entityId: assignmentId,
+      meta: { familyName: assignment.familyContact?.familyName },
+    });
+
+    return { message: 'Zuweisung entfernt' };
+  }
+
+  /**
    * Holt alle Zuweisungen für einen bestimmten Fahrer
+   * Daten werden 24h nach Tafelrunde-Datum für normale Fahrer versteckt
    */
   async getMyAssignments(user: any, tafelrundeId?: string) {
     if (!user.isTaxi) {
@@ -662,7 +764,7 @@ export class TaxiService {
       where.tafelrundeId = tafelrundeId;
     }
 
-    return this.prisma.taxiAssignment.findMany({
+    const assignments = await this.prisma.taxiAssignment.findMany({
       where,
       include: {
         tafelrunde: {
@@ -674,6 +776,8 @@ export class TaxiService {
             meetingPointMapName: true,
             meetingPointX: true,
             meetingPointY: true,
+            pickupStartTime: true,
+            arrivalDeadline: true,
           },
         },
         familyContact: {
@@ -692,6 +796,23 @@ export class TaxiService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Für normale Fahrer (nicht Leitung): Daten 24h nach Tafelrunde verstecken
+    const isLead = user.isTaxiLead || KEY_CREATOR_ROLES.includes(user.role);
+    if (!isLead) {
+      const now = new Date();
+      const twentyFourHoursMs = 24 * 60 * 60 * 1000;
+      
+      return assignments.filter(assignment => {
+        if (!assignment.tafelrunde?.date) return true;
+        const tafelrundeDate = new Date(assignment.tafelrunde.date);
+        const timeSinceTafelrunde = now.getTime() - tafelrundeDate.getTime();
+        // Zeige nur Zuweisungen deren Tafelrunde weniger als 24h her ist
+        return timeSinceTafelrunde < twentyFourHoursMs;
+      });
+    }
+
+    return assignments;
   }
 
   /**

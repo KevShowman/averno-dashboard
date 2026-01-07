@@ -52,6 +52,10 @@ interface ActivePartner {
   username: string
   avatarUrl?: string
   createdAt: string
+  partnerCanViewContacts: boolean
+  isPartner: boolean
+  isTaxi: boolean
+  isTaxiLead: boolean
 }
 
 interface PartnerFamilySuggestion {
@@ -220,6 +224,15 @@ export default function PartnerManagementPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partner-active'] })
       queryClient.invalidateQueries({ queryKey: ['partner-requests'] })
+    },
+  })
+
+  const toggleContactsPermissionMutation = useMutation({
+    mutationFn: async ({ id, canView }: { id: string; canView: boolean }) => {
+      await api.patch(`/partner/active/${id}/contacts-permission`, { canView })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-active'] })
     },
   })
 
@@ -625,19 +638,55 @@ export default function PartnerManagementPage() {
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-white">{partner.username}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-white">{partner.username}</p>
+                          {partner.isPartner && (
+                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-purple-500/20 text-purple-400 rounded">
+                              Partner
+                            </span>
+                          )}
+                          {partner.isTaxi && (
+                            <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${
+                              partner.isTaxiLead 
+                                ? 'bg-amber-500/20 text-amber-400' 
+                                : 'bg-blue-500/20 text-blue-400'
+                            }`}>
+                              {partner.isTaxiLead ? 'Taxi Lead' : 'Taxi'}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500">
-                          Partner seit {formatDate(partner.createdAt)}
+                          Seit {formatDate(partner.createdAt)}
                         </p>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                      onClick={() => {
-                        if (confirm(`Möchtest du den Partner-Zugang für ${partner.username} wirklich widerrufen?`)) {
-                          revokeAccessMutation.mutate(partner.id)
+                    <div className="flex items-center gap-3">
+                      {/* Kontaktdetails-Berechtigung Toggle */}
+                      <button
+                        onClick={() => {
+                          toggleContactsPermissionMutation.mutate({
+                            id: partner.id,
+                            canView: !partner.partnerCanViewContacts,
+                          })
+                        }}
+                        disabled={toggleContactsPermissionMutation.isPending}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          partner.partnerCanViewContacts
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
+                            : 'bg-gray-700/50 text-gray-400 border border-gray-600/50 hover:bg-gray-700'
+                        }`}
+                        title={partner.partnerCanViewContacts ? 'Kontaktdetails-Zugriff aktiv' : 'Kontaktdetails-Zugriff deaktiviert'}
+                      >
+                        <Eye className={`h-3.5 w-3.5 ${partner.partnerCanViewContacts ? 'text-emerald-400' : 'text-gray-500'}`} />
+                        {partner.partnerCanViewContacts ? 'Kontakte ✓' : 'Kontakte'}
+                      </button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        onClick={() => {
+                          if (confirm(`Möchtest du den Partner-Zugang für ${partner.username} wirklich widerrufen?`)) {
+                            revokeAccessMutation.mutate(partner.id)
                         }
                       }}
                       disabled={revokeAccessMutation.isPending}
@@ -651,6 +700,7 @@ export default function PartnerManagementPage() {
                         </>
                       )}
                     </Button>
+                    </div>
                   </div>
                 ))}
               </div>

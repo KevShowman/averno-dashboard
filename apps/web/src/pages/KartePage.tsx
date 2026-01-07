@@ -447,15 +447,17 @@ export default function KartePage() {
   const isContacto = hasRole(user, ['CONTACTO'])
   const isInteligencia = hasRole(user, ['INTELIGENCIA'])
   const isPartner = user?.isPartner === true
-  const canManage = isLeadership || isContacto || isInteligencia
+  // Partner haben jetzt vollen Zugriff auf Karte und Listenführung
+  const canManage = isLeadership || isContacto || isInteligencia || isPartner
   
-  // Users who can view family contact details (Leadership, Contacto, or with ListPermission)
+  // Users who can view family contact details (Leadership, Contacto, ListPermission, or Partners with explicit permission)
   const { data: listPermissions = [] } = useQuery({
     queryKey: ['list-permissions-check'],
     queryFn: () => api.get('/family-contacts/permissions/list').then(res => res.data),
   })
   const hasListPermission = listPermissions.some((p: any) => p.userId === user?.id)
-  const canViewContactDetails = isLeadership || isContacto || hasListPermission
+  const partnerCanViewContacts = (user as any)?.partnerCanViewContacts === true
+  const canViewContactDetails = isLeadership || isContacto || hasListPermission || (isPartner && partnerCanViewContacts)
   
   // Fetch annotations for current map
   const { data: annotations = [], isLoading } = useQuery({
@@ -753,7 +755,7 @@ export default function KartePage() {
       mapName: activeMap,
       x: newMarkerPosition.x,
       y: newMarkerPosition.y,
-      icon: isPartner ? 'users' : formData.icon, // Partner können nur "Gruppe" Icon verwenden
+      icon: formData.icon,
       label: formData.label || undefined,
       familyContactId: formData.familyContactId || undefined,
       isKeyFamily: formData.isKeyFamily,
@@ -761,6 +763,7 @@ export default function KartePage() {
     }
 
     if (canManage) {
+      // Partner haben jetzt vollen Zugriff, daher direkt erstellen
       createMutation.mutate(data)
     } else {
       createSuggestionMutation.mutate(data)
@@ -1709,38 +1712,28 @@ export default function KartePage() {
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* Icon Selection - Partner können nur "Gruppe" wählen */}
+            {/* Icon Selection */}
             <div>
               <Label className="text-gray-300">Icon</Label>
-              {isPartner ? (
-                <div className="mt-2 p-3 bg-gray-700/50 rounded-lg border border-amber-500/30">
-                  <div className="flex items-center gap-2 text-amber-400">
-                    <Users className="h-5 w-5" />
-                    <span className="text-sm font-medium">Gruppe</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Partner können nur das Gruppe-Icon verwenden</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-4 gap-2 mt-2">
-                  {ICON_OPTIONS.map(option => {
-                    const Icon = option.icon
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => setFormData({ ...formData, icon: option.value })}
-                        className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
-                          formData.icon === option.value
-                            ? 'border-amber-500 bg-amber-500/20 text-amber-400'
-                            : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-500'
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                        <span className="text-xs">{option.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {ICON_OPTIONS.map(option => {
+                  const Icon = option.icon
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => setFormData({ ...formData, icon: option.value })}
+                      className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
+                        formData.icon === option.value
+                          ? 'border-amber-500 bg-amber-500/20 text-amber-400'
+                          : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-500'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="text-xs">{option.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
             
             {/* Label */}
