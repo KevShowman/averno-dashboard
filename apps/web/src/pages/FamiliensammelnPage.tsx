@@ -299,7 +299,7 @@ export default function FamiliensammelnPage() {
             Familiensammeln
           </h1>
           <p className="text-gray-400 mt-1">
-            Mindestens 4 Tage ODER 4 Touren erforderlich
+            Mindestens 4 Tage ODER 8 Touren erforderlich
           </p>
         </div>
         <div className="flex gap-3">
@@ -458,12 +458,12 @@ export default function FamiliensammelnPage() {
                         <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full transition-all ${
-                              stat.totalTours >= 4 ? 'bg-green-500' : 'bg-amber-500'
+                              stat.totalTours >= 8 ? 'bg-green-500' : 'bg-amber-500'
                             }`}
-                            style={{ width: `${Math.min(100, (stat.totalTours / 4) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (stat.totalTours / 8) * 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-400 w-8">{stat.totalTours}/4</span>
+                        <span className="text-xs text-gray-400 w-8">{stat.totalTours}/8</span>
                       </div>
                     </div>
                     

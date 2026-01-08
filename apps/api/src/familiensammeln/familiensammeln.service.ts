@@ -93,9 +93,9 @@ export class FamiliensammelnService {
       stats.tours += p.tourCount || 1;
     });
 
-    // Update WeeklyDelivery für User mit 4+ Teilnahmen ODER 4+ Touren
+    // Update WeeklyDelivery für User mit 4+ Teilnahmen ODER 8+ Touren
     for (const [userId, stats] of userStats.entries()) {
-      if (stats.days >= 4 || stats.tours >= 4) {
+      if (stats.days >= 4 || stats.tours >= 8) {
         // Finde oder erstelle WeeklyDelivery für diesen User
         const weeklyDelivery = await this.prisma.weeklyDelivery.findFirst({
           where: {
@@ -345,11 +345,11 @@ export class FamiliensammelnService {
       const participationCount = userParticipationCount.get(user.id) || 0;
       const totalTours = userTourCount.get(user.id) || 0;
       const remainingDays = Math.max(0, 4 - participationCount);
-      const remainingTours = Math.max(0, 4 - totalTours);
-      // User muss zahlen, wenn WEDER 4+ Tage NOCH 4+ Touren erreicht
-      const mustPayWeeklyDelivery = participationCount < 4 && totalTours < 4;
-      // User hat bestanden, wenn ENTWEDER 4+ Tage ODER 4+ Touren erreicht
-      const hasPassed = participationCount >= 4 || totalTours >= 4;
+      const remainingTours = Math.max(0, 8 - totalTours);
+      // User muss zahlen, wenn WEDER 4+ Tage NOCH 8+ Touren erreicht
+      const mustPayWeeklyDelivery = participationCount < 4 && totalTours < 8;
+      // User hat bestanden, wenn ENTWEDER 4+ Tage ODER 8+ Touren erreicht
+      const hasPassed = participationCount >= 4 || totalTours >= 8;
 
       return {
         user,
