@@ -89,6 +89,7 @@ export default function FamiliensammelnPage() {
   const [showAllTimeStats, setShowAllTimeStats] = useState(false);
   const [editingParticipation, setEditingParticipation] = useState<Participation | null>(null);
   const [showProcessorPicker, setShowProcessorPicker] = useState(false);
+  const [processorCapacity, setProcessorCapacity] = useState(3000);
 
   const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']);
 
@@ -164,12 +165,13 @@ export default function FamiliensammelnPage() {
 
   // Mutation: Verarbeiter starten
   const startProcessorMutation = useMutation({
-    mutationFn: ({ userId }: { userId: string }) =>
-      familiensammelnApi.startProcessor(currentWeek!.id, userId),
+    mutationFn: ({ userId, capacity }: { userId: string; capacity: number }) =>
+      familiensammelnApi.startProcessor(currentWeek!.id, userId, capacity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['familiensammeln', 'processors'] });
       toast.success('Verarbeiter erfolgreich gestartet');
       setShowProcessorPicker(false);
+      setProcessorCapacity(3000); // Reset
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Fehler beim Starten des Verarbeiters');
@@ -231,7 +233,7 @@ export default function FamiliensammelnPage() {
 
   const handleStartProcessor = (selectedUser: User | null) => {
     if (!selectedUser) return;
-    startProcessorMutation.mutate({ userId: selectedUser.id });
+    startProcessorMutation.mutate({ userId: selectedUser.id, capacity: processorCapacity });
   };
 
   if (isLoading) {
@@ -299,7 +301,7 @@ export default function FamiliensammelnPage() {
             Familiensammeln
           </h1>
           <p className="text-gray-400 mt-1">
-            Mindestens 4 Tage ODER 8 Touren erforderlich
+            Mindestens 4 Tage ODER 4 Touren erforderlich
           </p>
         </div>
         <div className="flex gap-3">
@@ -760,7 +762,7 @@ export default function FamiliensammelnPage() {
               <div>
                 <h2 className="text-xl font-bold text-white">Verarbeiter-Tracking</h2>
                 <p className="text-gray-400 text-sm">
-                  Kapazität: 3000 Stück • Verarbeitung: 10/min → ~5 Stunden
+                  Max. Kapazität: 3000 Stück • Verarbeitung: 10/min
                 </p>
               </div>
             </div>
@@ -838,9 +840,25 @@ export default function FamiliensammelnPage() {
                               : 'bg-amber-500/20 text-amber-300 border-amber-500/30 px-3 py-1'
                           }>
                             {isFinished ? (
-                              <span className="flex items-center gap-1.5">
-                                <Check className="h-4 w-4" />
-                                Fertig
+                              <span className="flex flex-col items-center gap-0.5">
+                                <span className="flex items-center gap-1.5">
+                                  <Check className="h-4 w-4" />
+                                  Fertig
+                                </span>
+                                <span className="text-[10px] text-green-400/70">
+                                  seit {(() => {
+                                    const finishedAt = new Date(processor.finishesAt);
+                                    const now = new Date();
+                                    const diffMs = now.getTime() - finishedAt.getTime();
+                                    const diffMins = Math.floor(diffMs / 60000);
+                                    const diffHours = Math.floor(diffMins / 60);
+                                    if (diffHours > 0) {
+                                      const remainingMins = diffMins % 60;
+                                      return `${diffHours}h ${remainingMins}min`;
+                                    }
+                                    return `${diffMins}min`;
+                                  })()}
+                                </span>
                               </span>
                             ) : (
                               <span className="flex items-center gap-1.5">
@@ -931,6 +949,47 @@ export default function FamiliensammelnPage() {
               </div>
 
               <CardContent className="pt-2 pb-6 space-y-5">
+                {/* Kapazität Input */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Factory className="h-4 w-4 text-amber-400" />
+                    Anzahl (1-3000)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={3000}
+                    value={processorCapacity}
+                    onChange={(e) => {
+                      const val = Math.min(3000, Math.max(1, parseInt(e.target.value) || 1));
+                      setProcessorCapacity(val);
+                    }}
+                    className="w-full h-12 px-4 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                  />
+                  {/* Dynamische Zeit-Anzeige */}
+                  <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-400">Verarbeitungszeit:</span>
+                      <span className="text-amber-400 font-medium">
+                        {(() => {
+                          const minutes = processorCapacity / 10;
+                          const hours = Math.floor(minutes / 60);
+                          const mins = Math.round(minutes % 60);
+                          if (hours > 0) {
+                            return `${hours}h ${mins}min`;
+                          }
+                          return `${mins}min`;
+                        })()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-1">
+                      <span className="text-gray-400">Rate:</span>
+                      <span className="text-gray-300">10 Stück/min</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mitglied auswählen */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
                     <Users className="h-4 w-4 text-amber-400" />
@@ -944,7 +1003,10 @@ export default function FamiliensammelnPage() {
                 </div>
                 <Button
                   variant="outline"
-                  onClick={() => setShowProcessorPicker(false)}
+                  onClick={() => {
+                    setShowProcessorPicker(false);
+                    setProcessorCapacity(3000);
+                  }}
                   className="w-full h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
                 >
                   Abbrechen

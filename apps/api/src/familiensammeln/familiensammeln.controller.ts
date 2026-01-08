@@ -140,9 +140,9 @@ export class FamiliensammelnController {
   @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
   async startProcessor(
     @Param('weekId') weekId: string,
-    @Body() body: { userId: string },
+    @Body() body: { userId: string; capacity?: number },
   ) {
-    return this.familiensammelnService.startProcessor(weekId, body.userId);
+    return this.familiensammelnService.startProcessor(weekId, body.userId, body.capacity);
   }
 
   /**

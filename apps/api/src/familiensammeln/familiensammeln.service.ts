@@ -93,9 +93,9 @@ export class FamiliensammelnService {
       stats.tours += p.tourCount || 1;
     });
 
-    // Update WeeklyDelivery für User mit 4+ Teilnahmen ODER 8+ Touren
+    // Update WeeklyDelivery für User mit 4+ Teilnahmen ODER 4+ Touren
     for (const [userId, stats] of userStats.entries()) {
-      if (stats.days >= 4 || stats.tours >= 8) {
+      if (stats.days >= 4 || stats.tours >= 4) {
         // Finde oder erstelle WeeklyDelivery für diesen User
         const weeklyDelivery = await this.prisma.weeklyDelivery.findFirst({
           where: {
@@ -345,11 +345,11 @@ export class FamiliensammelnService {
       const participationCount = userParticipationCount.get(user.id) || 0;
       const totalTours = userTourCount.get(user.id) || 0;
       const remainingDays = Math.max(0, 4 - participationCount);
-      const remainingTours = Math.max(0, 8 - totalTours);
-      // User muss zahlen, wenn WEDER 4+ Tage NOCH 8+ Touren erreicht
-      const mustPayWeeklyDelivery = participationCount < 4 && totalTours < 8;
-      // User hat bestanden, wenn ENTWEDER 4+ Tage ODER 8+ Touren erreicht
-      const hasPassed = participationCount >= 4 || totalTours >= 8;
+      const remainingTours = Math.max(0, 4 - totalTours);
+      // User muss zahlen, wenn WEDER 4+ Tage NOCH 4+ Touren erreicht
+      const mustPayWeeklyDelivery = participationCount < 4 && totalTours < 4;
+      // User hat bestanden, wenn ENTWEDER 4+ Tage ODER 4+ Touren erreicht
+      const hasPassed = participationCount >= 4 || totalTours >= 4;
 
       return {
         user,
@@ -539,9 +539,14 @@ export class FamiliensammelnService {
 
   /**
    * Startet einen neuen Verarbeiter für einen User
-   * Kapazität: 3000, Verarbeitungsrate: 10/min → 300 min = 5 Stunden
+   * Kapazität: 1-3000, Verarbeitungsrate: 10/min
    */
-  async startProcessor(weekId: string, userId: string) {
+  async startProcessor(weekId: string, userId: string, capacity: number = 3000) {
+    // Validiere Kapazität
+    if (capacity < 1 || capacity > 3000) {
+      throw new BadRequestException('Kapazität muss zwischen 1 und 3000 liegen');
+    }
+
     // Prüfe ob Woche existiert
     const week = await this.prisma.familiensammelnWeek.findUnique({
       where: { id: weekId },
@@ -566,9 +571,11 @@ export class FamiliensammelnService {
       throw new BadRequestException('User hat bereits einen aktiven Verarbeiter');
     }
 
-    // Berechne Endzeit: 3000 / 10 = 300 Minuten = 5 Stunden
+    // Berechne Endzeit basierend auf Kapazität: capacity / 10 = Minuten
+    const processingRate = 10; // 10 Stück pro Minute
+    const processingTimeMinutes = capacity / processingRate;
     const startedAt = new Date();
-    const finishesAt = new Date(startedAt.getTime() + 5 * 60 * 60 * 1000); // +5 Stunden
+    const finishesAt = new Date(startedAt.getTime() + processingTimeMinutes * 60 * 1000);
 
     // Erstelle Verarbeiter
     const processor = await this.prisma.familiensammelnProcessor.create({
@@ -577,8 +584,8 @@ export class FamiliensammelnService {
         userId,
         startedAt,
         finishesAt,
-        capacity: 3000,
-        processingRate: 10,
+        capacity,
+        processingRate,
         status: ProcessorStatus.PROCESSING,
       },
       include: {
