@@ -65,9 +65,9 @@ export class TaxiService {
       throw new ForbiddenException('Keine Berechtigung zum Erstellen von Taxi-Keys');
     }
 
-    // Master Keys können nur von Leadership erstellt werden
-    if (data.isMasterKey && !KEY_CREATOR_ROLES.includes(user.role)) {
-      throw new ForbiddenException('Master Keys können nur von Leadership erstellt werden');
+    // Master Keys können nur von Leadership oder Taxi-Leitung erstellt werden
+    if (data.isMasterKey && !KEY_CREATOR_ROLES.includes(user.role) && !user.isTaxiLead) {
+      throw new ForbiddenException('Master Keys können nur von Leadership oder Taxi-Leitung erstellt werden');
     }
 
     // Generiere zufälligen Key (12 Zeichen, alphanumerisch)
