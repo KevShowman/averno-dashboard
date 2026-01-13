@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Role } from '@prisma/client';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 export interface RoleAssignmentDto {
   roleId: string;
@@ -54,14 +55,17 @@ export class OrganigrammService {
     [Role.TAXI_LEAD]: 'external',
   };
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private exclusionService: ExclusionService,
+  ) {}
 
   /**
    * Gibt alle Rollen-Zuordnungen basierend auf user.allRoles automatisch zurück
    */
   async getAllAssignments(): Promise<Record<string, RoleAssignmentDto[]>> {
-    // Hole alle User mit ihren Rollen (keine Partner/Taxi - nur interne Mitglieder)
-    const users = await this.prisma.user.findMany({
+    // Hole alle User mit ihren Rollen (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
+    const usersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -74,8 +78,12 @@ export class OrganigrammService {
         avatarUrl: true,
         role: true,
         allRoles: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const users = usersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     // Gruppiere nach roleId (Organigramm-Kategorien)
     const grouped: Record<string, RoleAssignmentDto[]> = {};

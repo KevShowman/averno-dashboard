@@ -1,10 +1,14 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Prisma, WeeklyDeliveryStatus, ProcessorStatus } from '@prisma/client';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 @Injectable()
 export class FamiliensammelnService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly exclusionService: ExclusionService,
+  ) {}
 
   /**
    * Holt oder erstellt die Woche für ein Startdatum (Montag)
@@ -290,8 +294,8 @@ export class FamiliensammelnService {
       throw new NotFoundException('Woche nicht gefunden');
     }
 
-    // Hole alle aktiven User (keine Partner/Taxi - nur interne Mitglieder)
-    const allUsers = await this.prisma.user.findMany({
+    // Hole alle aktiven User (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -303,8 +307,12 @@ export class FamiliensammelnService {
         icLastName: true,
         avatarUrl: true,
         role: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     // Hole alle aktiven Exclusions für diese Woche
     const activeExclusions = await this.prisma.weeklyDeliveryExclusion.findMany({

@@ -151,6 +151,7 @@ const navGroups: NavGroup[] = [
     name: 'Ausstattung',
     icon: Shirt,
     items: [
+      { name: 'Ausrüstung', href: '/equipment', icon: Shield },
       { name: 'Meine Kleidung', href: '/clothing', icon: Shirt },
       { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
       { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },

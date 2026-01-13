@@ -3,6 +3,7 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { AufstellungResponseStatus, Role } from '@prisma/client';
 import { DiscordService } from '../discord/discord.service';
 import { AbmeldungService } from '../abmeldung/abmeldung.service';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 @Injectable()
 export class SicarioService {
@@ -10,9 +11,10 @@ export class SicarioService {
     private prisma: PrismaService,
     private discordService: DiscordService,
     private abmeldungService: AbmeldungService,
+    private exclusionService: ExclusionService,
   ) {}
 
-  // Alle Sicarios holen (User mit SICARIO Rolle, keine Partner/Taxi)
+  // Alle Sicarios holen (User mit SICARIO Rolle, keine Partner/Taxi/Ausgeschlossene)
   private async getSicarioUsers() {
     const users = await this.prisma.user.findMany({
       where: {
@@ -36,11 +38,15 @@ export class SicarioService {
         icLastName: true,
         role: true,
         allRoles: true,
+        discordRoles: true,
       },
     });
 
-    // Zusätzlich filtern für JSON array (MySQL)
+    // Zusätzlich filtern für JSON array (MySQL) und ausgeschlossene User
     return users.filter(user => {
+      // Prüfe ob ausgeschlossen
+      if (this.exclusionService.hasExcludedRole(user.discordRoles)) return false;
+      // Prüfe ob Sicario
       if (user.role === Role.SICARIO) return true;
       const allRoles = Array.isArray(user.allRoles) ? user.allRoles : [];
       return allRoles.includes('SICARIO');
@@ -330,6 +336,7 @@ export class SicarioService {
       stats: {
         total: allSicarios.length,
         coming: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.COMING).length,
+        comingLate: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.COMING_LATE).length,
         notComing: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.NOT_COMING).length,
         unsure: aufstellung.responses.filter(r => r.status === AufstellungResponseStatus.UNSURE).length,
         noResponse: sicariosWithoutResponse.length,

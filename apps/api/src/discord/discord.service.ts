@@ -475,6 +475,92 @@ export class DiscordService {
     });
   }
 
+  async getUserByDiscordId(discordId: string) {
+    return this.prisma.user.findUnique({
+      where: { discordId },
+      select: { id: true, username: true, role: true, allRoles: true, discordRoles: true }
+    });
+  }
+
+  /**
+   * Synchronisiert Discord-Rollen für ALLE bestehenden DB-User
+   * (auch wenn sie keine gemappten Rollen haben)
+   */
+  async syncAllExistingUsersDiscordRoles() {
+    const allUsers = await this.prisma.user.findMany({
+      where: {
+        isPartner: false,
+        isTaxi: false,
+      },
+      select: {
+        id: true,
+        discordId: true,
+        username: true,
+        discordRoles: true,
+      },
+    });
+
+    // Filter nur User mit Discord-ID
+    const users = allUsers.filter(u => u.discordId);
+
+    console.log(`🔄 Sync Discord-Rollen für ${users.length} bestehende DB-User`);
+
+    let updated = 0;
+    let unchanged = 0;
+    const errors = [];
+    const changes = [];
+
+    for (const user of users) {
+      try {
+        if (!user.discordId) continue;
+
+        // Hole Rollen direkt von Discord API
+        const discordRoles = await this.getUserRoles(user.discordId);
+        
+        const oldRoles: string[] = Array.isArray(user.discordRoles) 
+          ? user.discordRoles as string[]
+          : [];
+
+        // Prüfe ob sich Rollen geändert haben
+        const rolesChanged = JSON.stringify(oldRoles.sort()) !== JSON.stringify(discordRoles.sort());
+
+        if (rolesChanged) {
+          await this.prisma.user.update({
+            where: { id: user.id },
+            data: { discordRoles },
+          });
+
+          changes.push({
+            username: user.username,
+            discordId: user.discordId,
+            oldRoleCount: oldRoles.length,
+            newRoleCount: discordRoles.length,
+            added: discordRoles.filter(r => !oldRoles.includes(r)),
+            removed: oldRoles.filter(r => !discordRoles.includes(r)),
+          });
+
+          console.log(`✅ ${user.username}: ${oldRoles.length} → ${discordRoles.length} Rollen`);
+          updated++;
+        } else {
+          unchanged++;
+        }
+      } catch (error) {
+        console.error(`❌ Fehler bei ${user.username}:`, error.message);
+        errors.push({ username: user.username, error: error.message });
+      }
+    }
+
+    console.log(`🏁 Fertig: ${updated} aktualisiert, ${unchanged} unverändert, ${errors.length} Fehler`);
+
+    return {
+      total: users.length,
+      updated,
+      unchanged,
+      errors,
+      changes,
+    };
+  }
+
   async getAllServerMembers(): Promise<any[]> {
     try {
       const response = await fetch(
@@ -821,13 +907,23 @@ export class DiscordService {
       let imported = 0;
       let updated = 0;
       const errors = [];
+      const syncDetails = [];
+
+      console.log(`🔄 Sync gestartet für ${members.length} Mitglieder`);
 
       for (const member of members) {
         try {
           const existingUser = await this.prisma.user.findUnique({
-            where: { discordId: member.discordId }
+            where: { discordId: member.discordId },
+            select: { id: true, username: true, discordRoles: true }
           });
 
+          // Log für jeden User
+          const oldRoles = existingUser?.discordRoles || [];
+          const newRoles = member.discordRoles || [];
+          
+          console.log(`📋 ${member.username}: Discord gibt ${newRoles.length} Rollen zurück, DB hat ${Array.isArray(oldRoles) ? oldRoles.length : 0} Rollen`);
+          
           if (existingUser) {
             // Aktualisiere bestehenden Benutzer
             await this.prisma.user.update({
@@ -839,6 +935,16 @@ export class DiscordService {
                 discordRoles: member.discordRoles,
               }
             });
+            
+            syncDetails.push({
+              username: member.username,
+              discordId: member.discordId,
+              action: 'updated',
+              oldRoleCount: Array.isArray(oldRoles) ? oldRoles.length : 0,
+              newRoleCount: newRoles.length,
+              discordRoles: newRoles,
+            });
+            
             updated++;
           } else {
             // Erstelle neuen Benutzer
@@ -855,19 +961,30 @@ export class DiscordService {
                 discordRoles: member.discordRoles,
               }
             });
+            
+            syncDetails.push({
+              username: member.username,
+              discordId: member.discordId,
+              action: 'imported',
+              discordRoles: newRoles,
+            });
+            
             imported++;
           }
         } catch (error) {
-          console.error(`Fehler beim Synchronisieren von ${member.username}:`, error);
+          console.error(`❌ Fehler beim Synchronisieren von ${member.username}:`, error);
           errors.push({ username: member.username, error: error.message });
         }
       }
+
+      console.log(`✅ Sync abgeschlossen: ${imported} importiert, ${updated} aktualisiert`);
 
       return {
         imported,
         updated,
         total: members.length,
-        errors
+        errors,
+        syncDetails, // Detaillierte Infos für jeden User
       };
     } catch (error) {
       console.error('Fehler beim Synchronisieren aller Mitglieder:', error);

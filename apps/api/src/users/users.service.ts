@@ -1,14 +1,18 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Role } from '@prisma/client';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private exclusionService: ExclusionService,
+  ) {}
 
-  // Alle User abrufen (keine Partner/Taxi - nur interne Mitglieder)
+  // Alle User abrufen (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
   async getAllUsers() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -27,6 +31,9 @@ export class UsersService {
       },
       orderBy: { username: 'asc' },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    return users.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
   }
 
   // User nach ID abrufen
@@ -151,7 +158,7 @@ export class UsersService {
 
     const searchTerm = query.trim().toLowerCase();
 
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -174,8 +181,13 @@ export class UsersService {
         updatedAt: true,
       },
       orderBy: { username: 'asc' },
-      take: 20, // Limit auf 20 Ergebnisse
+      take: 40, // Mehr holen für Filterung
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle) und limitiere auf 20
+    return users
+      .filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles))
+      .slice(0, 20);
   }
 
   // Alle verfügbaren Rollen abrufen

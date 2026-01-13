@@ -32,6 +32,8 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { PartnerModule } from './partner/partner.module';
 import { TafelrundeModule } from './tafelrunde/tafelrunde.module';
 import { TaxiModule } from './taxi/taxi.module';
+import { EquipmentModule } from './equipment/equipment.module';
+import { ExclusionModule } from './common/exclusion/exclusion.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -47,6 +49,7 @@ import { AppService } from './app.service';
       },
     ]),
     PrismaModule,
+    ExclusionModule, // Global exclusion service for filtering excluded users
     AuthModule,
     ItemsModule,
     CashModule,
@@ -77,6 +80,7 @@ import { AppService } from './app.service';
     PartnerModule,
     TafelrundeModule,
     TaxiModule,
+    EquipmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

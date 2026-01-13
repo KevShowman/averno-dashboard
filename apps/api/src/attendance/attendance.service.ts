@@ -1,12 +1,14 @@
 import { Injectable, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 @Injectable()
 export class AttendanceService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    private exclusionService: ExclusionService,
   ) {}
 
   // Leadership-Rollen
@@ -55,8 +57,8 @@ export class AttendanceService {
     // Berechne Start und Ende der Woche
     const { startDate, endDate } = this.getWeekDates(parseInt(year), weekNumber);
     
-    // Hole alle User (aktive Mitglieder, keine Partner/Taxi)
-    const users = await this.prisma.user.findMany({
+    // Hole alle User (aktive Mitglieder, keine Partner/Taxi/Ausgeschlossene)
+    const usersRaw = await this.prisma.user.findMany({
       where: {
         role: { notIn: ['FUTURO', 'GAST'] },
         isPartner: false,
@@ -69,12 +71,16 @@ export class AttendanceService {
         icLastName: true,
         role: true,
         avatarUrl: true,
+        discordRoles: true,
       },
       orderBy: [
         { icFirstName: 'asc' },
         { username: 'asc' },
       ],
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const users = usersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
     
     // Hole alle Anwesenheiten für die Woche
     const attendances = await this.prisma.dailyAttendance.findMany({
@@ -257,9 +263,9 @@ export class AttendanceService {
       countMap.set(a.userId, (countMap.get(a.userId) || 0) + 1);
     });
     
-    // Hole User-Daten (keine Partner/Taxi)
+    // Hole User-Daten (keine Partner/Taxi/Ausgeschlossene)
     const userIds = Array.from(countMap.keys());
-    const users = await this.prisma.user.findMany({
+    const usersRaw2 = await this.prisma.user.findMany({
       where: { 
         id: { in: userIds },
         isPartner: false,
@@ -271,8 +277,12 @@ export class AttendanceService {
         icFirstName: true,
         icLastName: true,
         avatarUrl: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const users = usersRaw2.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
     
     const userMap = new Map(users.map(u => [u.id, u]));
     
@@ -285,8 +295,8 @@ export class AttendanceService {
       .filter(s => s.user)
       .sort((a, b) => b.count - a.count);
     
-    // Hole auch alle User ohne Anwesenheiten (keine Partner/Taxi)
-    const allUsers = await this.prisma.user.findMany({
+    // Hole auch alle User ohne Anwesenheiten (keine Partner/Taxi/Ausgeschlossene)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         role: { notIn: ['FUTURO', 'GAST'] },
         id: { notIn: userIds },
@@ -299,8 +309,12 @@ export class AttendanceService {
         icFirstName: true,
         icLastName: true,
         avatarUrl: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
     
     const inactive = allUsers.map(u => ({ user: u, count: 0 }));
     
@@ -461,8 +475,8 @@ export class AttendanceService {
     const TRACKING_START_DATE = new Date('2025-12-13');
     TRACKING_START_DATE.setHours(0, 0, 0, 0);
 
-    // Hole alle aktiven User (keine Partner/Taxi)
-    const users = await this.prisma.user.findMany({
+    // Hole alle aktiven User (keine Partner/Taxi/Ausgeschlossene)
+    const usersRaw3 = await this.prisma.user.findMany({
       where: {
         role: { notIn: ['FUTURO', 'GAST'] },
         isPartner: false,
@@ -475,8 +489,12 @@ export class AttendanceService {
         icLastName: true,
         role: true,
         avatarUrl: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const users = usersRaw3.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     // Hole alle Blood Records (aktiv)
     const bloodRecords = await this.prisma.bloodRecord.findMany({

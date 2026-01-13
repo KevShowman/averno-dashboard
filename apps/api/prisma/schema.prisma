@@ -87,6 +87,13 @@ model User {
   taxiKeysUsed                     TaxiKey[]                      @relation("taxi_key_used_by")
   taxiAssignmentsAssigned          TaxiAssignment[]               @relation("taxi_assignment_driver")
   taxiAssignmentsCreated           TaxiAssignment[]               @relation("taxi_assignment_created_by")
+  // Equipment Management
+  equipmentWeapons                 EquipmentWeapon[]              @relation("equipment_weapons")
+  equipmentWeaponsCreated          EquipmentWeapon[]              @relation("equipment_weapon_created_by")
+  equipmentVests                   EquipmentVest[]                @relation("equipment_vests")
+  equipmentVestsCreated            EquipmentVest[]                @relation("equipment_vest_created_by")
+  equipmentAmmo                    EquipmentAmmo[]                @relation("equipment_ammo")
+  equipmentAmmoCreated             EquipmentAmmo[]                @relation("equipment_ammo_created_by")
 
   @@map("users")
 }
@@ -549,6 +556,7 @@ model AufstellungResponse {
 
 enum AufstellungResponseStatus {
   COMING // Kommt
+  COMING_LATE // Kommt später
   NOT_COMING // Kommt nicht
   UNSURE // Unsicher
 }
@@ -1229,6 +1237,81 @@ enum TaxiAssignmentStatus {
   PICKED_UP  // Familie abgeholt
   DELIVERED  // Familie abgeliefert
   CANCELLED  // Abgesagt
+}
+
+// ============ AUSRÜSTUNGSMANAGEMENT ============
+
+// Verfügbare Waffentypen
+enum WeaponType {
+  SMG
+  ADV
+  KARABINER
+  SPEZIALKARABINER
+  PDW
+  AK47
+  TOMMY_GUN
+}
+
+// Waffen-Zuweisung pro Mitglied
+model EquipmentWeapon {
+  id                String     @id @default(cuid())
+  userId            String
+  user              User       @relation("equipment_weapons", fields: [userId], references: [id], onDelete: Cascade)
+  weaponType        WeaponType // Art der Waffe
+  receivedAt        DateTime   @default(now()) // Wann wurde die Waffe erhalten
+  lastLostAt        DateTime?  // Wann wurde die letzte Waffe verloren
+  // Aufsätze (Checkboxen)
+  hasTaschenlampe   Boolean    @default(false)
+  hasTrommelmagazin Boolean    @default(false)
+  hasSchalldaempfer Boolean    @default(false)
+  hasGriff          Boolean    @default(false)
+  hasErwMagazin     Boolean    @default(false) // Erweitertes Magazin
+  hasZielfernrohr   Boolean    @default(false)
+  // Notizen
+  note              String?    @db.Text
+  // Tracking
+  createdById       String
+  createdBy         User       @relation("equipment_weapon_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  @@map("equipment_weapons")
+}
+
+// Westen-Zuweisung pro Mitglied
+model EquipmentVest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation("equipment_vests", fields: [userId], references: [id], onDelete: Cascade)
+  quantity        Int      // Anzahl der erhaltenen Westen
+  receivedAt      DateTime @default(now()) // Wann wurden die Westen erhalten
+  expectedEmptyAt DateTime // Wann sind die Westen voraussichtlich verbraucht (1 Weste pro Tag)
+  note            String?  @db.Text
+  // Tracking
+  createdById     String
+  createdBy       User     @relation("equipment_vest_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("equipment_vests")
+}
+
+// Munitions-Zuweisung pro Mitglied
+model EquipmentAmmo {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation("equipment_ammo", fields: [userId], references: [id], onDelete: Cascade)
+  quantity        Int      // Anzahl der erhaltenen Pakete
+  receivedAt      DateTime @default(now()) // Wann wurden die Pakete erhalten
+  expectedEmptyAt DateTime // Wann sind die Pakete voraussichtlich verbraucht (2 Pakete pro Tag)
+  note            String?  @db.Text
+  // Tracking
+  createdById     String
+  createdBy       User     @relation("equipment_ammo_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("equipment_ammo")
 }
 
 // Discord Role Mappings

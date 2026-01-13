@@ -6,6 +6,7 @@ import { SettingsService } from '../settings/settings.service';
 import { AuditService } from '../audit/audit.service';
 import { SanctionsService } from '../sanctions/sanctions.service';
 import { AbmeldungService } from '../abmeldung/abmeldung.service';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 @Injectable()
 export class WeeklyDeliveryService {
@@ -17,6 +18,7 @@ export class WeeklyDeliveryService {
     private sanctionsService: SanctionsService,
     @Inject(forwardRef(() => AbmeldungService))
     private abmeldungService: AbmeldungService,
+    private exclusionService: ExclusionService,
   ) {}
 
 
@@ -460,7 +462,7 @@ export class WeeklyDeliveryService {
     // Hole Wochenabgabe-Settings
     const settings = await this.settingsService.getWeeklyDeliverySettings();
     
-    const users = await this.prisma.user.findMany({
+    const usersRaw = await this.prisma.user.findMany({
       where: {
         role: {
           not: 'GAST', // Gäste sind ausgeschlossen
@@ -474,8 +476,12 @@ export class WeeklyDeliveryService {
         icFirstName: true,
         icLastName: true,
         role: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const users = usersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     const currentWeek = this.getCurrentWeek();
     const indexedDeliveries = [];
@@ -603,7 +609,17 @@ export class WeeklyDeliveryService {
         },
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            icFirstName: true,
+            icLastName: true,
+            isTaxi: true,
+            isPartner: true,
+            discordRoles: true,
+          },
+        },
       },
     });
 
@@ -632,6 +648,16 @@ export class WeeklyDeliveryService {
         });
         console.log(`⏭️  Überspringe Sanktion für ${delivery.user.username}: Taxi/Partner-User`);
         continue; // Keine Sanktion für Taxi/Partner-User
+      }
+
+      // Prüfe ob User ausgeschlossene Discord-Rolle hat
+      if (delivery.user && this.exclusionService.hasExcludedRole(delivery.user.discordRoles)) {
+        await this.prisma.weeklyDelivery.update({
+          where: { id: delivery.id },
+          data: { status: WeeklyDeliveryStatus.OVERDUE },
+        });
+        console.log(`⏭️  Überspringe Sanktion für ${delivery.user.username}: Ausgeschlossene Discord-Rolle`);
+        continue; // Keine Sanktion für ausgeschlossene User
       }
 
       // Prüfe, ob User für diese Woche als abgemeldet markiert wurde (persistent)

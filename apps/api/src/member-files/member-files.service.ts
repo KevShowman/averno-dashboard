@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { FileEntryType } from '@prisma/client';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 @Injectable()
 export class MemberFilesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private exclusionService: ExclusionService,
+  ) {}
 
   async getAllFiles(includeArchived: boolean = false) {
     const files = await this.prisma.memberFile.findMany({
@@ -45,8 +49,8 @@ export class MemberFilesService {
   }
 
   async getUsersPendingUprank() {
-    // Hole alle internen User aus der Datenbank (keine Partner/Taxi)
-    const allUsers = await this.prisma.user.findMany({
+    // Hole alle internen User aus der Datenbank (keine Partner/Taxi/Ausgeschlossene)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -59,8 +63,12 @@ export class MemberFilesService {
         role: true,
         avatarUrl: true,
         createdAt: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     // Hole alle Member Files
     const files = await this.prisma.memberFile.findMany({

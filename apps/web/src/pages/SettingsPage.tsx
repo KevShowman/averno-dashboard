@@ -743,6 +743,11 @@ export default function SettingsPage() {
         </Card>
       )}
 
+      {/* Discord Mitglieder Synchronisation - nur für Leadership */}
+      {canManageUsers && (
+        <DiscordMembersManager />
+      )}
+
       {/* System Information */}
       <Card className="lasanta-card">
         <CardHeader>

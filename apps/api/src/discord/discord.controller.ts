@@ -106,7 +106,8 @@ export class DiscordController {
         message: 'Alle Discord-Mitglieder erfolgreich synchronisiert',
         imported: result.imported,
         updated: result.updated,
-        total: result.total
+        total: result.total,
+        syncDetails: result.syncDetails, // Detaillierte Sync-Infos
       };
     } catch (error) {
       throw error;
@@ -138,6 +139,24 @@ export class DiscordController {
     return this.discordService.syncUsersAndRemoveInactive();
   }
 
+  // Sync Discord-Rollen für ALLE bestehenden DB-User (auch ohne gemappte Rollen)
+  @Get('sync-all-discord-roles')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async syncAllDiscordRoles() {
+    try {
+      const result = await this.discordService.syncAllExistingUsersDiscordRoles();
+      return {
+        message: 'Discord-Rollen für alle DB-User synchronisiert',
+        ...result,
+      };
+    } catch (error) {
+      return {
+        error: 'Fehler beim Synchronisieren',
+        message: error.message,
+      };
+    }
+  }
+
   // Alle Text-Channels des Servers abrufen (für Settings Dropdown)
   @Get('channels')
   @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
@@ -154,6 +173,43 @@ export class DiscordController {
         error: 'Fehler beim Abrufen der Channels',
         message: error.message,
         channels: [],
+      };
+    }
+  }
+
+  // Debug: Discord-Rollen eines spezifischen Users direkt von Discord API holen
+  @Get('debug-user-roles/:discordId')
+  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  async debugUserRoles(@Param('discordId') discordId: string) {
+    try {
+      // Hole Rollen direkt von Discord
+      const discordRoles = await this.discordService.getUserRoles(discordId);
+      
+      // Hole auch den User aus der DB
+      const dbUser = await this.discordService.getUserByDiscordId(discordId);
+      
+      // Parse DB roles sicher
+      const dbRoles: string[] = Array.isArray(dbUser?.discordRoles) 
+        ? dbUser.discordRoles as string[]
+        : [];
+      
+      return {
+        discordId,
+        fromDiscordApi: discordRoles,
+        fromDatabase: dbRoles,
+        dbUserId: dbUser?.id,
+        dbUsername: dbUser?.username,
+        roleCount: {
+          discord: discordRoles.length,
+          database: dbRoles.length,
+        },
+        missingInDb: discordRoles.filter(r => !dbRoles.includes(r)),
+        extraInDb: dbRoles.filter(r => !discordRoles.includes(r)),
+      };
+    } catch (error) {
+      return {
+        error: 'Fehler beim Debug',
+        message: error.message,
       };
     }
   }

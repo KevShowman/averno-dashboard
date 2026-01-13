@@ -4,6 +4,7 @@ import { AufstellungResponseStatus, Role } from '@prisma/client';
 import { SanctionsService } from '../sanctions/sanctions.service';
 import { AbmeldungService } from '../abmeldung/abmeldung.service';
 import { DiscordService } from '../discord/discord.service';
+import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 // Discord Kanal ID für Aufstellungs-Reminder
 const AUFSTELLUNG_REMINDER_CHANNEL_ID = '1431388063195594981';
@@ -16,6 +17,7 @@ export class AufstellungService {
     @Inject(forwardRef(() => AbmeldungService))
     private abmeldungService: AbmeldungService,
     private discordService: DiscordService,
+    private exclusionService: ExclusionService,
   ) {}
 
   // Erstelle neue Aufstellung
@@ -56,16 +58,20 @@ export class AufstellungService {
 
   // Automatisch abgemeldete User auf "Kommt nicht" setzen
   private async autoSetAbgemeldetUserNotComing(aufstellungId: string, aufstellungDate: Date) {
-    // Hole alle User (keine Partner/Taxi - nur interne Mitglieder)
-    const allUsers = await this.prisma.user.findMany({
+    // Hole alle aktiven User (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
       },
       select: {
         id: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     // Prüfe für jeden User, ob er abgemeldet ist
     for (const user of allUsers) {
@@ -165,8 +171,8 @@ export class AufstellungService {
       throw new NotFoundException('Aufstellung nicht gefunden');
     }
 
-    // Alle User abrufen um zu sehen wer nicht reagiert hat (keine Partner/Taxi - nur interne Mitglieder)
-    const allUsers = await this.prisma.user.findMany({
+    // Alle aktiven User abrufen um zu sehen wer nicht reagiert hat (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -177,8 +183,12 @@ export class AufstellungService {
         icFirstName: true,
         icLastName: true,
         role: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     const respondedUserIds = new Set(aufstellung.responses.map(r => r.userId));
     let usersWithoutResponse = allUsers.filter(user => !respondedUserIds.has(user.id));
@@ -214,6 +224,7 @@ export class AufstellungService {
       stats: {
         total: totalNonExcluded,
         coming: filteredResponses.filter(r => r.status === AufstellungResponseStatus.COMING).length,
+        comingLate: filteredResponses.filter(r => r.status === AufstellungResponseStatus.COMING_LATE).length,
         notComing: filteredResponses.filter(r => r.status === AufstellungResponseStatus.NOT_COMING).length,
         unsure: filteredResponses.filter(r => r.status === AufstellungResponseStatus.UNSURE).length,
         noResponse: usersWithoutResponse.length,
@@ -300,8 +311,8 @@ export class AufstellungService {
       throw new BadRequestException('Die Deadline wurde noch nicht erreicht');
     }
 
-    // Alle User abrufen (keine Partner/Taxi - nur interne Mitglieder)
-    const allUsers = await this.prisma.user.findMany({
+    // Alle aktiven User abrufen (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -311,10 +322,14 @@ export class AufstellungService {
         username: true,
         icFirstName: true,
         icLastName: true,
+        discordRoles: true,
       },
     });
 
-    // Filtere Responses: Nur interne User (keine Taxi/Partner)
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
+
+    // Filtere Responses: Nur interne User (keine Taxi/Partner/Ausgeschlossene)
     const internalUserIds = new Set(allUsers.map(u => u.id));
     const filteredResponses = aufstellung.responses.filter(r => internalUserIds.has(r.userId));
     const respondedUserIds = new Set(filteredResponses.map(r => r.userId));
@@ -633,8 +648,8 @@ export class AufstellungService {
       throw new NotFoundException('Aufstellung nicht gefunden');
     }
 
-    // Alle User abrufen (keine Partner/Taxi - nur interne Mitglieder)
-    const allUsers = await this.prisma.user.findMany({
+    // Alle aktiven User abrufen (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
+    const allUsersRaw = await this.prisma.user.findMany({
       where: {
         isPartner: false,
         isTaxi: false,
@@ -645,8 +660,12 @@ export class AufstellungService {
         icFirstName: true,
         icLastName: true,
         discordId: true,
+        discordRoles: true,
       },
     });
+
+    // Filter ausgeschlossene User (Discord-Rolle)
+    const allUsers = allUsersRaw.filter(u => !this.exclusionService.hasExcludedRole(u.discordRoles));
 
     // Filtere Responses: Nur interne User (keine Taxi/Partner)
     const internalUserIds = new Set(allUsers.map(u => u.id));

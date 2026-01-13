@@ -151,7 +151,7 @@ export const aufstellungApi = {
   getUpcoming: () => api.get('/aufstellung/upcoming'),
   getMyPending: () => api.get('/aufstellung/my-pending'),
   getById: (id: string) => api.get(`/aufstellung/${id}`),
-  respond: (id: string, status: 'COMING' | 'NOT_COMING' | 'UNSURE') =>
+  respond: (id: string, status: 'COMING' | 'COMING_LATE' | 'NOT_COMING' | 'UNSURE') =>
     api.post(`/aufstellung/${id}/respond`, { status }),
   sanctionNonResponders: (id: string) => api.post(`/aufstellung/${id}/sanction-non-responders`),
   sendReminder: (id: string) => api.post(`/aufstellung/${id}/send-reminder`),
@@ -242,6 +242,37 @@ export const clothingApi = {
   saveMyClothing: (data: any) => api.put('/clothing/my-clothing', data).then(res => res.data),
 };
 
+// Equipment API
+export const equipmentApi = {
+  // Weapons
+  getAllWeapons: () => api.get('/equipment/weapons').then(res => res.data),
+  getUserWeapons: (userId: string) => api.get(`/equipment/weapons/user/${userId}`).then(res => res.data),
+  getMyWeapons: () => api.get('/equipment/weapons/my').then(res => res.data),
+  createWeapon: (data: any) => api.post('/equipment/weapons', data).then(res => res.data),
+  updateWeapon: (id: string, data: any) => api.patch(`/equipment/weapons/${id}`, data).then(res => res.data),
+  deleteWeapon: (id: string) => api.delete(`/equipment/weapons/${id}`).then(res => res.data),
+  // Vests
+  getAllVests: () => api.get('/equipment/vests').then(res => res.data),
+  getUserVests: (userId: string) => api.get(`/equipment/vests/user/${userId}`).then(res => res.data),
+  getMyVests: () => api.get('/equipment/vests/my').then(res => res.data),
+  createVest: (data: any) => api.post('/equipment/vests', data).then(res => res.data),
+  deleteVest: (id: string) => api.delete(`/equipment/vests/${id}`).then(res => res.data),
+  // Ammo
+  getAllAmmo: () => api.get('/equipment/ammo').then(res => res.data),
+  getUserAmmo: (userId: string) => api.get(`/equipment/ammo/user/${userId}`).then(res => res.data),
+  getMyAmmo: () => api.get('/equipment/ammo/my').then(res => res.data),
+  createAmmo: (data: any) => api.post('/equipment/ammo', data).then(res => res.data),
+  deleteAmmo: (id: string) => api.delete(`/equipment/ammo/${id}`).then(res => res.data),
+  // Overview
+  getUserEquipment: (userId: string) => api.get(`/equipment/user/${userId}`).then(res => res.data),
+  getMyEquipment: () => api.get('/equipment/my').then(res => res.data),
+  getStats: () => api.get('/equipment/stats').then(res => res.data),
+  getWeaponTypes: () => api.get('/equipment/weapon-types').then(res => res.data),
+  getAttachments: () => api.get('/equipment/attachments').then(res => res.data),
+  // Recommendations (Ampelsystem)
+  getRecommendations: () => api.get('/equipment/recommendations').then(res => res.data),
+};
+
 // Sicario API
 export const sicarioApi = {
   checkAccess: () => api.get('/sicario/access').then(res => res.data),
@@ -252,7 +283,7 @@ export const sicarioApi = {
   getAufstellungById: (id: string) => api.get(`/sicario/aufstellung/${id}`).then(res => res.data),
   createAufstellung: (data: { date: string; time: string; reason: string; location?: string }) =>
     api.post('/sicario/aufstellung', data).then(res => res.data),
-  respondToAufstellung: (id: string, status: 'COMING' | 'NOT_COMING' | 'UNSURE') =>
+  respondToAufstellung: (id: string, status: 'COMING' | 'COMING_LATE' | 'NOT_COMING' | 'UNSURE') =>
     api.post(`/sicario/aufstellung/${id}/respond`, { status }).then(res => res.data),
   deleteAufstellung: (id: string) => api.delete(`/sicario/aufstellung/${id}`).then(res => res.data),
 };

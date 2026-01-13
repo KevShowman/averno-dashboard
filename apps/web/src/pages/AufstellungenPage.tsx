@@ -49,7 +49,7 @@ interface Aufstellung {
   }
   responses: Array<{
     id: string
-    status: 'COMING' | 'NOT_COMING' | 'UNSURE'
+    status: 'COMING' | 'COMING_LATE' | 'NOT_COMING' | 'UNSURE'
     user: {
       id: string
       username: string
@@ -60,6 +60,7 @@ interface Aufstellung {
   stats?: {
     total: number
     coming: number
+    comingLate: number
     notComing: number
     unsure: number
     noResponse: number
@@ -130,7 +131,7 @@ export default function AufstellungenPage() {
 
   // Mutation: Reagieren
   const respondMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: 'COMING' | 'NOT_COMING' | 'UNSURE' }) =>
+    mutationFn: ({ id, status }: { id: string; status: 'COMING' | 'COMING_LATE' | 'NOT_COMING' | 'UNSURE' }) =>
       aufstellungApi.respond(id, status),
     onSuccess: () => {
       toast.success('Deine Antwort wurde gespeichert')
@@ -524,6 +525,12 @@ export default function AufstellungenPage() {
                                 Komme
                               </Badge>
                             )}
+                            {myResponse.status === 'COMING_LATE' && (
+                              <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                                <Clock className="mr-1 h-3 w-3" />
+                                Komme später
+                              </Badge>
+                            )}
                             {myResponse.status === 'NOT_COMING' && (
                               <Badge className="bg-red-900/40 text-red-300 border-red-500/50">
                                 <XCircle className="mr-1 h-3 w-3" />
@@ -554,6 +561,12 @@ export default function AufstellungenPage() {
                             <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
                           </div>
                           <span className="text-green-400 font-medium">{auf.responses.filter(r => r.status === 'COMING').length}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-sm">
+                          <div className="p-1 bg-blue-900/40 rounded">
+                            <Clock className="h-3.5 w-3.5 text-blue-400" />
+                          </div>
+                          <span className="text-blue-400 font-medium">{auf.responses.filter(r => r.status === 'COMING_LATE').length}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-sm">
                           <div className="p-1 bg-red-900/40 rounded">
@@ -656,6 +669,12 @@ export default function AufstellungenPage() {
                                   Komme
                                 </Badge>
                               )}
+                              {myResponse.status === 'COMING_LATE' && (
+                                <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                                  <Clock className="mr-1 h-3 w-3" />
+                                  Komme später
+                                </Badge>
+                              )}
                               {myResponse.status === 'NOT_COMING' && (
                                 <Badge className="bg-red-900/40 text-red-300 border-red-500/50">
                                   <XCircle className="mr-1 h-3 w-3" />
@@ -684,6 +703,12 @@ export default function AufstellungenPage() {
                                 <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
                               </div>
                               <span className="text-green-400 font-medium">{auf.responses.filter(r => r.status === 'COMING').length}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <div className="p-1 bg-blue-900/40 rounded">
+                                <Clock className="h-3.5 w-3.5 text-blue-400" />
+                              </div>
+                              <span className="text-blue-400 font-medium">{auf.responses.filter(r => r.status === 'COMING_LATE').length}</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-sm">
                               <div className="p-1 bg-red-900/40 rounded">
@@ -764,7 +789,7 @@ export default function AufstellungenPage() {
                         <Zap className="h-5 w-5 text-amber-400" />
                         Deine Reaktion
                       </h3>
-                      <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-2 gap-3">
                         <Button
                           variant={getMyResponse(aufstellungDetails)?.status === 'COMING' ? 'default' : 'outline'}
                           className={`h-12 transition-all ${
@@ -782,6 +807,24 @@ export default function AufstellungenPage() {
                         >
                           <CheckCircle2 className="mr-2 h-5 w-5" />
                           Komme
+                        </Button>
+                        <Button
+                          variant={getMyResponse(aufstellungDetails)?.status === 'COMING_LATE' ? 'default' : 'outline'}
+                          className={`h-12 transition-all ${
+                            getMyResponse(aufstellungDetails)?.status === 'COMING_LATE'
+                              ? 'bg-blue-600 hover:bg-blue-500 border-blue-500 shadow-lg shadow-blue-500/20 text-white'
+                              : 'border-gray-600 hover:border-blue-500 hover:bg-blue-900/20 text-gray-300 hover:text-blue-400'
+                          }`}
+                          onClick={() =>
+                            respondMutation.mutate({
+                              id: selectedAufstellung,
+                              status: 'COMING_LATE',
+                            })
+                          }
+                          disabled={respondMutation.isPending}
+                        >
+                          <Clock className="mr-2 h-5 w-5" />
+                          Komme später
                         </Button>
                         <Button
                           variant={getMyResponse(aufstellungDetails)?.status === 'NOT_COMING' ? 'default' : 'outline'}
@@ -830,7 +873,7 @@ export default function AufstellungenPage() {
                         <BarChart3 className="h-5 w-5 text-amber-400" />
                         Übersicht
                       </h3>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-3 gap-3">
                         <div className="group relative overflow-hidden bg-gradient-to-br from-green-900/50 to-green-800/30 p-4 rounded-xl border border-green-500/30 hover:border-green-500/60 transition-all">
                           <div className="relative">
                             <CheckCircle2 className="h-5 w-5 text-green-400 mb-2" />
@@ -838,6 +881,15 @@ export default function AufstellungenPage() {
                               {aufstellungDetails.stats.coming}
                             </div>
                             <div className="text-xs text-green-300/70 uppercase tracking-wide">Kommen</div>
+                          </div>
+                        </div>
+                        <div className="group relative overflow-hidden bg-gradient-to-br from-blue-900/50 to-blue-800/30 p-4 rounded-xl border border-blue-500/30 hover:border-blue-500/60 transition-all">
+                          <div className="relative">
+                            <Clock className="h-5 w-5 text-blue-400 mb-2" />
+                            <div className="text-3xl font-bold text-blue-400 mb-1">
+                              {aufstellungDetails.stats.comingLate || 0}
+                            </div>
+                            <div className="text-xs text-blue-300/70 uppercase tracking-wide">Später</div>
                           </div>
                         </div>
                         <div className="group relative overflow-hidden bg-gradient-to-br from-red-900/50 to-red-800/30 p-4 rounded-xl border border-red-500/30 hover:border-red-500/60 transition-all">
@@ -858,7 +910,7 @@ export default function AufstellungenPage() {
                             <div className="text-xs text-yellow-300/70 uppercase tracking-wide">Unsicher</div>
                           </div>
                         </div>
-                        <div className="group relative overflow-hidden bg-gradient-to-br from-orange-900/50 to-orange-800/30 p-4 rounded-xl border border-orange-500/30 hover:border-orange-500/60 transition-all">
+                        <div className="col-span-2 group relative overflow-hidden bg-gradient-to-br from-orange-900/50 to-orange-800/30 p-4 rounded-xl border border-orange-500/30 hover:border-orange-500/60 transition-all">
                           <div className="relative">
                             <UserX className="h-5 w-5 text-orange-400 mb-2" />
                             <div className="text-3xl font-bold text-orange-400 mb-1">
@@ -896,6 +948,36 @@ export default function AufstellungenPage() {
                                 >
                                   <div className="p-1 bg-green-500/20 rounded">
                                     <User className="h-3 w-3 text-green-400" />
+                                  </div>
+                                  {getDisplayName(r.user)}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Komme später */}
+                      {aufstellungDetails.responses.filter((r: any) => r.status === 'COMING_LATE').length > 0 && (
+                        <div className="bg-gray-800/50 p-4 rounded-xl border border-blue-500/30">
+                          <h3 className="text-white font-semibold mb-3 flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                              <Clock className="h-5 w-5 text-blue-400" />
+                              Kommen später
+                            </span>
+                            <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                              {aufstellungDetails.responses.filter((r: any) => r.status === 'COMING_LATE').length}
+                            </Badge>
+                          </h3>
+                          <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                            {aufstellungDetails.responses
+                              .filter((r: any) => r.status === 'COMING_LATE')
+                              .map((r: any) => (
+                                <div
+                                  key={r.id}
+                                  className="flex items-center gap-2 bg-blue-900/20 hover:bg-blue-900/30 border border-blue-500/30 p-3 rounded-lg text-sm text-blue-200 transition-colors"
+                                >
+                                  <div className="p-1 bg-blue-500/20 rounded">
+                                    <User className="h-3 w-3 text-blue-400" />
                                   </div>
                                   {getDisplayName(r.user)}
                                 </div>
