@@ -64,10 +64,8 @@ export class EquipmentController {
 
   // ============ WAFFEN ============
 
-  // Alle Waffen abrufen (Leadership)
+  // Alle Waffen abrufen (Alle Mitglieder)
   @Get('weapons')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
-  @UseGuards(RolesGuard)
   async getAllWeapons() {
     return this.equipmentService.getAllWeapons();
   }
@@ -110,10 +108,8 @@ export class EquipmentController {
 
   // ============ WESTEN ============
 
-  // Alle Westen abrufen (Leadership)
+  // Alle Westen abrufen (Alle Mitglieder)
   @Get('vests')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
-  @UseGuards(RolesGuard)
   async getAllVests() {
     return this.equipmentService.getAllVests();
   }
@@ -148,10 +144,8 @@ export class EquipmentController {
 
   // ============ MUNITION ============
 
-  // Alle Munition abrufen (Leadership)
+  // Alle Munition abrufen (Alle Mitglieder)
   @Get('ammo')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
-  @UseGuards(RolesGuard)
   async getAllAmmo() {
     return this.equipmentService.getAllAmmo();
   }
@@ -198,10 +192,8 @@ export class EquipmentController {
     return this.equipmentService.getUserEquipment(req.user.id);
   }
 
-  // Statistiken (Leadership)
+  // Statistiken (Alle Mitglieder)
   @Get('stats')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
-  @UseGuards(RolesGuard)
   async getStats() {
     return this.equipmentService.getStats();
   }
@@ -218,10 +210,8 @@ export class EquipmentController {
     return this.equipmentService.getAttachments();
   }
 
-  // Waffen-Empfehlungen (Ampelsystem)
+  // Waffen-Empfehlungen (Ampelsystem) - Alle Mitglieder
   @Get('recommendations')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
-  @UseGuards(RolesGuard)
   async getWeaponRecommendations() {
     return this.equipmentService.getWeaponRecommendations();
   }

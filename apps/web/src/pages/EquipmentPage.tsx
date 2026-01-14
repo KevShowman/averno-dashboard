@@ -186,29 +186,28 @@ export default function EquipmentPage() {
     (user.allRoles && (user.allRoles as string[]).includes('LOGISTICA'))
   );
 
-  // Queries
+  // Queries - Alle Mitglieder können sehen
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ['equipment', 'stats'],
     queryFn: () => equipmentApi.getStats(),
-    enabled: !!canManage,
   });
 
   const { data: weapons = [], isLoading: loadingWeapons } = useQuery({
     queryKey: ['equipment', 'weapons'],
     queryFn: () => equipmentApi.getAllWeapons(),
-    enabled: !!canManage && (viewMode === 'weapons' || viewMode === 'overview'),
+    enabled: viewMode === 'weapons' || viewMode === 'overview',
   });
 
   const { data: vests = [], isLoading: loadingVests } = useQuery({
     queryKey: ['equipment', 'vests'],
     queryFn: () => equipmentApi.getAllVests(),
-    enabled: !!canManage && (viewMode === 'vests' || viewMode === 'overview'),
+    enabled: viewMode === 'vests' || viewMode === 'overview',
   });
 
   const { data: ammo = [], isLoading: loadingAmmo } = useQuery({
     queryKey: ['equipment', 'ammo'],
     queryFn: () => equipmentApi.getAllAmmo(),
-    enabled: !!canManage && (viewMode === 'ammo' || viewMode === 'overview'),
+    enabled: viewMode === 'ammo' || viewMode === 'overview',
   });
 
   const { data: weaponTypes = [] } = useQuery({
@@ -224,7 +223,7 @@ export default function EquipmentPage() {
   const { data: recommendationsData, isLoading: loadingRecommendations } = useQuery({
     queryKey: ['equipment', 'recommendations'],
     queryFn: () => equipmentApi.getRecommendations(),
-    enabled: !!canManage && viewMode === 'recommendations',
+    enabled: viewMode === 'recommendations',
   });
 
   const { data: allUsers = [] } = useQuery({
@@ -238,11 +237,10 @@ export default function EquipmentPage() {
     enabled: searchQuery.length >= 2,
   });
 
-  // My Equipment (for non-leadership)
+  // My Equipment (persönliche Ansicht)
   const { data: myEquipment } = useQuery({
     queryKey: ['equipment', 'my'],
     queryFn: () => equipmentApi.getMyEquipment(),
-    enabled: !canManage,
   });
 
   // Mutations
@@ -497,97 +495,7 @@ export default function EquipmentPage() {
     );
   }
 
-  // Non-leadership view - show only my equipment
-  if (!canManage) {
-    return (
-      <div className="container mx-auto p-6 space-y-6">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-orange-500/5" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
-          <div className="relative flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl shadow-lg shadow-amber-500/30">
-              <Shield className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">Meine Ausrüstung</h1>
-              <p className="text-gray-400 mt-1">Übersicht deiner zugewiesenen Ausrüstung</p>
-            </div>
-          </div>
-        </div>
-
-        {myEquipment && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">Waffen</p>
-                    <p className="text-3xl font-bold text-amber-400">{myEquipment.summary?.weaponCount || 0}</p>
-                  </div>
-                  <Swords className="h-10 w-10 text-amber-500/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-blue-500/30">
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">Westen (Tage)</p>
-                    <p className="text-3xl font-bold text-blue-400">{myEquipment.summary?.vestsRemaining || 0}</p>
-                  </div>
-                  <Shield className="h-10 w-10 text-blue-500/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-red-500/30">
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">Munition (Pakete)</p>
-                    <p className="text-3xl font-bold text-red-400">{myEquipment.summary?.ammoRemaining || 0}</p>
-                  </div>
-                  <Target className="h-10 w-10 text-red-500/30" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* My Weapons */}
-        {myEquipment?.weapons && myEquipment.weapons.length > 0 && (
-          <Card className="bg-gray-900/50 border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Swords className="h-5 w-5 text-amber-400" />
-                Meine Waffen
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {myEquipment.weapons.map((weapon: Weapon) => (
-                  <div key={weapon.id} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-white">{WEAPON_TYPE_NAMES[weapon.weaponType] || weapon.weaponType}</span>
-                      <span className="text-gray-400 text-sm">Erhalten: {formatDate(weapon.receivedAt)}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {getAttachmentBadges(weapon).map(badge => (
-                        <Badge key={badge} variant="outline" className="text-xs bg-amber-500/10 border-amber-500/30 text-amber-300">
-                          {badge}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    );
-  }
-
-  // Management view
+  // Full view - alle können sehen, nur Leadership kann bearbeiten
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
@@ -606,20 +514,22 @@ export default function EquipmentPage() {
             </div>
           </div>
           
-          <div className="flex gap-2">
-            <Button onClick={() => setShowWeaponModal(true)} className="bg-amber-600 hover:bg-amber-700 text-white">
-              <Swords className="mr-2 h-4 w-4" />
-              Waffe eintragen
-            </Button>
-            <Button onClick={() => setShowVestModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Shield className="mr-2 h-4 w-4" />
-              Westen eintragen
-            </Button>
-            <Button onClick={() => setShowAmmoModal(true)} className="bg-red-600 hover:bg-red-700 text-white">
-              <Target className="mr-2 h-4 w-4" />
-              Munition eintragen
-            </Button>
-          </div>
+          {canManage && (
+            <div className="flex gap-2">
+              <Button onClick={() => setShowWeaponModal(true)} className="bg-amber-600 hover:bg-amber-700 text-white">
+                <Swords className="mr-2 h-4 w-4" />
+                Waffe eintragen
+              </Button>
+              <Button onClick={() => setShowVestModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Shield className="mr-2 h-4 w-4" />
+                Westen eintragen
+              </Button>
+              <Button onClick={() => setShowAmmoModal(true)} className="bg-red-600 hover:bg-red-700 text-white">
+                <Target className="mr-2 h-4 w-4" />
+                Munition eintragen
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -787,7 +697,7 @@ export default function EquipmentPage() {
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aufsätze</th>
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erhalten</th>
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Letzter Verlust</th>
-                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800/50">
@@ -836,30 +746,32 @@ export default function EquipmentPage() {
                             <span className="text-gray-500 text-sm">-</span>
                           )}
                         </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEditWeapon(weapon)}
-                              className="h-8 px-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                if (confirm('Waffe wirklich löschen?')) {
-                                  deleteWeaponMutation.mutate(weapon.id);
-                                }
-                              }}
-                              className="h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
+                        {canManage && (
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleEditWeapon(weapon)}
+                                className="h-8 px-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  if (confirm('Waffe wirklich löschen?')) {
+                                    deleteWeaponMutation.mutate(weapon.id);
+                                  }
+                                }}
+                                className="h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -898,7 +810,7 @@ export default function EquipmentPage() {
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erhalten</th>
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Verbraucht bis</th>
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tage übrig</th>
-                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800/50">
@@ -942,20 +854,22 @@ export default function EquipmentPage() {
                               {daysRemaining > 0 ? `${daysRemaining} Tage` : 'Verbraucht'}
                             </Badge>
                           </td>
-                          <td className="py-4 px-6 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                if (confirm('Eintrag wirklich löschen?')) {
-                                  deleteVestMutation.mutate(vest.id);
-                                }
-                              }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </td>
+                          {canManage && (
+                            <td className="py-4 px-6 text-right">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  if (confirm('Eintrag wirklich löschen?')) {
+                                    deleteVestMutation.mutate(vest.id);
+                                  }
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
@@ -995,7 +909,7 @@ export default function EquipmentPage() {
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erhalten</th>
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Verbraucht bis</th>
                       <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tage übrig</th>
-                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800/50">
@@ -1039,20 +953,22 @@ export default function EquipmentPage() {
                               {daysRemaining > 0 ? `${daysRemaining} Tage` : 'Verbraucht'}
                             </Badge>
                           </td>
-                          <td className="py-4 px-6 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                if (confirm('Eintrag wirklich löschen?')) {
-                                  deleteAmmoMutation.mutate(a.id);
-                                }
-                              }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </td>
+                          {canManage && (
+                            <td className="py-4 px-6 text-right">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  if (confirm('Eintrag wirklich löschen?')) {
+                                    deleteAmmoMutation.mutate(a.id);
+                                  }
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
@@ -1534,7 +1450,7 @@ export default function EquipmentPage() {
                         <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sicario</th>
                         <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Hat Waffe</th>
                         <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Empfehlung</th>
-                        <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>
+                        {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800/50">
@@ -1633,21 +1549,23 @@ export default function EquipmentPage() {
                               {rec.statusText}
                             </Badge>
                           </td>
-                          <td className="py-4 px-6 text-right">
-                            {!rec.hasWeapon && rec.user && (
-                              <Button
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedUserId(rec.user!.id);
-                                  setShowWeaponModal(true);
-                                }}
-                                className="bg-amber-600 hover:bg-amber-700 text-gray-900"
-                              >
-                                <Swords className="h-4 w-4 mr-1" />
-                                Waffe zuweisen
-                              </Button>
-                            )}
-                          </td>
+                          {canManage && (
+                            <td className="py-4 px-6 text-right">
+                              {!rec.hasWeapon && rec.user && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedUserId(rec.user!.id);
+                                    setShowWeaponModal(true);
+                                  }}
+                                  className="bg-amber-600 hover:bg-amber-700 text-gray-900"
+                                >
+                                  <Swords className="h-4 w-4 mr-1" />
+                                  Waffe zuweisen
+                                </Button>
+                              )}
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
