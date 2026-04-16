@@ -1,0 +1,1317 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  discordId    String   @unique
+  username     String
+  icFirstName  String? // IC Vorname
+  icLastName   String? // IC Nachname
+  avatarUrl    String?
+  email        String?
+  gender       Gender?  @default(MALE) // Geschlecht für Kleidungszuweisung
+  role         Role     @default(SOLDADO)
+  allRoles     Json     @default("[]") // Alle System-Rollen des Users (JSON array)
+  discordRoles Json     @default("[]") // Discord Rollen-IDs (JSON array)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  actions                          ActionLog[]
+  moneyTxCreated                   MoneyTransaction[]             @relation("tx_created_by")
+  moneyTxApproved                  MoneyTransaction[]             @relation("tx_approved_by")
+  stockMovements                   StockMovement[]                @relation("movement_created_by")
+  stockMovementsApproved           StockMovement[]                @relation("movement_approved_by")
+  packageDeposits                  PackageDeposit[]               @relation("deposit_created_by")
+  packageConfirmations             PackageDeposit[]               @relation("deposit_confirmed_by")
+  packageRejections                PackageDeposit[]               @relation("deposit_rejected_by")
+  weeklyDeliveries                 WeeklyDelivery[]               @relation("delivery_created_by")
+  weeklyDeliveryConfirmations      WeeklyDelivery[]               @relation("delivery_confirmed_by")
+  sanctionsCreated                 Sanction[]                     @relation("sanction_created_by")
+  sanctionsReceived                Sanction[]                     @relation("sanction_received_by")
+  exclusionsReceived               WeeklyDeliveryExclusion[]      @relation("exclusion_user")
+  exclusionsCreated                WeeklyDeliveryExclusion[]      @relation("exclusion_created_by")
+  archivesCreated                  WeeklyDeliveryArchive[]        @relation("archive_created_by")
+  aufstellungenCreated             Aufstellung[]                  @relation("aufstellung_created_by")
+  aufstellungResponses             AufstellungResponse[]          @relation("aufstellung_responses")
+  aufstellungExclusionsReceived    AufstellungExclusion[]         @relation("aufstellung_exclusion_user")
+  aufstellungExclusionsCreated     AufstellungExclusion[]         @relation("aufstellung_exclusion_created_by")
+  abmeldungenCreated               Abmeldung[]                    @relation("abmeldung_user")
+  familiensammelnParticipations    FamiliensammelnParticipation[] @relation("familiensammeln_participations")
+  organigrammAssignments           OrganigrammAssignment[]        @relation("organigramm_assignments")
+  processors                       FamiliensammelnProcessor[]     @relation("processor_user")
+  processorsCompleted              FamiliensammelnProcessor[]     @relation("processor_completed_by")
+  memberFile                       MemberFile?                    @relation("member_files")
+  fileEntriesCreated               MemberFileEntry[]              @relation("file_entries_created")
+  sicarioAufstellungenCreated      SicarioAufstellung[]           @relation("sicario_aufstellung_created_by")
+  sicarioAufstellungResponses      SicarioAufstellungResponse[]   @relation("sicario_aufstellung_responses")
+  mapAnnotationsCreated            MapAnnotation[]                @relation("map_annotation_created_by")
+  mapAreasCreated                  MapArea[]                      @relation("map_area_created_by")
+  familyContactsOutdatedMarked     FamilyContact[]                @relation("family_contact_outdated_by")
+  dailyAttendanceMarked            DailyAttendance[]              @relation("attendance_marked_by")
+  dailyAttendanceReceived          DailyAttendance[]              @relation("attendance_user")
+  attendancePermissionsGranted     AttendancePermission[]         @relation("attendance_permission_granted_by")
+  attendancePermissionsReceived    AttendancePermission[]         @relation("attendance_permission_user")
+  listPermissionsGranted           ListPermission[]               @relation("list_permission_granted_by")
+  listPermissionsReceived          ListPermission[]               @relation("list_permission_user")
+  mapPermissionsGranted            MapPermission[]                @relation("map_permission_granted_by")
+  mapPermissionsReceived           MapPermission[]                @relation("map_permission_user")
+  mapSuggestionsCreated            MapSuggestion[]                @relation("map_suggestion_created_by")
+  mapSuggestionsReviewed           MapSuggestion[]                @relation("map_suggestion_reviewed_by")
+  // Partner System
+  isPartner                        Boolean                        @default(false) // Kennzeichnet Partner-User
+  partnerCanViewContacts           Boolean                        @default(false) // Partner kann Kontaktdetails sehen
+  partnerRequestsReviewed          PartnerAccessRequest[]         @relation("partner_request_reviewed_by")
+  partnerPermissionsGranted        PartnerManagementPermission[]  @relation("partner_permission_granted_by")
+  partnerPermissionsReceived       PartnerManagementPermission[]  @relation("partner_permission_user")
+  partnerFamilySuggestionsCreated  PartnerFamilySuggestion[]      @relation("partner_family_suggestion_created_by")
+  partnerFamilySuggestionsReviewed PartnerFamilySuggestion[]      @relation("partner_family_suggestion_reviewed_by")
+  // Tafelrunde System
+  tafelrundenCreated               Tafelrunde[]                   @relation("tafelrunde_created_by")
+  tafelrundeFamiliesUpdated        TafelrundeFamily[]             @relation("tafelrunde_family_updated_by")
+  tafelrundePermissionsGranted     TafelrundePermission[]         @relation("tafelrunde_permission_granted_by")
+  tafelrundePermissionsReceived    TafelrundePermission[]         @relation("tafelrunde_permission_user")
+  // Taxi System
+  isTaxi                           Boolean                        @default(false) // Kennzeichnet Taxi-User
+  isTaxiLead                       Boolean                        @default(false) // Taxi-Leitungsebene (Master Key)
+  taxiKeysCreated                  TaxiKey[]                      @relation("taxi_key_created_by")
+  taxiKeysUsed                     TaxiKey[]                      @relation("taxi_key_used_by")
+  taxiAssignmentsAssigned          TaxiAssignment[]               @relation("taxi_assignment_driver")
+  taxiAssignmentsCreated           TaxiAssignment[]               @relation("taxi_assignment_created_by")
+  // Equipment Management
+  equipmentWeapons                 EquipmentWeapon[]              @relation("equipment_weapons")
+  equipmentWeaponsCreated          EquipmentWeapon[]              @relation("equipment_weapon_created_by")
+  equipmentVests                   EquipmentVest[]                @relation("equipment_vests")
+  equipmentVestsCreated            EquipmentVest[]                @relation("equipment_vest_created_by")
+  equipmentAmmo                    EquipmentAmmo[]                @relation("equipment_ammo")
+  equipmentAmmoCreated             EquipmentAmmo[]                @relation("equipment_ammo_created_by")
+
+  @@map("users")
+}
+
+enum Role {
+  // Alte Rollen (temporär für Migration)
+  ADMIN
+  QUARTIERMEISTER
+  MITGLIED
+  GAST
+  // Leaderschaft (automatisch synchronisiert)
+  EL_PATRON // 👑 - El Patrón
+  DON_CAPITAN // ⚔️ - Don - El Capitán
+  DON_COMANDANTE // 🛡️ - Don - El Comandante
+  EL_MANO_DERECHA // 🤝 - El Mano Derecha
+  // Normale Ränge (1-9)
+  EL_CUSTODIO // 🔒 - Rang 9 - Sicherheitsbegleitung / Wachposten
+  EL_MENTOR // 📚 - Rang 8 - Ausbilder der Neulinge
+  EL_ENCARGADO // 🧰 - Rang 7 - Zuständiger / Koordinator
+  EL_TENIENTE // ⭐ - Rang 6 - Unteroffizier / Bereichsverantwortlicher
+  SOLDADO // 🧭 - Rang 5 - Vollwertiger Soldat (Kern der Truppe)
+  EL_PREFECTO // 🐍 - Rang 4 - Kontrollinstanz / Operationsaufsicht
+  EL_CONFIDENTE // 🫢 - Rang 3 - Vertrauensperson der Führung
+  EL_PROTECTOR // 🐢 - Rang 2 - Schutz der Führung
+  EL_NOVATO // 🌱 - Rang 1 - Neuling / Probezeit
+  // Funktionsrollen (zusätzliche Rollen neben Rang)
+  CONSEJERO // 🧘 - Consejero/a (Berater)
+  RUTAS // 🚛 - Rutas (Routenverwaltung)
+  LOGISTICA // 📦 - Logística (Lagerverwaltung)
+  INTELIGENCIA // 🧠 - Inteligencia (Nachrichtendienst)
+  FORMACION // 🎓 - Formación (Ausbildung)
+  SICARIO // 🔫 - Sicario (Spezialkräfte)
+  CONTACTO // 📞 - Contacto (Kontaktperson)
+  // Legacy Rollen (deprecated)
+  ROUTENVERWALTUNG // Alte Routenverwaltung
+  FUTURO // Anwärter, niedrigste Rolle, nur lesen
+  // Partner (externe Benutzer)
+  PARTNER // 🤝 - Partner (eingeschränkter Zugriff auf Karte & Listen)
+  // Taxi System
+  TAXI // 🚕 - Taxi-Fahrer (kann zugewiesene Familien sehen)
+  TAXI_LEAD // 🚖 - Taxi-Leitung (kann Fahrer zuweisen, Master Key)
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  key       String   @unique // "lager", "kasse", future modules
+  name      String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("modules")
+}
+
+model ItemCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  items     Item[]
+  createdAt DateTime @default(now())
+
+  @@map("item_categories")
+}
+
+model Item {
+  id            String       @id @default(cuid())
+  name          String
+  sku           String?      @unique
+  categoryId    String
+  category      ItemCategory @relation(fields: [categoryId], references: [id])
+  minStock      Int          @default(0)
+  currentStock  Int          @default(0)
+  reservedStock Int          @default(0)
+  isLocked      Boolean      @default(false)
+  tags          Json         @default("[]") // Tags als JSON array (MySQL hat keine nativen Arrays)
+  location      String? // Regal/Standort
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  stockEntries StockMovement[]
+
+  @@map("items")
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUST
+  RESERVE
+  RELEASE
+}
+
+enum MovementStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model StockMovement {
+  id              String         @id @default(cuid())
+  itemId          String
+  item            Item           @relation(fields: [itemId], references: [id])
+  type            MovementType
+  quantity        Int
+  previousStock   Int
+  newStock        Int
+  note            String?
+  reference       String? // Auftrag/Person/Event
+  batchNumber     String? // für Serien/Batches
+  status          MovementStatus @default(PENDING)
+  approvedById    String?
+  approvedBy      User?          @relation("movement_approved_by", fields: [approvedById], references: [id])
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdById     String
+  createdBy       User           @relation("movement_created_by", fields: [createdById], references: [id])
+  createdAt       DateTime       @default(now())
+
+  @@map("stock_movements")
+}
+
+model MoneyTransaction {
+  id           String            @id @default(cuid())
+  kind         MoneyKind
+  amount       Int // in Einheiten (1 = 1$ Schwarz)
+  category     String?
+  note         String?
+  reference    String? // Auftrag/Person
+  status       TransactionStatus @default(PENDING)
+  approvedById String?
+  createdById  String
+  createdBy    User              @relation("tx_created_by", fields: [createdById], references: [id])
+  approvedBy   User?             @relation("tx_approved_by", fields: [approvedById], references: [id])
+  approvedAt   DateTime?
+  createdAt    DateTime          @default(now())
+
+  @@map("money_transactions")
+}
+
+enum MoneyKind {
+  EINZAHLUNG
+  AUSZAHLUNG
+  TRANSFER
+  KORREKTUR
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ActionLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String // e.g. "ITEM_CREATE", "MOVE_OUT", "MONEY_TX"
+  entity    String // "Item", "StockMovement", "MoneyTransaction"
+  entityId  String
+  meta      Json
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("action_logs")
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  type      String   @default("string") // "string", "number", "boolean", "json"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+// Aktensystem
+model MemberFile {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation("member_files", fields: [userId], references: [id])
+  lastUprankDate DateTime? // Datum des letzten Upranks
+  isArchived     Boolean   @default(false) // Archiviert wenn Blood Out
+  archivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  entries MemberFileEntry[]
+
+  @@map("member_files")
+}
+
+model MemberFileEntry {
+  id          String        @id @default(cuid())
+  fileId      String
+  file        MemberFile    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  type        FileEntryType // POSITIVE, NEGATIVE, NEUTRAL
+  content     String        @db.Text
+  createdById String
+  createdBy   User          @relation("file_entries_created", fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("member_file_entries")
+}
+
+enum FileEntryType {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+model CasaImage {
+  id        String   @id @default(cuid())
+  filename  String
+  path      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("casa_images")
+}
+
+// Package-Deposit System (früher Kokain)
+model PackageDeposit {
+  id                     String           @id @default(cuid())
+  userId                 String
+  user                   User             @relation("deposit_created_by", fields: [userId], references: [id])
+  packages               Int // Anzahl Pakete
+  status                 DepositStatus    @default(PENDING)
+  confirmedById          String?
+  confirmedBy            User?            @relation("deposit_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt            DateTime?
+  rejectedById           String?
+  rejectedBy             User?            @relation("deposit_rejected_by", fields: [rejectedById], references: [id])
+  rejectedAt             DateTime?
+  rejectionReason        String?
+  note                   String?
+  uebergabeId            String? // Referenz zur Übergabe-Session
+  uebergabe              PackageHandover? @relation(fields: [uebergabeId], references: [id])
+  // Wochenabgabe Integration
+  weeklyDeliveryId       String? // Referenz zur Wochenabgabe
+  weeklyDelivery         WeeklyDelivery?  @relation(fields: [weeklyDeliveryId], references: [id])
+  weeklyDeliveryPackages Int? // Pakete die für Wochenabgabe verwendet wurden
+  payoutPackages         Int? // Pakete die als Auszahlung verwendet wurden
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  @@map("package_deposits")
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+// Übergabe-Sessions für Archivierung
+model PackageHandover {
+  id            String    @id @default(cuid())
+  name          String // z.B. "Übergabe Dezember 2024"
+  totalPackages Int
+  totalValue    Int // Gesamtwert in Schwarzgeld
+  isActive      Boolean   @default(true)
+  archivedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  deposits PackageDeposit[]
+
+  @@map("package_handovers")
+}
+
+model DiscordRoleMapping {
+  id            String   @id @default(cuid())
+  discordRoleId String   @unique // Discord Rollen-ID
+  systemRole    Role // System-Rolle
+  name          String // Name der Discord-Rolle
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("discord_role_mappings")
+}
+
+// Wochenabgabe System
+model WeeklyDelivery {
+  id              String               @id @default(cuid())
+  userId          String
+  user            User                 @relation("delivery_created_by", fields: [userId], references: [id])
+  weekStart       DateTime // Start der Woche (Montag)
+  weekEnd         DateTime // Ende der Woche (Sonntag)
+  packages        Int                  @default(300) // Standard: 300 Pakete
+  paidAmount      Int? // Bezahlte Menge in Paketen
+  paidMoney       Int? // Bezahlte Menge in Schwarzgeld
+  status          WeeklyDeliveryStatus @default(PENDING)
+  confirmedById   String?
+  confirmedBy     User?                @relation("delivery_confirmed_by", fields: [confirmedById], references: [id])
+  confirmedAt     DateTime?
+  note            String?
+  isPrepaid       Boolean              @default(false) // Vorauszahlung für mehrere Wochen
+  prepaidWeeks    Int? // Anzahl der vorausbezahlten Wochen
+  isAbgemeldet    Boolean              @default(false) // Persistent: User war >2 Tage abgemeldet
+  abgemeldeteDays Int? // Anzahl der abgemeldeten Tage während dieser Woche
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  // Relations
+  packageDeposits PackageDeposit[]
+
+  @@map("weekly_deliveries")
+}
+
+enum WeeklyDeliveryStatus {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+}
+
+// Wochenabgabe Ausschlüsse
+model WeeklyDeliveryExclusion {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation("exclusion_user", fields: [userId], references: [id])
+  reason      String
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  createdById String
+  createdBy   User      @relation("exclusion_created_by", fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("weekly_delivery_exclusions")
+}
+
+model WeeklyDeliveryArchive {
+  id                String   @id @default(cuid())
+  weekStart         DateTime
+  weekEnd           DateTime
+  archiveName       String
+  totalDeliveries   Int
+  paidDeliveries    Int
+  overdueDeliveries Int
+  pendingDeliveries Int
+  totalPackages     Int
+  paidPackages      Int
+  totalMoney        Int
+  deliveryData      Json // Vollständige Delivery-Daten
+  archivedById      String
+  archivedBy        User     @relation("archive_created_by", fields: [archivedById], references: [id])
+  createdAt         DateTime @default(now())
+
+  @@map("weekly_delivery_archives")
+}
+
+// Sanktionssystem
+model Sanction {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation("sanction_received_by", fields: [userId], references: [id])
+  category    SanctionCategory
+  level       Int              @default(1) // 1-4, Level bestimmt Strafe
+  description String
+  amount      Int? // Geldstrafe in Schwarzgeld
+  penalty     String? // Spezielle Strafe (z.B. "LaSanta Calavera Brücke 1x")
+  status      SanctionStatus   @default(ACTIVE)
+  createdById String
+  createdBy   User             @relation("sanction_created_by", fields: [createdById], references: [id])
+  paidAt      DateTime?
+  expiresAt   DateTime? // Für automatische Bereinigung nach 4 Wochen
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("sanctions")
+}
+
+enum SanctionCategory {
+  ABMELDUNG
+  RESPEKTVERHALTEN
+  FUNKCHECK
+  REAKTIONSPFLICHT
+  NICHT_BEZAHLT
+  NICHT_BEZAHLT_48H
+  // Neue Sanktionen
+  RESPEKTLOS_ZIVILISTEN
+  RESPEKTLOS_FAMILIE
+  TOETUNG_FAMILIENMITGLIEDER
+  SEXUELLE_BELAESTIGUNG
+  UNNOETIGES_BOXEN_SCHIESSEN
+  MISSACHTUNG_ANWEISUNGEN
+  FEHLEN_AUFSTELLUNG
+  NICHT_ANMELDEN_FUNKCHECK
+  KLEIDERORDNUNG
+  MUNITIONSVERSCHWENDUNG
+  CASA_OHNE_ANKUENDIGUNG
+  FUNKPFLICHT_MISSACHTUNG
+  FUNKDISZIPLIN_MISSACHTUNG
+  WOCHENABGABE_NICHT_ENTRICHTET // Verpflichtet zur Wochenabgabe, aber nicht abgegeben
+}
+
+enum SanctionStatus {
+  ACTIVE
+  PAID
+  EXPIRED
+  CANCELLED
+}
+
+// Aufstellungssystem
+model Aufstellung {
+  id          String   @id @default(cuid())
+  createdById String
+  createdBy   User     @relation("aufstellung_created_by", fields: [createdById], references: [id])
+  date        DateTime // Datum und Uhrzeit der Aufstellung
+  reason      String // Grund/Location der Aufstellung
+  deadline    DateTime // Deadline für Reaktionen (= date)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  responses AufstellungResponse[]
+
+  @@map("aufstellungen")
+}
+
+// Aufstellung-Ausschlüsse (wie Wochenabgabe-Ausschlüsse)
+model AufstellungExclusion {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation("aufstellung_exclusion_user", fields: [userId], references: [id])
+  reason      String
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  createdById String
+  createdBy   User      @relation("aufstellung_exclusion_created_by", fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("aufstellung_exclusions")
+}
+
+model AufstellungResponse {
+  id            String                    @id @default(cuid())
+  aufstellungId String
+  aufstellung   Aufstellung               @relation(fields: [aufstellungId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                      @relation("aufstellung_responses", fields: [userId], references: [id], onDelete: Cascade)
+  status        AufstellungResponseStatus
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  @@unique([aufstellungId, userId])
+  @@map("aufstellung_responses")
+}
+
+enum AufstellungResponseStatus {
+  COMING // Kommt
+  COMING_LATE // Kommt später
+  NOT_COMING // Kommt nicht
+  UNSURE // Unsicher
+}
+
+// Abmeldungssystem
+model Abmeldung {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("abmeldung_user", fields: [userId], references: [id])
+  startDate DateTime // Start der Abmeldung
+  endDate   DateTime // Ende der Abmeldung
+  reason    String? // Grund der Abmeldung (optional)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("abmeldungen")
+}
+
+// BloodList System - Mitgliederverwaltung
+model BloodRecord {
+  id                String      @id @default(cuid())
+  vorname           String
+  nachname          String
+  telefon           Int
+  steam             String
+  bloodinDurch      String // Wer hat Blood In durchgeführt
+  bloodinTimestamp  DateTime    @default(now())
+  status            BloodStatus @default(ACTIVE)
+  bloodoutTimestamp DateTime?
+  bloodoutDurch     String?
+  bloodoutGrund     String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@unique([telefon, status]) // Telefon muss unique sein für ACTIVE Status
+  @@map("blood_records")
+}
+
+enum BloodStatus {
+  ACTIVE
+  BLOODOUT
+}
+
+// Familiensammeln System
+model FamiliensammelnWeek {
+  id        String   @id @default(cuid())
+  weekStart DateTime // Montag
+  weekEnd   DateTime // Samstag (6 Tage)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  participations FamiliensammelnParticipation[]
+  processors     FamiliensammelnProcessor[]
+
+  @@unique([weekStart])
+  @@map("familiensammeln_weeks")
+}
+
+model FamiliensammelnParticipation {
+  id        String              @id @default(cuid())
+  weekId    String
+  week      FamiliensammelnWeek @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                @relation("familiensammeln_participations", fields: [userId], references: [id])
+  date      DateTime // Datum der Teilnahme
+  tourCount Int                 @default(1) // Anzahl der Touren an diesem Tag
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@unique([weekId, userId, date]) // User kann nur 1x pro Tag teilnehmen
+  @@map("familiensammeln_participations")
+}
+
+// Organigramm-Rollenzuweisungen
+model OrganigrammAssignment {
+  id        String   @id @default(cuid())
+  roleId    String // z.B. "patron", "capitan", "comandante", etc.
+  userId    String
+  user      User     @relation("organigramm_assignments", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([roleId, userId]) // Ein User kann nur einmal pro Rolle zugewiesen werden
+  @@map("organigramm_assignments")
+}
+
+// Familiensammeln Verarbeiter (Processor Tracking)
+model FamiliensammelnProcessor {
+  id              String              @id @default(cuid())
+  weekId          String
+  week            FamiliensammelnWeek @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User                @relation("processor_user", fields: [userId], references: [id], onDelete: Cascade)
+  startedAt       DateTime            @default(now()) // Wann wurde der Verarbeiter gestartet
+  finishesAt      DateTime // Wann ist der Verarbeiter fertig (startedAt + 5 Stunden)
+  capacity        Int                 @default(3000) // Kapazität des Verarbeiters
+  processingRate  Int                 @default(10) // Wie viele Stück pro Minute verarbeitet werden
+  status          ProcessorStatus     @default(PROCESSING)
+  completedAt     DateTime? // Wann wurde die Entnahme bestätigt
+  completedBy     String?
+  completedByUser User?               @relation("processor_completed_by", fields: [completedBy], references: [id])
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@map("familiensammeln_processors")
+}
+
+enum ProcessorStatus {
+  PROCESSING // Verarbeiter läuft noch
+  FINISHED // Verarbeitung abgeschlossen, bereit zur Entnahme
+  COMPLETED // Entnahme wurde bestätigt
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+// Kleidungsmanagement-System
+// Rang-Gruppen für Kleidung: 1-3, 4-6, 7-9, plus individuelle Leaderschaft-Ränge
+model RankClothingTemplate {
+  id        String @id @default(cuid())
+  rankGroup String // "1-3", "4-6", "7-9", "EL_PATRON", "DON_CAPITAN", "DON_COMANDANTE", "EL_MANO_DERECHA"
+
+  // Maske (Männer)
+  maskItemMale         Int?
+  maskVariationMale    Int?
+  maskCustomizableMale Boolean @default(false) // Kann vom User selbst gewählt werden
+  maskColorMale        String? // Farbvorgabe (wenn customizable = true)
+
+  // Maske (Frauen)
+  maskItemFemale         Int?
+  maskVariationFemale    Int?
+  maskCustomizableFemale Boolean @default(false)
+  maskColorFemale        String?
+
+  // Torso (Männer)
+  torsoItemMale         Int?
+  torsoVariationMale    Int?
+  torsoCustomizableMale Boolean @default(false)
+  torsoColorMale        String?
+
+  // Torso (Frauen)
+  torsoItemFemale         Int?
+  torsoVariationFemale    Int?
+  torsoCustomizableFemale Boolean @default(false)
+  torsoColorFemale        String?
+
+  // T-Shirt (Männer)
+  tshirtItemMale         Int?
+  tshirtVariationMale    Int?
+  tshirtCustomizableMale Boolean @default(false)
+  tshirtColorMale        String?
+
+  // T-Shirt (Frauen)
+  tshirtItemFemale         Int?
+  tshirtVariationFemale    Int?
+  tshirtCustomizableFemale Boolean @default(false)
+  tshirtColorFemale        String?
+
+  // Weste (Männer)
+  vesteItemMale         Int?
+  vesteVariationMale    Int?
+  vesteCustomizableMale Boolean @default(false)
+  vesteColorMale        String?
+
+  // Weste (Frauen)
+  vesteItemFemale         Int?
+  vesteVariationFemale    Int?
+  vesteCustomizableFemale Boolean @default(false)
+  vesteColorFemale        String?
+
+  // Hose (Männer)
+  hoseItemMale         Int?
+  hoseVariationMale    Int?
+  hoseCustomizableMale Boolean @default(false)
+  hoseColorMale        String?
+
+  // Hose (Frauen)
+  hoseItemFemale         Int?
+  hoseVariationFemale    Int?
+  hoseCustomizableFemale Boolean @default(false)
+  hoseColorFemale        String?
+
+  // Schuhe (Männer)
+  schuheItemMale         Int?
+  schuheVariationMale    Int?
+  schuheCustomizableMale Boolean @default(false)
+  schuheColorMale        String?
+
+  // Schuhe (Frauen)
+  schuheItemFemale         Int?
+  schuheVariationFemale    Int?
+  schuheCustomizableFemale Boolean @default(false)
+  schuheColorFemale        String?
+
+  // Rucksack (Männer)
+  rucksackItemMale         Int?
+  rucksackVariationMale    Int?
+  rucksackCustomizableMale Boolean @default(false)
+  rucksackColorMale        String?
+
+  // Rucksack (Frauen)
+  rucksackItemFemale         Int?
+  rucksackVariationFemale    Int?
+  rucksackCustomizableFemale Boolean @default(false)
+  rucksackColorFemale        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([rankGroup])
+  @@map("rank_clothing_templates")
+}
+
+// Sicario Aufstellungssystem
+model SicarioAufstellung {
+  id          String   @id @default(cuid())
+  createdById String
+  createdBy   User     @relation("sicario_aufstellung_created_by", fields: [createdById], references: [id])
+  date        DateTime // Datum und Uhrzeit der Aufstellung
+  reason      String // Grund/Art des Einsatzes
+  location    String? // Treffpunkt
+  deadline    DateTime // Deadline für Reaktionen (= date)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  responses SicarioAufstellungResponse[]
+
+  @@map("sicario_aufstellungen")
+}
+
+model SicarioAufstellungResponse {
+  id            String                    @id @default(cuid())
+  aufstellungId String
+  aufstellung   SicarioAufstellung        @relation(fields: [aufstellungId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                      @relation("sicario_aufstellung_responses", fields: [userId], references: [id], onDelete: Cascade)
+  status        AufstellungResponseStatus // Wiederverwende den existierenden Enum
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  @@unique([aufstellungId, userId])
+  @@map("sicario_aufstellung_responses")
+}
+
+// Listenführung - Familien-Kontakte
+model FamilyContact {
+  id                 String              @id @default(cuid())
+  familyName         String // Familienname
+  status             FamilyContactStatus @default(UNKNOWN) // Status der Familie
+  propertyZip        String? // Anwesen PLZ (max 6 Stellen)
+  // Ansprechpartner 1
+  contact1FirstName  String?
+  contact1LastName   String?
+  contact1Phone      String? // IC Rufnummer
+  // Ansprechpartner 2
+  contact2FirstName  String?
+  contact2LastName   String?
+  contact2Phone      String? // IC Rufnummer
+  // Kontaktdaten Patron / Führung
+  leadershipInfo     String? // Kann Vorname, Nachname oder Telefonnummer sein
+  notes              String?             @db.Text // Zusätzliche Notizen
+  // Schlüsselfamilie & Veraltet-Status
+  isKeyFamily        Boolean             @default(false) // Offizielle Schlüsselfamilie
+  isOutdated         Boolean             @default(false) // Information veraltet
+  outdatedMarkedAt   DateTime? // Wann als veraltet markiert
+  outdatedMarkedById String? // Wer hat als veraltet markiert
+  outdatedMarkedBy   User?               @relation("family_contact_outdated_by", fields: [outdatedMarkedById], references: [id])
+  outdatedComment    String?             @db.Text // Kommentar wieso veraltet
+  createdById        String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  // Relations
+  mapAnnotations      MapAnnotation[]           @relation("map_annotation_family")
+  mapSuggestions      MapSuggestion[]           @relation("map_suggestion_family")
+  partnerSuggestions  PartnerFamilySuggestion[] @relation("partner_suggestion_family")
+  tafelrundeInvites   TafelrundeFamily[]        @relation("tafelrunde_family")
+  taxiAssignments     TaxiAssignment[]          @relation("taxi_assignment_family")
+
+  @@map("family_contacts")
+}
+
+enum FamilyContactStatus {
+  UNKNOWN // Unbekannt
+  ACTIVE // Aktiv
+  ENDANGERED // Gefährdet
+  DISSOLVED // Aufgelöst
+}
+
+// Interaktive Karte - Map Annotationen
+model MapAnnotation {
+  id              String         @id @default(cuid())
+  mapName         MapName // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  x               Float // Normalisierte X-Koordinate (0.0 - 1.0)
+  y               Float // Normalisierte Y-Koordinate (0.0 - 1.0)
+  icon            String         @default("home") // Icon: home, building, warehouse, skull, etc.
+  label           String? // Optionaler Kurztext für Tooltip
+  familyContactId String?
+  familyContact   FamilyContact? @relation("map_annotation_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  // Direkte Flags (unabhängig von Familie)
+  isKeyFamily     Boolean        @default(false) // Schlüsselfamilie-Badge direkt auf POI
+  isOutdated      Boolean        @default(false) // Veraltet-Badge direkt auf POI
+  createdById     String? // Optional für historische Daten wenn Ersteller gelöscht
+  createdBy       User?          @relation("map_annotation_created_by", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("map_annotations")
+}
+
+enum MapName {
+  NARCO_CITY
+  ROXWOOD
+  CAYO_PERICO
+}
+
+// Interaktive Karte - Gebiete/Bereiche
+model MapArea {
+  id          String   @id @default(cuid())
+  mapName     MapName // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  points      Json // Array von {x, y} Koordinaten (normalisiert 0-1)
+  label       String // Gebietsname
+  color       String   @default("#f59e0b") // Hex-Farbe
+  createdById String? // Optional für historische Daten wenn Ersteller gelöscht
+  createdBy   User?    @relation("map_area_created_by", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("map_areas")
+}
+
+// Tägliche Anwesenheitsliste
+model DailyAttendance {
+  id         String   @id @default(cuid())
+  date       DateTime @db.Date // Datum der Anwesenheit
+  userId     String // Wer war anwesend
+  user       User     @relation("attendance_user", fields: [userId], references: [id], onDelete: Cascade)
+  markedById String? // Wer hat die Anwesenheit eingetragen (optional für historische Daten)
+  markedBy   User?    @relation("attendance_marked_by", fields: [markedById], references: [id], onDelete: SetNull)
+  markedAt   DateTime @default(now()) // Wann wurde eingetragen
+  createdAt  DateTime @default(now())
+
+  @@unique([date, userId]) // Pro Tag und User nur ein Eintrag
+  @@map("daily_attendance")
+}
+
+// Anwesenheits-Berechtigungen (wer darf Anwesenheiten eintragen)
+model AttendancePermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("attendance_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String? // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedBy   User?    @relation("attendance_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("attendance_permissions")
+}
+
+// Männer-Outfits (5 vordefinierte Outfits)
+model MaleOutfit {
+  id                String   @id @default(cuid())
+  outfitNumber      Int      @unique // 1-5
+  name              String // Name des Outfits
+  imagePath         String? // Pfad zum Bild (relativ zu /uploads/outfits/)
+  // Kleidungsstücke
+  maskItem          Int?
+  maskVariation     Int?
+  torsoItem         Int?
+  torsoVariation    Int?
+  tshirtItem        Int?
+  tshirtVariation   Int?
+  vesteItem         Int?
+  vesteVariation    Int?
+  hoseItem          Int?
+  hoseVariation     Int?
+  schuheItem        Int?
+  schuheVariation   Int?
+  rucksackItem      Int?
+  rucksackVariation Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("male_outfits")
+}
+
+// Listenführung-Berechtigungen (wer darf Familienkontakte bearbeiten)
+model ListPermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("list_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String? // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedBy   User?    @relation("list_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("list_permissions")
+}
+
+// Karten-Berechtigungen (wer darf Map-Annotationen bearbeiten)
+model MapPermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("map_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String? // Wer hat die Berechtigung erteilt (optional für historische Daten)
+  grantedBy   User?    @relation("map_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("map_permissions")
+}
+
+// Karten-Änderungsvorschläge (für User ohne Berechtigungen)
+model MapSuggestion {
+  id              String           @id @default(cuid())
+  mapName         MapName // NARCO_CITY, ROXWOOD, CAYO_PERICO
+  x               Float // Normalisierte X-Koordinate (0.0 - 1.0)
+  y               Float // Normalisierte Y-Koordinate (0.0 - 1.0)
+  icon            String           @default("home") // Icon: home, building, warehouse, skull, etc.
+  label           String? // Optionaler Kurztext
+  familyContactId String? // Optional: Verknüpfung mit Familie
+  familyContact   FamilyContact?   @relation("map_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  // Flags für POI
+  isKeyFamily     Boolean          @default(false) // Schlüsselfamilie-Badge
+  isOutdated      Boolean          @default(false) // Veraltet-Badge
+  status          SuggestionStatus @default(PENDING)
+  createdById     String // Wer hat den Vorschlag erstellt
+  createdBy       User             @relation("map_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  reviewedById    String? // Wer hat den Vorschlag überprüft
+  reviewedBy      User?            @relation("map_suggestion_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt      DateTime? // Wann wurde überprüft
+  reviewNote      String?          @db.Text // Kommentar bei Ablehnung
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("map_suggestions")
+}
+
+enum SuggestionStatus {
+  PENDING // Offen
+  APPROVED // Genehmigt
+  REJECTED // Abgelehnt
+}
+
+// ============ PARTNER SYSTEM ============
+
+// Partner-Zugangsanfragen
+model PartnerAccessRequest {
+  id           String              @id @default(cuid())
+  discordId    String              @unique // Discord-ID des Partners
+  username     String // Discord-Username
+  avatarUrl    String? // Avatar
+  familyName   String? // Von welcher Familie ist der Partner
+  reason       String?             @db.Text // Warum möchte der Partner Zugang
+  status       PartnerAccessStatus @default(PENDING)
+  reviewedById String? // Wer hat die Anfrage bearbeitet
+  reviewedBy   User?               @relation("partner_request_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+  reviewNote   String?             @db.Text // Kommentar bei Ablehnung
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@map("partner_access_requests")
+}
+
+enum PartnerAccessStatus {
+  PENDING // Ausstehend
+  APPROVED // Genehmigt
+  REJECTED // Abgelehnt
+}
+
+// Berechtigung zur Partner-Verwaltung (wer darf Partner-Anfragen bearbeiten)
+model PartnerManagementPermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Wer hat die Berechtigung
+  user        User     @relation("partner_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String? // Wer hat die Berechtigung erteilt
+  grantedBy   User?    @relation("partner_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  grantedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@map("partner_management_permissions")
+}
+
+// Partner-Vorschläge für Familienkontakte
+model PartnerFamilySuggestion {
+  id               String                @id @default(cuid())
+  type             PartnerSuggestionType // CREATE, UPDATE
+  familyContactId  String? // Falls UPDATE: Referenz zur bestehenden Familie
+  familyContact    FamilyContact?        @relation("partner_suggestion_family", fields: [familyContactId], references: [id], onDelete: SetNull)
+  // Vorgeschlagene Daten
+  familyName       String // Familienname
+  familyStatus     FamilyContactStatus? // Status der Familie
+  propertyZip      String? // Anwesen PLZ
+  // Kontaktdaten (von Partner eingepflegt, aber nicht einsehbar für Partner)
+  contact1FirstName String? // Kontakt 1 Vorname
+  contact1LastName  String? // Kontakt 1 Nachname
+  contact1Phone     String? // Kontakt 1 Telefon
+  contact2FirstName String? // Kontakt 2 Vorname
+  contact2LastName  String? // Kontakt 2 Nachname
+  contact2Phone     String? // Kontakt 2 Telefon
+  notes            String?               @db.Text // Notizen
+  // Schlüsselfamilie & Veraltet-Flags
+  isKeyFamily      Boolean               @default(false) // Vorgeschlagen als Schlüsselfamilie
+  isOutdated       Boolean               @default(false) // Vorgeschlagen als veraltet
+  // Map-Koordinaten (optional - für neue POIs)
+  mapName          MapName? // Karte
+  mapX             Float? // X-Koordinate
+  mapY             Float? // Y-Koordinate
+  mapIcon          String? // Icon
+  // Verknüpfung mit bestehendem POI (optional - statt neuen POI zu erstellen)
+  linkedMapAnnotationId String? // Falls gesetzt: Diesen POI mit der neuen Familie verknüpfen
+  // Review-Status
+  suggestionStatus SuggestionStatus      @default(PENDING)
+  createdById      String // Partner der den Vorschlag erstellt hat
+  createdBy        User                  @relation("partner_family_suggestion_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  reviewedById     String? // Wer hat den Vorschlag überprüft
+  reviewedBy       User?                 @relation("partner_family_suggestion_reviewed_by", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt       DateTime?
+  reviewNote       String?               @db.Text // Kommentar bei Ablehnung
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@map("partner_family_suggestions")
+}
+
+enum PartnerSuggestionType {
+  CREATE // Neue Familie vorschlagen
+  UPDATE // Bestehende Familie aktualisieren
+  DELETE // Löschung vorschlagen (POI oder Familie)
+}
+
+// ============ TAFELRUNDE SYSTEM ============
+
+// Tafelrunde - Ein Meeting/Event bei dem Familien zusammenkommen
+model Tafelrunde {
+  id          String              @id @default(cuid())
+  title       String // Titel der Tafelrunde (z.B. "Bündnis Abstimmung")
+  description String?             @db.Text // Optionale Beschreibung
+  date        DateTime // Datum der Tafelrunde
+  location    String? // Optionaler Treffpunkt (Text-Beschreibung)
+  // Treffpunkt auf der Karte (PFLICHT für Taxi-Zielort)
+  meetingPointMapName String      // Kartenname: NARCO_CITY, ROXWOOD, CAYO_PERICO
+  meetingPointX       Float       // X-Koordinate (normalisiert 0-1)
+  meetingPointY       Float       // Y-Koordinate (normalisiert 0-1)
+  // Zeitplanung
+  pickupStartTime     String?     // Vorgeschlagene Abhol-Startzeit (z.B. "17:30")
+  arrivalDeadline     String?     // Spätestens am Treffpunkt (z.B. "18:00")
+  status      TafelrundeStatus    @default(PLANNED)
+  // Ersteller
+  createdById String
+  createdBy   User                @relation("tafelrunde_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  // Familien die eingeladen sind
+  families    TafelrundeFamily[]
+  // Taxi-Zuweisungen
+  taxiAssignments TaxiAssignment[]
+  // Timestamps
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@map("tafelrunden")
+}
+
+// Verknüpfung zwischen Tafelrunde und Familie mit Anwesenheitsstatus
+model TafelrundeFamily {
+  id              String                    @id @default(cuid())
+  tafelrundeId    String
+  tafelrunde      Tafelrunde                @relation(fields: [tafelrundeId], references: [id], onDelete: Cascade)
+  familyContactId String
+  familyContact   FamilyContact             @relation("tafelrunde_family", fields: [familyContactId], references: [id], onDelete: Cascade)
+  // Anwesenheitsstatus
+  attendanceStatus TafelrundeAttendance     @default(UNKNOWN)
+  // Wer hat den Status zuletzt geändert
+  updatedById     String?
+  updatedBy       User?                     @relation("tafelrunde_family_updated_by", fields: [updatedById], references: [id], onDelete: SetNull)
+  // Notiz (z.B. warum Familie nicht kommt)
+  note            String?
+  // Timestamps
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  @@unique([tafelrundeId, familyContactId])
+  @@map("tafelrunde_families")
+}
+
+// Status einer Tafelrunde
+enum TafelrundeStatus {
+  PLANNED // Geplant
+  ACTIVE // Aktiv/Laufend
+  COMPLETED // Abgeschlossen
+  CANCELLED // Abgesagt
+}
+
+// Anwesenheitsstatus einer Familie bei einer Tafelrunde
+enum TafelrundeAttendance {
+  UNKNOWN // Noch nicht bekannt
+  ATTENDING // Kommt
+  NOT_ATTENDING // Kommt nicht
+  MAYBE // Vielleicht
+}
+
+// Berechtigung zur Tafelrunden-Verwaltung
+model TafelrundePermission {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation("tafelrunde_permission_user", fields: [userId], references: [id], onDelete: Cascade)
+  grantedById String?
+  grantedBy   User?    @relation("tafelrunde_permission_granted_by", fields: [grantedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@map("tafelrunde_permissions")
+}
+
+// ============ TAXI SYSTEM ============
+
+// Taxi-Zugangsschlüssel
+model TaxiKey {
+  id          String       @id @default(cuid())
+  key         String       @unique // Der eigentliche Zugangsschlüssel
+  type        TaxiKeyType  @default(SINGLE_USE) // Art des Keys
+  isMasterKey Boolean      @default(false) // Master Key = Taxi-Leitungsebene
+  status      TaxiKeyStatus @default(ACTIVE)
+  usedById    String?      // Wer hat den Key verwendet
+  usedBy      User?        @relation("taxi_key_used_by", fields: [usedById], references: [id], onDelete: SetNull)
+  usedAt      DateTime?    // Wann wurde der Key verwendet
+  expiresAt   DateTime?    // Optional: Ablaufdatum
+  createdById String
+  createdBy   User         @relation("taxi_key_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  note        String?      // Optionale Notiz (z.B. "Für Max Mustermann")
+
+  @@map("taxi_keys")
+}
+
+enum TaxiKeyType {
+  SINGLE_USE // Einmalig verwendbar
+  MULTI_USE  // Mehrfach verwendbar (z.B. für Tests)
+  PERMANENT  // Permanent gültig
+}
+
+enum TaxiKeyStatus {
+  ACTIVE     // Aktiv und verwendbar
+  USED       // Bereits verwendet (bei SINGLE_USE)
+  REVOKED    // Widerrufen/Invalidiert
+  EXPIRED    // Abgelaufen
+}
+
+// Taxi-Zuweisung: Welcher Fahrer holt welche Familie ab
+model TaxiAssignment {
+  id              String           @id @default(cuid())
+  tafelrundeId    String
+  tafelrunde      Tafelrunde       @relation(fields: [tafelrundeId], references: [id], onDelete: Cascade)
+  familyContactId String
+  familyContact   FamilyContact    @relation("taxi_assignment_family", fields: [familyContactId], references: [id], onDelete: Cascade)
+  driverId        String?          // Zugewiesener Fahrer (null = noch nicht zugewiesen)
+  driver          User?            @relation("taxi_assignment_driver", fields: [driverId], references: [id], onDelete: SetNull)
+  status          TaxiAssignmentStatus @default(PENDING)
+  pickupNotes     String?          @db.Text // Abholnotizen (Adresse, Hinweise)
+  pickupTime      String?          // Geplante Abholzeit
+  completedAt     DateTime?        // Wann wurde die Abholung abgeschlossen
+  createdById     String
+  createdBy       User             @relation("taxi_assignment_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([tafelrundeId, familyContactId]) // Eine Familie pro Tafelrunde nur einmal
+  @@map("taxi_assignments")
+}
+
+enum TaxiAssignmentStatus {
+  PENDING    // Noch nicht zugewiesen
+  ASSIGNED   // Fahrer zugewiesen
+  EN_ROUTE   // Fahrer unterwegs
+  PICKED_UP  // Familie abgeholt
+  DELIVERED  // Familie abgeliefert
+  CANCELLED  // Abgesagt
+}
+
+// ============ AUSRÜSTUNGSMANAGEMENT ============
+
+// Verfügbare Waffentypen
+enum WeaponType {
+  SMG
+  ADV
+  KARABINER
+  SPEZIALKARABINER
+  PDW
+  AK47
+  TOMMY_GUN
+}
+
+// Waffen-Zuweisung pro Mitglied
+model EquipmentWeapon {
+  id                String     @id @default(cuid())
+  userId            String
+  user              User       @relation("equipment_weapons", fields: [userId], references: [id], onDelete: Cascade)
+  weaponType        WeaponType // Art der Waffe
+  receivedAt        DateTime   @default(now()) // Wann wurde die Waffe erhalten
+  lastLostAt        DateTime?  // Wann wurde die letzte Waffe verloren
+  // Aufsätze (Checkboxen)
+  hasTaschenlampe   Boolean    @default(false)
+  hasTrommelmagazin Boolean    @default(false)
+  hasSchalldaempfer Boolean    @default(false)
+  hasGriff          Boolean    @default(false)
+  hasErwMagazin     Boolean    @default(false) // Erweitertes Magazin
+  hasZielfernrohr   Boolean    @default(false)
+  // Notizen
+  note              String?    @db.Text
+  // Tracking
+  createdById       String
+  createdBy         User       @relation("equipment_weapon_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  @@map("equipment_weapons")
+}
+
+// Westen-Zuweisung pro Mitglied
+model EquipmentVest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation("equipment_vests", fields: [userId], references: [id], onDelete: Cascade)
+  quantity        Int      // Anzahl der erhaltenen Westen
+  receivedAt      DateTime @default(now()) // Wann wurden die Westen erhalten
+  expectedEmptyAt DateTime // Wann sind die Westen voraussichtlich verbraucht (1 Weste pro Tag)
+  note            String?  @db.Text
+  // Tracking
+  createdById     String
+  createdBy       User     @relation("equipment_vest_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("equipment_vests")
+}
+
+// Munitions-Zuweisung pro Mitglied
+model EquipmentAmmo {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation("equipment_ammo", fields: [userId], references: [id], onDelete: Cascade)
+  quantity        Int      // Anzahl der erhaltenen Pakete
+  receivedAt      DateTime @default(now()) // Wann wurden die Pakete erhalten
+  expectedEmptyAt DateTime // Wann sind die Pakete voraussichtlich verbraucht (2 Pakete pro Tag)
+  note            String?  @db.Text
+  // Tracking
+  createdById     String
+  createdBy       User     @relation("equipment_ammo_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("equipment_ammo")
+}
+
+// Discord Role Mappings

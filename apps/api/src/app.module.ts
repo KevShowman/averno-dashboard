@@ -1,0 +1,88 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { PrismaModule } from './common/prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { ItemsModule } from './items/items.module';
+import { CashModule } from './cash/cash.module';
+import { AuditModule } from './audit/audit.module';
+import { ModulesModule } from './modules/modules.module';
+import { UsersModule } from './users/users.module';
+import { SettingsModule } from './settings/settings.module';
+import { PackagesModule } from './packages/packages.module';
+import { DiscordModule } from './discord/discord.module';
+import { WeeklyDeliveryModule } from './weekly-delivery/weekly-delivery.module';
+import { SanctionsModule } from './sanctions/sanctions.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
+import { StartupModule } from './startup/startup.module';
+import { AufstellungModule } from './aufstellung/aufstellung.module';
+import { AbmeldungModule } from './abmeldung/abmeldung.module';
+import { BloodListModule } from './bloodlist/bloodlist.module';
+import { FamiliensammelnModule } from './familiensammeln/familiensammeln.module';
+import { OrganigrammModule } from './organigramm/organigramm.module';
+import { ClothingModule } from './clothing/clothing.module';
+import { CommunicationModule } from './communication/communication.module';
+import { MemberFilesModule } from './member-files/member-files.module';
+import { VehicleTuningModule } from './vehicle-tuning/vehicle-tuning.module';
+import { CasaModule } from './casa/casa.module';
+import { SicarioModule } from './sicario/sicario.module';
+import { FamilyContactsModule } from './family-contacts/family-contacts.module';
+import { MapAnnotationsModule } from './map-annotations/map-annotations.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { PartnerModule } from './partner/partner.module';
+import { TafelrundeModule } from './tafelrunde/tafelrunde.module';
+import { TaxiModule } from './taxi/taxi.module';
+import { EquipmentModule } from './equipment/equipment.module';
+import { ExclusionModule } from './common/exclusion/exclusion.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute
+        limit: 100, // 100 requests per minute
+      },
+    ]),
+    PrismaModule,
+    ExclusionModule, // Global exclusion service for filtering excluded users
+    AuthModule,
+    ItemsModule,
+    CashModule,
+    AuditModule,
+    ModulesModule,
+    UsersModule,
+    SettingsModule,
+    PackagesModule,
+    DiscordModule,
+    WeeklyDeliveryModule,
+    SanctionsModule,
+    SchedulerModule,
+    StartupModule,
+    AufstellungModule,
+    AbmeldungModule,
+    BloodListModule,
+    FamiliensammelnModule,
+    OrganigrammModule,
+    ClothingModule,
+    CommunicationModule,
+    MemberFilesModule,
+    VehicleTuningModule,
+    CasaModule,
+    SicarioModule,
+    FamilyContactsModule,
+    MapAnnotationsModule,
+    AttendanceModule,
+    PartnerModule,
+    TafelrundeModule,
+    TaxiModule,
+    EquipmentModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}

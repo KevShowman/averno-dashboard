@@ -1,0 +1,169 @@
+# Production Dockerfile für Frontend
+FROM node:18-alpine AS base
+
+# Installiere pnpm
+RUN npm install -g pnpm
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere package files
+COPY package.json ./
+
+# Installiere Dependencies
+RUN pnpm install --no-frozen-lockfile
+
+# Kopiere Source Code
+COPY . .
+
+# Kopiere Casa-Bilder falls vorhanden
+RUN mkdir -p public/casa || true
+
+# Prüfe ob Service Worker vorhanden ist
+RUN echo "=== Checking for sw.js ===" && \
+    find . -name "sw.js" -type f && \
+    ls -la public/ || echo "Public directory not found" && \
+    ls -la public/casa/ || echo "Casa directory not found"
+
+# Build Stage
+FROM base AS build
+
+# Build für Production
+RUN pnpm run build
+
+# Debug: Zeige Verzeichnisse und Dateien
+RUN echo "=== Current directory structure ===" && find . -name "*.js" -o -name "*.json" | head -20
+RUN echo "=== Public directory contents ===" && ls -la public/ || echo "Public directory not found"
+RUN echo "=== Dist directory contents ===" && ls -la dist/ || echo "Dist directory not found"
+
+# Erstelle Service Worker direkt
+RUN echo "=== Creating Service Worker ===" && \
+    mkdir -p dist && \
+    cat > dist/sw.js <<'EOF'
+// Service Worker für LaSanta Calavera
+// Handles app updates and cache management
+
+const CACHE_NAME = 'lascanta-v1'
+const STATIC_CACHE = 'lascanta-static-v1'
+
+self.addEventListener('install', (event) => {
+  console.log('SW: Installing...')
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', (event) => {
+  console.log('SW: Activating...')
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then(names => {
+        return Promise.all(
+          names.map(name => {
+            if (name !== CACHE_NAME && name !== STATIC_CACHE) {
+              console.log('SW: Deleting old cache:', name)
+              return caches.delete(name)
+            }
+          })
+        )
+      })
+    ])
+  )
+})
+
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return
+  if (!event.request.url.startsWith(self.location.origin)) return
+
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) return response
+
+      return fetch(event.request).then(response => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response
+        }
+        const responseToCache = response.clone()
+        if (event.request.url.includes('/assets/') ||
+            event.request.url.includes('.js') ||
+            event.request.url.includes('.css')) {
+          caches.open(STATIC_CACHE).then(cache => {
+            cache.put(event.request, responseToCache)
+          })
+        }
+        return response
+      })
+    })
+  )
+})
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
+self.addEventListener('controllerchange', () => {
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'APP_UPDATED',
+        message: 'Neue Version verfügbar!'
+      })
+    })
+  })
+})
+EOF
+RUN echo "✅ Service worker created successfully" && ls -la dist/sw.js
+
+# Kopiere Version.json
+RUN echo "=== Copying Version.json ===" && \
+    if [ -f "public/version.json" ]; then \
+        cp public/version.json dist/version.json && \
+        echo "✅ Version.json copied successfully" && \
+        ls -la dist/version.json; \
+    else \
+        echo "❌ Version.json not found in public/" && \
+        exit 1; \
+    fi
+
+# Finale Überprüfung
+RUN echo "=== Final dist directory contents ===" && ls -la dist/
+RUN echo "=== Checking for sw.js ===" && ls -la dist/sw.js || echo "sw.js not found in dist/"
+
+# Production Stage mit Nginx
+FROM nginx:alpine AS production
+
+# Erstelle Verzeichnisse für statische Assets
+RUN mkdir -p /usr/share/nginx/html/casa /usr/share/nginx/html/outfit-images
+
+# Kopiere Built Files
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Kopiere Logo direkt aus dem Build-Kontext
+COPY assets/logo.png /usr/share/nginx/html/logo.png
+
+# Kopiere Casa-Bilder direkt aus dem Build-Kontext
+COPY assets/casa/ /usr/share/nginx/html/casa/
+
+# Kopiere Outfit-Bilder (aus assets/, wie Casa-Bilder)
+COPY assets/outfit-images/ /usr/share/nginx/html/outfit-images/
+
+# Kopiere Map-Tiles für interaktive Karte
+COPY assets/map-tiles/ /usr/share/nginx/html/map-tiles/
+
+# Kopiere Nginx Config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Setze korrekte Berechtigungen für HTML-Dateien
+RUN chmod -R 755 /usr/share/nginx/html && \
+    chmod 644 /etc/nginx/nginx.conf
+
+# Nginx läuft als root und spawnt Worker als nginx User (Standard-Verhalten)
+# Das ist sicher, da nginx selbst die Worker-Prozesse mit niedrigeren Rechten startet
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

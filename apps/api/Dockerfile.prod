@@ -1,0 +1,80 @@
+# Production Dockerfile für API
+FROM node:18-alpine AS base
+
+# Installiere pnpm
+RUN npm install -g pnpm
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere package files
+COPY package.json ./
+
+# Installiere Dependencies
+RUN pnpm install --no-frozen-lockfile
+
+# Kopiere Source Code
+COPY . .
+
+# Generiere Prisma Client
+RUN pnpm exec prisma generate
+
+# Build Stage
+FROM base AS build
+RUN pnpm run build
+
+# Debug: Zeige was im dist Ordner ist
+RUN echo "=== Checking dist directory ===" && ls -la dist/ && ls -la dist/src/ || echo "Build failed"
+
+# Production Stage
+FROM node:18-alpine AS production
+
+# Installiere pnpm, wget und OpenSSL
+RUN npm install -g pnpm && apk add --no-cache wget openssl openssl-dev
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere package files und installiere ALLE dependencies (inkl. dev für Prisma)
+COPY package.json ./
+RUN pnpm install --no-frozen-lockfile
+
+# Kopiere built application
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+
+# Kopiere Default Casa-Bilder aus dem Build Context
+COPY uploads/casa/*.png ./uploads/casa/
+
+# Debug: Prüfe ob main.js existiert
+RUN echo "=== Checking copied files ===" && \
+    test -f dist/src/main.js && echo "✅ main.js found at dist/src/main.js" || echo "❌ main.js NOT found"
+
+# Kopiere startup script
+COPY startup.sh ./startup.sh
+RUN chmod +x ./startup.sh
+
+# Generiere Prisma Client für Production (als root, damit Schreibrechte vorhanden)
+RUN pnpm exec prisma generate
+
+# Erstelle Verzeichnisse für Uploads und Logs (falls noch nicht existieren)
+RUN mkdir -p uploads/casa logs
+
+# Setze Berechtigungen für Uploads
+RUN chmod -R 755 uploads
+
+# Setze Umgebungsvariable für OpenSSL
+ENV OPENSSL_CONF=/etc/ssl/openssl.cnf
+
+# Container läuft als root für Prisma-Migrationen beim Start
+# NestJS selbst hat keine privilegierten Operationen
+
+# Exponiere Port
+EXPOSE 3000
+
+# Health Check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+
+# Starte Anwendung mit Migrations-Script
+CMD ["./startup.sh"]

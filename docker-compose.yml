@@ -1,0 +1,82 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: lasanta-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lasanta
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: lasanta_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups  # Für Datenbank-Backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lasanta -d lasanta_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NestJS API
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: lasanta-api
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
+    environment:
+      DATABASE_URL: "postgresql://lasanta:password@db:5432/lasanta_db?schema=public"
+      NODE_ENV: development
+      HOST: "0.0.0.0"
+      PORT: 3000
+      JWT_SECRET: "your-super-secret-jwt-key-here-change-in-production"
+      JWT_REFRESH_SECRET: "your-super-secret-refresh-key-here-change-in-production"
+      JWT_EXPIRES_IN: "15m"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      DISCORD_CLIENT_ID: "${DISCORD_CLIENT_ID}"
+      DISCORD_CLIENT_SECRET: "${DISCORD_CLIENT_SECRET}"
+      DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
+      DISCORD_GUILD_ID: "${DISCORD_GUILD_ID}"
+      DISCORD_REDIRECT_URI: "http://localhost:3001/api/auth/discord/callback"
+      FRONTEND_URL: "http://localhost:5173"
+      API_BASE_URL: "http://localhost:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+      - api_uploads:/app/uploads  # Für persistente Uploads/Dateien
+      - api_logs:/app/logs  # Für Log-Dateien
+
+  # React Frontend
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: lasanta-web
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://localhost:3001/api"
+      NODE_ENV: development
+      DOCKER: "true"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+    driver: local
+  api_uploads:
+    driver: local
+  api_logs:
+    driver: local
