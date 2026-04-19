@@ -146,6 +146,7 @@ Source of truth: `apps/api/prisma/schema.prisma` (`enum Role`).
 ## Manual verification workflows (non-standard Discord role path)
 - Partner flow (manual approval): `apps/api/src/partner/partner.controller.ts`, `apps/api/src/partner/partner.service.ts`
   - Approved request sets `role = PARTNER`, `allRoles = [PARTNER]`, `isPartner = true`.
+
 - Taxi flow (key-based onboarding): `apps/api/src/taxi/taxi.controller.ts`, `apps/api/src/taxi/taxi.service.ts`
   - Valid key sets `isTaxi = true`, role to `TAXI` or `TAXI_LEAD`.
 
@@ -184,6 +185,6 @@ Source of truth: `apps/api/prisma/schema.prisma` (`enum Role`).
 
 ## 7) Important observations (current state)
 
-- Frontend still contains legacy role strings (`DON`, `ASESOR`) in some type/display helpers (`apps/web/src/stores/auth.ts`, `apps/web/src/lib/utils.ts`) while backend enum uses `DON_CAPITAN` / `DON_COMANDANTE` and no `ASESOR` role.
+- Frontend still contains legacy role strings (`DON`, `ASESOR`) in some type/display helpers (`apps/web/src/stores/auth.ts`, `apps/web/src/lib/utils.ts`) while backend enum uses `DON_CAPITAN` / `DON_COMANDANTE` and no `ASESOR` role. This should be aligned as follow-up cleanup (remove/replace legacy frontend role strings or add an explicit compatibility mapping).
 - Legacy roles remain in schema and some services/scripts for backward compatibility (`ADMIN`, `QUARTIERMEISTER`, `MITGLIED`, `GAST`, `FUTURO`, `ROUTENVERWALTUNG`).
 - Effective access checks frequently combine `role` and `allRoles`; both are relevant for accurate authorization analysis.
