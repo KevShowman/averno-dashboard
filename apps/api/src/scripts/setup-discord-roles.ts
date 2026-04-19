@@ -6,76 +6,71 @@ async function setupDiscordRoles() {
   try {
     console.log('🚀 Richte Discord-Rollen-Mappings ein...');
 
-    // Discord-Rollen-Mappings definieren (neue 13 Ränge)
+    // Discord-Rollen-Mappings definieren (12 Hauptrollen)
     const roleMappings = [
       // Leaderschaft
       {
-        discordRoleId: '1431388062474309701', // 👑 - El Patrón
-        systemRole: Role.EL_PATRON,
-        name: 'El Patrón'
+        discordRoleId: '1431388062474309701', // 👑 - 12 | Patron
+        systemRole: Role.PATRON,
+        name: '12 | Patron'
       },
       {
-        discordRoleId: '1431388062474309699', // 🔥 - Don (El Capitán)
-        systemRole: Role.DON_CAPITAN,
-        name: 'Don - El Capitán'
+        discordRoleId: '1431388062474309699', // 🔥 - 11 | Don
+        systemRole: Role.DON,
+        name: '11 | Don'
       },
       {
-        discordRoleId: '1438638866432135348', // 🛡️ - Don (El Comandante)
-        systemRole: Role.DON_COMANDANTE,
-        name: 'Don - El Comandante'
-      },
-      {
-        discordRoleId: '1431388062474309698', // 🤝 - El Mano Derecha
-        systemRole: Role.EL_MANO_DERECHA,
-        name: 'El Mano Derecha'
+        discordRoleId: '1438638866432135348', // 🛡️ - 10 | Capo
+        systemRole: Role.CAPO,
+        name: '10 | Capo'
       },
       // Ränge 7-9
       {
-        discordRoleId: '1431388062427906229', // 🔒 - 9 | El Custodio
-        systemRole: Role.EL_CUSTODIO,
-        name: '9 | El Custodio'
+        discordRoleId: '1431388062427906229', // 🔒 - 9 | Consultora
+        systemRole: Role.CONSULTORA,
+        name: '9 | Consultora'
       },
       {
-        discordRoleId: '1438641189372035092', // 📚 - 8 | El Mentor
-        systemRole: Role.EL_MENTOR,
-        name: '8 | El Mentor'
+        discordRoleId: '1438641189372035092', // 📚 - 8 | Padrino
+        systemRole: Role.PADRINO,
+        name: '8 | Padrino'
       },
       {
-        discordRoleId: '1438641369038979295', // 🧰 - 7 | El Encargado
-        systemRole: Role.EL_ENCARGADO,
-        name: '7 | El Encargado'
+        discordRoleId: '1438641369038979295', // 🧰 - 7 | Gestión de Rutas
+        systemRole: Role.GESTION_DE_RUTAS,
+        name: '7 | Gestión de Rutas'
       },
       // Ränge 4-6
       {
-        discordRoleId: '1438637584975921286', // ⭐ - 6 | El Teniente
-        systemRole: Role.EL_TENIENTE,
-        name: '6 | El Teniente'
+        discordRoleId: '1438637584975921286', // ⭐ - 6 | El Mudo
+        systemRole: Role.EL_MUDO,
+        name: '6 | El Mudo'
       },
       {
-        discordRoleId: '1431388062427906228', // ⚔️ - 5 | Soldado
-        systemRole: Role.SOLDADO,
-        name: '5 | Soldado'
+        discordRoleId: '1431388062427906228', // ⚔️ - 5 | Lince
+        systemRole: Role.LINCE,
+        name: '5 | Lince'
       },
       {
-        discordRoleId: '1438642330532839596', // 🐍 - 4 | El Prefecto
-        systemRole: Role.EL_PREFECTO,
-        name: '4 | El Prefecto'
+        discordRoleId: '1438642330532839596', // 🐍 - 4 | Capataz
+        systemRole: Role.CAPATAZ,
+        name: '4 | Capataz'
       },
       // Ränge 1-3
       {
-        discordRoleId: '1438641614481264743', // 🫢 - 3 | El Confidente
-        systemRole: Role.EL_CONFIDENTE,
-        name: '3 | El Confidente'
+        discordRoleId: '1438641614481264743', // 🫢 - 3 | Mercader
+        systemRole: Role.MERCADER,
+        name: '3 | Mercader'
       },
       {
-        discordRoleId: '1438639256275914752', // 🐢 - 2 | El Protector
-        systemRole: Role.EL_PROTECTOR,
-        name: '2 | El Protector'
+        discordRoleId: '1438639256275914752', // 🐢 - 2 | Coyote
+        systemRole: Role.COYOTE,
+        name: '2 | Coyote'
       },
       {
-        discordRoleId: '1438636794181718199', // 🌱 - 1 | El Novato
-        systemRole: Role.EL_NOVATO,
-        name: '1 | El Novato'
+        discordRoleId: '1438636794181718199', // 🌱 - 1 | Recluta
+        systemRole: Role.RECLUTA,
+        name: '1 | Recluta'
       },
       // Legacy/Spezialrollen (falls noch im Discord vorhanden)
       {

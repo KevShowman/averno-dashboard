@@ -36,13 +36,13 @@ interface EnhancedPeoplePickerProps {
 }
 
 const roleIcons = {
-  'EL_PATRON': Crown,
+  'PATRON': Crown,
   'DON': Shield,
-  'ASESOR': UserCheck,
+  'CAPO': UserCheck,
   'LOGISTICA': Package,
   'ROUTENVERWALTUNG': MapPin,
   'SICARIO': AlertTriangle,
-  'SOLDADO': User,
+  'LINCE': User,
   'FUTURO': User,
 }
 

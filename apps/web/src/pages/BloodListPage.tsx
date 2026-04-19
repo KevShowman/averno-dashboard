@@ -94,12 +94,12 @@ export default function BloodListPage() {
     bloodinDurch: '',
   });
 
-  const isLeadership = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
+  const isLeadership = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
   const canBloodIn = user && (
-    ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'FORMACION'].includes(user.role as string) ||
+    ['PATRON', 'DON', 'CAPO', 'FORMACION'].includes(user.role as string) ||
     (user.allRoles && (user.allRoles as string[]).includes('FORMACION'))
   );
-  const canBloodOut = user && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role);
+  const canBloodOut = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
 
   // Queries
   const { data: activeMembers = [], isLoading } = useQuery({

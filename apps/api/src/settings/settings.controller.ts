@@ -55,7 +55,7 @@ export class SettingsController {
 
   // Setting erstellen oder aktualisieren (Leaderschaft)
   @Put()
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   @UseGuards(RolesGuard)
   async setSetting(@Body() setSettingDto: SetSettingDto) {
     return this.settingsService.setSetting(
@@ -67,7 +67,7 @@ export class SettingsController {
 
   // Setting löschen (Leaderschaft)
   @Delete(':key')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   @UseGuards(RolesGuard)
   async deleteSetting(@Param('key') key: string) {
     return this.settingsService.deleteSetting(key);
@@ -81,7 +81,7 @@ export class SettingsController {
 
   // Weekly Delivery Settings setzen (Leaderschaft)
   @Put('weekly-delivery')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   @UseGuards(RolesGuard)
   async setWeeklyDeliverySettings(@Body() settingsDto: WeeklyDeliverySettingsDto) {
     if (settingsDto.packages <= 0) {
@@ -105,7 +105,7 @@ export class SettingsController {
 
   // Xiao Motors Settings setzen (Leaderschaft)
   @Put('xiao-motors')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   @UseGuards(RolesGuard)
   async setXiaoMotorsSettings(@Body() settingsDto: XiaoMotorsSettingsDto) {
     return this.settingsService.setXiaoMotorsSettings(
@@ -122,7 +122,7 @@ export class SettingsController {
 
   // Blood List Channel Settings setzen (Leaderschaft)
   @Put('bloodlist')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   @UseGuards(RolesGuard)
   async setBloodListSettings(@Body() settingsDto: BloodListSettingsDto) {
     return this.settingsService.setBloodListSettings(
@@ -137,9 +137,9 @@ export class SettingsController {
     return { roleIds: await this.settingsService.getBloodInDiscordRoles() };
   }
 
-  // Blood In Discord Rollen setzen (NUR El Patron)
+  // Blood In Discord Rollen setzen (NUR Patron)
   @Put('bloodlist/roles')
-  @Roles(Role.EL_PATRON)
+  @Roles(Role.PATRON)
   @UseGuards(RolesGuard)
   async setBloodInDiscordRoles(@Body() body: { roleIds: string[] }) {
     return this.settingsService.setBloodInDiscordRoles(body.roleIds);

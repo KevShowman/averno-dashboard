@@ -157,8 +157,8 @@ export class CashService {
   }
 
   async createTransaction(data: CreateTransactionDto, userId: string, userRole: Role) {
-    // Alle Transaktionen benötigen Bestätigung, außer El Patrón
-    const needsApproval = userRole !== Role.EL_PATRON;
+    // Alle Transaktionen benötigen Bestätigung, außer Patron
+    const needsApproval = userRole !== Role.PATRON;
 
     const transaction = await this.prisma.moneyTransaction.create({
       data: {
@@ -195,7 +195,7 @@ export class CashService {
   }
 
   async approveTransaction(id: string, userId: string, userRole: Role) {
-    if (userRole !== Role.EL_PATRON) {
+    if (userRole !== Role.PATRON) {
       throw new BadRequestException('Insufficient permissions to approve transactions');
     }
 
@@ -253,7 +253,7 @@ export class CashService {
   }
 
   async rejectTransaction(id: string, userId: string, userRole: Role) {
-    if (userRole !== Role.EL_PATRON) {
+    if (userRole !== Role.PATRON) {
       throw new BadRequestException('Insufficient permissions to reject transactions');
     }
 

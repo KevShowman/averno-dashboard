@@ -103,8 +103,8 @@ export default function SanctionsPage() {
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
-  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
-  const isElPatron = hasRole(user, 'EL_PATRON')
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const isElPatron = hasRole(user, 'PATRON')
 
   const { data: sanctions = [], isLoading: loadingSanctions } = useQuery({
     queryKey: ['sanctions', 'all', selectedStatus, selectedCategory],

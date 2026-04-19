@@ -443,7 +443,7 @@ export default function KartePage() {
   const [filterKeyFamily, setFilterKeyFamily] = useState<'all' | 'only' | 'exclude'>('all')
   
   // Permission check
-  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
   const isContacto = hasRole(user, ['CONTACTO'])
   const isInteligencia = hasRole(user, ['INTELIGENCIA'])
   const isPartner = user?.isPartner === true

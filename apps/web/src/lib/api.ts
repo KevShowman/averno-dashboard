@@ -92,7 +92,7 @@ export const settingsApi = {
   // Blood List Settings
   getBloodListSettings: () => api.get('/settings/bloodlist/values'),
   setBloodListSettings: (data: { bloodInChannelId: string; bloodOutChannelId: string }) => api.put('/settings/bloodlist', data),
-  // Blood In Discord Rollen (nur El Patron)
+  // Blood In Discord Rollen (nur Patron)
   getBloodInDiscordRoles: () => api.get('/settings/bloodlist/roles').then(res => res.data),
   setBloodInDiscordRoles: (roleIds: string[]) => api.put('/settings/bloodlist/roles', { roleIds }).then(res => res.data),
 }

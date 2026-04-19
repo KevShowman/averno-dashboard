@@ -19,7 +19,7 @@ model User {
   avatarUrl    String?
   email        String?
   gender       Gender?  @default(MALE) // Geschlecht für Kleidungszuweisung
-  role         Role     @default(SOLDADO)
+  role         Role     @default(LINCE)
   allRoles     Json     @default("[]") // Alle System-Rollen des Users (JSON array)
   discordRoles Json     @default("[]") // Discord Rollen-IDs (JSON array)
   createdAt    DateTime @default(now())
@@ -105,20 +105,19 @@ enum Role {
   MITGLIED
   GAST
   // Leaderschaft (automatisch synchronisiert)
-  EL_PATRON // 👑 - El Patrón
-  DON_CAPITAN // ⚔️ - Don - El Capitán
-  DON_COMANDANTE // 🛡️ - Don - El Comandante
-  EL_MANO_DERECHA // 🤝 - El Mano Derecha
+  PATRON // 👑 - 12 Patron
+  DON // ⚔️ - 11 Don
+  CAPO // 🛡️ - 10 Capo
   // Normale Ränge (1-9)
-  EL_CUSTODIO // 🔒 - Rang 9 - Sicherheitsbegleitung / Wachposten
-  EL_MENTOR // 📚 - Rang 8 - Ausbilder der Neulinge
-  EL_ENCARGADO // 🧰 - Rang 7 - Zuständiger / Koordinator
-  EL_TENIENTE // ⭐ - Rang 6 - Unteroffizier / Bereichsverantwortlicher
-  SOLDADO // 🧭 - Rang 5 - Vollwertiger Soldat (Kern der Truppe)
-  EL_PREFECTO // 🐍 - Rang 4 - Kontrollinstanz / Operationsaufsicht
-  EL_CONFIDENTE // 🫢 - Rang 3 - Vertrauensperson der Führung
-  EL_PROTECTOR // 🐢 - Rang 2 - Schutz der Führung
-  EL_NOVATO // 🌱 - Rang 1 - Neuling / Probezeit
+  CONSULTORA // 🔒 - Rang 9 - Sicherheitsbegleitung / Wachposten
+  PADRINO // 📚 - Rang 8 - Ausbilder der Neulinge
+  GESTION_DE_RUTAS // 🧰 - Rang 7 - Zuständiger / Koordinator
+  EL_MUDO // ⭐ - Rang 6 - Unteroffizier / Bereichsverantwortlicher
+  LINCE // 🧭 - Rang 5 - Vollwertiger Soldat (Kern der Truppe)
+  CAPATAZ // 🐍 - Rang 4 - Kontrollinstanz / Operationsaufsicht
+  MERCADER // 🫢 - Rang 3 - Vertrauensperson der Führung
+  COYOTE // 🐢 - Rang 2 - Schutz der Führung
+  RECLUTA // 🌱 - Rang 1 - Neuling / Probezeit
   // Funktionsrollen (zusätzliche Rollen neben Rang)
   CONSEJERO // 🧘 - Consejero/a (Berater)
   RUTAS // 🚛 - Rutas (Routenverwaltung)
@@ -680,7 +679,7 @@ enum Gender {
 // Rang-Gruppen für Kleidung: 1-3, 4-6, 7-9, plus individuelle Leaderschaft-Ränge
 model RankClothingTemplate {
   id        String @id @default(cuid())
-  rankGroup String // "1-3", "4-6", "7-9", "EL_PATRON", "DON_CAPITAN", "DON_COMANDANTE", "EL_MANO_DERECHA"
+  rankGroup String // "1-3", "4-6", "7-9", "PATRON", "DON", "CAPO", "CAPO"
 
   // Maske (Männer)
   maskItemMale         Int?

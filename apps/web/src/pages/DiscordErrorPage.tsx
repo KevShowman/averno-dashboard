@@ -100,7 +100,7 @@ export default function DiscordErrorPage() {
               </h3>
               <ol className="space-y-2 text-sm text-gray-300 list-decimal list-inside">
                 <li>Trete dem <strong className="text-white">LaSanta Calavera Discord-Server</strong> bei</li>
-                <li>Wende dich an die <strong className="text-gold-400">Leaderschaft</strong> (El Patron, Don oder Asesor)</li>
+                <li>Wende dich an die <strong className="text-gold-400">Leaderschaft</strong> (Patron, Don oder Capo)</li>
                 <li>Warte bis dir eine <strong className="text-white">Rolle zugewiesen</strong> wurde</li>
                 <li>Versuche dich dann <strong className="text-white">erneut anzumelden</strong></li>
               </ol>

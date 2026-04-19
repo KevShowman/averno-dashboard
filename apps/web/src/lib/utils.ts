@@ -44,13 +44,11 @@ export function formatCurrency(amount: number | string) {
 
 export function getRoleColor(role: string) {
   switch (role) {
-    case 'EL_PATRON':
+    case 'PATRON':
       return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-    case 'DON_CAPITAN':
-    case 'DON_COMANDANTE':
+    case 'DON':
+    case 'CAPO':
       return 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-    case 'EL_MANO_DERECHA':
-      return 'bg-yellow-600/20 text-yellow-500 border-yellow-600/30'
     case 'ROUTENVERWALTUNG':
     case 'RUTAS':
       return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
@@ -58,7 +56,7 @@ export function getRoleColor(role: string) {
       return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
     case 'SICARIO':
       return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-    case 'SOLDADO':
+    case 'LINCE':
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
     case 'FUTURO':
       return 'bg-slate-600/20 text-slate-500 border-slate-600/30'
@@ -69,20 +67,36 @@ export function getRoleColor(role: string) {
 
 export function getRoleDisplayName(role: string) {
   switch (role) {
-    case 'EL_PATRON':
-      return 'El Patrón'
+    case 'PATRON':
+      return 'Patron'
     case 'DON':
       return 'Don'
-    case 'ASESOR':
-      return 'Asesor'
+    case 'CAPO':
+      return 'Capo'
+    case 'CONSULTORA':
+      return 'Consultora'
+    case 'PADRINO':
+      return 'Padrino'
+    case 'GESTION_DE_RUTAS':
+      return 'Gestión de Rutas'
+    case 'EL_MUDO':
+      return 'El Mudo'
+    case 'CAPATAZ':
+      return 'Capataz'
+    case 'MERCADER':
+      return 'Mercader'
+    case 'COYOTE':
+      return 'Coyote'
+    case 'RECLUTA':
+      return 'Recluta'
     case 'ROUTENVERWALTUNG':
       return 'Routenverwaltung'
     case 'LOGISTICA':
       return 'Logistica'
     case 'SICARIO':
       return 'Sicario'
-    case 'SOLDADO':
-      return 'Soldado'
+    case 'LINCE':
+      return 'Lince'
     case 'FUTURO':
       return 'Futuro'
     default:
@@ -116,17 +130,17 @@ export function hasAnyRole(user: any, requiredRoles: string[]) {
 }
 
 // Leaderschaft-Rollen Konstante
-export const LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']
-export const TOP_LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']
+export const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO']
+export const TOP_LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO']
 
 // Normale Ränge 1-9 (keine Leadership, keine Funktionsrollen)
 export const RANK_1_9_ROLES = [
   // Ränge 7-9
-  'EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO',
+  'CONSULTORA', 'PADRINO', 'GESTION_DE_RUTAS',
   // Ränge 4-6
-  'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO',
+  'EL_MUDO', 'LINCE', 'CAPATAZ',
   // Ränge 1-3
-  'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO',
+  'MERCADER', 'COYOTE', 'RECLUTA',
 ]
 
 export function hasAllRoles(user: any, requiredRoles: string[]) {

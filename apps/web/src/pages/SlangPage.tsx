@@ -67,9 +67,9 @@ const slangWords: SlangWord[] = [
   { german: "Boss / Chef", spanish: "Jefe", category: "Familie" },
   { german: "Anführer", spanish: "Líder", category: "Familie" },
   { german: "Der Pate", spanish: "El Padrino", category: "Familie" },
-  { german: "Der Patron", spanish: "El Patrón", category: "Familie" },
-  { german: "Soldat", spanish: "Soldado", category: "Familie" },
-  { german: "Neuling", spanish: "Novato", category: "Familie" },
+  { german: "Der Patron", spanish: "Patron", category: "Familie" },
+  { german: "Soldat", spanish: "Lince", category: "Familie" },
+  { german: "Neuling", spanish: "Recluta", category: "Familie" },
   { german: "Mitglied", spanish: "Miembro", category: "Familie" },
   { german: "Verräter", spanish: "Traidor", category: "Familie" },
   
@@ -271,4 +271,3 @@ export default function SlangPage() {
     </div>
   );
 }
-

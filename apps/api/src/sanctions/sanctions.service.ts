@@ -763,7 +763,7 @@ export class SanctionsService {
     return {};
   }
 
-  // El Patron: Sanktions-Level für User und Kategorie zurücksetzen
+  // Patron: Sanktions-Level für User und Kategorie zurücksetzen
   async resetUserSanctionLevels(userId: string, category: SanctionCategory, createdById: string) {
     // Alle aktiven Sanktionen für diesen User und diese Kategorie finden
     const activeSanctions = await this.prisma.sanction.findMany({

@@ -101,24 +101,23 @@ export class UsersService {
       // Legacy-Rollen
       [Role.FUTURO]: 0,
       // Neue Ränge (1-9)
-      [Role.EL_NOVATO]: 1,
-      [Role.EL_PROTECTOR]: 2,
-      [Role.EL_CONFIDENTE]: 3,
-      [Role.EL_PREFECTO]: 4,
-      [Role.SOLDADO]: 5,
-      [Role.EL_TENIENTE]: 6,
-      [Role.EL_ENCARGADO]: 7,
-      [Role.EL_MENTOR]: 8,
-      [Role.EL_CUSTODIO]: 9,
+      [Role.RECLUTA]: 1,
+      [Role.COYOTE]: 2,
+      [Role.MERCADER]: 3,
+      [Role.CAPATAZ]: 4,
+      [Role.LINCE]: 5,
+      [Role.EL_MUDO]: 6,
+      [Role.GESTION_DE_RUTAS]: 7,
+      [Role.PADRINO]: 8,
+      [Role.CONSULTORA]: 9,
+      // Leaderschaft (10-12)
+      [Role.CAPO]: 10,
+      [Role.DON]: 11,
+      [Role.PATRON]: 12,
       // Legacy erweiterte Rollen
-      [Role.SICARIO]: 10,
-      [Role.ROUTENVERWALTUNG]: 11,
-      [Role.LOGISTICA]: 12,
-      // Leaderschaft
-      [Role.EL_MANO_DERECHA]: 13,
-      [Role.DON_COMANDANTE]: 14,
-      [Role.DON_CAPITAN]: 15,
-      [Role.EL_PATRON]: 16,
+      [Role.SICARIO]: 5,
+      [Role.ROUTENVERWALTUNG]: 6,
+      [Role.LOGISTICA]: 5,
     };
 
     const highestRole = allRoles.reduce((highest, current) => {
@@ -194,22 +193,21 @@ export class UsersService {
   async getAvailableRoles() {
     return [
       // Leaderschaft
-      { key: Role.EL_PATRON, name: 'El Patrón', description: '👑 - Höchste Autorität' },
-      { key: Role.DON_CAPITAN, name: 'Don - El Capitán', description: '⚔️ - Don' },
-      { key: Role.DON_COMANDANTE, name: 'Don - El Comandante', description: '🛡️ - Don' },
-      { key: Role.EL_MANO_DERECHA, name: 'El Mano Derecha', description: '🤝 - Berater' },
+      { key: Role.PATRON, name: 'Patron', description: '👑 - Rang 12' },
+      { key: Role.DON, name: 'Don', description: '⚔️ - Rang 11' },
+      { key: Role.CAPO, name: 'Capo', description: '🛡️ - Rang 10' },
       // Ränge 7-9
-      { key: Role.EL_CUSTODIO, name: 'El Custodio', description: '🔒 - Rang 9 - Sicherheit' },
-      { key: Role.EL_MENTOR, name: 'El Mentor', description: '📚 - Rang 8 - Ausbilder' },
-      { key: Role.EL_ENCARGADO, name: 'El Encargado', description: '🧰 - Rang 7 - Koordinator' },
+      { key: Role.CONSULTORA, name: 'Consultora', description: '🔒 - Rang 9 - Sicherheit' },
+      { key: Role.PADRINO, name: 'Padrino', description: '📚 - Rang 8 - Ausbilder' },
+      { key: Role.GESTION_DE_RUTAS, name: 'Gestión de Rutas', description: '🧰 - Rang 7 - Koordinator' },
       // Ränge 4-6
-      { key: Role.EL_TENIENTE, name: 'El Teniente', description: '⭐ - Rang 6 - Unteroffizier' },
-      { key: Role.SOLDADO, name: 'Soldado', description: '🧭 - Rang 5 - Soldat' },
-      { key: Role.EL_PREFECTO, name: 'El Prefecto', description: '🐍 - Rang 4 - Kontrolle' },
+      { key: Role.EL_MUDO, name: 'El Mudo', description: '⭐ - Rang 6 - Unteroffizier' },
+      { key: Role.LINCE, name: 'Lince', description: '🧭 - Rang 5 - Soldat' },
+      { key: Role.CAPATAZ, name: 'Capataz', description: '🐍 - Rang 4 - Kontrolle' },
       // Ränge 1-3
-      { key: Role.EL_CONFIDENTE, name: 'El Confidente', description: '🫢 - Rang 3 - Vertrauensperson' },
-      { key: Role.EL_PROTECTOR, name: 'El Protector', description: '🐢 - Rang 2 - Schutz' },
-      { key: Role.EL_NOVATO, name: 'El Novato', description: '🌱 - Rang 1 - Neuling' },
+      { key: Role.MERCADER, name: 'Mercader', description: '🫢 - Rang 3 - Vertrauensperson' },
+      { key: Role.COYOTE, name: 'Coyote', description: '🐢 - Rang 2 - Schutz' },
+      { key: Role.RECLUTA, name: 'Recluta', description: '🌱 - Rang 1 - Neuling' },
       // Legacy
       { key: Role.FUTURO, name: 'Futuro', description: 'Anwärter (Legacy)' },
       { key: Role.SICARIO, name: 'Sicario', description: 'Erweiterte Berechtigungen (Legacy)' },
@@ -271,22 +269,21 @@ export class UsersService {
   private getRoleDisplayName(role: Role): string {
     switch (role) {
       // Leaderschaft
-      case Role.EL_PATRON: return 'El Patrón';
-      case Role.DON_CAPITAN: return 'Don - El Capitán';
-      case Role.DON_COMANDANTE: return 'Don - El Comandante';
-      case Role.EL_MANO_DERECHA: return 'El Mano Derecha';
+      case Role.PATRON: return 'Patron';
+      case Role.DON: return 'Don';
+      case Role.CAPO: return 'Capo';
       // Ränge 7-9
-      case Role.EL_CUSTODIO: return 'El Custodio';
-      case Role.EL_MENTOR: return 'El Mentor';
-      case Role.EL_ENCARGADO: return 'El Encargado';
+      case Role.CONSULTORA: return 'Consultora';
+      case Role.PADRINO: return 'Padrino';
+      case Role.GESTION_DE_RUTAS: return 'Gestión de Rutas';
       // Ränge 4-6
-      case Role.EL_TENIENTE: return 'El Teniente';
-      case Role.SOLDADO: return 'Soldado';
-      case Role.EL_PREFECTO: return 'El Prefecto';
+      case Role.EL_MUDO: return 'El Mudo';
+      case Role.LINCE: return 'Lince';
+      case Role.CAPATAZ: return 'Capataz';
       // Ränge 1-3
-      case Role.EL_CONFIDENTE: return 'El Confidente';
-      case Role.EL_PROTECTOR: return 'El Protector';
-      case Role.EL_NOVATO: return 'El Novato';
+      case Role.MERCADER: return 'Mercader';
+      case Role.COYOTE: return 'Coyote';
+      case Role.RECLUTA: return 'Recluta';
       // Funktionsrollen
       case Role.CONSEJERO: return 'Consejero/a';
       case Role.RUTAS: return 'Rutas';

@@ -27,13 +27,13 @@ import DiscordMembersManager from '../components/DiscordMembersManager'
 
 const getRoleDisplayName = (role: string) => {
   switch (role) {
-    case 'EL_PATRON': return 'El Patrón'
+    case 'PATRON': return 'Patron'
     case 'DON': return 'Don'
-    case 'ASESOR': return 'Asesor'
+    case 'CAPO': return 'Capo'
     case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
     case 'LOGISTICA': return 'Logistica'
     case 'SICARIO': return 'Sicario'
-    case 'SOLDADO': return 'Soldado'
+    case 'LINCE': return 'Lince'
     case 'FUTURO': return 'Futuro'
     default: return role
   }
@@ -64,25 +64,25 @@ export default function SettingsPage() {
   // Xiao Motors settings states
   const [xiaoMotorsCodewort, setXiaoMotorsCodewort] = useState('')
 
-  // Blood In Discord Roles state (nur El Patron)
+  // Blood In Discord Roles state (nur Patron)
   const [bloodInRoleIds, setBloodInRoleIds] = useState<string[]>([])
 
   // Permission checks
-  const isPatron = user?.role === 'EL_PATRON'
-  const canManageUsers = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
-  const canManageSettings = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
-  const canManagePackagePrice = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'RUTAS'])
+  const isPatron = user?.role === 'PATRON'
+  const canManageUsers = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const canManageSettings = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const canManagePackagePrice = hasRole(user, ['PATRON', 'DON', 'CAPO', 'RUTAS'])
   const canChangeIcName = hasRole(user, [
     // Leadership
-    'EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA',
+    'PATRON', 'DON', 'CAPO',
     // Funktionsrollen
     'RUTAS', 'LOGISTICA', 'SICARIO', 'CONSEJERO', 'INTELIGENCIA', 'FORMACION', 'CONTACTO',
     // Ränge 7-9
-    'EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO',
+    'CONSULTORA', 'PADRINO', 'GESTION_DE_RUTAS',
     // Ränge 4-6
-    'EL_TENIENTE', 'SOLDADO', 'EL_PREFECTO',
+    'EL_MUDO', 'LINCE', 'CAPATAZ',
     // Ränge 1-3
-    'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO',
+    'MERCADER', 'COYOTE', 'RECLUTA',
     // Legacy
     'FUTURO'
   ])
@@ -124,7 +124,7 @@ export default function SettingsPage() {
     enabled: canManageSettings,
   })
 
-  // Discord Rollen für Blood In Auswahl (nur El Patron)
+  // Discord Rollen für Blood In Auswahl (nur Patron)
   const { data: discordRoles, isLoading: loadingRoles } = useQuery({
     queryKey: ['discord-roles'],
     queryFn: () => discordApi.getRoles(),
@@ -154,12 +154,12 @@ export default function SettingsPage() {
     mutationFn: (discordId: string) =>
       api.post('/users/make-admin', { discordId }),
     onSuccess: () => {
-      toast.success('Benutzer wurde zum El Patrón ernannt')
+      toast.success('Benutzer wurde zum Patron ernannt')
       queryClient.invalidateQueries({ queryKey: ['users'] })
       setNewAdminDiscordId('')
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Fehler beim Ernennen des El Patrón')
+      toast.error(error.response?.data?.message || 'Fehler beim Ernennen des Patron')
     },
   })
 
@@ -391,7 +391,7 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Paket-System-Einstellungen - für El Patron, Don, Asesor, Routenverwaltung */}
+      {/* Paket-System-Einstellungen - für Patron, Don, Capo, Routenverwaltung */}
       {canManagePackagePrice && (
         <Card className="lasanta-card">
           <CardHeader>
@@ -433,8 +433,8 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Wochenabgabe-Einstellungen - für El Patron und Don */}
-      {(user?.role === 'EL_PATRON' || user?.role === 'DON') && (
+      {/* Wochenabgabe-Einstellungen - für Patron und Don */}
+      {(user?.role === 'PATRON' || user?.role === 'DON') && (
         <Card className="lasanta-card">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
@@ -591,7 +591,7 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Blood In Discord Rollen - NUR für El Patron */}
+      {/* Blood In Discord Rollen - NUR für Patron */}
       {isPatron && (
         <Card className="lasanta-card">
           <CardHeader>
@@ -600,7 +600,7 @@ export default function SettingsPage() {
               Blood In Discord Rollen
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Diese Discord Rollen werden automatisch bei einem Blood In zugewiesen (nur El Patrón)
+              Diese Discord Rollen werden automatisch bei einem Blood In zugewiesen (nur Patron)
             </CardDescription>
           </CardHeader>
           <CardContent>

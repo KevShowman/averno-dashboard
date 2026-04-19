@@ -18,10 +18,10 @@ async function migrateRolesTemp() {
 
     // Migration mapping mit RAW SQL um die Enum-Beschränkung zu umgehen
     const migrations = [
-      { from: 'ADMIN', to: 'EL_PATRON' },
+      { from: 'ADMIN', to: 'PATRON' },
       { from: 'QUARTIERMEISTER', to: 'DON' },
-      { from: 'MITGLIED', to: 'ASESOR' },
-      { from: 'GAST', to: 'SOLDADO' },
+      { from: 'MITGLIED', to: 'CAPO' },
+      { from: 'GAST', to: 'LINCE' },
     ];
 
     let totalUpdated = 0;
