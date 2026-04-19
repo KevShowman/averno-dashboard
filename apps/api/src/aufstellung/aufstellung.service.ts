@@ -7,7 +7,7 @@ import { DiscordService } from '../discord/discord.service';
 import { ExclusionService } from '../common/exclusion/exclusion.service';
 
 // Discord Kanal ID für Aufstellungs-Reminder
-const AUFSTELLUNG_REMINDER_CHANNEL_ID = '1431388063195594981';
+const AUFSTELLUNG_REMINDER_CHANNEL_ID = '1495540055601578135';
 
 @Injectable()
 export class AufstellungService {

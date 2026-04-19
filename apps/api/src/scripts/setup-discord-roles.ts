@@ -10,65 +10,65 @@ async function setupDiscordRoles() {
     const roleMappings = [
       // Leaderschaft
       {
-        discordRoleId: '1431388062474309701', // 👑 - 12 | Patron
+        discordRoleId: '1493787076200497202', // 👑 - 12 | Patron
         systemRole: Role.PATRON,
         name: '12 | Patron'
       },
       {
-        discordRoleId: '1431388062474309699', // 🔥 - 11 | Don
+        discordRoleId: '1493787560567374016', // 🔥 - 11 | Don
         systemRole: Role.DON,
         name: '11 | Don'
       },
       {
-        discordRoleId: '1438638866432135348', // 🛡️ - 10 | Capo
+        discordRoleId: '1493787917322289213', // 🛡️ - 10 | Capo
         systemRole: Role.CAPO,
         name: '10 | Capo'
       },
       // Ränge 7-9
       {
-        discordRoleId: '1431388062427906229', // 🔒 - 9 | Consultora
+        discordRoleId: '1493788418071724123', // 🔒 - 9 | Consultora
         systemRole: Role.CONSULTORA,
         name: '9 | Consultora'
       },
       {
-        discordRoleId: '1438641189372035092', // 📚 - 8 | Padrino
+        discordRoleId: '1493788737484623952', // 📚 - 8 | Padrino
         systemRole: Role.PADRINO,
         name: '8 | Padrino'
       },
       {
-        discordRoleId: '1438641369038979295', // 🧰 - 7 | Gestión de Rutas
+        discordRoleId: '1493789450080096256', // 🧰 - 7 | Gestión de Rutas
         systemRole: Role.GESTION_DE_RUTAS,
         name: '7 | Gestión de Rutas'
       },
       // Ränge 4-6
       {
-        discordRoleId: '1438637584975921286', // ⭐ - 6 | El Mudo
+        discordRoleId: '1494287016555188294', // ⭐ - 6 | El Mudo
         systemRole: Role.EL_MUDO,
         name: '6 | El Mudo'
       },
       {
-        discordRoleId: '1431388062427906228', // ⚔️ - 5 | Lince
+        discordRoleId: '1494287930502680586', // ⚔️ - 5 | Lince
         systemRole: Role.LINCE,
         name: '5 | Lince'
       },
       {
-        discordRoleId: '1438642330532839596', // 🐍 - 4 | Capataz
+        discordRoleId: '1494288340600750170', // 🐍 - 4 | Capataz
         systemRole: Role.CAPATAZ,
         name: '4 | Capataz'
       },
       // Ränge 1-3
       {
-        discordRoleId: '1438641614481264743', // 🫢 - 3 | Mercader
+        discordRoleId: '1494288697384894575', // 🫢 - 3 | Mercader
         systemRole: Role.MERCADER,
         name: '3 | Mercader'
       },
       {
-        discordRoleId: '1438639256275914752', // 🐢 - 2 | Coyote
+        discordRoleId: '1494289191478235257', // 🐢 - 2 | Coyote
         systemRole: Role.COYOTE,
         name: '2 | Coyote'
       },
       {
-        discordRoleId: '1438636794181718199', // 🌱 - 1 | Recluta
+        discordRoleId: '1494289466074988677', // 🌱 - 1 | Recluta
         systemRole: Role.RECLUTA,
         name: '1 | Recluta'
       },

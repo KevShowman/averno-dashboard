@@ -32,7 +32,6 @@ export class ClothingService {
     [Role.PATRON]: 'PATRON',
     [Role.DON]: 'DON',
     [Role.CAPO]: 'CAPO',
-    [Role.CAPO]: 'CAPO',
     // Ränge 7-9
     [Role.CONSULTORA]: '7-9',
     [Role.PADRINO]: '7-9',
