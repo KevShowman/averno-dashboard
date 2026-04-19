@@ -111,18 +111,57 @@ export function getDisplayName(user: { icFirstName?: string; icLastName?: string
   return user.username
 }
 
+function normalizeRole(role: unknown): string | null {
+  if (typeof role !== 'string') return null
+
+  const normalized = role
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\s-]+/g, '_')
+    .toUpperCase()
+
+  return normalized || null
+}
+
+function getUserRoles(user: any): string[] {
+  if (!user) return []
+
+  const roles: string[] = []
+  const mainRole = normalizeRole(user.role)
+  if (mainRole) roles.push(mainRole)
+
+  let allRoles = user.allRoles
+
+  if (typeof allRoles === 'string') {
+    try {
+      allRoles = JSON.parse(allRoles)
+    } catch {
+      allRoles = [allRoles]
+    }
+  }
+
+  if (Array.isArray(allRoles)) {
+    for (const role of allRoles) {
+      const normalizedRole = normalizeRole(role)
+      if (normalizedRole) roles.push(normalizedRole)
+    }
+  }
+
+  return [...new Set(roles)]
+}
+
 export function hasRole(user: any, requiredRoles: string | string[]) {
   if (!user) return false
   
-  const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
-  
-  // Prüfe Hauptrolle
-  if (roles.includes(user.role)) return true
-  
-  // Prüfe alle Rollen
-  if (user.allRoles && user.allRoles.some((role: string) => roles.includes(role))) return true
-  
-  return false
+  const roles = (Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles])
+    .map(normalizeRole)
+    .filter((role): role is string => !!role)
+
+  if (roles.length === 0) return false
+
+  const userRoles = getUserRoles(user)
+  return roles.some(role => userRoles.includes(role))
 }
 
 export function hasAnyRole(user: any, requiredRoles: string[]) {
@@ -146,15 +185,14 @@ export const RANK_1_9_ROLES = [
 export function hasAllRoles(user: any, requiredRoles: string[]) {
   if (!user) return false
   
-  // Prüfe Hauptrolle
-  const hasMainRole = requiredRoles.includes(user.role)
-  
-  // Prüfe alle Rollen
-  const hasAllUserRoles = user.allRoles ? 
-    requiredRoles.every(role => user.allRoles.includes(role)) : 
-    hasMainRole
-  
-  return hasAllUserRoles
+  const roles = requiredRoles
+    .map(normalizeRole)
+    .filter((role): role is string => !!role)
+
+  if (roles.length === 0) return false
+
+  const userRoles = getUserRoles(user)
+  return roles.every(role => userRoles.includes(role))
 }
 
 export function getMovementTypeColor(type: string) {

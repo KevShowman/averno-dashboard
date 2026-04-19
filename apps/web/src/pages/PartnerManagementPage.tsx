@@ -27,6 +27,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { hasRole } from '../lib/utils'
 
 interface PartnerAccessRequest {
   id: string
@@ -141,8 +142,8 @@ export default function PartnerManagementPage() {
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [selectedUserId, setSelectedUserId] = useState<string>('')
 
-  const isLeadership = user && LEADERSHIP_ROLES.includes(user.role)
-  const isElPatron = user && user.role === 'PATRON'
+  const isLeadership = hasRole(user, LEADERSHIP_ROLES)
+  const isElPatron = hasRole(user, 'PATRON')
 
   // Queries
   const { data: pendingRequests = [], isLoading: loadingRequests } = useQuery({
@@ -1061,4 +1062,3 @@ export default function PartnerManagementPage() {
     </div>
   )
 }
-

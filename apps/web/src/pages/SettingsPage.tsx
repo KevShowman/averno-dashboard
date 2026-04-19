@@ -68,7 +68,7 @@ export default function SettingsPage() {
   const [bloodInRoleIds, setBloodInRoleIds] = useState<string[]>([])
 
   // Permission checks
-  const isPatron = user?.role === 'PATRON'
+  const isPatron = hasRole(user, 'PATRON')
   const canManageUsers = hasRole(user, ['PATRON', 'DON', 'CAPO'])
   const canManageSettings = hasRole(user, ['PATRON', 'DON', 'CAPO'])
   const canManagePackagePrice = hasRole(user, ['PATRON', 'DON', 'CAPO', 'RUTAS'])

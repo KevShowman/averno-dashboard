@@ -158,7 +158,7 @@ export default function TafelrundePage() {
     arrivalDeadline: '',
   })
 
-  const isLeadership = user && LEADERSHIP_ROLES.includes(user.role)
+  const isLeadership = hasRole(user, LEADERSHIP_ROLES)
   const isPartner = user?.isPartner === true
 
   // Queries
@@ -1378,5 +1378,4 @@ function AddFamiliesDialog({
     </Dialog>
   )
 }
-
 

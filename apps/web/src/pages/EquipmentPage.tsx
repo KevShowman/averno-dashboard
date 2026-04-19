@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '../stores/auth';
+import { hasRole } from '../lib/utils';
 import { usersApi } from '../lib/api';
 
 // Types
@@ -180,11 +181,8 @@ export default function EquipmentPage() {
     note: '',
   });
 
-  const isLeadership = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
-  const canManage = user && (
-    ['PATRON', 'DON', 'CAPO'].includes(user.role as string) ||
-    (user.allRoles && (user.allRoles as string[]).includes('LOGISTICA'))
-  );
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO']);
+  const canManage = hasRole(user, ['PATRON', 'DON', 'CAPO', 'LOGISTICA']);
 
   // Queries - Alle Mitglieder können sehen
   const { data: stats, isLoading: loadingStats } = useQuery({

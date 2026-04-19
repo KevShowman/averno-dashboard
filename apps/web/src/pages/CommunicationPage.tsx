@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { useAuthStore } from '../stores/auth'
+import { hasRole } from '../lib/utils'
 import { Radio, MessageSquare, Pencil, Save, X, Signal, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -16,7 +17,7 @@ export default function CommunicationPage() {
   const [funkValue, setFunkValue] = useState('')
   const [darkChatValue, setDarkChatValue] = useState('')
 
-  const isLeadership = user?.role && ['PATRON', 'DON', 'CAPO'].includes(user.role)
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
 
   const { data, isLoading } = useQuery({
     queryKey: ['communication'],

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '../stores/auth';
+import { hasRole } from '../lib/utils';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isBefore } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -58,7 +59,7 @@ export default function AbmeldungenPage() {
   const [showStartCalendar, setShowStartCalendar] = useState(false);
   const [showEndCalendar, setShowEndCalendar] = useState(false);
 
-  const isLeadership = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO']);
 
   // Queries
   const { data: abmeldungen = [], isLoading } = useQuery({

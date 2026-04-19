@@ -8,6 +8,44 @@ export const ROLES_KEY = 'roles';
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
+  private normalizeRole(role: unknown): string | null {
+    if (typeof role !== 'string') return null;
+
+    const normalized = role
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\s-]+/g, '_')
+      .toUpperCase();
+
+    return normalized || null;
+  }
+
+  private getUserRoles(user: any): string[] {
+    const roles: string[] = [];
+
+    const mainRole = this.normalizeRole(user?.role);
+    if (mainRole) roles.push(mainRole);
+
+    let allRoles = user?.allRoles;
+    if (typeof allRoles === 'string') {
+      try {
+        allRoles = JSON.parse(allRoles);
+      } catch {
+        allRoles = [allRoles];
+      }
+    }
+
+    if (Array.isArray(allRoles)) {
+      for (const role of allRoles) {
+        const normalizedRole = this.normalizeRole(role);
+        if (normalizedRole) roles.push(normalizedRole);
+      }
+    }
+
+    return [...new Set(roles)];
+  }
+
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
@@ -24,16 +62,11 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Benutzer nicht authentifiziert');
     }
 
-    const hasRole = requiredRoles.some((role) => 
-      user.role === role || (user.allRoles && user.allRoles.includes(role))
-    );
-
-    // Fallback: Wenn allRoles nicht existiert, prüfe nur die Hauptrolle
-    // TODO: Entfernen nach Datenbank-Migration
-    if (!hasRole && !user.allRoles) {
-      const fallbackHasRole = requiredRoles.some((role) => user.role === role);
-      return fallbackHasRole;
-    }
+    const normalizedRequiredRoles = requiredRoles
+      .map((role) => this.normalizeRole(role))
+      .filter((role): role is string => !!role);
+    const userRoles = this.getUserRoles(user);
+    const hasRole = normalizedRequiredRoles.some((role) => userRoles.includes(role));
     
     if (!hasRole) {
       throw new ForbiddenException(`Zugriff verweigert. Erforderliche Rollen: ${requiredRoles.join(', ')}`);

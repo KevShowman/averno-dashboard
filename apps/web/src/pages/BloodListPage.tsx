@@ -27,6 +27,7 @@ import {
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../stores/auth';
+import { hasRole } from '../lib/utils';
 
 interface BloodRecord {
   id: string;
@@ -94,12 +95,9 @@ export default function BloodListPage() {
     bloodinDurch: '',
   });
 
-  const isLeadership = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
-  const canBloodIn = user && (
-    ['PATRON', 'DON', 'CAPO', 'FORMACION'].includes(user.role as string) ||
-    (user.allRoles && (user.allRoles as string[]).includes('FORMACION'))
-  );
-  const canBloodOut = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO']);
+  const canBloodIn = hasRole(user, ['PATRON', 'DON', 'CAPO', 'FORMACION']);
+  const canBloodOut = hasRole(user, ['PATRON', 'DON', 'CAPO']);
 
   // Queries
   const { data: activeMembers = [], isLoading } = useQuery({

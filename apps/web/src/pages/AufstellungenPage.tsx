@@ -32,6 +32,7 @@ import {
   Bell,
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth'
+import { hasRole } from '../lib/utils'
 import CreateExclusionModal from '../components/CreateExclusionModal'
 import CreateAufstellungModal from '../components/CreateAufstellungModal'
 
@@ -85,7 +86,7 @@ export default function AufstellungenPage() {
   const [showOlderAufstellungen, setShowOlderAufstellungen] = useState(false)
 
   // Rechte prüfen
-  const canManageAufstellungen = user?.role && ['PATRON', 'DON', 'CAPO'].includes(user.role)
+  const canManageAufstellungen = hasRole(user, ['PATRON', 'DON', 'CAPO'])
 
   // Query: Alle Aufstellungen
   const { data: aufstellungen, isLoading } = useQuery({
