@@ -90,7 +90,7 @@ Source of truth: `apps/api/prisma/schema.prisma` (`enum Role`).
 
 | Role | Main purpose / privilege level | Where used for access control (examples) | Special privileges |
 |---|---|---|---|
-| `EL_PATRON` | Highest authority | Many `@Roles` endpoints (cash, discord admin ops, settings, users, modules, etc.) | Exclusive gates include `cash` approval endpoints, `users/:id/roles`, `discord/roles`, module management |
+| `EL_PATRON` | Highest authority | Many `@Roles` endpoints (cash, discord admin ops, settings, users, modules, etc.) | Patron-only gates: cash approvals, user-role edits, module management, `discord/roles` |
 | `DON_CAPITAN` | Top leadership | Leadership-gated controllers (packages, attendance-adjacent flows, settings, discord ops, etc.) | Leadership privileges without patron-only exclusives |
 | `DON_COMANDANTE` | Top leadership | Same leadership groups as above | Leadership privileges |
 | `EL_MANO_DERECHA` | Top leadership | Same leadership groups as above | Leadership privileges |
@@ -185,6 +185,10 @@ Source of truth: `apps/api/prisma/schema.prisma` (`enum Role`).
 
 ## 7) Important observations (current state)
 
-- Frontend still contains legacy role strings (`DON`, `ASESOR`) in some type/display helpers (`apps/web/src/stores/auth.ts`, `apps/web/src/lib/utils.ts`) while backend enum uses `DON_CAPITAN` / `DON_COMANDANTE` and no `ASESOR` role. This should be aligned as follow-up cleanup (remove/replace legacy frontend role strings or add an explicit compatibility mapping).
+- Frontend still contains legacy role strings (`DON`, `ASESOR`) in some type/display helpers (`apps/web/src/stores/auth.ts`, `apps/web/src/lib/utils.ts`) while backend enum uses `DON_CAPITAN` / `DON_COMANDANTE` and no `ASESOR` role.
 - Legacy roles remain in schema and some services/scripts for backward compatibility (`ADMIN`, `QUARTIERMEISTER`, `MITGLIED`, `GAST`, `FUTURO`, `ROUTENVERWALTUNG`).
 - Effective access checks frequently combine `role` and `allRoles`; both are relevant for accurate authorization analysis.
+
+## 8) Follow-up action items
+
+- Create a cleanup task to align frontend legacy role strings (`DON`, `ASESOR`) with backend enum values (`DON_CAPITAN`, `DON_COMANDANTE`, no `ASESOR`) or add an explicit compatibility mapper.
