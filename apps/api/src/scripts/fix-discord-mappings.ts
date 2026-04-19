@@ -13,8 +13,8 @@ const DEFAULT_MAPPINGS = [
   // Beispiel:
   // {
   //   discordRoleId: 'DISCORD_ROLE_ID_HIER',
-  //   systemRole: Role.ASESOR,
-  //   name: 'Asesor',
+  //   systemRole: Role.CAPO,
+  //   name: 'Capo',
   // },
 ];
 

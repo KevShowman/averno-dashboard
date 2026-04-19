@@ -32,9 +32,9 @@ export class AufstellungController {
     private discordWebhookService: DiscordWebhookService,
   ) {}
 
-  // Erstelle neue Aufstellung (nur El Patron, Don, Asesor)
+  // Erstelle neue Aufstellung (nur Patron, Don, Capo)
   @Post()
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async createAufstellung(
     @Body() createDto: CreateAufstellungDto,
     @CurrentUser() user: User,
@@ -96,21 +96,21 @@ export class AufstellungController {
 
   // Aktive Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions/active')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async getActiveExclusions() {
     return this.aufstellungService.getActiveExclusions();
   }
 
   // Alle Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async getAllExclusions() {
     return this.aufstellungService.getAllExclusions();
   }
 
-  // Exclusion erstellen (nur El Patron, Don, Asesor)
+  // Exclusion erstellen (nur Patron, Don, Capo)
   @Post('exclusions')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async createExclusion(
     @Body() createDto: CreateExclusionDto,
     @CurrentUser() user: User,
@@ -126,14 +126,14 @@ export class AufstellungController {
 
   // Exclusion deaktivieren (Leaderschaft)
   @Patch('exclusions/:id/deactivate')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async deactivateExclusion(@Param('id') id: string) {
     return this.aufstellungService.deactivateExclusion(id);
   }
 
-  // Exclusion löschen (nur El Patron)
+  // Exclusion löschen (nur Patron)
   @Delete('exclusions/:id')
-  @Roles(Role.EL_PATRON)
+  @Roles(Role.PATRON)
   async deleteExclusion(@Param('id') id: string) {
     return this.aufstellungService.deleteExclusion(id);
   }
@@ -160,23 +160,23 @@ export class AufstellungController {
     );
   }
 
-  // Nicht-Reagierer sanktionieren (nur El Patron, Don, Asesor)
+  // Nicht-Reagierer sanktionieren (nur Patron, Don, Capo)
   @Post(':id/sanction-non-responders')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async sanctionNonResponders(@Param('id') id: string) {
     return this.aufstellungService.sanctionNonResponders(id);
   }
 
   // Reminder an nicht-reagierende User senden (Leaderschaft)
   @Post(':id/send-reminder')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async sendReminder(@Param('id') id: string) {
     return this.aufstellungService.sendReminder(id);
   }
 
   // Aufstellung löschen (Leaderschaft)
   @Delete(':id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
   }

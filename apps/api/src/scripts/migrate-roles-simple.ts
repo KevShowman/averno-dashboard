@@ -18,10 +18,10 @@ async function migrateRolesSimple() {
 
     // Migration mapping mit normalen Prisma Updates
     const migrations = [
-      { from: Role.ADMIN, to: Role.EL_PATRON },
-      { from: Role.QUARTIERMEISTER, to: Role.DON_CAPITAN },
-      { from: Role.MITGLIED, to: Role.EL_MANO_DERECHA },
-      { from: Role.GAST, to: Role.SOLDADO },
+      { from: Role.ADMIN, to: Role.PATRON },
+      { from: Role.QUARTIERMEISTER, to: Role.DON },
+      { from: Role.MITGLIED, to: Role.CAPO },
+      { from: Role.GAST, to: Role.LINCE },
     ];
 
     let totalUpdated = 0;
@@ -49,10 +49,10 @@ async function migrateRolesSimple() {
     console.log('\n📊 Benutzer nach Migration:');
     updatedUsers.forEach(user => {
       const displayName = {
-        'EL_PATRON': 'El Patrón',
+        'PATRON': 'Patron',
         'DON': 'Don',
-        'ASESOR': 'Asesor',
-        'SOLDADO': 'Soldado'
+        'CAPO': 'Capo',
+        'LINCE': 'Lince'
       }[user.role] || user.role;
       
       console.log(`   ${user.username}: ${displayName}`);

@@ -29,22 +29,22 @@ export class ClothingService {
   // Mapping von Rollen zu Rang-Gruppen
   private readonly roleToGroupMap: Record<Role, string> = {
     // Leaderschaft (individuelle Kleidung)
-    [Role.EL_PATRON]: 'EL_PATRON',
-    [Role.DON_CAPITAN]: 'DON_CAPITAN',
-    [Role.DON_COMANDANTE]: 'DON_COMANDANTE',
-    [Role.EL_MANO_DERECHA]: 'EL_MANO_DERECHA',
+    [Role.PATRON]: 'PATRON',
+    [Role.DON]: 'DON',
+    [Role.CAPO]: 'CAPO',
+    [Role.CAPO]: 'CAPO',
     // Ränge 7-9
-    [Role.EL_CUSTODIO]: '7-9',
-    [Role.EL_MENTOR]: '7-9',
-    [Role.EL_ENCARGADO]: '7-9',
+    [Role.CONSULTORA]: '7-9',
+    [Role.PADRINO]: '7-9',
+    [Role.GESTION_DE_RUTAS]: '7-9',
     // Ränge 4-6
-    [Role.EL_TENIENTE]: '4-6',
-    [Role.SOLDADO]: '4-6',
-    [Role.EL_PREFECTO]: '4-6',
+    [Role.EL_MUDO]: '4-6',
+    [Role.LINCE]: '4-6',
+    [Role.CAPATAZ]: '4-6',
     // Ränge 1-3
-    [Role.EL_CONFIDENTE]: '1-3',
-    [Role.EL_PROTECTOR]: '1-3',
-    [Role.EL_NOVATO]: '1-3',
+    [Role.MERCADER]: '1-3',
+    [Role.COYOTE]: '1-3',
+    [Role.RECLUTA]: '1-3',
     // Funktionsrollen (Fallback zu 1-3, außer Sicario hat eigene Kleidung)
     [Role.CONSEJERO]: '1-3',
     [Role.RUTAS]: '1-3',
@@ -56,7 +56,7 @@ export class ClothingService {
     // Legacy
     [Role.FUTURO]: '1-3',
     [Role.ROUTENVERWALTUNG]: '1-3',
-    [Role.ADMIN]: 'EL_PATRON',
+    [Role.ADMIN]: 'PATRON',
     [Role.QUARTIERMEISTER]: '4-6',
     [Role.MITGLIED]: '1-3',
     [Role.GAST]: '1-3',
@@ -69,10 +69,10 @@ export class ClothingService {
 
   // Leaderschaft-Rollen (dürfen Kleidung bearbeiten)
   private readonly leadershipRoles: Role[] = [
-    Role.EL_PATRON,
-    Role.DON_CAPITAN,
-    Role.DON_COMANDANTE,
-    Role.EL_MANO_DERECHA,
+    Role.PATRON,
+    Role.DON,
+    Role.CAPO,
+    Role.CAPO,
     Role.ADMIN,
   ];
 

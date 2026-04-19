@@ -128,7 +128,7 @@ interface UserForPermission {
   role: string
 }
 
-const LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'ADMIN']
+const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN']
 
 export default function PartnerManagementPage() {
   usePageTitle('Partner-Verwaltung')
@@ -142,7 +142,7 @@ export default function PartnerManagementPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>('')
 
   const isLeadership = user && LEADERSHIP_ROLES.includes(user.role)
-  const isElPatron = user && user.role === 'EL_PATRON'
+  const isElPatron = user && user.role === 'PATRON'
 
   // Queries
   const { data: pendingRequests = [], isLoading: loadingRequests } = useQuery({
@@ -177,7 +177,7 @@ export default function PartnerManagementPage() {
     },
   })
 
-  // Permission queries (nur für El Patron)
+  // Permission queries (nur für Patron)
   const permissionsQuery = useQuery({
     queryKey: ['partner-permissions'],
     queryFn: () => api.get('/partner/permissions').then(res => res.data as PartnerManagementPermission[]),
@@ -932,7 +932,7 @@ export default function PartnerManagementPage() {
         </Card>
       )}
 
-      {/* Berechtigungen Tab (nur El Patron) */}
+      {/* Berechtigungen Tab (nur Patron) */}
       {activeTab === 'permissions' && isElPatron && (
         <div className="space-y-4">
           <Card className="bg-gray-900/50 border-gray-800">
@@ -943,7 +943,7 @@ export default function PartnerManagementPage() {
               </CardTitle>
               <CardDescription>
                 Bestimme welche Mitglieder Partner-Anfragen und Vorschläge verwalten dürfen.
-                Leadership (Patron, Don, Asesor) hat automatisch Zugriff.
+                Leadership (Patron, Don, Capo) hat automatisch Zugriff.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1048,10 +1048,10 @@ export default function PartnerManagementPage() {
               <div className="text-sm text-gray-300">
                 <p className="font-medium text-blue-400 mb-1">Hinweis zu Berechtigungen</p>
                 <ul className="list-disc list-inside space-y-1 text-gray-400">
-                  <li>Leadership (El Patron, Don Capitán, Don Comandante, El Mano Derecha) hat automatisch Zugriff</li>
+                  <li>Leadership (Patron, Don, Capo, Capo) hat automatisch Zugriff</li>
                   <li>Berechtigte Mitglieder können Partner-Anfragen annehmen/ablehnen</li>
                   <li>Berechtigte Mitglieder können Partner-Vorschläge prüfen</li>
-                  <li>Nur El Patron kann diese Berechtigungen vergeben</li>
+                  <li>Nur Patron kann diese Berechtigungen vergeben</li>
                 </ul>
               </div>
             </div>

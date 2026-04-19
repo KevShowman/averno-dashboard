@@ -35,7 +35,7 @@ export class BloodListController {
 
   // Blood In - Leaderschaft + Formación
   @Post('blood-in')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.FORMACION)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.FORMACION)
   async bloodIn(@Body() bloodInDto: BloodInDto, @CurrentUser() user: User) {
     return this.bloodListService.bloodIn(
       bloodInDto.vorname,
@@ -49,7 +49,7 @@ export class BloodListController {
 
   // Blood Out - NUR Leaderschaft (NICHT Formación!)
   @Post('blood-out')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async bloodOut(@Body() bloodOutDto: BloodOutDto, @CurrentUser() user: User) {
     // Verwende den eingeloggten User als bloodoutDurch
     const durchUser = user.icFirstName && user.icLastName
@@ -78,14 +78,14 @@ export class BloodListController {
 
   // Blood Out Historie - Nur für Leaderschaft
   @Get('history')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async getBloodOutHistory() {
     return this.bloodListService.getBloodOutHistory();
   }
 
-  // Alle Records - Nur El Patron
+  // Alle Records - Nur Patron
   @Get('all')
-  @Roles(Role.EL_PATRON)
+  @Roles(Role.PATRON)
   async getAllRecords() {
     return this.bloodListService.getAllRecords();
   }
@@ -105,7 +105,7 @@ export class BloodListController {
   // Discord User die noch nicht zugewiesen sind - Leaderschaft + Formación
   // WICHTIG: Diese Route muss VOR :id stehen!
   @Get('discord/unassigned')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.FORMACION)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.FORMACION)
   async getUnassignedDiscordUsers() {
     return this.bloodListService.getUnassignedDiscordUsers();
   }
@@ -113,14 +113,14 @@ export class BloodListController {
   // Ghost Users - User die nicht mehr im Discord sind - NUR Leaderschaft (nicht Formación)
   // WICHTIG: Diese Route muss VOR :id stehen!
   @Get('discord/ghost-users')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async getGhostUsers() {
     return this.bloodListService.getGhostUsers();
   }
 
   // Discord User mit Blood Record verknüpfen (Blood In) - Leaderschaft + Formación
   @Post('link-discord-user')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.FORMACION)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.FORMACION)
   async linkDiscordUser(@Body() linkDto: LinkDiscordUserDto, @CurrentUser() user: User) {
     return this.bloodListService.linkDiscordUserToBloodRecord(
       linkDto.discordId,

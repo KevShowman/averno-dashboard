@@ -80,7 +80,7 @@ export default function DashboardPage() {
     weekChange: cashStats?.weekChange || 0,
   }
 
-  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
   const isSicario = hasRole(user, 'SICARIO')
   const isContacto = hasRole(user, 'CONTACTO')
 
@@ -103,7 +103,7 @@ export default function DashboardPage() {
     { key: 'sanctions', name: 'Sanktionen', icon: Scale, desc: 'Verstöße & Strafen' },
     { key: 'organigramm', name: 'Organisation', icon: Network, desc: 'Familienstruktur' },
     ...(isLeadership ? [{ key: 'member-files', name: 'Aktensystem', icon: FileText, desc: 'Mitglieder-Akten' }] : []),
-    ...(hasRole(user, 'EL_PATRON') ? [{ key: 'user-management', name: 'Benutzer', icon: Shield, desc: 'Rollen & Rechte' }] : []),
+    ...(hasRole(user, 'PATRON') ? [{ key: 'user-management', name: 'Benutzer', icon: Shield, desc: 'Rollen & Rechte' }] : []),
     // Ausstattung
     { key: 'clothing', name: 'Meine Kleidung', icon: Shirt, desc: 'Deine Outfits' },
     ...(isLeadership ? [{ key: 'clothing-management', name: 'Kleidungsverwaltung', icon: Shirt, desc: 'Vorlagen verwalten' }] : []),

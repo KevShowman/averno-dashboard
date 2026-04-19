@@ -25,21 +25,21 @@ async function fixOldRoleMappings() {
     });
     console.log('');
 
-    // 3. Aktualisiere alte DON Mappings zu DON_CAPITAN
+    // 3. Aktualisiere alte DON Mappings zu DON
     const donUpdated = await prisma.$executeRaw`
       UPDATE discord_role_mappings 
-      SET systemRole = 'DON_CAPITAN' 
+      SET systemRole = 'DON' 
       WHERE systemRole = 'DON'
     `;
-    console.log(`✅ Aktualisiert DON → DON_CAPITAN: ${donUpdated} Mappings`);
+    console.log(`✅ Aktualisiert DON → DON: ${donUpdated} Mappings`);
 
-    // 4. Aktualisiere alte ASESOR Mappings zu EL_MANO_DERECHA
+    // 4. Aktualisiere alte CAPO Mappings zu CAPO
     const asesorUpdated = await prisma.$executeRaw`
       UPDATE discord_role_mappings 
-      SET systemRole = 'EL_MANO_DERECHA' 
-      WHERE systemRole = 'ASESOR'
+      SET systemRole = 'CAPO' 
+      WHERE systemRole = 'CAPO'
     `;
-    console.log(`✅ Aktualisiert ASESOR → EL_MANO_DERECHA: ${asesorUpdated} Mappings`);
+    console.log(`✅ Aktualisiert CAPO → CAPO: ${asesorUpdated} Mappings`);
 
     // 5. Lösche leere oder NULL Mappings
     const emptyDeleted = await prisma.$executeRaw`
@@ -53,9 +53,9 @@ async function fixOldRoleMappings() {
       DELETE FROM discord_role_mappings 
       WHERE systemRole NOT IN (
         'ADMIN', 'QUARTIERMEISTER', 'MITGLIED', 'GAST',
-        'EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA',
-        'EL_CUSTODIO', 'EL_MENTOR', 'EL_ENCARGADO', 'EL_TENIENTE',
-        'SOLDADO', 'EL_PREFECTO', 'EL_CONFIDENTE', 'EL_PROTECTOR', 'EL_NOVATO',
+        'PATRON', 'DON', 'CAPO',
+        'CONSULTORA', 'PADRINO', 'GESTION_DE_RUTAS', 'EL_MUDO',
+        'LINCE', 'CAPATAZ', 'MERCADER', 'COYOTE', 'RECLUTA',
         'ROUTENVERWALTUNG', 'LOGISTICA', 'SICARIO', 'FUTURO'
       )
     `;
@@ -66,17 +66,17 @@ async function fixOldRoleMappings() {
     // 7. Aktualisiere User mit alten Rollen
     const userDonUpdated = await prisma.$executeRaw`
       UPDATE users 
-      SET role = 'DON_CAPITAN' 
+      SET role = 'DON' 
       WHERE role = 'DON'
     `;
-    console.log(`✅ Aktualisiert User DON → DON_CAPITAN: ${userDonUpdated} Users`);
+    console.log(`✅ Aktualisiert User DON → DON: ${userDonUpdated} Users`);
 
-    const userAsesorUpdated = await prisma.$executeRaw`
+    const userCapoUpdated = await prisma.$executeRaw`
       UPDATE users 
-      SET role = 'EL_MANO_DERECHA' 
-      WHERE role = 'ASESOR'
+      SET role = 'CAPO' 
+      WHERE role = 'CAPO'
     `;
-    console.log(`✅ Aktualisiert User ASESOR → EL_MANO_DERECHA: ${userAsesorUpdated} Users`);
+    console.log(`✅ Aktualisiert User CAPO → CAPO: ${userCapoUpdated} Users`);
 
     console.log('\n🎉 Bereinigung abgeschlossen!');
     console.log('\n📊 Verbleibende Mappings:');

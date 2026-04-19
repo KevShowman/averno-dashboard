@@ -118,7 +118,7 @@ export class SettingsService {
     };
   }
 
-  // Blood In Discord Rollen Settings (nur El Patron)
+  // Blood In Discord Rollen Settings (nur Patron)
   async getBloodInDiscordRoles(): Promise<string[]> {
     const roles = await this.getSetting('bloodlist_blood_in_discord_roles');
     if (!roles) return [];

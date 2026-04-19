@@ -115,7 +115,7 @@ interface UserForPermission {
   role: string
 }
 
-const LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA', 'ADMIN']
+const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN']
 
 const statusConfig: Record<TafelrundeStatus, { label: string; color: string; bgColor: string }> = {
   PLANNED: { label: 'Geplant', color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
@@ -672,7 +672,7 @@ export default function TafelrundePage() {
               <div className="text-sm text-gray-300">
                 <p className="font-medium text-blue-400 mb-1">Hinweis zu Berechtigungen</p>
                 <ul className="list-disc list-inside space-y-1 text-gray-400">
-                  <li>Leadership (Patron, Don, Asesor) hat automatisch Zugriff</li>
+                  <li>Leadership (Patron, Don, Capo) hat automatisch Zugriff</li>
                   <li>Berechtigte Mitglieder können Tafelrunden erstellen und verwalten</li>
                   <li>Partner können nur den Anwesenheitsstatus von Familien ändern</li>
                   <li>Alle Aktionen werden im Audit-Log protokolliert</li>

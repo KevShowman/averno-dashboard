@@ -94,7 +94,7 @@ const overviewSections: OverviewSection[] = [
   },
   {
     id: 'los-onces',
-    title: '⚔️ Los Onces – El Capitán & El Comandante',
+    title: '⚔️ Los Onces – Don & Capo',
     description:
       'Die beiden Ersten unter dem Patrón. Sie sind direkt ihm unterstellt und steuern Operationen & Sicherheit.',
     responsibilities: [
@@ -109,7 +109,7 @@ const overviewSections: OverviewSection[] = [
     ],
     subSections: [
       {
-        title: 'El Capitán – Operaciones',
+        title: 'Don – Operaciones',
         description: 'Der, der die Maschine am Laufen hält.',
         responsibilities: [
           'Gibt Aufträge an Logística, Inteligencia und Finanzleute.',
@@ -123,7 +123,7 @@ const overviewSections: OverviewSection[] = [
         ],
       },
       {
-        title: 'El Comandante – Seguridad',
+        title: 'Capo – Seguridad',
         description: 'Der Schatten. Die Waffe. Der Schutz.',
         responsibilities: [
           'Führt Sicarios, plant Sicherheitsmaßnahmen.',
@@ -140,7 +140,7 @@ const overviewSections: OverviewSection[] = [
   },
   {
     id: 'mano-derecha',
-    title: '🕴️ El Mano Derecha – Coordinador',
+    title: '🕴️ Capo – Coordinador',
     description:
       'La voz del Patrón. Er redet, wenn der Boss schweigt. Sorgt dafür, dass alle Rädchen ineinandergreifen – steht aber unter den Onces.',
     responsibilities: [
@@ -158,7 +158,7 @@ const overviewSections: OverviewSection[] = [
     id: 'funciones',
     title: '🧭 Funciones – Die Säulen',
     description:
-      'Logística, Inteligencia, Mediación, Sicarios – sie halten alles zusammen. Berichten an Mano Derecha.',
+      'Logística, Inteligencia, Mediación, Sicarios – sie halten alles zusammen. Berichten an Capo.',
     responsibilities: [
       'Jeder Bereich verantwortet sein Tagesgeschäft.',
       'Planen, führen, melden – ohne Fehler.',
@@ -166,7 +166,7 @@ const overviewSections: OverviewSection[] = [
     ],
     dailyDuties: [
       'Tägliche Abstimmung mit ihren Leuten.',
-      'Berichte an Mano Derecha oder direkt an die Onces.',
+      'Berichte an Capo oder direkt an die Onces.',
       'Reagieren schnell, wenn etwas klemmt.',
     ],
     subSections: [
@@ -232,7 +232,7 @@ const overviewSections: OverviewSection[] = [
     id: 'ranks-7-9',
     title: '🔹 Ränge 7-9: Oberste Soldaten',
     description:
-      'El Custodio, El Mentor, El Encargado – die erfahrensten und vertrauenswürdigsten Soldaten.',
+      'Consultora, Padrino, Gestión de Rutas – die erfahrensten und vertrauenswürdigsten Soldaten.',
     responsibilities: [
       'Führen kleinere Teams und mentorieren neue Mitglieder.',
       'Überwachen kritische Operationen und Transporte.',
@@ -248,7 +248,7 @@ const overviewSections: OverviewSection[] = [
     id: 'ranks-4-6',
     title: '🔸 Ränge 4-6: Bewährte Soldaten',
     description:
-      'El Teniente, Soldado, El Prefecto – das Rückgrat der operativen Arbeit.',
+      'El Mudo, Lince, Capataz – das Rückgrat der operativen Arbeit.',
     responsibilities: [
       'Führen Aufträge selbstständig aus.',
       'Unterstützen höhere Ränge bei komplexen Operationen.',
@@ -264,7 +264,7 @@ const overviewSections: OverviewSection[] = [
     id: 'ranks-1-3',
     title: '🔻 Ränge 1-3: Neue Gesichter',
     description:
-      'El Novato, El Protector, El Confidente – der Einstieg in die Familia.',
+      'Recluta, Coyote, Mercader – der Einstieg in die Familia.',
     responsibilities: [
       'Lernen die Abläufe und Strukturen kennen.',
       'Unterstützen erfahrene Mitglieder bei einfachen Aufgaben.',
@@ -296,7 +296,7 @@ const treeNodes: Record<string, TreeNode> = {
   },
   capitan: {
     id: 'capitan',
-    label: 'El Capitán – Operaciones',
+    label: 'Don – Operaciones',
     summary: 'Der, der die Maschine am Laufen hält.',
     responsibilities: [
       'Gibt Aufträge an Logística, Inteligencia und Finanzleute.',
@@ -311,7 +311,7 @@ const treeNodes: Record<string, TreeNode> = {
   },
   comandante: {
     id: 'comandante',
-    label: 'El Comandante – Seguridad',
+    label: 'Capo – Seguridad',
     summary: 'Der Schatten. Die Waffe. Der Schutz.',
     responsibilities: [
       'Führt Sicarios, plant Sicherheitsmaßnahmen.',
@@ -326,7 +326,7 @@ const treeNodes: Record<string, TreeNode> = {
   },
   'mano-derecha': {
     id: 'mano-derecha',
-    label: 'El Mano Derecha – Coordinador',
+    label: 'Capo – Coordinador',
     summary: 'La voz del Patrón. Sorgt dafür, dass alle Rädchen ineinandergreifen.',
     responsibilities: [
       'Setzt Befehle um, verteilt Infos, hält alle synchron.',
@@ -446,7 +446,7 @@ const treeNodes: Record<string, TreeNode> = {
   },
   'ranks-7-9': {
     id: 'ranks-7-9',
-    label: 'Ränge 7-9: El Custodio, El Mentor, El Encargado',
+    label: 'Ränge 7-9: Consultora, Padrino, Gestión de Rutas',
     summary: 'Die obersten Soldaten – erfahren, vertrauenswürdig, führend.',
     responsibilities: [
       'Führen kleinere Teams und mentorieren neue Mitglieder.',
@@ -461,7 +461,7 @@ const treeNodes: Record<string, TreeNode> = {
   },
   'ranks-4-6': {
     id: 'ranks-4-6',
-    label: 'Ränge 4-6: El Teniente, Soldado, El Prefecto',
+    label: 'Ränge 4-6: El Mudo, Lince, Capataz',
     summary: 'Das Rückgrat – bewährt, zuverlässig, immer im Einsatz.',
     responsibilities: [
       'Führen Aufträge selbstständig aus.',
@@ -476,7 +476,7 @@ const treeNodes: Record<string, TreeNode> = {
   },
   'ranks-1-3': {
     id: 'ranks-1-3',
-    label: 'Ränge 1-3: El Novato, El Protector, El Confidente',
+    label: 'Ränge 1-3: Recluta, Coyote, Mercader',
     summary: 'Der Einstieg – lernen, beweisen, wachsen.',
     responsibilities: [
       'Lernen die Abläufe und Strukturen kennen.',
@@ -507,7 +507,7 @@ const organigramLevels: OrganigramLevel[] = [
   {
     id: 'level-3',
     title: '🕴️ Coordinación',
-    description: 'El Mano Derecha hält die Fäden zwischen den Onces und den Funciones.',
+    description: 'Capo hält die Fäden zwischen den Onces und den Funciones.',
     nodes: ['mano-derecha'],
   },
   {
@@ -519,19 +519,19 @@ const organigramLevels: OrganigramLevel[] = [
   {
     id: 'level-5',
     title: '🔹 Ränge 7-9 – Oberste Soldaten',
-    description: 'El Custodio, El Mentor, El Encargado – die erfahrensten Kämpfer.',
+    description: 'Consultora, Padrino, Gestión de Rutas – die erfahrensten Kämpfer.',
     nodes: ['ranks-7-9'],
   },
   {
     id: 'level-6',
     title: '🔸 Ränge 4-6 – Bewährte Soldaten',
-    description: 'El Teniente, Soldado, El Prefecto – das operative Rückgrat.',
+    description: 'El Mudo, Lince, Capataz – das operative Rückgrat.',
     nodes: ['ranks-4-6'],
   },
   {
     id: 'level-7',
     title: '🔻 Ränge 1-3 – Neue Gesichter',
-    description: 'El Novato, El Protector, El Confidente – der Einstieg.',
+    description: 'Recluta, Coyote, Mercader – der Einstieg.',
     nodes: ['ranks-1-3'],
   },
 ]
@@ -547,19 +547,19 @@ const assignmentRoles: AssignmentRole[] = [
   },
   {
     id: 'capitan',
-    label: 'El Capitán – Operaciones',
+    label: 'Don – Operaciones',
     description: 'Der, der die Maschine am Laufen hält.',
     icon: <Briefcase className="h-5 w-5 text-blue-400" />,
   },
   {
     id: 'comandante',
-    label: 'El Comandante – Seguridad',
+    label: 'Capo – Seguridad',
     description: 'Der Schatten. Die Waffe. Der Schutz.',
     icon: <Shield className="h-5 w-5 text-red-400" />,
   },
   {
     id: 'mano-derecha',
-    label: 'El Mano Derecha – Coordinador',
+    label: 'Capo – Coordinador',
     description: 'La voz del Patrón. Koordiniert zwischen den Onces.',
     icon: <BadgeCheck className="h-5 w-5 text-cyan-400" />,
   },
@@ -608,19 +608,19 @@ const assignmentRoles: AssignmentRole[] = [
   {
     id: 'ranks-7-9',
     label: 'Ränge 7-9: Oberste Soldaten',
-    description: 'El Custodio, El Mentor, El Encargado',
+    description: 'Consultora, Padrino, Gestión de Rutas',
     icon: <Users className="h-5 w-5 text-purple-400" />,
   },
   {
     id: 'ranks-4-6',
     label: 'Ränge 4-6: Bewährte Soldaten',
-    description: 'El Teniente, Soldado, El Prefecto',
+    description: 'El Mudo, Lince, Capataz',
     icon: <Users className="h-5 w-5 text-indigo-400" />,
   },
   {
     id: 'ranks-1-3',
     label: 'Ränge 1-3: Neue Gesichter',
-    description: 'El Novato, El Protector, El Confidente',
+    description: 'Recluta, Coyote, Mercader',
     icon: <Users className="h-5 w-5 text-slate-400" />,
   },
 ]

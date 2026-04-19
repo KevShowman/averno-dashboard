@@ -84,7 +84,7 @@ export class EquipmentController {
 
   // Waffe erstellen (Leadership + Logistica)
   @Post('weapons')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async createWeapon(@Body() data: CreateWeaponDto, @Request() req) {
     return this.equipmentService.createWeapon(data, req.user.id);
@@ -92,7 +92,7 @@ export class EquipmentController {
 
   // Waffe aktualisieren (Leadership + Logistica)
   @Patch('weapons/:id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async updateWeapon(@Param('id') id: string, @Body() data: UpdateWeaponDto, @Request() req) {
     return this.equipmentService.updateWeapon(id, data, req.user.id);
@@ -100,7 +100,7 @@ export class EquipmentController {
 
   // Waffe löschen (Leadership + Logistica)
   @Delete('weapons/:id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async deleteWeapon(@Param('id') id: string, @Request() req) {
     return this.equipmentService.deleteWeapon(id, req.user.id);
@@ -128,7 +128,7 @@ export class EquipmentController {
 
   // Westen erstellen (Leadership + Logistica)
   @Post('vests')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async createVest(@Body() data: CreateVestDto, @Request() req) {
     return this.equipmentService.createVest(data, req.user.id);
@@ -136,7 +136,7 @@ export class EquipmentController {
 
   // Westen-Eintrag löschen (Leadership + Logistica)
   @Delete('vests/:id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async deleteVest(@Param('id') id: string, @Request() req) {
     return this.equipmentService.deleteVest(id, req.user.id);
@@ -164,7 +164,7 @@ export class EquipmentController {
 
   // Munition erstellen (Leadership + Logistica)
   @Post('ammo')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async createAmmo(@Body() data: CreateAmmoDto, @Request() req) {
     return this.equipmentService.createAmmo(data, req.user.id);
@@ -172,7 +172,7 @@ export class EquipmentController {
 
   // Munitions-Eintrag löschen (Leadership + Logistica)
   @Delete('ammo/:id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.LOGISTICA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.LOGISTICA)
   @UseGuards(RolesGuard)
   async deleteAmmo(@Param('id') id: string, @Request() req) {
     return this.equipmentService.deleteAmmo(id, req.user.id);

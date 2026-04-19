@@ -25,24 +25,23 @@ async function scheduledUserSync() {
 
     // Rollen-Hierarchie (höhere Zahl = höhere Berechtigung)
     const roleHierarchy: Record<string, number> = {
-      'EL_NOVATO': 1,
-      'EL_PROTECTOR': 2,
-      'EL_CONFIDENTE': 3,
-      'EL_PREFECTO': 4,
-      'SOLDADO': 5,
-      'EL_TENIENTE': 6,
-      'EL_ENCARGADO': 7,
-      'EL_MENTOR': 8,
-      'EL_CUSTODIO': 9,
-      'EL_MANO_DERECHA': 10,
-      'DON_COMANDANTE': 11,
-      'DON_CAPITAN': 12,
-      'EL_PATRON': 13,
+      'RECLUTA': 1,
+      'COYOTE': 2,
+      'MERCADER': 3,
+      'CAPATAZ': 4,
+      'LINCE': 5,
+      'EL_MUDO': 6,
+      'GESTION_DE_RUTAS': 7,
+      'PADRINO': 8,
+      'CONSULTORA': 9,
+      'CAPO': 10,
+      'DON': 11,
+      'PATRON': 12,
       'SICARIO': 5,
       'ROUTENVERWALTUNG': 6,
       'LOGISTICA': 5,
       'FUTURO': 1,
-      'ADMIN': 13,
+      'ADMIN': 12,
       'QUARTIERMEISTER': 5,
       'MITGLIED': 2,
       'GAST': 0,
@@ -123,4 +122,3 @@ async function scheduledUserSync() {
 }
 
 scheduledUserSync();
-

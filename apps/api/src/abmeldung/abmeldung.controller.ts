@@ -44,7 +44,7 @@ export class AbmeldungController {
 
   // Alle Abmeldungen abrufen (nur Leaderschaft)
   @Get()
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async getAllAbmeldungen() {
     return this.abmeldungService.getAllAbmeldungen();
   }
@@ -95,9 +95,9 @@ export class AbmeldungController {
     return this.abmeldungService.deleteAbmeldung(id, user.id, user.role);
   }
 
-  // Cleanup alte Abmeldungen (nur El Patron)
+  // Cleanup alte Abmeldungen (nur Patron)
   @Post('cleanup')
-  @Roles(Role.EL_PATRON)
+  @Roles(Role.PATRON)
   async cleanupOldAbmeldungen() {
     return this.abmeldungService.cleanupOldAbmeldungen();
   }

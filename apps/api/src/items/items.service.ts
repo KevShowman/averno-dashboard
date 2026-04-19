@@ -206,11 +206,11 @@ export class ItemsService {
       throw new NotFoundException('User not found');
     }
 
-    // Prüfe ob User El Patron oder Don ist (für gesperrte Items)
+    // Prüfe ob User Patron oder Don ist (für gesperrte Items)
     // JSON zu Array casten (MySQL verwendet Json statt native Arrays)
     const allRoles = Array.isArray(user.allRoles) ? user.allRoles as Role[] : [];
-    const isElPatronOrDon = user.role === Role.EL_PATRON || user.role === Role.DON_CAPITAN || user.role === Role.DON_COMANDANTE ||
-                           (allRoles.includes(Role.EL_PATRON) || allRoles.includes(Role.DON_CAPITAN) || allRoles.includes(Role.DON_COMANDANTE));
+    const isElPatronOrDon = user.role === Role.PATRON || user.role === Role.DON || user.role === Role.CAPO ||
+                           (allRoles.includes(Role.PATRON) || allRoles.includes(Role.DON) || allRoles.includes(Role.CAPO));
 
     if (item.isLocked && !isElPatronOrDon) {
       throw new BadRequestException('Item is locked');
@@ -254,11 +254,11 @@ export class ItemsService {
     }
 
     // Determine if movement needs approval
-    // El Patron, Don und Logistica können direkt ausführen
+    // Patron, Don und Logistica können direkt ausführen
     // JSON zu Array casten (MySQL verwendet Json statt native Arrays)
     const userAllRoles = Array.isArray(user.allRoles) ? user.allRoles as Role[] : [];
-    const isLeadership = user.role === Role.EL_PATRON || user.role === Role.DON_CAPITAN || user.role === Role.DON_COMANDANTE || user.role === Role.LOGISTICA ||
-                        (userAllRoles.includes(Role.EL_PATRON) || userAllRoles.includes(Role.DON_CAPITAN) || userAllRoles.includes(Role.DON_COMANDANTE) || userAllRoles.includes(Role.LOGISTICA));
+    const isLeadership = user.role === Role.PATRON || user.role === Role.DON || user.role === Role.CAPO || user.role === Role.LOGISTICA ||
+                        (userAllRoles.includes(Role.PATRON) || userAllRoles.includes(Role.DON) || userAllRoles.includes(Role.CAPO) || userAllRoles.includes(Role.LOGISTICA));
     
     const needsApproval = !isLeadership;
 
@@ -413,7 +413,7 @@ export class ItemsService {
             note: count.note || `Inventory count adjustment: ${difference > 0 ? '+' : ''}${difference}`,
           },
           userId,
-          Role.DON_CAPITAN, // Assume inventory can be done by Don or higher
+          Role.DON, // Assume inventory can be done by Don or higher
         );
         adjustments.push(result);
       }

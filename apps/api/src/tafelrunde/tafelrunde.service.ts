@@ -5,10 +5,10 @@ import { DiscordService } from '../discord/discord.service';
 import { Role, TafelrundeStatus, TafelrundeAttendance } from '@prisma/client';
 
 const LEADERSHIP_ROLES: Role[] = [
-  Role.EL_PATRON,
-  Role.DON_CAPITAN,
-  Role.DON_COMANDANTE,
-  Role.EL_MANO_DERECHA,
+  Role.PATRON,
+  Role.DON,
+  Role.CAPO,
+  Role.CAPO,
   Role.ADMIN,
 ];
 

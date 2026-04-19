@@ -86,9 +86,9 @@ export class UsersController {
     return this.usersService.updateGender(req.user.id, updateDto.gender);
   }
 
-  // User-Rollen aktualisieren (nur El Patron)
+  // User-Rollen aktualisieren (nur Patron)
   @Put(':id/roles')
-  @Roles(Role.EL_PATRON)
+  @Roles(Role.PATRON)
   @UseGuards(RolesGuard)
   async updateUserRoles(
     @Param('id') userId: string,
@@ -104,7 +104,7 @@ export class UsersController {
 
   // User löschen (nur Leaderschaft)
   @Delete(':id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   @UseGuards(RolesGuard)
   async deleteUser(
     @Param('id') userId: string,

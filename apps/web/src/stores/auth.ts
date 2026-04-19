@@ -9,8 +9,8 @@ export interface User {
   icLastName?: string
   avatarUrl?: string
   email?: string
-  role: 'EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER' | 'TAXI' | 'TAXI_LEAD'
-  allRoles?: ('EL_PATRON' | 'DON' | 'ASESOR' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'SOLDADO' | 'FUTURO' | 'PARTNER' | 'TAXI' | 'TAXI_LEAD')[]
+  role: 'PATRON' | 'DON' | 'CAPO' | 'CONSULTORA' | 'PADRINO' | 'GESTION_DE_RUTAS' | 'EL_MUDO' | 'LINCE' | 'CAPATAZ' | 'MERCADER' | 'COYOTE' | 'RECLUTA' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'FUTURO' | 'PARTNER' | 'TAXI' | 'TAXI_LEAD'
+  allRoles?: ('PATRON' | 'DON' | 'CAPO' | 'CONSULTORA' | 'PADRINO' | 'GESTION_DE_RUTAS' | 'EL_MUDO' | 'LINCE' | 'CAPATAZ' | 'MERCADER' | 'COYOTE' | 'RECLUTA' | 'ROUTENVERWALTUNG' | 'LOGISTICA' | 'SICARIO' | 'FUTURO' | 'PARTNER' | 'TAXI' | 'TAXI_LEAD')[]
   gender?: 'MALE' | 'FEMALE'
   isPartner?: boolean
   isTaxi?: boolean

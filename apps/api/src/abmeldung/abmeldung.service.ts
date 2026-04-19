@@ -365,7 +365,7 @@ export class AbmeldungService {
     }
 
     // Prüfe Berechtigung: Nur eigene Abmeldungen oder Leaderschaft
-    const isLeadership = ([Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA] as Role[]).includes(userRole);
+    const isLeadership = ([Role.PATRON, Role.DON, Role.CAPO] as Role[]).includes(userRole);
     const isOwnAbmeldung = abmeldung.userId === userId;
 
     if (!isLeadership && !isOwnAbmeldung) {
@@ -410,7 +410,7 @@ export class AbmeldungService {
     }
 
     // Prüfe Berechtigung
-    const isLeadership = ([Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA] as Role[]).includes(userRole);
+    const isLeadership = ([Role.PATRON, Role.DON, Role.CAPO] as Role[]).includes(userRole);
     const isOwnAbmeldung = abmeldung.userId === userId;
 
     if (!isLeadership && !isOwnAbmeldung) {

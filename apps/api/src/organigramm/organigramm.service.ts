@@ -16,10 +16,10 @@ export class OrganigrammService {
   // Mapping von System-Rollen zu Organigramm-Kategorien
   private readonly roleMapping: Record<Role, string> = {
     // Leaderschaft
-    [Role.EL_PATRON]: 'patron',
-    [Role.DON_CAPITAN]: 'capitan',
-    [Role.DON_COMANDANTE]: 'comandante',
-    [Role.EL_MANO_DERECHA]: 'mano-derecha',
+    [Role.PATRON]: 'patron',
+    [Role.DON]: 'capitan',
+    [Role.CAPO]: 'comandante',
+    [Role.CAPO]: 'mano-derecha',
     
     // Funktionsrollen
     [Role.CONSEJERO]: 'funktionsleiter-consejero',
@@ -31,15 +31,15 @@ export class OrganigrammService {
     [Role.CONTACTO]: 'funktionsleiter-contacto',
     
     // Normale Ränge
-    [Role.EL_CUSTODIO]: 'ranks-7-9',
-    [Role.EL_MENTOR]: 'ranks-7-9',
-    [Role.EL_ENCARGADO]: 'ranks-7-9',
-    [Role.EL_TENIENTE]: 'ranks-4-6',
-    [Role.SOLDADO]: 'ranks-4-6',
-    [Role.EL_PREFECTO]: 'ranks-4-6',
-    [Role.EL_CONFIDENTE]: 'ranks-1-3',
-    [Role.EL_PROTECTOR]: 'ranks-1-3',
-    [Role.EL_NOVATO]: 'ranks-1-3',
+    [Role.CONSULTORA]: 'ranks-7-9',
+    [Role.PADRINO]: 'ranks-7-9',
+    [Role.GESTION_DE_RUTAS]: 'ranks-7-9',
+    [Role.EL_MUDO]: 'ranks-4-6',
+    [Role.LINCE]: 'ranks-4-6',
+    [Role.CAPATAZ]: 'ranks-4-6',
+    [Role.MERCADER]: 'ranks-1-3',
+    [Role.COYOTE]: 'ranks-1-3',
+    [Role.RECLUTA]: 'ranks-1-3',
     
     // Legacy
     [Role.ROUTENVERWALTUNG]: 'funktionsleiter-rutas',

@@ -14,20 +14,20 @@ async function setDefaultAdmin() {
     });
 
     if (existingUser) {
-      if (existingUser.role === Role.EL_PATRON) {
-        console.log('✅ Standard-Admin ist bereits als El Patron konfiguriert:');
+      if (existingUser.role === Role.PATRON) {
+        console.log('✅ Standard-Admin ist bereits als Patron konfiguriert:');
         console.log(`   Name: ${existingUser.username}`);
         console.log(`   Discord ID: ${existingUser.discordId}`);
         console.log(`   Rolle: ${existingUser.role}`);
         return;
       } else {
-        // Update zur El Patron Rolle
+        // Update zur Patron Rolle
         const updatedUser = await prisma.user.update({
           where: { discordId: DEFAULT_ADMIN_DISCORD_ID },
-          data: { role: Role.EL_PATRON },
+          data: { role: Role.PATRON },
         });
 
-        console.log('✅ Standard-Admin wurde zur El Patron Rolle befördert:');
+        console.log('✅ Standard-Admin wurde zur Patron Rolle befördert:');
         console.log(`   Name: ${updatedUser.username}`);
         console.log(`   Discord ID: ${updatedUser.discordId}`);
         console.log(`   Neue Rolle: ${updatedUser.role}`);

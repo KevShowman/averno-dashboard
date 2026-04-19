@@ -553,16 +553,16 @@ export class WeeklyDeliveryService {
 
     const sanctions = [];
 
-    // Finde den ersten El Patron als System-User für Sanktionen
+    // Finde den ersten Patron als System-User für Sanktionen
     const systemUser = await this.prisma.user.findFirst({
-      where: { role: 'EL_PATRON' },
+      where: { role: 'PATRON' },
       select: { id: true }
     });
 
     if (!systemUser) {
-      console.warn('Kein El Patron gefunden für System-Sanktionen');
+      console.warn('Kein Patron gefunden für System-Sanktionen');
       return {
-        message: 'Kein El Patron gefunden für System-Sanktionen',
+        message: 'Kein Patron gefunden für System-Sanktionen',
         sanctions: [],
       };
     }
@@ -625,16 +625,16 @@ export class WeeklyDeliveryService {
 
     const sanctions = [];
 
-    // Finde den ersten El Patron als System-User für Sanktionen
+    // Finde den ersten Patron als System-User für Sanktionen
     const systemUser = await this.prisma.user.findFirst({
-      where: { role: 'EL_PATRON' },
+      where: { role: 'PATRON' },
       select: { id: true }
     });
 
     if (!systemUser) {
-      console.warn('Kein El Patron gefunden für System-Sanktionen');
+      console.warn('Kein Patron gefunden für System-Sanktionen');
       return {
-        message: 'Kein El Patron gefunden für System-Sanktionen',
+        message: 'Kein Patron gefunden für System-Sanktionen',
         sanctions: [],
       };
     }

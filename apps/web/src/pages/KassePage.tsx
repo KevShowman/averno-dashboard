@@ -68,8 +68,8 @@ export default function KassePage() {
     retry: 1,
   })
 
-  const canApprove = hasRole(user, 'EL_PATRON')
-  const canTransact = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const canApprove = hasRole(user, 'PATRON')
+  const canTransact = hasRole(user, ['PATRON', 'DON', 'CAPO'])
 
   const approveTransactionMutation = useMutation({
     mutationFn: (transactionId: string) => api.post(`/cash/transactions/${transactionId}/approve`),

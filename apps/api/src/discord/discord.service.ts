@@ -244,28 +244,27 @@ export class DiscordService {
       // Rollen-Hierarchie definieren (höhere Zahlen = höhere Berechtigung)
       const roleHierarchy = {
         // Ränge 1-3
-        [Role.EL_NOVATO]: 1,
-        [Role.EL_PROTECTOR]: 2,
-        [Role.EL_CONFIDENTE]: 3,
+        [Role.RECLUTA]: 1,
+        [Role.COYOTE]: 2,
+        [Role.MERCADER]: 3,
         // Ränge 4-6
-        [Role.EL_PREFECTO]: 4,
-        [Role.SOLDADO]: 5,
-        [Role.EL_TENIENTE]: 6,
+        [Role.CAPATAZ]: 4,
+        [Role.LINCE]: 5,
+        [Role.EL_MUDO]: 6,
         // Ränge 7-9
-        [Role.EL_ENCARGADO]: 7,
-        [Role.EL_MENTOR]: 8,
-        [Role.EL_CUSTODIO]: 9,
+        [Role.GESTION_DE_RUTAS]: 7,
+        [Role.PADRINO]: 8,
+        [Role.CONSULTORA]: 9,
         // Leaderschaft
-        [Role.EL_MANO_DERECHA]: 10,
-        [Role.DON_COMANDANTE]: 11,
-        [Role.DON_CAPITAN]: 12,
-        [Role.EL_PATRON]: 13, // Höchste Rolle
+        [Role.CAPO]: 10,
+        [Role.DON]: 11,
+        [Role.PATRON]: 12, // Höchste Rolle
         // Legacy/Spezialrollen
         [Role.SICARIO]: 5,
         [Role.ROUTENVERWALTUNG]: 6,
         [Role.LOGISTICA]: 5,
         [Role.FUTURO]: 1,
-        [Role.ADMIN]: 13,
+        [Role.ADMIN]: 12,
         [Role.QUARTIERMEISTER]: 5,
         [Role.MITGLIED]: 2,
         [Role.GAST]: 0,
@@ -366,24 +365,23 @@ export class DiscordService {
 
           // Finde die höchste Rolle basierend auf der Hierarchie
           const roleHierarchy = {
-            [Role.EL_NOVATO]: 1,
-            [Role.EL_PROTECTOR]: 2,
-            [Role.EL_CONFIDENTE]: 3,
-            [Role.EL_PREFECTO]: 4,
-            [Role.SOLDADO]: 5,
-            [Role.EL_TENIENTE]: 6,
-            [Role.EL_ENCARGADO]: 7,
-            [Role.EL_MENTOR]: 8,
-            [Role.EL_CUSTODIO]: 9,
-            [Role.EL_MANO_DERECHA]: 10,
-            [Role.DON_COMANDANTE]: 11,
-            [Role.DON_CAPITAN]: 12,
-            [Role.EL_PATRON]: 13,
+            [Role.RECLUTA]: 1,
+            [Role.COYOTE]: 2,
+            [Role.MERCADER]: 3,
+            [Role.CAPATAZ]: 4,
+            [Role.LINCE]: 5,
+            [Role.EL_MUDO]: 6,
+            [Role.GESTION_DE_RUTAS]: 7,
+            [Role.PADRINO]: 8,
+            [Role.CONSULTORA]: 9,
+            [Role.CAPO]: 10,
+            [Role.DON]: 11,
+            [Role.PATRON]: 12,
             [Role.SICARIO]: 5,
             [Role.ROUTENVERWALTUNG]: 6,
             [Role.LOGISTICA]: 5,
             [Role.FUTURO]: 1,
-            [Role.ADMIN]: 13,
+            [Role.ADMIN]: 12,
             [Role.QUARTIERMEISTER]: 5,
             [Role.MITGLIED]: 2,
             [Role.GAST]: 0,
@@ -640,13 +638,21 @@ export class DiscordService {
 
         // Rollen-Hierarchie definieren
         const roleHierarchy = {
-          [Role.SOLDADO]: 1,
-          [Role.SICARIO]: 2,
-          [Role.ROUTENVERWALTUNG]: 3,
-          // REMOVED
+          [Role.RECLUTA]: 1,
+          [Role.COYOTE]: 2,
+          [Role.MERCADER]: 3,
+          [Role.CAPATAZ]: 4,
+          [Role.LINCE]: 5,
+          [Role.EL_MUDO]: 6,
+          [Role.GESTION_DE_RUTAS]: 7,
+          [Role.PADRINO]: 8,
+          [Role.CONSULTORA]: 9,
+          [Role.CAPO]: 10,
+          [Role.DON]: 11,
+          [Role.PATRON]: 12,
+          [Role.SICARIO]: 5,
+          [Role.ROUTENVERWALTUNG]: 6,
           [Role.LOGISTICA]: 5,
-          // REMOVED
-          [Role.EL_PATRON]: 7,
         };
 
         const highestRole = memberRoleMappings.reduce((highest, current) => {

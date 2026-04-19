@@ -197,7 +197,7 @@ export default function TaxiDashboardPage() {
   usePageTitle('Taxi-Dashboard')
 
   // Leadership Rollen die vollen Taxi-Zugang haben (MUSS VOR useState sein!)
-  const LEADERSHIP_ROLES = ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA']
+  const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO']
   const isLeadership = user?.role && LEADERSHIP_ROLES.includes(user.role)
   const isTaxiLead = user?.isTaxiLead || isLeadership
   const isTaxiUser = user?.isTaxi

@@ -43,7 +43,7 @@ export class SicarioController {
 
   // Erstelle neue Sicario-Aufstellung (nur Leaderschaft)
   @Post('aufstellung')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA, Role.SICARIO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.SICARIO)
   async createAufstellung(
     @Body() createDto: CreateSicarioAufstellungDto,
     @CurrentUser() user: User,
@@ -109,7 +109,7 @@ export class SicarioController {
 
   // Aufstellung löschen (nur Leaderschaft)
   @Delete('aufstellung/:id')
-  @Roles(Role.EL_PATRON, Role.DON_CAPITAN, Role.DON_COMANDANTE, Role.EL_MANO_DERECHA)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO)
   async deleteAufstellung(@Param('id') id: string, @CurrentUser() user: User) {
     await this.checkAccess(user.id);
     return this.sicarioService.deleteAufstellung(id);

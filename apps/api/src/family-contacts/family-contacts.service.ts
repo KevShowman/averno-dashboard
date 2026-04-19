@@ -11,10 +11,10 @@ export class FamilyContactsService {
     if (user.isPartner) return true;
 
     const allowedRoles = [
-      'EL_PATRON',
-      'DON_CAPITAN', 
-      'DON_COMANDANTE',
-      'EL_MANO_DERECHA',
+      'PATRON',
+      'DON', 
+      'CAPO',
+      'CAPO',
       'CONTACTO',
     ];
     
@@ -39,10 +39,10 @@ export class FamilyContactsService {
   // Prüft ob User Leadership ist (für Berechtigungsverwaltung)
   private isLeadership(user: any): boolean {
     const leadershipRoles = [
-      'EL_PATRON',
-      'DON_CAPITAN',
-      'DON_COMANDANTE',
-      'EL_MANO_DERECHA',
+      'PATRON',
+      'DON',
+      'CAPO',
+      'CAPO',
     ];
     
     if (leadershipRoles.includes(user.role)) {

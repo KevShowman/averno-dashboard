@@ -8,10 +8,10 @@ async function migrateRoles() {
   try {
     // Migration mapping
     const roleMigration = [
-      { from: 'ADMIN', to: 'EL_PATRON' },
+      { from: 'ADMIN', to: 'PATRON' },
       { from: 'QUARTIERMEISTER', to: 'DON' },
-      { from: 'MITGLIED', to: 'ASESOR' },
-      { from: 'GAST', to: 'SOLDADO' },
+      { from: 'MITGLIED', to: 'CAPO' },
+      { from: 'GAST', to: 'LINCE' },
     ];
 
     let totalUpdated = 0;
@@ -43,10 +43,10 @@ async function migrateRoles() {
     console.log('\n📊 Aktuelle Rollen-Verteilung:');
     roleStats.forEach(stat => {
       const displayName = {
-        'EL_PATRON': 'El Patrón',
+        'PATRON': 'Patron',
         'DON': 'Don',
-        'ASESOR': 'Asesor',
-        'SOLDADO': 'Soldado'
+        'CAPO': 'Capo',
+        'LINCE': 'Lince'
       }[stat.role] || stat.role;
       
       console.log(`   ${displayName}: ${stat._count.role} Benutzer`);

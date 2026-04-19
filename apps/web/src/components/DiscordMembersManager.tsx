@@ -86,13 +86,13 @@ export default function DiscordMembersManager() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'EL_PATRON': return 'bg-red-900/20 text-red-400 border-red-400'
+      case 'PATRON': return 'bg-red-900/20 text-red-400 border-red-400'
       case 'DON': return 'bg-purple-900/20 text-purple-400 border-purple-400'
-      case 'ASESOR': return 'bg-blue-900/20 text-blue-400 border-blue-400'
+      case 'CAPO': return 'bg-blue-900/20 text-blue-400 border-blue-400'
       case 'LOGISTICA': return 'bg-cyan-900/20 text-cyan-400 border-cyan-400'
       case 'ROUTENVERWALTUNG': return 'bg-orange-900/20 text-orange-400 border-orange-400'
       case 'SICARIO': return 'bg-yellow-900/20 text-yellow-400 border-yellow-400'
-      case 'SOLDADO': return 'bg-gray-900/20 text-gray-400 border-gray-400'
+      case 'LINCE': return 'bg-gray-900/20 text-gray-400 border-gray-400'
       case 'FUTURO': return 'bg-slate-900/20 text-slate-500 border-slate-600'
       default: return 'bg-gray-900/20 text-gray-400 border-gray-400'
     }
@@ -100,13 +100,13 @@ export default function DiscordMembersManager() {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'EL_PATRON': return 'El Patron'
+      case 'PATRON': return 'Patron'
       case 'DON': return 'Don'
-      case 'ASESOR': return 'Asesor'
+      case 'CAPO': return 'Capo'
       case 'LOGISTICA': return 'Logistica'
       case 'ROUTENVERWALTUNG': return 'Routenverwaltung'
       case 'SICARIO': return 'Sicario'
-      case 'SOLDADO': return 'Soldado'
+      case 'LINCE': return 'Lince'
       case 'FUTURO': return 'Futuro'
       default: return role
     }

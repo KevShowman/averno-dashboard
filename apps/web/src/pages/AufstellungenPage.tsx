@@ -85,7 +85,7 @@ export default function AufstellungenPage() {
   const [showOlderAufstellungen, setShowOlderAufstellungen] = useState(false)
 
   // Rechte prüfen
-  const canManageAufstellungen = user?.role && ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(user.role)
+  const canManageAufstellungen = user?.role && ['PATRON', 'DON', 'CAPO'].includes(user.role)
 
   // Query: Alle Aufstellungen
   const { data: aufstellungen, isLoading } = useQuery({

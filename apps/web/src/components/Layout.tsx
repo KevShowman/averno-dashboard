@@ -45,19 +45,18 @@ interface LayoutProps {
 
 const getRoleDisplayName = (role: string) => {
   const roleMap: Record<string, string> = {
-    'EL_PATRON': 'El Patrón',
-    'DON_CAPITAN': 'Don Capitán',
-    'DON_COMANDANTE': 'Don Comandante',
-    'EL_MANO_DERECHA': 'Mano Derecha',
-    'EL_CUSTODIO': 'El Custodio',
-    'EL_MENTOR': 'El Mentor',
-    'EL_ENCARGADO': 'El Encargado',
-    'EL_TENIENTE': 'El Teniente',
-    'SOLDADO': 'Soldado',
-    'EL_PREFECTO': 'El Prefecto',
-    'EL_CONFIDENTE': 'El Confidente',
-    'EL_PROTECTOR': 'El Protector',
-    'EL_NOVATO': 'El Novato',
+    'PATRON': 'Patron',
+    'DON': 'Don',
+    'CAPO': 'Capo',
+    'CONSULTORA': 'Consultora',
+    'PADRINO': 'Padrino',
+    'GESTION_DE_RUTAS': 'Gestión de Rutas',
+    'EL_MUDO': 'El Mudo',
+    'LINCE': 'Lince',
+    'CAPATAZ': 'Capataz',
+    'MERCADER': 'Mercader',
+    'COYOTE': 'Coyote',
+    'RECLUTA': 'Recluta',
     'ROUTENVERWALTUNG': 'Routenverwaltung',
     'LOGISTICA': 'Logística',
     'SICARIO': 'Sicario',
@@ -68,7 +67,7 @@ const getRoleDisplayName = (role: string) => {
 }
 
 const getRoleBadgeColor = (role: string) => {
-  if (['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'].includes(role)) {
+  if (['PATRON', 'DON', 'CAPO'].includes(role)) {
     return 'bg-amber-500/20 text-amber-300 border-amber-500/30'
   }
   if (role === 'SICARIO') {
@@ -236,9 +235,9 @@ function NavGroupComponent({
   isOpen: boolean
   onToggle: () => void
 }) {
-  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
   const isSicario = hasRole(user, 'SICARIO')
-  const isPatron = hasRole(user, 'EL_PATRON')
+  const isPatron = hasRole(user, 'PATRON')
 
   // Filter items based on permissions
   const isContacto = hasRole(user, 'CONTACTO')

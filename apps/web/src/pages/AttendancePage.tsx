@@ -149,7 +149,7 @@ export default function AttendancePage() {
   const [statsSearchTerm, setStatsSearchTerm] = useState('')
   const [confirmAction, setConfirmAction] = useState<'add' | 'remove'>('add')
 
-  const isLeadership = hasRole(user, ['EL_PATRON', 'DON_CAPITAN', 'DON_COMANDANTE', 'EL_MANO_DERECHA'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
 
   // Fetch week overview
   const { data: weekData, isLoading } = useQuery<WeekOverview>({

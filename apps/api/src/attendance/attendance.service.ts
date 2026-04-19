@@ -13,10 +13,10 @@ export class AttendanceService {
 
   // Leadership-Rollen
   private readonly leadershipRoles = [
-    'EL_PATRON',
-    'DON_CAPITAN',
-    'DON_COMANDANTE',
-    'EL_MANO_DERECHA',
+    'PATRON',
+    'DON',
+    'CAPO',
+    'CAPO',
   ];
 
   // Prüft ob User Leadership ist
