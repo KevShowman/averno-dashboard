@@ -14,7 +14,6 @@ export class FamilyContactsService {
       'PATRON',
       'DON', 
       'CAPO',
-      'CAPO',
       'CONTACTO',
     ];
     
@@ -41,7 +40,6 @@ export class FamilyContactsService {
     const leadershipRoles = [
       'PATRON',
       'DON',
-      'CAPO',
       'CAPO',
     ];
     
@@ -380,4 +378,3 @@ export class FamilyContactsService {
     return csvLines.join('\n');
   }
 }
-

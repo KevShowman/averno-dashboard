@@ -19,7 +19,6 @@ export class OrganigrammService {
     [Role.PATRON]: 'patron',
     [Role.DON]: 'capitan',
     [Role.CAPO]: 'comandante',
-    [Role.CAPO]: 'mano-derecha',
     
     // Funktionsrollen
     [Role.CONSEJERO]: 'funktionsleiter-consejero',

@@ -19,7 +19,6 @@ export class MapAnnotationsService {
       'PATRON',
       'DON',
       'CAPO',
-      'CAPO',
       'CONTACTO',
       'INTELIGENCIA',
     ];
@@ -47,7 +46,6 @@ export class MapAnnotationsService {
     const leadershipRoles = [
       'PATRON',
       'DON',
-      'CAPO',
       'CAPO',
     ];
     
@@ -1022,4 +1020,3 @@ export class MapAnnotationsService {
     });
   }
 }
-

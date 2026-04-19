@@ -25,21 +25,21 @@ async function fixOldRoleMappings() {
     });
     console.log('');
 
-    // 3. Aktualisiere alte DON Mappings zu DON
+    // 3. Aktualisiere alte DON_CAPITAN Mappings zu DON
     const donUpdated = await prisma.$executeRaw`
       UPDATE discord_role_mappings 
       SET systemRole = 'DON' 
-      WHERE systemRole = 'DON'
+      WHERE systemRole = 'DON_CAPITAN'
     `;
-    console.log(`✅ Aktualisiert DON → DON: ${donUpdated} Mappings`);
+    console.log(`✅ Aktualisiert DON_CAPITAN → DON: ${donUpdated} Mappings`);
 
     // 4. Aktualisiere alte CAPO Mappings zu CAPO
     const asesorUpdated = await prisma.$executeRaw`
       UPDATE discord_role_mappings 
       SET systemRole = 'CAPO' 
-      WHERE systemRole = 'CAPO'
+      WHERE systemRole IN ('DON_COMANDANTE', 'EL_MANO_DERECHA', 'ASESOR')
     `;
-    console.log(`✅ Aktualisiert CAPO → CAPO: ${asesorUpdated} Mappings`);
+    console.log(`✅ Aktualisiert DON_COMANDANTE/EL_MANO_DERECHA/ASESOR → CAPO: ${asesorUpdated} Mappings`);
 
     // 5. Lösche leere oder NULL Mappings
     const emptyDeleted = await prisma.$executeRaw`
@@ -67,16 +67,16 @@ async function fixOldRoleMappings() {
     const userDonUpdated = await prisma.$executeRaw`
       UPDATE users 
       SET role = 'DON' 
-      WHERE role = 'DON'
+      WHERE role = 'DON_CAPITAN'
     `;
-    console.log(`✅ Aktualisiert User DON → DON: ${userDonUpdated} Users`);
+    console.log(`✅ Aktualisiert User DON_CAPITAN → DON: ${userDonUpdated} Users`);
 
     const userCapoUpdated = await prisma.$executeRaw`
       UPDATE users 
       SET role = 'CAPO' 
-      WHERE role = 'CAPO'
+      WHERE role IN ('DON_COMANDANTE', 'EL_MANO_DERECHA', 'ASESOR')
     `;
-    console.log(`✅ Aktualisiert User CAPO → CAPO: ${userCapoUpdated} Users`);
+    console.log(`✅ Aktualisiert User DON_COMANDANTE/EL_MANO_DERECHA/ASESOR → CAPO: ${userCapoUpdated} Users`);
 
     console.log('\n🎉 Bereinigung abgeschlossen!');
     console.log('\n📊 Verbleibende Mappings:');
@@ -114,4 +114,3 @@ fixOldRoleMappings()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

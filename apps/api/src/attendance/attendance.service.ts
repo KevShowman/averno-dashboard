@@ -16,7 +16,6 @@ export class AttendanceService {
     'PATRON',
     'DON',
     'CAPO',
-    'CAPO',
   ];
 
   // Prüft ob User Leadership ist
@@ -709,4 +708,3 @@ export class AttendanceService {
     };
   }
 }
-

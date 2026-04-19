@@ -8,7 +8,6 @@ const LEADERSHIP_ROLES: Role[] = [
   Role.PATRON,
   Role.DON,
   Role.CAPO,
-  Role.CAPO,
   Role.ADMIN,
 ];
 
@@ -711,5 +710,4 @@ export class TafelrundeService {
     return summary;
   }
 }
-
 

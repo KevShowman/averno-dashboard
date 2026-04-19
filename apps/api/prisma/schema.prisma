@@ -679,7 +679,7 @@ enum Gender {
 // Rang-Gruppen für Kleidung: 1-3, 4-6, 7-9, plus individuelle Leaderschaft-Ränge
 model RankClothingTemplate {
   id        String @id @default(cuid())
-  rankGroup String // "1-3", "4-6", "7-9", "PATRON", "DON", "CAPO", "CAPO"
+  rankGroup String // "1-3", "4-6", "7-9", "PATRON", "DON", "CAPO"
 
   // Maske (Männer)
   maskItemMale         Int?
