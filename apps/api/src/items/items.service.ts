@@ -535,15 +535,24 @@ export class ItemsService {
           newStock = currentItem.currentStock + movement.quantity;
           break;
         case MovementType.OUT:
+          if (currentItem.currentStock - currentItem.reservedStock < movement.quantity) {
+            throw new BadRequestException('Insufficient available stock to approve this movement');
+          }
           newStock = currentItem.currentStock - movement.quantity;
           break;
         case MovementType.ADJUST:
           newStock = movement.quantity; // quantity is the new desired stock level
           break;
         case MovementType.RESERVE:
+          if (currentItem.currentStock - currentItem.reservedStock < movement.quantity) {
+            throw new BadRequestException('Insufficient available stock to approve this reservation');
+          }
           newStock = currentItem.currentStock;
           break;
         case MovementType.RELEASE:
+          if (currentItem.reservedStock < movement.quantity) {
+            throw new BadRequestException('Cannot release more than the currently reserved quantity');
+          }
           newStock = currentItem.currentStock;
           break;
         default:
