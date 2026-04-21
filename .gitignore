@@ -3,6 +3,9 @@ node_modules/
 .pnp
 .pnp.js
 
+# Docker production yml
+docker-compose.prod.yml
+
 # Production builds
 dist/
 build/
