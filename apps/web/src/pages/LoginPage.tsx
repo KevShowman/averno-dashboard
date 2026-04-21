@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuthStore } from '../stores/auth'
 import { Button } from '../components/ui/button'
@@ -7,6 +7,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function LoginPage() {
   const { isAuthenticated, login, partnerLogin, taxiLogin } = useAuthStore()
+  const location = useLocation()
   const [rememberMe, setRememberMe] = useState(true)
   const [isHovering, setIsHovering] = useState(false)
   const [isPartnerHovering, setIsPartnerHovering] = useState(false)
@@ -20,7 +21,8 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false')
-    login()
+    const from = (location.state as { from?: string })?.from
+    login(from || '/app')
   }
 
   return (

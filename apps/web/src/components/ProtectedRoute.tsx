@@ -31,7 +31,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />
   }
 
   // Taxi access restriction (only taxi routes allowed)
