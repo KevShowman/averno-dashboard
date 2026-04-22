@@ -187,6 +187,8 @@ export class ClothingController {
       schuheVariation?: number | null;
       rucksackItem?: number | null;
       rucksackVariation?: number | null;
+      armeItem?: number | null;
+      armeVariation?: number | null;
     },
   ) {
     return this.clothingService.updateMaleOutfit(req.user.role, parseInt(outfitNumber), data);

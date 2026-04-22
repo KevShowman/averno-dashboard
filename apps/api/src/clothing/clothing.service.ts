@@ -22,6 +22,7 @@ export interface ClothingTemplate {
   hose: ClothingItem;
   schuhe: ClothingItem;
   rucksack: ClothingItem;
+  arme: ClothingItem;
 }
 
 @Injectable()
@@ -185,6 +186,14 @@ export class ClothingService {
         rucksackVariationFemale: null,
         rucksackCustomizableFemale: false,
         rucksackColorFemale: null,
+        armeItemMale: null,
+        armeVariationMale: null,
+        armeCustomizableMale: false,
+        armeColorMale: null,
+        armeItemFemale: null,
+        armeVariationFemale: null,
+        armeCustomizableFemale: false,
+        armeColorFemale: null,
       };
     }
 
@@ -245,6 +254,14 @@ export class ClothingService {
       rucksackVariationFemale: template.rucksack.variationFemale,
       rucksackCustomizableFemale: template.rucksack.customizableFemale,
       rucksackColorFemale: template.rucksack.colorFemale,
+      armeItemMale: template.arme.itemMale,
+      armeVariationMale: template.arme.variationMale,
+      armeCustomizableMale: template.arme.customizableMale,
+      armeColorMale: template.arme.colorMale,
+      armeItemFemale: template.arme.itemFemale,
+      armeVariationFemale: template.arme.variationFemale,
+      armeCustomizableFemale: template.arme.customizableFemale,
+      armeColorFemale: template.arme.colorFemale,
     };
   }
 
@@ -283,6 +300,10 @@ export class ClothingService {
         rucksackVariation: null,
         rucksackCustomizable: false,
         rucksackColor: null,
+        armeItem: null,
+        armeVariation: null,
+        armeCustomizable: false,
+        armeColor: null,
       };
     }
 
@@ -317,6 +338,10 @@ export class ClothingService {
       rucksackVariation: isMale ? template.rucksack.variationMale : template.rucksack.variationFemale,
       rucksackCustomizable: isMale ? template.rucksack.customizableMale : template.rucksack.customizableFemale,
       rucksackColor: isMale ? template.rucksack.colorMale : template.rucksack.colorFemale,
+      armeItem: isMale ? template.arme.itemMale : template.arme.itemFemale,
+      armeVariation: isMale ? template.arme.variationMale : template.arme.variationFemale,
+      armeCustomizable: isMale ? template.arme.customizableMale : template.arme.customizableFemale,
+      armeColor: isMale ? template.arme.colorMale : template.arme.colorFemale,
     };
   }
 
@@ -392,6 +417,14 @@ export class ClothingService {
         rucksackVariationFemale: data.rucksack?.variationFemale,
         rucksackCustomizableFemale: data.rucksack?.customizableFemale ?? false,
         rucksackColorFemale: data.rucksack?.colorFemale,
+        armeItemMale: data.arme?.itemMale,
+        armeVariationMale: data.arme?.variationMale,
+        armeCustomizableMale: data.arme?.customizableMale ?? false,
+        armeColorMale: data.arme?.colorMale,
+        armeItemFemale: data.arme?.itemFemale,
+        armeVariationFemale: data.arme?.variationFemale,
+        armeCustomizableFemale: data.arme?.customizableFemale ?? false,
+        armeColorFemale: data.arme?.colorFemale,
       },
       create: {
         rankGroup,
@@ -451,6 +484,14 @@ export class ClothingService {
         rucksackVariationFemale: data.rucksack?.variationFemale,
         rucksackCustomizableFemale: data.rucksack?.customizableFemale ?? false,
         rucksackColorFemale: data.rucksack?.colorFemale,
+        armeItemMale: data.arme?.itemMale,
+        armeVariationMale: data.arme?.variationMale,
+        armeCustomizableMale: data.arme?.customizableMale ?? false,
+        armeColorMale: data.arme?.colorMale,
+        armeItemFemale: data.arme?.itemFemale,
+        armeVariationFemale: data.arme?.variationFemale,
+        armeCustomizableFemale: data.arme?.customizableFemale ?? false,
+        armeColorFemale: data.arme?.colorFemale,
       },
     });
 
@@ -587,6 +628,16 @@ export class ClothingService {
         customizableFemale: template.rucksackCustomizableFemale,
         colorFemale: template.rucksackColorFemale,
       },
+      arme: {
+        itemMale: template.armeItemMale,
+        variationMale: template.armeVariationMale,
+        customizableMale: template.armeCustomizableMale,
+        colorMale: template.armeColorMale,
+        itemFemale: template.armeItemFemale,
+        variationFemale: template.armeVariationFemale,
+        customizableFemale: template.armeCustomizableFemale,
+        colorFemale: template.armeColorFemale,
+      },
     };
   }
 
@@ -655,6 +706,8 @@ export class ClothingService {
       schuheVariation?: number | null;
       rucksackItem?: number | null;
       rucksackVariation?: number | null;
+      armeItem?: number | null;
+      armeVariation?: number | null;
     }
   ) {
     if (!this.isLeadership(userRole)) {

@@ -765,6 +765,18 @@ model RankClothingTemplate {
   rucksackCustomizableFemale Boolean @default(false)
   rucksackColorFemale        String?
 
+  // Arme (Männer)
+  armeItemMale         Int?
+  armeVariationMale    Int?
+  armeCustomizableMale Boolean @default(false)
+  armeColorMale        String?
+
+  // Arme (Frauen)
+  armeItemFemale         Int?
+  armeVariationFemale    Int?
+  armeCustomizableFemale Boolean @default(false)
+  armeColorFemale        String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -940,6 +952,8 @@ model MaleOutfit {
   schuheVariation   Int?
   rucksackItem      Int?
   rucksackVariation Int?
+  armeItem          Int?
+  armeVariation     Int?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
