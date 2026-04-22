@@ -26,17 +26,17 @@ export default function DatePicker({
     gold: {
       ring: 'focus:ring-gold-500/20 focus:border-gold-500',
       icon: 'text-gold-400',
-      gradient: 'from-gold-600 to-amber-600',
+      gradient: 'from-gold-600 to-orange-600',
     },
     amber: {
-      ring: 'focus:ring-amber-500/20 focus:border-amber-500',
-      icon: 'text-amber-400',
-      gradient: 'from-amber-600 to-yellow-600',
+      ring: 'focus:ring-orange-500/20 focus:border-orange-500',
+      icon: 'text-orange-400',
+      gradient: 'from-orange-600 to-orange-600',
     },
     blue: {
-      ring: 'focus:ring-blue-500/20 focus:border-blue-500',
-      icon: 'text-blue-400',
-      gradient: 'from-blue-600 to-cyan-600',
+      ring: 'focus:ring-blue-500/20 focus:border-orange-500',
+      icon: 'text-orange-400',
+      gradient: 'from-orange-600 to-orange-600',
     },
     green: {
       ring: 'focus:ring-green-500/20 focus:border-green-500',
@@ -76,9 +76,9 @@ export default function DatePicker({
       <button
         type="button"
         onClick={() => setShowCalendar(!showCalendar)}
-        className={`w-full h-11 px-4 bg-gray-800/50 border border-gray-700 rounded-xl text-left text-white ${theme.ring} transition-all flex items-center justify-between hover:border-gray-600`}
+        className={`w-full h-11 px-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-left text-white ${theme.ring} transition-all flex items-center justify-between hover:border-zinc-600`}
       >
-        <span className={value ? 'text-white' : 'text-gray-500'}>
+        <span className={value ? 'text-white' : 'text-zinc-500'}>
           {value 
             ? format(value, 'EEEE, dd. MMMM yyyy', { locale: de })
             : placeholder
@@ -96,7 +96,7 @@ export default function DatePicker({
             onClick={() => setShowCalendar(false)}
           />
           
-          <div className="absolute z-50 mt-2 w-full bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4">
+          <div className="absolute z-50 mt-2 w-full bg-zinc-800 border border-zinc-700 rounded-xl shadow-2xl p-4">
             {/* Month Navigation */}
             <div className="flex items-center justify-between mb-4">
               <Button
@@ -104,7 +104,7 @@ export default function DatePicker({
                 variant="ghost"
                 size="icon"
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="h-8 w-8 text-gray-400 hover:text-white"
+                className="h-8 w-8 text-zinc-400 hover:text-white"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -116,7 +116,7 @@ export default function DatePicker({
                 variant="ghost"
                 size="icon"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="h-8 w-8 text-gray-400 hover:text-white"
+                className="h-8 w-8 text-zinc-400 hover:text-white"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -125,7 +125,7 @@ export default function DatePicker({
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((day) => (
-                <div key={day} className="text-center text-xs text-gray-500 py-1">
+                <div key={day} className="text-center text-xs text-zinc-500 py-1">
                   {day}
                 </div>
               ))}
@@ -151,10 +151,10 @@ export default function DatePicker({
                       isSelected
                         ? `bg-gradient-to-r ${theme.gradient} text-white shadow-lg`
                         : isCurrentDay
-                          ? 'bg-gray-700 text-white'
+                          ? 'bg-zinc-700 text-white'
                           : isCurrentMonth
-                            ? 'text-gray-300 hover:bg-gray-700'
-                            : 'text-gray-600'
+                            ? 'text-zinc-300 hover:bg-zinc-700'
+                            : 'text-zinc-600'
                     }`}
                   >
                     {format(day, 'd')}
@@ -164,7 +164,7 @@ export default function DatePicker({
             </div>
 
             {/* Today Button */}
-            <div className="mt-3 pt-3 border-t border-gray-700">
+            <div className="mt-3 pt-3 border-t border-zinc-700">
               <Button
                 type="button"
                 variant="ghost"
@@ -173,7 +173,7 @@ export default function DatePicker({
                   setCurrentMonth(new Date())
                   handleSelect(new Date())
                 }}
-                className="w-full text-gray-400 hover:text-white text-sm"
+                className="w-full text-zinc-400 hover:text-white text-sm"
               >
                 Heute
               </Button>

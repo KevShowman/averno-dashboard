@@ -144,8 +144,8 @@ export default function ClothingPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-          <p className="text-gray-400">Lade Kleidungsvorlage...</p>
+          <div className="h-10 w-10 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+          <p className="text-zinc-400">Lade Kleidungsvorlage...</p>
         </div>
       </div>
     )
@@ -154,17 +154,17 @@ export default function ClothingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+          <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
             <Shirt className="h-8 w-8 text-white" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Familienkleidung</h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-zinc-400 mt-1">
               {isFreeChoice 
                 ? 'Du hast freie Klamottenwahl!' 
                 : 'Wähle eines der 5 vordefinierten Outfits'}
@@ -174,11 +174,11 @@ export default function ClothingPage() {
       </div>
 
       {/* Gender Selector */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         <CardHeader className="relative">
           <CardTitle className="text-white">Geschlecht auswählen</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Wähle dein Geschlecht aus, um die passende Kleidung anzuzeigen.
           </CardDescription>
         </CardHeader>
@@ -189,8 +189,8 @@ export default function ClothingPage() {
               disabled={updateGenderMutation.isPending}
               className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 selectedGender === 'MALE' 
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
-                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
+                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
               }`}
             >
               {updateGenderMutation.isPending && selectedGender === 'MALE' ? (
@@ -205,8 +205,8 @@ export default function ClothingPage() {
               disabled={updateGenderMutation.isPending}
               className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
-                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
+                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
               }`}
             >
               {updateGenderMutation.isPending && selectedGender === 'FEMALE' ? (
@@ -223,7 +223,7 @@ export default function ClothingPage() {
       {/* Main Content */}
       {isFreeChoice ? (
         // Free Choice Display (Women) - mit Farbvorgaben und Pflichtkleidung
-        <Card className="bg-gray-900/50 border-green-500/30 overflow-hidden">
+        <Card className="bg-zinc-900/50 border-green-500/30 overflow-hidden">
           <CardHeader className="border-b border-green-500/20">
             <CardTitle className="text-white flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-green-400" />
@@ -232,54 +232,54 @@ export default function ClothingPage() {
           </CardHeader>
           <CardContent className="p-6 space-y-6">
             {/* Farbvorgabe */}
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700">
               <h3 className="text-lg font-semibold text-white mb-2">Farbvorgabe</h3>
-              <p className="text-gray-300">
+              <p className="text-zinc-300">
                 <span className="text-white font-medium">Schwarz</span> und <span className="text-white font-medium">elegant</span>.
-                In Ausnahmefällen sind <span className="text-gray-400">graue Elemente</span> erlaubt.
+                In Ausnahmefällen sind <span className="text-zinc-400">graue Elemente</span> erlaubt.
               </p>
             </div>
 
             {/* Vorgeschriebene Kleidung */}
-            <div className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/30">
-              <h3 className="text-lg font-semibold text-amber-300 mb-3">Vorgeschriebene Kleidung</h3>
+            <div className="bg-orange-500/10 rounded-xl p-4 border border-orange-500/30">
+              <h3 className="text-lg font-semibold text-orange-300 mb-3">Vorgeschriebene Kleidung</h3>
               <div className="grid gap-3">
-                <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
                   <span className="text-white font-medium">Maske</span>
                   <div className="flex gap-4">
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-amber-400">310</p>
+                      <p className="text-xs text-zinc-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-orange-400">310</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-amber-400">15</p>
+                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-orange-400">15</p>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
                   <span className="text-white font-medium">Weste</span>
                   <div className="flex gap-4">
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-amber-400">140</p>
+                      <p className="text-xs text-zinc-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-orange-400">140</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-amber-400">23</p>
+                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-orange-400">23</p>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
                   <span className="text-white font-medium">Hose</span>
                   <div className="flex gap-4">
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-amber-400">368</p>
+                      <p className="text-xs text-zinc-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-orange-400">368</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-amber-400">4</p>
+                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-orange-400">4</p>
                     </div>
                   </div>
                 </div>
@@ -300,13 +300,13 @@ export default function ClothingPage() {
         </Card>
       ) : hasOutfits && outfits.length > 0 ? (
         // Outfit Selection (Men)
-        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-          <CardHeader className="border-b border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+          <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Shirt className="h-5 w-5 text-amber-400" />
+              <Shirt className="h-5 w-5 text-orange-400" />
               Outfit auswählen
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Wähle eines der 5 vordefinierten Outfits aus.
             </CardDescription>
           </CardHeader>
@@ -316,7 +316,7 @@ export default function ClothingPage() {
               value={String(selectedOutfit)}
               onValueChange={(val) => setSelectedOutfit(parseInt(val))}
             >
-              <SelectTrigger className="w-full h-16 bg-gray-800/50 border-gray-700">
+              <SelectTrigger className="w-full h-16 bg-zinc-800/50 border-zinc-700">
                 <SelectValue>
                   <div className="flex items-center gap-3">
                     <img
@@ -331,7 +331,7 @@ export default function ClothingPage() {
                   </div>
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
+              <SelectContent className="bg-zinc-800 border-zinc-700">
                 {outfits.map((outfit) => (
                   <SelectItem key={outfit.outfitNumber} value={String(outfit.outfitNumber)}>
                     <div className="flex items-center gap-3">
@@ -357,7 +357,7 @@ export default function ClothingPage() {
                 <img
                   src={`/outfit-images/outfit-${selectedOutfit}.png`}
                   alt={currentOutfit?.name || `Outfit ${selectedOutfit}`}
-                  className="w-64 h-auto rounded-xl border border-gray-700 object-cover"
+                  className="w-64 h-auto rounded-xl border border-zinc-700 object-cover"
                   onError={(e) => {
                     e.currentTarget.src = ''
                     e.currentTarget.alt = 'Bild nicht verfügbar'
@@ -370,17 +370,17 @@ export default function ClothingPage() {
                 {outfitClothingParts.map((part, index) => (
                   <div
                     key={index}
-                    className="rounded-xl border border-gray-700 bg-gray-800/30 p-4"
+                    className="rounded-xl border border-zinc-700 bg-zinc-800/30 p-4"
                   >
                     <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{part.label}</h3>
                     <div className="flex gap-4">
                       <div className="text-center">
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Item</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider">Item</p>
                         <p className="text-lg font-mono text-white">{part.item ?? '-'}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Variation</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider">Variation</p>
                         <p className="text-lg font-mono text-white">{part.variation ?? '-'}</p>
                       </div>
                     </div>
@@ -398,17 +398,17 @@ export default function ClothingPage() {
               </p>
             </div>
 
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex items-start gap-3">
-              <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-blue-300">
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-start gap-3">
+              <Info className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-orange-300">
                 Die Outfits wurden von der Leaderschaft festgelegt. Wähle eines der 5 vordefinierten Outfits.
               </p>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-gray-900/50 border-gray-800">
-          <CardContent className="p-6 text-center text-gray-400">
+        <Card className="bg-zinc-900/50 border-zinc-800">
+          <CardContent className="p-6 text-center text-zinc-400">
             Keine Kleidungsdaten verfügbar.
           </CardContent>
         </Card>
@@ -416,7 +416,7 @@ export default function ClothingPage() {
 
       {/* Sicario Clothing Section */}
       {sicarioClothingParts && (
-        <Card className="relative overflow-hidden bg-gray-900/50 border border-orange-500/30">
+        <Card className="relative overflow-hidden bg-zinc-900/50 border border-orange-500/30">
           <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl" />
           <CardHeader className="border-b border-orange-500/20 relative">
             <CardTitle className="text-white flex items-center gap-2">
@@ -434,7 +434,7 @@ export default function ClothingPage() {
                 className={`rounded-xl border p-4 ${
                   part.customizable 
                     ? 'border-green-500/30 bg-green-900/10' 
-                    : 'border-gray-700 bg-gray-800/30'
+                    : 'border-zinc-700 bg-zinc-800/30'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -452,19 +452,19 @@ export default function ClothingPage() {
                     <p className="text-green-300 text-sm">Dieses Kleidungsstück ist frei wählbar!</p>
                     {part.color !== null && (
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-400 text-sm">Vorgabe:</span>
-                        <span className="text-white font-mono bg-gray-800 px-2 py-1 rounded">{part.color}</span>
+                        <span className="text-zinc-400 text-sm">Vorgabe:</span>
+                        <span className="text-white font-mono bg-zinc-800 px-2 py-1 rounded">{part.color}</span>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Item</p>
+                    <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Item</p>
                       <p className="text-lg font-mono text-white">{part.item !== null ? part.item : '-'}</p>
                     </div>
-                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Variation</p>
+                    <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Variation</p>
                       <p className="text-lg font-mono text-white">{part.variation !== null ? part.variation : '-'}</p>
                     </div>
                   </div>

@@ -247,7 +247,7 @@ export default function FamiliensammelnPage() {
   if (!currentWeek) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-400">Keine Woche gefunden</p>
+        <p className="text-zinc-400">Keine Woche gefunden</p>
       </div>
     );
   }
@@ -300,7 +300,7 @@ export default function FamiliensammelnPage() {
             <Users className="h-8 w-8 text-gold-500" />
             Familiensammeln
           </h1>
-          <p className="text-gray-400 mt-1">
+          <p className="text-zinc-400 mt-1">
             Mindestens 4 Tage ODER 4 Touren erforderlich
           </p>
         </div>
@@ -332,18 +332,18 @@ export default function FamiliensammelnPage() {
 
       {/* Statistik-Ansicht */}
       {showStatistics && statistics && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/30 border border-amber-500/30">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-900/30 via-orange-900/20 to-orange-900/30 border border-orange-500/30">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl" />
           
-          <div className="relative p-6 border-b border-amber-500/20">
+          <div className="relative p-6 border-b border-orange-500/20">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg shadow-amber-500/30">
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Wochenstatistik</h2>
-                <p className="text-amber-200/60 text-sm">
+                <p className="text-orange-200/60 text-sm">
                   {new Date(currentWeek.weekStart).toLocaleDateString('de-DE')} – {new Date(currentWeek.weekEnd).toLocaleDateString('de-DE')}
                 </p>
               </div>
@@ -379,29 +379,29 @@ export default function FamiliensammelnPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-amber-900/40 to-amber-800/20 rounded-xl p-4 border border-amber-500/20">
+              <div className="bg-gradient-to-br from-orange-900/40 to-orange-800/20 rounded-xl p-4 border border-orange-500/20">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-500/20 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-amber-400" />
+                  <div className="p-2 bg-orange-500/20 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-amber-400">
+                    <div className="text-2xl font-bold text-orange-400">
                       {statistics.statistics.reduce((sum, s) => sum + s.totalTours, 0)}
                     </div>
-                    <div className="text-xs text-amber-300/60 uppercase tracking-wide">Touren</div>
+                    <div className="text-xs text-orange-300/60 uppercase tracking-wide">Touren</div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-yellow-900/40 to-yellow-800/20 rounded-xl p-4 border border-yellow-500/20">
+              <div className="bg-gradient-to-br from-orange-900/40 to-orange-800/20 rounded-xl p-4 border border-orange-500/20">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-500/20 rounded-lg">
-                    <Calendar className="h-5 w-5 text-yellow-400" />
+                  <div className="p-2 bg-orange-500/20 rounded-lg">
+                    <Calendar className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-yellow-400">
+                    <div className="text-2xl font-bold text-orange-400">
                       {statistics.statistics.filter(s => s.mustPayWeeklyDelivery).length}
                     </div>
-                    <div className="text-xs text-yellow-300/60 uppercase tracking-wide">Abgabe fällig</div>
+                    <div className="text-xs text-orange-300/60 uppercase tracking-wide">Abgabe fällig</div>
                   </div>
                 </div>
               </div>
@@ -415,14 +415,14 @@ export default function FamiliensammelnPage() {
                   className={`group flex items-center justify-between p-4 rounded-xl border transition-all ${
                     stat.hasPassed 
                       ? 'bg-green-900/10 border-green-500/20 hover:border-green-500/40' 
-                      : 'bg-gray-800/30 border-gray-700/50 hover:border-amber-500/30'
+                      : 'bg-zinc-800/30 border-zinc-700/50 hover:border-orange-500/30'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                       stat.hasPassed 
                         ? 'bg-gradient-to-br from-green-500 to-emerald-600' 
-                        : 'bg-gradient-to-br from-amber-500 to-orange-600'
+                        : 'bg-gradient-to-br from-orange-500 to-orange-600'
                     }`}>
                       <span className="text-white font-bold text-lg">
                         {stat.user.username.charAt(0).toUpperCase()}
@@ -431,7 +431,7 @@ export default function FamiliensammelnPage() {
                     <div>
                       <p className="font-semibold text-white">{stat.user.username}</p>
                       {stat.user.icFirstName && (
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-zinc-400">
                           {stat.user.icFirstName} {stat.user.icLastName}
                         </p>
                       )}
@@ -443,41 +443,41 @@ export default function FamiliensammelnPage() {
                     <div className="hidden md:flex flex-col gap-1.5">
                       {/* Days Progress */}
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 w-12">Tage</span>
-                        <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                        <span className="text-xs text-zinc-500 w-12">Tage</span>
+                        <div className="w-24 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full transition-all ${
-                              stat.participationCount >= 4 ? 'bg-green-500' : 'bg-amber-500'
+                              stat.participationCount >= 4 ? 'bg-green-500' : 'bg-orange-500'
                             }`}
                             style={{ width: `${Math.min(100, (stat.participationCount / 4) * 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-400 w-8">{stat.participationCount}/4</span>
+                        <span className="text-xs text-zinc-400 w-8">{stat.participationCount}/4</span>
                       </div>
                       {/* Tours Progress */}
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 w-12">Touren</span>
-                        <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                        <span className="text-xs text-zinc-500 w-12">Touren</span>
+                        <div className="w-24 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full transition-all ${
-                              stat.totalTours >= 8 ? 'bg-green-500' : 'bg-amber-500'
+                              stat.totalTours >= 8 ? 'bg-green-500' : 'bg-orange-500'
                             }`}
                             style={{ width: `${Math.min(100, (stat.totalTours / 8) * 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-400 w-8">{stat.totalTours}/8</span>
+                        <span className="text-xs text-zinc-400 w-8">{stat.totalTours}/8</span>
                       </div>
                     </div>
                     
                     {/* Mobile: Show combined stats */}
                     <div className="md:hidden text-center min-w-[50px]">
                       <p className="text-lg font-bold text-white">{stat.participationCount}</p>
-                      <p className="text-xs text-gray-500">Tage</p>
+                      <p className="text-xs text-zinc-500">Tage</p>
                     </div>
                     
                     <div className="text-center min-w-[50px]">
-                      <p className="text-lg md:text-2xl font-bold text-amber-400">{stat.totalTours}</p>
-                      <p className="text-xs text-gray-500">Touren</p>
+                      <p className="text-lg md:text-2xl font-bold text-orange-400">{stat.totalTours}</p>
+                      <p className="text-xs text-zinc-500">Touren</p>
                     </div>
 
                     {stat.hasPassed ? (
@@ -493,7 +493,7 @@ export default function FamiliensammelnPage() {
                     )}
 
                     {stat.mustPayWeeklyDelivery && (
-                      <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 px-3 py-1.5">
+                      <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30 px-3 py-1.5">
                         💰 Fällig
                       </Badge>
                     )}
@@ -509,74 +509,74 @@ export default function FamiliensammelnPage() {
       {showAllTimeStats && allTimeStats && (
         <div className="space-y-6">
           {/* Modern Header - Gold Theme */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/30">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/30">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
             
             <div className="relative p-6">
               <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+                <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                   <TrendingUp className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">Gesamtstatistik</h2>
-                  <p className="text-gray-400 text-sm">Alle Zeiten • Komplettes Tracking</p>
+                  <p className="text-zinc-400 text-sm">Alle Zeiten • Komplettes Tracking</p>
                 </div>
               </div>
 
               {/* Stats Grid - All Gold based */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/30 text-center">
-                  <div className="p-2 bg-amber-500/20 rounded-lg w-fit mx-auto mb-2">
-                    <TrendingUp className="h-5 w-5 text-amber-400" />
+                <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/30 text-center">
+                  <div className="p-2 bg-orange-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <TrendingUp className="h-5 w-5 text-orange-400" />
                   </div>
-                  <p className="text-3xl font-bold text-amber-400">{allTimeStats.totalStats.totalTours}</p>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mt-1">Touren Gesamt</p>
+                  <p className="text-3xl font-bold text-orange-400">{allTimeStats.totalStats.totalTours}</p>
+                  <p className="text-xs text-zinc-400 uppercase tracking-wide mt-1">Touren Gesamt</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/20 text-center">
-                  <div className="p-2 bg-amber-500/20 rounded-lg w-fit mx-auto mb-2">
-                    <Calendar className="h-5 w-5 text-amber-400" />
+                <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/20 text-center">
+                  <div className="p-2 bg-orange-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <Calendar className="h-5 w-5 text-orange-400" />
                   </div>
                   <p className="text-3xl font-bold text-white">{allTimeStats.totalStats.totalParticipations}</p>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mt-1">Teilnahmen</p>
+                  <p className="text-xs text-zinc-400 uppercase tracking-wide mt-1">Teilnahmen</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/20 text-center">
-                  <div className="p-2 bg-amber-500/20 rounded-lg w-fit mx-auto mb-2">
-                    <Users className="h-5 w-5 text-amber-400" />
+                <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/20 text-center">
+                  <div className="p-2 bg-orange-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <Users className="h-5 w-5 text-orange-400" />
                   </div>
                   <p className="text-3xl font-bold text-white">{allTimeStats.totalStats.activeUsers}</p>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mt-1">Aktive User</p>
+                  <p className="text-xs text-zinc-400 uppercase tracking-wide mt-1">Aktive User</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/20 text-center">
-                  <div className="p-2 bg-amber-500/20 rounded-lg w-fit mx-auto mb-2">
-                    <Calendar className="h-5 w-5 text-amber-400" />
+                <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/20 text-center">
+                  <div className="p-2 bg-orange-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <Calendar className="h-5 w-5 text-orange-400" />
                   </div>
                   <p className="text-3xl font-bold text-white">{allTimeStats.totalStats.totalWeeks}</p>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mt-1">Wochen</p>
+                  <p className="text-xs text-zinc-400 uppercase tracking-wide mt-1">Wochen</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/20 text-center">
-                  <div className="p-2 bg-amber-500/20 rounded-lg w-fit mx-auto mb-2">
-                    <TrendingUp className="h-5 w-5 text-amber-400" />
+                <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/20 text-center">
+                  <div className="p-2 bg-orange-500/20 rounded-lg w-fit mx-auto mb-2">
+                    <TrendingUp className="h-5 w-5 text-orange-400" />
                   </div>
-                  <p className="text-3xl font-bold text-amber-400">{allTimeStats.totalStats.averageToursPerParticipation}</p>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mt-1">Ø Touren/Tag</p>
+                  <p className="text-3xl font-bold text-orange-400">{allTimeStats.totalStats.averageToursPerParticipation}</p>
+                  <p className="text-xs text-zinc-400 uppercase tracking-wide mt-1">Ø Touren/Tag</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Leaderboard */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/30 border border-amber-500/30">
-            <div className="absolute top-0 left-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl" />
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-900/30 via-orange-900/20 to-orange-900/30 border border-orange-500/30">
+            <div className="absolute top-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl" />
             
-            <div className="relative p-6 border-b border-amber-500/20">
+            <div className="relative p-6 border-b border-orange-500/20">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+                <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                   <span className="text-2xl">🏆</span>
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">Touren-Leaderboard</h2>
-                  <p className="text-amber-200/60 text-sm">Die fleißigsten Familienmitglieder aller Zeiten</p>
+                  <p className="text-orange-200/60 text-sm">Die fleißigsten Familienmitglieder aller Zeiten</p>
                 </div>
               </div>
             </div>
@@ -587,24 +587,24 @@ export default function FamiliensammelnPage() {
                   const isTop3 = index < 3;
                   const medals = ['🥇', '🥈', '🥉'];
                   const bgColors = [
-                    'bg-gradient-to-r from-amber-900/40 to-yellow-900/30 border-amber-500/50',
-                    'bg-gradient-to-r from-gray-700/40 to-gray-600/30 border-gray-400/50',
-                    'bg-gradient-to-r from-orange-900/40 to-amber-900/30 border-orange-500/50'
+                    'bg-gradient-to-r from-orange-900/40 to-orange-900/30 border-orange-500/50',
+                    'bg-gradient-to-r from-zinc-700/40 to-zinc-600/30 border-zinc-400/50',
+                    'bg-gradient-to-r from-orange-900/40 to-orange-900/30 border-orange-500/50'
                   ];
                   
                   return (
                     <div
                       key={entry.user.id}
                       className={`group flex items-center justify-between p-4 rounded-xl border transition-all hover:scale-[1.01] ${
-                        isTop3 ? bgColors[index] : 'bg-gray-800/30 border-gray-700/50 hover:border-amber-500/30'
+                        isTop3 ? bgColors[index] : 'bg-zinc-800/30 border-zinc-700/50 hover:border-orange-500/30'
                       }`}
                     >
                       <div className="flex items-center gap-4">
                         {/* Rank */}
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                           isTop3 
-                            ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30'
-                            : 'bg-gray-700'
+                            ? 'bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/30'
+                            : 'bg-zinc-700'
                         }`}>
                           <span className="text-xl font-bold text-white">
                             {isTop3 ? medals[index] : `#${index + 1}`}
@@ -615,7 +615,7 @@ export default function FamiliensammelnPage() {
                         <div>
                           <p className="font-semibold text-white text-lg">{entry.user.username}</p>
                           {entry.user.icFirstName && (
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm text-zinc-400">
                               {entry.user.icFirstName} {entry.user.icLastName}
                             </p>
                           )}
@@ -625,20 +625,20 @@ export default function FamiliensammelnPage() {
                       {/* Stats */}
                       <div className="flex items-center gap-4 md:gap-8">
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-amber-400">{entry.totalTours}</p>
-                          <p className="text-xs text-gray-500 uppercase">Touren</p>
+                          <p className="text-2xl font-bold text-orange-400">{entry.totalTours}</p>
+                          <p className="text-xs text-zinc-500 uppercase">Touren</p>
                         </div>
                         <div className="hidden md:block text-center">
                           <p className="text-xl font-bold text-white">{entry.totalDays}</p>
-                          <p className="text-xs text-gray-500 uppercase">Tage</p>
+                          <p className="text-xs text-zinc-500 uppercase">Tage</p>
                         </div>
                         <div className="hidden md:block text-center">
-                          <p className="text-xl font-bold text-blue-400">{entry.weeksParticipated}</p>
-                          <p className="text-xs text-gray-500 uppercase">Wochen</p>
+                          <p className="text-xl font-bold text-orange-400">{entry.weeksParticipated}</p>
+                          <p className="text-xs text-zinc-500 uppercase">Wochen</p>
                         </div>
                         <div className="text-center">
                           <p className="text-xl font-bold text-green-400">{entry.averageToursPerDay}</p>
-                          <p className="text-xs text-gray-500 uppercase">Ø/Tag</p>
+                          <p className="text-xs text-zinc-500 uppercase">Ø/Tag</p>
                         </div>
                       </div>
                     </div>
@@ -661,7 +661,7 @@ export default function FamiliensammelnPage() {
             return (
               <Card
                 key={index}
-                className={`bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 transition-all duration-200 ${
+                className={`bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700 transition-all duration-200 ${
                   isLeadership ? 'hover:border-gold-500/50 cursor-pointer' : ''
                 } ${isToday ? 'ring-2 ring-gold-500/50' : ''}`}
                 onClick={() => handleDayClick(day)}
@@ -681,19 +681,19 @@ export default function FamiliensammelnPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-3xl font-bold text-gold-400">{participations.length}</p>
-                      <p className="text-sm text-gray-400">Teilnehmer</p>
+                      <p className="text-sm text-zinc-400">Teilnehmer</p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     {participations.length === 0 ? (
-                      <p className="text-gray-500 text-sm italic">Keine Teilnehmer</p>
+                      <p className="text-zinc-500 text-sm italic">Keine Teilnehmer</p>
                     ) : (
                       participations.map((p) => (
                         <div
                           key={p.id}
-                          className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-gold-500/30 transition-colors"
+                          className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700 hover:border-gold-500/30 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-600 to-gold-800 flex items-center justify-center">
@@ -704,7 +704,7 @@ export default function FamiliensammelnPage() {
                             <div className="flex-1">
                               <p className="font-medium text-white text-sm">{p.user.username}</p>
                               {p.user.icFirstName && (
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-zinc-400">
                                   {p.user.icFirstName} {p.user.icLastName}
                                 </p>
                               )}
@@ -749,19 +749,19 @@ export default function FamiliensammelnPage() {
       )}
 
       {/* Verarbeiter Tracking */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 mt-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 mt-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative p-6 border-b border-amber-500/20">
+        <div className="relative p-6 border-b border-orange-500/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                 <Factory className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Verarbeiter-Tracking</h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-zinc-400 text-sm">
                   Max. Kapazität: 3000 Stück • Verarbeitung: 10/min
                 </p>
               </div>
@@ -769,7 +769,7 @@ export default function FamiliensammelnPage() {
             {isLeadership && (
               <Button
                 onClick={() => setShowProcessorPicker(true)}
-                className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 shadow-lg shadow-amber-500/25"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-zinc-900 shadow-lg shadow-orange-500/25"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Verarbeiter starten
@@ -781,9 +781,9 @@ export default function FamiliensammelnPage() {
         <div className="relative p-6">
           {processors.length === 0 ? (
             <div className="text-center py-8">
-              <Factory className="h-12 w-12 mx-auto text-gray-600 mb-3" />
-              <p className="text-gray-400">Keine aktiven Verarbeiter</p>
-              <p className="text-gray-500 text-sm mt-1">Starte einen Verarbeiter um die Produktion zu beginnen</p>
+              <Factory className="h-12 w-12 mx-auto text-zinc-600 mb-3" />
+              <p className="text-zinc-400">Keine aktiven Verarbeiter</p>
+              <p className="text-zinc-500 text-sm mt-1">Starte einen Verarbeiter um die Produktion zu beginnen</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -801,20 +801,20 @@ export default function FamiliensammelnPage() {
                       className={`relative overflow-hidden rounded-xl border p-4 transition-all ${
                         isFinished
                           ? 'border-green-500/50 bg-green-900/20'
-                          : 'border-gray-700 bg-gray-800/50 hover:border-amber-500/30'
+                          : 'border-zinc-700 bg-zinc-800/50 hover:border-orange-500/30'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl ${
-                            isFinished ? 'bg-green-500/20' : 'bg-amber-500/20'
+                            isFinished ? 'bg-green-500/20' : 'bg-orange-500/20'
                           }`}>
                             {isFinished ? (
                               <CheckCircle className="h-6 w-6 text-green-400" />
                             ) : (
                               <>
-                                <Clock className="h-6 w-6 text-amber-400" />
-                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-pulse" />
+                                <Clock className="h-6 w-6 text-orange-400" />
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full animate-pulse" />
                               </>
                             )}
                           </div>
@@ -822,7 +822,7 @@ export default function FamiliensammelnPage() {
                             <p className="font-semibold text-white text-lg">
                               {getDisplayName(processor.user)}
                             </p>
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm text-zinc-400">
                               Gestartet: {new Date(processor.startedAt).toLocaleString('de-DE', {
                                 day: '2-digit',
                                 month: '2-digit',
@@ -837,7 +837,7 @@ export default function FamiliensammelnPage() {
                           <Badge className={
                             isFinished
                               ? 'bg-green-500/20 text-green-300 border-green-500/30 px-3 py-1'
-                              : 'bg-amber-500/20 text-amber-300 border-amber-500/30 px-3 py-1'
+                              : 'bg-orange-500/20 text-orange-300 border-orange-500/30 px-3 py-1'
                           }>
                             {isFinished ? (
                               <span className="flex flex-col items-center gap-0.5">
@@ -900,13 +900,13 @@ export default function FamiliensammelnPage() {
                       {/* Progress Bar */}
                       {!isFinished && (
                         <div className="mt-4">
-                          <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
+                          <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5">
                             <span>Fortschritt</span>
                             <span>{Math.round(progress)}%</span>
                           </div>
-                          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                          <div className="h-2 bg-zinc-700 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-1000 rounded-full"
+                              className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-1000 rounded-full"
                               style={{ width: `${progress}%` }}
                             />
                           </div>
@@ -925,22 +925,22 @@ export default function FamiliensammelnPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md relative">
             {/* Glow Effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 blur-xl rounded-2xl pointer-events-none" />
             
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden">
               {/* Header mit Gradient */}
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-900/50 via-orange-800/30 to-transparent pointer-events-none" />
                 <CardHeader className="relative pb-4">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+                    <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                       <Factory className="h-7 w-7 text-white" />
                     </div>
                     <div>
                       <CardTitle className="text-2xl font-bold text-white">
                         Verarbeiter starten
                       </CardTitle>
-                      <CardDescription className="text-amber-200/70 mt-1">
+                      <CardDescription className="text-orange-200/70 mt-1">
                         Wähle ein Mitglied aus
                       </CardDescription>
                     </div>
@@ -951,8 +951,8 @@ export default function FamiliensammelnPage() {
               <CardContent className="pt-2 pb-6 space-y-5">
                 {/* Kapazität Input */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Factory className="h-4 w-4 text-amber-400" />
+                  <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                    <Factory className="h-4 w-4 text-orange-400" />
                     Anzahl (1-3000)
                   </label>
                   <input
@@ -964,13 +964,13 @@ export default function FamiliensammelnPage() {
                       const val = Math.min(3000, Math.max(1, parseInt(e.target.value) || 1));
                       setProcessorCapacity(val);
                     }}
-                    className="w-full h-12 px-4 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                    className="w-full h-12 px-4 bg-zinc-800 border border-zinc-600 rounded-lg text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none"
                   />
                   {/* Dynamische Zeit-Anzeige */}
-                  <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                  <div className="p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Verarbeitungszeit:</span>
-                      <span className="text-amber-400 font-medium">
+                      <span className="text-zinc-400">Verarbeitungszeit:</span>
+                      <span className="text-orange-400 font-medium">
                         {(() => {
                           const minutes = processorCapacity / 10;
                           const hours = Math.floor(minutes / 60);
@@ -983,16 +983,16 @@ export default function FamiliensammelnPage() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm mt-1">
-                      <span className="text-gray-400">Rate:</span>
-                      <span className="text-gray-300">10 Stück/min</span>
+                      <span className="text-zinc-400">Rate:</span>
+                      <span className="text-zinc-300">10 Stück/min</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Mitglied auswählen */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Users className="h-4 w-4 text-amber-400" />
+                  <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                    <Users className="h-4 w-4 text-orange-400" />
                     Mitglied auswählen
                   </label>
                   <EnhancedPeoplePicker
@@ -1007,7 +1007,7 @@ export default function FamiliensammelnPage() {
                     setShowProcessorPicker(false);
                     setProcessorCapacity(3000);
                   }}
-                  className="w-full h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                  className="w-full h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
                 >
                   Abbrechen
                 </Button>
@@ -1022,22 +1022,22 @@ export default function FamiliensammelnPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md relative">
             {/* Glow Effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 blur-xl rounded-2xl pointer-events-none" />
             
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden">
               {/* Header mit Gradient */}
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-900/50 via-orange-800/30 to-transparent pointer-events-none" />
                 <CardHeader className="relative pb-4">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+                    <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                       <Plus className="h-7 w-7 text-white" />
                     </div>
                     <div>
                       <CardTitle className="text-2xl font-bold text-white">
                         Teilnehmer hinzufügen
                       </CardTitle>
-                      <CardDescription className="text-blue-200/70 mt-1 flex items-center gap-1">
+                      <CardDescription className="text-orange-200/70 mt-1 flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
                         {formatDate(selectedDay)}
                       </CardDescription>
@@ -1048,8 +1048,8 @@ export default function FamiliensammelnPage() {
 
               <CardContent className="pt-2 pb-6 space-y-5">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Users className="h-4 w-4 text-blue-400" />
+                  <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                    <Users className="h-4 w-4 text-orange-400" />
                     Mitglied auswählen
                   </label>
                   <EnhancedPeoplePicker
@@ -1064,7 +1064,7 @@ export default function FamiliensammelnPage() {
                     setShowUserPicker(false);
                     setSelectedDay(null);
                   }}
-                  className="w-full h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                  className="w-full h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
                 >
                   Abbrechen
                 </Button>

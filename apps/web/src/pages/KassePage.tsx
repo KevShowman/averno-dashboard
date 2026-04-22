@@ -130,18 +130,18 @@ export default function KassePage() {
   return (
     <div className="space-y-6">
       {/* Header - Gold Theme */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+            <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
               <Wallet className="h-8 w-8 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Kassensystem</h1>
-              <p className="text-gray-400 mt-1">
+              <p className="text-zinc-400 mt-1">
                 Schwarzgeld-Verwaltung und Buchungen
               </p>
             </div>
@@ -177,7 +177,7 @@ export default function KassePage() {
 
       {/* Stats Cards - Gold with semantic colors */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-green-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-green-500/30">
           <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
@@ -185,12 +185,12 @@ export default function KassePage() {
                 <DollarSign className="h-5 w-5 text-green-400" />
               </div>
             </div>
-            <p className="text-gray-400 text-sm">Aktueller Saldo</p>
+            <p className="text-zinc-400 text-sm">Aktueller Saldo</p>
             <p className="text-2xl font-bold text-green-400">{formatCurrency(summary?.currentBalance || 0)}</p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${(summary?.todayChange || 0) >= 0 ? 'border-green-500/20' : 'border-red-500/30'}`}>
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 ${(summary?.todayChange || 0) >= 0 ? 'border-green-500/20' : 'border-red-500/30'}`}>
           <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.todayChange || 0) >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
@@ -202,38 +202,38 @@ export default function KassePage() {
                 )}
               </div>
             </div>
-            <p className="text-gray-400 text-sm">Heute</p>
+            <p className="text-zinc-400 text-sm">Heute</p>
             <p className={`text-2xl font-bold ${(summary?.todayChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {(summary?.todayChange || 0) >= 0 ? '+' : ''}{formatCurrency(summary?.todayChange || 0)}
             </p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${(summary?.weekChange || 0) >= 0 ? 'border-amber-500/20' : 'border-red-500/30'}`}>
-          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.weekChange || 0) >= 0 ? 'bg-amber-500/10' : 'bg-red-500/10'} rounded-full blur-2xl pointer-events-none`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 ${(summary?.weekChange || 0) >= 0 ? 'border-orange-500/20' : 'border-red-500/30'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.weekChange || 0) >= 0 ? 'bg-orange-500/10' : 'bg-red-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 ${(summary?.weekChange || 0) >= 0 ? 'bg-amber-500/20' : 'bg-red-500/20'} rounded-lg`}>
-                <TrendingUp className={`h-5 w-5 ${(summary?.weekChange || 0) >= 0 ? 'text-amber-400' : 'text-red-400'}`} />
+              <div className={`p-2 ${(summary?.weekChange || 0) >= 0 ? 'bg-orange-500/20' : 'bg-red-500/20'} rounded-lg`}>
+                <TrendingUp className={`h-5 w-5 ${(summary?.weekChange || 0) >= 0 ? 'text-orange-400' : 'text-red-400'}`} />
               </div>
             </div>
-            <p className="text-gray-400 text-sm">Diese Woche</p>
+            <p className="text-zinc-400 text-sm">Diese Woche</p>
             <p className={`text-2xl font-bold ${(summary?.weekChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {(summary?.weekChange || 0) >= 0 ? '+' : ''}{formatCurrency(summary?.weekChange || 0)}
             </p>
           </CardContent>
         </Card>
         
-        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${(summary?.pendingTransactions || 0) > 0 ? 'border-yellow-500/30' : 'border-amber-500/20'}`}>
-          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl pointer-events-none`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 ${(summary?.pendingTransactions || 0) > 0 ? 'border-orange-500/30' : 'border-orange-500/20'}`}>
+          <div className={`absolute top-0 right-0 w-16 h-16 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-orange-500/10' : 'bg-orange-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-yellow-500/20' : 'bg-amber-500/20'} rounded-lg`}>
-                <Clock className={`h-5 w-5 ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-amber-400'}`} />
+              <div className={`p-2 ${(summary?.pendingTransactions || 0) > 0 ? 'bg-orange-500/20' : 'bg-orange-500/20'} rounded-lg`}>
+                <Clock className={`h-5 w-5 ${(summary?.pendingTransactions || 0) > 0 ? 'text-orange-400' : 'text-orange-400'}`} />
               </div>
             </div>
-            <p className="text-gray-400 text-sm">Ausstehend</p>
-            <p className={`text-2xl font-bold ${(summary?.pendingTransactions || 0) > 0 ? 'text-yellow-400' : 'text-amber-400'}`}>
+            <p className="text-zinc-400 text-sm">Ausstehend</p>
+            <p className={`text-2xl font-bold ${(summary?.pendingTransactions || 0) > 0 ? 'text-orange-400' : 'text-orange-400'}`}>
               {summary?.pendingTransactions || 0}
             </p>
           </CardContent>
@@ -241,18 +241,18 @@ export default function KassePage() {
       </div>
 
       {/* Chart */}
-      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-        <CardHeader className="border-b border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+        <CardHeader className="border-b border-zinc-800">
           <CardTitle className="text-white">Saldo-Verlauf</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Komplette Entwicklung des Schwarzgeld-Saldos
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6">
           {chartLoading ? (
-            <div className="h-80 flex items-center justify-center text-gray-400">
+            <div className="h-80 flex items-center justify-center text-zinc-400">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+                <div className="h-8 w-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
                 <p>Lade Chart-Daten...</p>
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function KassePage() {
             <div className="h-80 flex items-center justify-center text-red-400">
               <div className="text-center">
                 <p>Fehler beim Laden der Daten</p>
-                <p className="text-sm text-gray-400 mt-2">
+                <p className="text-sm text-zinc-400 mt-2">
                   {chartError instanceof Error ? chartError.message : 'Unbekannter Fehler'}
                 </p>
               </div>
@@ -329,7 +329,7 @@ export default function KassePage() {
               />
             </div>
           ) : (
-            <div className="h-80 flex items-center justify-center text-gray-400">
+            <div className="h-80 flex items-center justify-center text-zinc-400">
               <div className="text-center">
                 <DollarSign className="h-16 w-16 mx-auto mb-4 opacity-30" />
                 <p>Keine Daten verfügbar</p>
@@ -341,10 +341,10 @@ export default function KassePage() {
       </Card>
 
       {/* Transactions Table */}
-      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-        <CardHeader className="border-b border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+        <CardHeader className="border-b border-zinc-800">
           <CardTitle className="text-white">Letzte Transaktionen</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Übersicht über alle Buchungen
           </CardDescription>
         </CardHeader>
@@ -352,47 +352,47 @@ export default function KassePage() {
           {transactionsLoading ? (
             <div className="flex justify-center py-16">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-                <p className="text-gray-400">Lade Transaktionen...</p>
+                <div className="h-8 w-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+                <p className="text-zinc-400">Lade Transaktionen...</p>
               </div>
             </div>
           ) : (!transactions?.transactions || transactions.transactions.length === 0) ? (
             <div className="py-16 text-center">
-              <DollarSign className="h-16 w-16 mx-auto text-gray-600 mb-4" />
-              <p className="text-gray-400 text-lg">Keine Transaktionen gefunden</p>
+              <DollarSign className="h-16 w-16 mx-auto text-zinc-600 mb-4" />
+              <p className="text-zinc-400 text-lg">Keine Transaktionen gefunden</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-800 bg-gray-800/30">
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Typ</th>
-                    <th className="text-right py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Betrag</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategorie</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Notiz</th>
-                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erstellt von</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Datum</th>
+                  <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Typ</th>
+                    <th className="text-right py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Betrag</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Kategorie</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Notiz</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Erstellt von</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Datum</th>
                     {canApprove && (
-                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktionen</th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800/50">
+                <tbody className="divide-y divide-zinc-800/50">
                   {transactions?.transactions?.map((tx: any) => (
-                    <tr key={tx.id} className="group hover:bg-gray-800/30 transition-colors">
+                    <tr key={tx.id} className="group hover:bg-zinc-800/30 transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className={`w-2 h-2 rounded-full ${
                             tx.kind === 'EINZAHLUNG' ? 'bg-green-500' : 
                             tx.kind === 'AUSZAHLUNG' ? 'bg-red-500' : 
-                            tx.kind === 'KORREKTUR' ? 'bg-yellow-500' : 'bg-blue-500'
+                            tx.kind === 'KORREKTUR' ? 'bg-orange-500' : 'bg-orange-500'
                           }`} />
                           <div className="flex items-center gap-2">
                             {tx.kind === 'EINZAHLUNG' && <TrendingUp className="h-4 w-4 text-green-400" />}
                             {tx.kind === 'AUSZAHLUNG' && <TrendingDown className="h-4 w-4 text-red-400" />}
-                            {tx.kind === 'KORREKTUR' && <RotateCcw className="h-4 w-4 text-yellow-400" />}
-                            {tx.kind === 'TRANSFER' && <DollarSign className="h-4 w-4 text-blue-400" />}
+                            {tx.kind === 'KORREKTUR' && <RotateCcw className="h-4 w-4 text-orange-400" />}
+                            {tx.kind === 'TRANSFER' && <DollarSign className="h-4 w-4 text-orange-400" />}
                             <span className="text-white font-medium">{getKindDisplay(tx.kind)}</span>
                           </div>
                         </div>
@@ -408,15 +408,15 @@ export default function KassePage() {
                       </td>
                       <td className="py-4 px-4">
                         {tx.category ? (
-                          <Badge variant="outline" className="bg-gray-800/50 border-gray-700 text-gray-300 font-normal">
+                          <Badge variant="outline" className="bg-zinc-800/50 border-zinc-700 text-zinc-300 font-normal">
                             {tx.category}
                           </Badge>
                         ) : (
-                          <span className="text-gray-500">-</span>
+                          <span className="text-zinc-500">-</span>
                         )}
                       </td>
                       <td className="py-4 px-4 max-w-xs">
-                        <span className="text-gray-300 truncate block">{tx.note || '-'}</span>
+                        <span className="text-zinc-300 truncate block">{tx.note || '-'}</span>
                       </td>
                       <td className="py-4 px-4 text-center">
                         {tx.status === 'APPROVED' && (
@@ -426,7 +426,7 @@ export default function KassePage() {
                           </Badge>
                         )}
                         {tx.status === 'PENDING' && (
-                          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                          <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">
                             <Clock className="mr-1 h-3 w-3" />
                             Ausstehend
                           </Badge>
@@ -439,10 +439,10 @@ export default function KassePage() {
                         )}
                       </td>
                       <td className="py-4 px-4">
-                        <span className="text-gray-300">{getDisplayName(tx.createdBy)}</span>
+                        <span className="text-zinc-300">{getDisplayName(tx.createdBy)}</span>
                       </td>
                       <td className="py-4 px-4">
-                        <span className="text-gray-400 text-sm">{formatDate(tx.createdAt)}</span>
+                        <span className="text-zinc-400 text-sm">{formatDate(tx.createdAt)}</span>
                       </td>
                       {canApprove && (
                         <td className="py-4 px-6">

@@ -197,7 +197,7 @@ export default function AbmeldungenPage() {
     onSelect: (date: Date) => void; 
     minDate?: Date | null;
   }) => (
-    <div className="absolute z-[100] mt-2 w-full bg-gray-800 border border-amber-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 p-4">
+    <div className="absolute z-[100] mt-2 w-full bg-zinc-800 border border-orange-500/30 rounded-xl shadow-2xl shadow-orange-500/10 p-4">
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-4">
         <Button
@@ -205,7 +205,7 @@ export default function AbmeldungenPage() {
           variant="ghost"
           size="icon"
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-700"
+          className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-700"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -217,7 +217,7 @@ export default function AbmeldungenPage() {
           variant="ghost"
           size="icon"
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-700"
+          className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-700"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -226,7 +226,7 @@ export default function AbmeldungenPage() {
       {/* Weekday Headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((day) => (
-          <div key={day} className="text-center text-xs text-gray-500 py-1 font-medium">
+          <div key={day} className="text-center text-xs text-zinc-500 py-1 font-medium">
             {day}
           </div>
         ))}
@@ -252,14 +252,14 @@ export default function AbmeldungenPage() {
               disabled={isDisabled}
               className={`h-9 rounded-lg text-sm font-medium transition-all ${
                 isSelected
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 shadow-lg shadow-amber-500/30'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-zinc-900 shadow-lg shadow-orange-500/30'
                   : isCurrentDay
-                    ? 'bg-cyan-900/50 text-cyan-300 border border-amber-500/30'
+                    ? 'bg-orange-900/50 text-orange-300 border border-orange-500/30'
                     : isDisabled
-                      ? 'text-gray-600 cursor-not-allowed'
+                      ? 'text-zinc-600 cursor-not-allowed'
                       : isCurrentMonth
-                        ? 'text-gray-300 hover:bg-gray-700'
-                        : 'text-gray-600'
+                        ? 'text-zinc-300 hover:bg-zinc-700'
+                        : 'text-zinc-600'
               }`}
             >
               {format(day, 'd')}
@@ -269,7 +269,7 @@ export default function AbmeldungenPage() {
       </div>
 
       {/* Today Button */}
-      <div className="mt-3 pt-3 border-t border-gray-700">
+      <div className="mt-3 pt-3 border-t border-zinc-700">
         <Button
           type="button"
           variant="ghost"
@@ -278,7 +278,7 @@ export default function AbmeldungenPage() {
             setCurrentMonth(new Date());
             onSelect(new Date());
           }}
-          className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30 text-sm"
+          className="w-full text-orange-400 hover:text-orange-300 hover:bg-orange-900/30 text-sm"
         >
           Heute
         </Button>
@@ -290,8 +290,8 @@ export default function AbmeldungenPage() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 border-4 border-amber-500/30 border-t-cyan-500 rounded-full animate-spin" />
-          <span className="text-gray-400 text-lg">Lädt Abmeldungen...</span>
+          <div className="h-8 w-8 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+          <span className="text-zinc-400 text-lg">Lädt Abmeldungen...</span>
         </div>
       </div>
     );
@@ -300,28 +300,28 @@ export default function AbmeldungenPage() {
   return (
     <div className="space-y-6">
       {/* Modern Header - Gold Theme */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative px-6 py-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg shadow-amber-500/30">
+              <div className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg shadow-orange-500/30">
                 <CalendarDays className="h-8 w-8 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white flex items-center gap-3">
                   Abmeldungen
-                  <Sparkles className="h-6 w-6 text-amber-400" />
+                  <Sparkles className="h-6 w-6 text-orange-400" />
                 </h1>
-                <p className="text-gray-400 mt-1">
+                <p className="text-zinc-400 mt-1">
                   Verwalte deine Abwesenheiten für Aufstellungen und Wochenabgaben
                 </p>
               </div>
             </div>
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 font-semibold px-6 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-zinc-900 font-semibold px-6 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all"
             >
               <Plus className="mr-2 h-4 w-4" />
               Neue Abmeldung
@@ -330,50 +330,50 @@ export default function AbmeldungenPage() {
 
           {/* Stats Cards - Gold based with semantic colors */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/30">
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/30">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-500/20 rounded-lg">
-                  <CalendarDays className="h-5 w-5 text-amber-400" />
+                <div className="p-2 bg-orange-500/20 rounded-lg">
+                  <CalendarDays className="h-5 w-5 text-orange-400" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-amber-400">{totalAbmeldungen}</div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide">Gesamt</div>
+                  <div className="text-2xl font-bold text-orange-400">{totalAbmeldungen}</div>
+                  <div className="text-xs text-zinc-400 uppercase tracking-wide">Gesamt</div>
                 </div>
               </div>
             </div>
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-green-500/20">
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-green-500/20">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-500/20 rounded-lg">
                   <CalendarCheck className="h-5 w-5 text-green-400" />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-green-400">{activeCount}</div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide">Aktiv</div>
+                  <div className="text-xs text-zinc-400 uppercase tracking-wide">Aktiv</div>
                 </div>
               </div>
             </div>
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/20">
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/20">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-500/20 rounded-lg">
-                  <CalendarClock className="h-5 w-5 text-amber-400" />
+                <div className="p-2 bg-orange-500/20 rounded-lg">
+                  <CalendarClock className="h-5 w-5 text-orange-400" />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-white">{futureCount}</div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide">Geplant</div>
+                  <div className="text-xs text-zinc-400 uppercase tracking-wide">Geplant</div>
                 </div>
               </div>
             </div>
             {isLeadership && (
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-amber-500/20">
+              <div className="bg-zinc-800/50 rounded-xl p-4 border border-orange-500/20">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-500/20 rounded-lg">
-                    <Users className="h-5 w-5 text-amber-400" />
+                  <div className="p-2 bg-orange-500/20 rounded-lg">
+                    <Users className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-white">
                       {new Set(abmeldungen.map((a: Abmeldung) => a.userId)).size}
                     </div>
-                    <div className="text-xs text-gray-400 uppercase tracking-wide">User</div>
+                    <div className="text-xs text-zinc-400 uppercase tracking-wide">User</div>
                   </div>
                 </div>
               </div>
@@ -383,14 +383,14 @@ export default function AbmeldungenPage() {
       </div>
 
       {/* Info Card - Gold Theme */}
-      <div className="bg-gray-800/50 border border-amber-500/20 rounded-xl p-4">
+      <div className="bg-zinc-800/50 border border-orange-500/20 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-amber-500/20 rounded-lg">
-            <Info className="h-5 w-5 text-amber-400" />
+          <div className="p-2 bg-orange-500/20 rounded-lg">
+            <Info className="h-5 w-5 text-orange-400" />
           </div>
-          <div className="text-sm text-gray-300 space-y-2">
-            <p className="font-semibold text-amber-300">Automatische Anwendung:</p>
-            <ul className="list-disc list-inside space-y-1 ml-2 text-gray-400">
+          <div className="text-sm text-zinc-300 space-y-2">
+            <p className="font-semibold text-orange-300">Automatische Anwendung:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2 text-zinc-400">
               <li>Bei Aufstellungen wirst du automatisch als "Kommt nicht" markiert</li>
               <li>Wochenabgaben werden als "Abgemeldet" markiert wenn du über 2 Tage abgemeldet bist</li>
               <li>Abmeldungen werden auch retrospektiv angewendet auf bestehende Aufstellungen</li>
@@ -430,14 +430,14 @@ export default function AbmeldungenPage() {
                           ? `${abmeldung.user.icFirstName} ${abmeldung.user.icLastName}`
                           : abmeldung.user.username}
                       </div>
-                      <div className="text-sm text-gray-400 flex items-center gap-2 mt-1">
+                      <div className="text-sm text-zinc-400 flex items-center gap-2 mt-1">
                         <Calendar className="h-3 w-3 text-green-400" />
                         {formatDateRange(abmeldung.startDate, abmeldung.endDate)} 
-                        <span className="text-gray-600">•</span>
+                        <span className="text-zinc-600">•</span>
                         {getDaysCount(abmeldung.startDate, abmeldung.endDate)} Tag(e)
                         {abmeldung.reason && (
                           <>
-                            <span className="text-gray-600">•</span>
+                            <span className="text-zinc-600">•</span>
                             <span className="text-green-300/80 italic">"{abmeldung.reason}"</span>
                           </>
                         )}
@@ -462,11 +462,11 @@ export default function AbmeldungenPage() {
       )}
 
       {/* Alle Abmeldungen */}
-      <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-amber-500/30">
+      <Card className="bg-gradient-to-br from-zinc-900/80 to-zinc-800/50 border-orange-500/30">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-3">
-            <div className="p-2 bg-cyan-500/20 rounded-lg">
-              <CalendarDays className="h-5 w-5 text-cyan-400" />
+            <div className="p-2 bg-orange-500/20 rounded-lg">
+              <CalendarDays className="h-5 w-5 text-orange-400" />
             </div>
             {isLeadership ? 'Alle Abmeldungen' : 'Meine Abmeldungen'} ({abmeldungen.length})
           </CardTitle>
@@ -477,11 +477,11 @@ export default function AbmeldungenPage() {
         <CardContent>
           {abmeldungen.length === 0 ? (
             <div className="text-center py-12">
-              <div className="p-4 bg-gray-800/50 rounded-2xl w-fit mx-auto mb-4">
-                <CalendarDays className="h-12 w-12 text-gray-600" />
+              <div className="p-4 bg-zinc-800/50 rounded-2xl w-fit mx-auto mb-4">
+                <CalendarDays className="h-12 w-12 text-zinc-600" />
               </div>
-              <p className="text-gray-400 text-lg">Keine Abmeldungen vorhanden</p>
-              <p className="text-gray-500 text-sm mt-1">Erstelle eine neue Abmeldung wenn du abwesend sein wirst</p>
+              <p className="text-zinc-400 text-lg">Keine Abmeldungen vorhanden</p>
+              <p className="text-zinc-500 text-sm mt-1">Erstelle eine neue Abmeldung wenn du abwesend sein wirst</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -496,16 +496,16 @@ export default function AbmeldungenPage() {
                       active
                         ? 'bg-green-900/20 border-green-500/30 hover:bg-green-900/30'
                         : future
-                        ? 'bg-blue-900/20 border-blue-500/30 hover:bg-blue-900/30'
-                        : 'bg-gray-800/30 border-gray-700/30 hover:bg-gray-800/50'
+                        ? 'bg-orange-900/20 border-orange-500/30 hover:bg-orange-900/30'
+                        : 'bg-zinc-800/30 border-zinc-700/30 hover:bg-zinc-800/50'
                     }`}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div className={`p-2.5 rounded-xl ${
-                        active ? 'bg-green-500/20' : future ? 'bg-blue-500/20' : 'bg-gray-700/50'
+                        active ? 'bg-green-500/20' : future ? 'bg-orange-500/20' : 'bg-zinc-700/50'
                       }`}>
                         <Calendar className={`h-5 w-5 ${
-                          active ? 'text-green-400' : future ? 'text-blue-400' : 'text-gray-400'
+                          active ? 'text-green-400' : future ? 'text-orange-400' : 'text-zinc-400'
                         }`} />
                       </div>
                       <div className="flex-1">
@@ -523,19 +523,19 @@ export default function AbmeldungenPage() {
                             </Badge>
                           )}
                           {future && !active && (
-                            <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                            <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                               Geplant
                             </Badge>
                           )}
                         </div>
-                        <div className="text-sm text-gray-400 mt-1 flex items-center gap-2">
-                          <Calendar className={`h-3 w-3 ${active ? 'text-green-400' : future ? 'text-blue-400' : 'text-gray-500'}`} />
+                        <div className="text-sm text-zinc-400 mt-1 flex items-center gap-2">
+                          <Calendar className={`h-3 w-3 ${active ? 'text-green-400' : future ? 'text-orange-400' : 'text-zinc-500'}`} />
                           {formatDateRange(abmeldung.startDate, abmeldung.endDate)} 
-                          <span className="text-gray-600">•</span>
+                          <span className="text-zinc-600">•</span>
                           {getDaysCount(abmeldung.startDate, abmeldung.endDate)} Tag(e)
                         </div>
                         {abmeldung.reason && (
-                          <div className="text-sm text-gray-300 mt-1 italic">
+                          <div className="text-sm text-zinc-300 mt-1 italic">
                             "{abmeldung.reason}"
                           </div>
                         )}
@@ -565,23 +565,23 @@ export default function AbmeldungenPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-16 p-4 z-50 animate-in fade-in duration-200 overflow-y-auto">
           <div className="w-full max-w-md relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl pointer-events-none" />
+            <div className="absolute -inset-2 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 blur-xl rounded-2xl pointer-events-none" />
             
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl shadow-cyan-500/10 rounded-2xl overflow-visible">
+            <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30 shadow-2xl shadow-orange-500/10 rounded-2xl overflow-visible">
               {/* Header mit Gradient */}
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/50 via-amber-800/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-900/50 via-orange-800/30 to-transparent pointer-events-none" />
                 <CardHeader className="relative pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+                      <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                         <CalendarDays className="h-7 w-7 text-white" />
                       </div>
                       <div>
                         <CardTitle className="text-2xl font-bold text-white">
                           Neue Abmeldung
                         </CardTitle>
-                        <CardDescription className="text-cyan-200/70 mt-1">
+                        <CardDescription className="text-orange-200/70 mt-1">
                           Zeitraum der Abwesenheit eintragen
                         </CardDescription>
                       </div>
@@ -591,7 +591,7 @@ export default function AbmeldungenPage() {
                       size="icon"
                       onClick={handleCloseModal}
                       disabled={createMutation.isPending}
-                      className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                      className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                     >
                       <X className="h-5 w-5" />
                     </Button>
@@ -602,14 +602,14 @@ export default function AbmeldungenPage() {
               <CardContent className="pt-2 pb-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Mode Toggle */}
-                  <div className="flex gap-2 p-1 bg-gray-800/50 rounded-xl">
+                  <div className="flex gap-2 p-1 bg-zinc-800/50 rounded-xl">
                     <button
                       type="button"
                       onClick={() => setIsRangeMode(false)}
                       className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                         !isRangeMode 
-                          ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 shadow-lg shadow-amber-500/30' 
-                          : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-zinc-900 shadow-lg shadow-orange-500/30' 
+                          : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
                       }`}
                     >
                       <Calendar className="h-4 w-4" />
@@ -620,8 +620,8 @@ export default function AbmeldungenPage() {
                       onClick={() => setIsRangeMode(true)}
                       className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                         isRangeMode 
-                          ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 shadow-lg shadow-amber-500/30' 
-                          : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-zinc-900 shadow-lg shadow-orange-500/30' 
+                          : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
                       }`}
                     >
                       <CalendarDays className="h-4 w-4" />
@@ -632,8 +632,8 @@ export default function AbmeldungenPage() {
                   {/* Datum Felder */}
                   <div className={`grid gap-4 ${isRangeMode ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     <div className="space-y-2 relative">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-cyan-400" />
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-orange-400" />
                         {isRangeMode ? 'Von' : 'Datum'}
                       </label>
                       <button
@@ -642,15 +642,15 @@ export default function AbmeldungenPage() {
                           setShowStartCalendar(!showStartCalendar);
                           setShowEndCalendar(false);
                         }}
-                        className="w-full h-11 px-4 bg-gray-800/50 border border-gray-700 hover:border-cyan-500/50 rounded-xl text-left text-white transition-all flex items-center justify-between"
+                        className="w-full h-11 px-4 bg-zinc-800/50 border border-zinc-700 hover:border-orange-500/50 rounded-xl text-left text-white transition-all flex items-center justify-between"
                       >
-                        <span className={startDate ? 'text-white' : 'text-gray-500'}>
+                        <span className={startDate ? 'text-white' : 'text-zinc-500'}>
                           {startDate 
                             ? format(startDate, 'dd. MMMM yyyy', { locale: de })
                             : 'Datum auswählen'
                           }
                         </span>
-                        <Calendar className="h-4 w-4 text-cyan-400" />
+                        <Calendar className="h-4 w-4 text-orange-400" />
                       </button>
                       
                       {showStartCalendar && (
@@ -675,8 +675,8 @@ export default function AbmeldungenPage() {
 
                     {isRangeMode && (
                       <div className="space-y-2 relative">
-                        <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-cyan-400" />
+                        <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-orange-400" />
                           Bis
                         </label>
                         <button
@@ -685,15 +685,15 @@ export default function AbmeldungenPage() {
                             setShowEndCalendar(!showEndCalendar);
                             setShowStartCalendar(false);
                           }}
-                          className="w-full h-11 px-4 bg-gray-800/50 border border-gray-700 hover:border-cyan-500/50 rounded-xl text-left text-white transition-all flex items-center justify-between"
+                          className="w-full h-11 px-4 bg-zinc-800/50 border border-zinc-700 hover:border-orange-500/50 rounded-xl text-left text-white transition-all flex items-center justify-between"
                         >
-                          <span className={endDate ? 'text-white' : 'text-gray-500'}>
+                          <span className={endDate ? 'text-white' : 'text-zinc-500'}>
                             {endDate 
                               ? format(endDate, 'dd. MMMM yyyy', { locale: de })
                               : 'Datum auswählen'
                             }
                           </span>
-                          <Calendar className="h-4 w-4 text-cyan-400" />
+                          <Calendar className="h-4 w-4 text-orange-400" />
                         </button>
                         
                         {showEndCalendar && (
@@ -718,16 +718,16 @@ export default function AbmeldungenPage() {
 
                   {/* Reason */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-cyan-400" />
-                      Grund <span className="text-gray-500 font-normal">(optional)</span>
+                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-orange-400" />
+                      Grund <span className="text-zinc-500 font-normal">(optional)</span>
                     </label>
                     <Textarea
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                       placeholder="z.B. Urlaub, Krankheit, private Gründe..."
                       rows={3}
-                      className="!bg-gray-800/50 border-gray-700 focus:border-cyan-500 focus:ring-cyan-500/20 resize-none text-white placeholder:text-gray-500"
+                      className="!bg-zinc-800/50 border-zinc-700 focus:border-orange-500 focus:ring-orange-500/20 resize-none text-white placeholder:text-zinc-500"
                     />
                   </div>
 
@@ -737,14 +737,14 @@ export default function AbmeldungenPage() {
                       type="button"
                       variant="outline"
                       onClick={handleCloseModal}
-                      className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                      className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
                       disabled={createMutation.isPending}
                     >
                       Abbrechen
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 h-12 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 font-semibold shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-amber-500/40"
+                      className="flex-1 h-12 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-zinc-900 font-semibold shadow-lg shadow-orange-500/25 transition-all duration-200 hover:shadow-orange-500/40"
                       disabled={createMutation.isPending || !startDate || (isRangeMode && !endDate)}
                     >
                       {createMutation.isPending ? (

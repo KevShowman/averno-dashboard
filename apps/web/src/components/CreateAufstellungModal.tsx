@@ -49,15 +49,15 @@ export default function CreateAufstellungModal({
     buttonGradient: 'from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500',
     buttonText: 'text-white',
   } : {
-    gradient: 'from-amber-600 to-orange-600',
+    gradient: 'from-orange-600 to-orange-600',
     border: 'border-gold-500/30',
-    glow: 'from-gold-600/20 via-amber-500/20 to-gold-600/20',
-    headerBg: 'from-amber-900/50 via-yellow-800/30',
+    glow: 'from-gold-600/20 via-orange-500/20 to-gold-600/20',
+    headerBg: 'from-orange-900/50 via-orange-800/30',
     icon: 'text-gold-400',
-    shadow: 'shadow-amber-500/25 hover:shadow-amber-500/40',
-    text: 'text-amber-200/70',
+    shadow: 'shadow-orange-500/25 hover:shadow-orange-500/40',
+    text: 'text-orange-200/70',
     ring: 'focus:ring-gold-500/20 focus:border-gold-500',
-    buttonGradient: 'from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
+    buttonGradient: 'from-orange-600 to-orange-600 hover:from-orange-500 hover:to-orange-500',
     buttonText: 'text-white',
   }
 
@@ -109,7 +109,7 @@ export default function CreateAufstellungModal({
         {/* Glow Effect */}
         <div className={`absolute inset-0 bg-gradient-to-r ${theme.glow} blur-xl rounded-2xl`} />
         
-        <Card className={`relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 ${theme.border} shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto`}>
+        <Card className={`relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 ${theme.border} shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto`}>
           {/* Header mit Gradient */}
           <div className="relative">
             <div className={`absolute inset-0 bg-gradient-to-r ${theme.headerBg} to-transparent`} />
@@ -133,7 +133,7 @@ export default function CreateAufstellungModal({
                   size="icon"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                  className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -144,7 +144,7 @@ export default function CreateAufstellungModal({
           <CardContent className="pt-2 pb-6 space-y-5">
             {/* Date Picker */}
             <div className="space-y-3">
-              <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+              <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                 <Calendar className={`h-4 w-4 ${theme.icon}`} />
                 Datum
               </label>
@@ -152,27 +152,27 @@ export default function CreateAufstellungModal({
                 <button
                   type="button"
                   onClick={() => setShowCalendar(!showCalendar)}
-                  className={`w-full h-11 px-4 bg-gray-800/50 border border-gray-700 rounded-xl text-left text-white ${theme.ring} transition-all flex items-center justify-between`}
+                  className={`w-full h-11 px-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-left text-white ${theme.ring} transition-all flex items-center justify-between`}
                 >
-                  <span className={selectedDate ? 'text-white' : 'text-gray-500'}>
+                  <span className={selectedDate ? 'text-white' : 'text-zinc-500'}>
                     {selectedDate 
                       ? format(selectedDate, 'EEEE, dd. MMMM yyyy', { locale: de })
                       : 'Datum auswählen...'
                     }
                   </span>
-                  <Calendar className="h-4 w-4 text-gray-400" />
+                  <Calendar className="h-4 w-4 text-zinc-400" />
                 </button>
                 
                 {/* Custom Calendar Dropdown */}
                 {showCalendar && (
-                  <div className="absolute z-10 mt-2 w-full bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4">
+                  <div className="absolute z-10 mt-2 w-full bg-zinc-800 border border-zinc-700 rounded-xl shadow-2xl p-4">
                     {/* Month Navigation */}
                     <div className="flex items-center justify-between mb-4">
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                        className="h-8 w-8 text-gray-400 hover:text-white"
+                        className="h-8 w-8 text-zinc-400 hover:text-white"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </Button>
@@ -183,7 +183,7 @@ export default function CreateAufstellungModal({
                         variant="ghost"
                         size="icon"
                         onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                        className="h-8 w-8 text-gray-400 hover:text-white"
+                        className="h-8 w-8 text-zinc-400 hover:text-white"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </Button>
@@ -192,7 +192,7 @@ export default function CreateAufstellungModal({
                     {/* Weekday Headers */}
                     <div className="grid grid-cols-7 gap-1 mb-2">
                       {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((day) => (
-                        <div key={day} className="text-center text-xs text-gray-500 py-1">
+                        <div key={day} className="text-center text-xs text-zinc-500 py-1">
                           {day}
                         </div>
                       ))}
@@ -221,10 +221,10 @@ export default function CreateAufstellungModal({
                               isSelected
                                 ? `bg-gradient-to-r ${theme.gradient} text-white shadow-lg`
                                 : isCurrentDay
-                                  ? 'bg-gray-700 text-white'
+                                  ? 'bg-zinc-700 text-white'
                                   : isCurrentMonth
-                                    ? 'text-gray-300 hover:bg-gray-700'
-                                    : 'text-gray-600'
+                                    ? 'text-zinc-300 hover:bg-zinc-700'
+                                    : 'text-zinc-600'
                             }`}
                           >
                             {format(day, 'd')}
@@ -239,7 +239,7 @@ export default function CreateAufstellungModal({
 
             {/* Time Picker */}
             <div className="space-y-3">
-              <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+              <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                 <Clock className={`h-4 w-4 ${theme.icon}`} />
                 Uhrzeit
               </label>
@@ -252,7 +252,7 @@ export default function CreateAufstellungModal({
                     className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
                       selectedTime === time
                         ? `bg-gradient-to-r ${theme.gradient} text-white shadow-lg`
-                        : 'bg-gray-800/50 border border-gray-700 text-gray-300 hover:border-gray-600 hover:bg-gray-800'
+                        : 'bg-zinc-800/50 border border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800'
                     }`}
                   >
                     {time}
@@ -264,15 +264,15 @@ export default function CreateAufstellungModal({
             {/* Location (optional, especially for Sicario) */}
             {isSicario && (
               <div className="space-y-3">
-                <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+                <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                   <MapPin className={`h-4 w-4 ${theme.icon}`} />
-                  Treffpunkt <span className="text-gray-500 font-normal">(optional)</span>
+                  Treffpunkt <span className="text-zinc-500 font-normal">(optional)</span>
                 </label>
                 <Input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="z.B. Casa, Hafen, Flughafen..."
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 placeholder:text-gray-500`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 placeholder:text-zinc-500`}
                   disabled={isLoading}
                 />
               </div>
@@ -280,7 +280,7 @@ export default function CreateAufstellungModal({
 
             {/* Reason */}
             <div className="space-y-3">
-              <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+              <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                 {isSicario ? <Skull className={`h-4 w-4 ${theme.icon}`} /> : <Zap className={`h-4 w-4 ${theme.icon}`} />}
                 {isSicario ? 'Mission / Auftrag' : 'Grund / Anlass'}
               </label>
@@ -292,18 +292,18 @@ export default function CreateAufstellungModal({
                   : 'z.B. Casa Meeting, Routenplanung, Geschäftsabwicklung...'
                 }
                 rows={3}
-                className={`!bg-gray-800/50 border-gray-700 ${theme.ring} resize-none text-white placeholder:text-gray-500`}
+                className={`!bg-zinc-800/50 border-zinc-700 ${theme.ring} resize-none text-white placeholder:text-zinc-500`}
                 disabled={isLoading}
               />
             </div>
 
             {/* Info Banner */}
-            <div className={`bg-gradient-to-r ${isSicario ? 'from-red-900/30 to-rose-900/20 border-red-500/30' : 'from-amber-900/30 to-yellow-900/20 border-amber-500/30'} border p-4 rounded-xl`}>
+            <div className={`bg-gradient-to-r ${isSicario ? 'from-red-900/30 to-rose-900/20 border-red-500/30' : 'from-orange-900/30 to-orange-900/20 border-orange-500/30'} border p-4 rounded-xl`}>
               <div className="flex items-start gap-3">
                 <Zap className={`h-5 w-5 ${theme.icon} flex-shrink-0 mt-0.5`} />
                 <div className="text-sm">
-                  <p className={isSicario ? 'text-red-300' : 'text-amber-300'} style={{ fontWeight: 500 }}>Discord Benachrichtigung</p>
-                  <p className="text-gray-300/80 mt-1">
+                  <p className={isSicario ? 'text-red-300' : 'text-orange-300'} style={{ fontWeight: 500 }}>Discord Benachrichtigung</p>
+                  <p className="text-zinc-300/80 mt-1">
                     {isSicario 
                       ? 'Alle Sicarios werden per Discord DM über diesen Einsatz informiert.'
                       : 'Alle Mitglieder werden im Discord über diese Aufstellung informiert.'
@@ -319,7 +319,7 @@ export default function CreateAufstellungModal({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
               >
                 Abbrechen
               </Button>

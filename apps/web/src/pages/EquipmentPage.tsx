@@ -447,23 +447,23 @@ export default function EquipmentPage() {
     const u = allUsers.find((u: User) => u.id === selectedUserId);
     if (!u) return null;
     return (
-      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl shadow-lg shadow-amber-500/5">
+      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500/10 to-orange-500/10 border border-orange-500/30 rounded-xl shadow-lg shadow-orange-500/5">
         {u.avatarUrl ? (
-          <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-amber-500/50" />
+          <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-orange-500/50" />
         ) : (
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600/30 to-orange-600/30 flex items-center justify-center ring-2 ring-amber-500/50">
-            <User className="h-5 w-5 text-amber-400" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600/30 to-orange-600/30 flex items-center justify-center ring-2 ring-orange-500/50">
+            <User className="h-5 w-5 text-orange-400" />
           </div>
         )}
         <div className="flex flex-col flex-1">
-          <span className="text-amber-300 font-semibold">
+          <span className="text-orange-300 font-semibold">
             {u.icFirstName && u.icLastName ? `${u.icFirstName} ${u.icLastName}` : u.username}
           </span>
-          <span className="text-xs text-amber-400/60">@{u.username}</span>
+          <span className="text-xs text-orange-400/60">@{u.username}</span>
         </div>
         <button 
           onClick={() => setSelectedUserId('')} 
-          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+          className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
         >
           <X className="h-4 w-4" />
         </button>
@@ -488,8 +488,8 @@ export default function EquipmentPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-          <p className="text-gray-400">Laden...</p>
+          <div className="h-10 w-10 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+          <p className="text-zinc-400">Laden...</p>
         </div>
       </div>
     );
@@ -499,28 +499,28 @@ export default function EquipmentPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-orange-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl" />
         
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl shadow-lg shadow-amber-500/30">
+            <div className="p-3 bg-gradient-to-br from-orange-600 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
               <Shield className="h-8 w-8 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Ausrüstungsmanagement</h1>
-              <p className="text-gray-400 mt-1">Waffen, Westen & Munition verwalten</p>
+              <p className="text-zinc-400 mt-1">Waffen, Westen & Munition verwalten</p>
             </div>
           </div>
           
           {canManage && (
             <div className="flex gap-2">
-              <Button onClick={() => setShowWeaponModal(true)} className="bg-amber-600 hover:bg-amber-700 text-white">
+              <Button onClick={() => setShowWeaponModal(true)} className="bg-orange-600 hover:bg-orange-700 text-white">
                 <Swords className="mr-2 h-4 w-4" />
                 Waffe eintragen
               </Button>
-              <Button onClick={() => setShowVestModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button onClick={() => setShowVestModal(true)} className="bg-orange-600 hover:bg-orange-700 text-white">
                 <Shield className="mr-2 h-4 w-4" />
                 Westen eintragen
               </Button>
@@ -538,7 +538,7 @@ export default function EquipmentPage() {
         <Button
           onClick={() => setViewMode('overview')}
           variant={viewMode === 'overview' ? 'default' : 'outline'}
-          className={viewMode === 'overview' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
+          className={viewMode === 'overview' ? 'bg-orange-600 hover:bg-orange-700 text-zinc-900' : 'border-zinc-700 hover:bg-zinc-800 hover:border-orange-500/50'}
         >
           <Users className="mr-2 h-4 w-4" />
           Übersicht
@@ -546,7 +546,7 @@ export default function EquipmentPage() {
         <Button
           onClick={() => setViewMode('weapons')}
           variant={viewMode === 'weapons' ? 'default' : 'outline'}
-          className={viewMode === 'weapons' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
+          className={viewMode === 'weapons' ? 'bg-orange-600 hover:bg-orange-700 text-zinc-900' : 'border-zinc-700 hover:bg-zinc-800 hover:border-orange-500/50'}
         >
           <Swords className="mr-2 h-4 w-4" />
           Waffen
@@ -554,7 +554,7 @@ export default function EquipmentPage() {
         <Button
           onClick={() => setViewMode('vests')}
           variant={viewMode === 'vests' ? 'default' : 'outline'}
-          className={viewMode === 'vests' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
+          className={viewMode === 'vests' ? 'bg-orange-600 hover:bg-orange-700 text-zinc-900' : 'border-zinc-700 hover:bg-zinc-800 hover:border-orange-500/50'}
         >
           <Shield className="mr-2 h-4 w-4" />
           Westen
@@ -562,7 +562,7 @@ export default function EquipmentPage() {
         <Button
           onClick={() => setViewMode('ammo')}
           variant={viewMode === 'ammo' ? 'default' : 'outline'}
-          className={viewMode === 'ammo' ? 'bg-amber-600 hover:bg-amber-700 text-gray-900' : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
+          className={viewMode === 'ammo' ? 'bg-orange-600 hover:bg-orange-700 text-zinc-900' : 'border-zinc-700 hover:bg-zinc-800 hover:border-orange-500/50'}
         >
           <Target className="mr-2 h-4 w-4" />
           Munition
@@ -570,7 +570,7 @@ export default function EquipmentPage() {
         <Button
           onClick={() => setViewMode('recommendations')}
           variant={viewMode === 'recommendations' ? 'default' : 'outline'}
-          className={viewMode === 'recommendations' ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white' : 'border-gray-700 hover:bg-gray-800 hover:border-purple-500/50'}
+          className={viewMode === 'recommendations' ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white' : 'border-zinc-700 hover:bg-zinc-800 hover:border-purple-500/50'}
         >
           <TrendingUp className="mr-2 h-4 w-4" />
           Waffen-Status
@@ -581,44 +581,44 @@ export default function EquipmentPage() {
       {stats && viewMode === 'overview' && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
+            <Card className="bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/30">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Waffen vergeben</p>
-                    <p className="text-3xl font-bold text-amber-400">{stats.totalWeapons}</p>
+                    <p className="text-zinc-400 text-sm">Waffen vergeben</p>
+                    <p className="text-3xl font-bold text-orange-400">{stats.totalWeapons}</p>
                   </div>
-                  <Swords className="h-10 w-10 text-amber-500/30" />
+                  <Swords className="h-10 w-10 text-orange-500/30" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-blue-500/30">
+            <Card className="bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/30">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Westen-Einträge</p>
-                    <p className="text-3xl font-bold text-blue-400">{stats.totalVests}</p>
+                    <p className="text-zinc-400 text-sm">Westen-Einträge</p>
+                    <p className="text-3xl font-bold text-orange-400">{stats.totalVests}</p>
                   </div>
-                  <Shield className="h-10 w-10 text-blue-500/30" />
+                  <Shield className="h-10 w-10 text-orange-500/30" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-red-500/30">
+            <Card className="bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-red-500/30">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Munitions-Einträge</p>
+                    <p className="text-zinc-400 text-sm">Munitions-Einträge</p>
                     <p className="text-3xl font-bold text-red-400">{stats.totalAmmo}</p>
                   </div>
                   <Target className="h-10 w-10 text-red-500/30" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-orange-500/30">
+            <Card className="bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/30">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Ohne Waffe</p>
+                    <p className="text-zinc-400 text-sm">Ohne Waffe</p>
                     <p className="text-3xl font-bold text-orange-400">{stats.usersWithoutWeapons}</p>
                   </div>
                   <AlertTriangle className="h-10 w-10 text-orange-500/30" />
@@ -631,16 +631,16 @@ export default function EquipmentPage() {
           {(stats.lowVestUsers?.length > 0 || stats.lowAmmoUsers?.length > 0) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {stats.lowVestUsers?.length > 0 && (
-                <Card className="bg-yellow-900/20 border-yellow-500/30">
+                <Card className="bg-orange-900/20 border-orange-500/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-yellow-400 text-sm flex items-center gap-2">
+                    <CardTitle className="text-orange-400 text-sm flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />
                       Westen-Warnung (≤3 Tage)
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {stats.lowVestUsers.map((u: User) => (
-                      <div key={u.id} className="text-yellow-200/80 text-sm">
+                      <div key={u.id} className="text-orange-200/80 text-sm">
                         {u.icFirstName && u.icLastName ? `${u.icFirstName} ${u.icLastName}` : u.username}
                       </div>
                     ))}
@@ -671,45 +671,45 @@ export default function EquipmentPage() {
 
       {/* Weapons Table */}
       {(viewMode === 'weapons' || viewMode === 'overview') && (
-        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-          <CardHeader className="border-b border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+          <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Swords className="h-5 w-5 text-amber-400" />
+              <Swords className="h-5 w-5 text-orange-400" />
               Waffen ({weapons.length})
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Alle vergebenen Waffen
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {weapons.length === 0 ? (
               <div className="py-16 text-center">
-                <Swords className="h-16 w-16 mx-auto text-gray-600 mb-4" />
-                <p className="text-gray-400">Keine Waffen eingetragen</p>
+                <Swords className="h-16 w-16 mx-auto text-zinc-600 mb-4" />
+                <p className="text-zinc-400">Keine Waffen eingetragen</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-800 bg-gray-800/30">
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Mitglied</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Waffe</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aufsätze</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erhalten</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Letzter Verlust</th>
-                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>}
+                    <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Mitglied</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Waffe</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aufsätze</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Erhalten</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Letzter Verlust</th>
+                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktionen</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-800/50">
+                  <tbody className="divide-y divide-zinc-800/50">
                     {weapons.map((weapon: Weapon) => (
-                      <tr key={weapon.id} className="group hover:bg-amber-950/20 transition-colors">
+                      <tr key={weapon.id} className="group hover:bg-orange-950/20 transition-colors">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             {weapon.user.avatarUrl ? (
                               <img src={weapon.user.avatarUrl} alt={weapon.user.username} className="w-8 h-8 rounded-full" />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                                <User className="h-4 w-4 text-gray-400" />
+                              <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center">
+                                <User className="h-4 w-4 text-zinc-400" />
                               </div>
                             )}
                             <span className="font-medium text-white">
@@ -720,30 +720,30 @@ export default function EquipmentPage() {
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+                          <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">
                             {WEAPON_TYPE_NAMES[weapon.weaponType] || weapon.weaponType}
                           </Badge>
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex flex-wrap gap-1">
                             {getAttachmentBadges(weapon).map(badge => (
-                              <Badge key={badge} variant="outline" className="text-xs bg-gray-700/50 border-gray-600 text-gray-300">
+                              <Badge key={badge} variant="outline" className="text-xs bg-zinc-700/50 border-zinc-600 text-zinc-300">
                                 {badge}
                               </Badge>
                             ))}
                             {getAttachmentBadges(weapon).length === 0 && (
-                              <span className="text-gray-500 text-sm">-</span>
+                              <span className="text-zinc-500 text-sm">-</span>
                             )}
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <span className="text-gray-300 text-sm">{formatDate(weapon.receivedAt)}</span>
+                          <span className="text-zinc-300 text-sm">{formatDate(weapon.receivedAt)}</span>
                         </td>
                         <td className="py-4 px-4">
                           {weapon.lastLostAt ? (
                             <span className="text-red-400 text-sm">{formatDate(weapon.lastLostAt)}</span>
                           ) : (
-                            <span className="text-gray-500 text-sm">-</span>
+                            <span className="text-zinc-500 text-sm">-</span>
                           )}
                         </td>
                         {canManage && (
@@ -753,7 +753,7 @@ export default function EquipmentPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleEditWeapon(weapon)}
-                                className="h-8 px-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                                className="h-8 px-2 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -784,47 +784,47 @@ export default function EquipmentPage() {
 
       {/* Vests Table */}
       {(viewMode === 'vests' || viewMode === 'overview') && (
-        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-          <CardHeader className="border-b border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+          <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-400" />
+              <Shield className="h-5 w-5 text-orange-400" />
               Westen ({vests.length})
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Westen-Zuteilungen (1 Weste pro Tag)
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {vests.length === 0 ? (
               <div className="py-16 text-center">
-                <Shield className="h-16 w-16 mx-auto text-gray-600 mb-4" />
-                <p className="text-gray-400">Keine Westen eingetragen</p>
+                <Shield className="h-16 w-16 mx-auto text-zinc-600 mb-4" />
+                <p className="text-zinc-400">Keine Westen eingetragen</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-800 bg-gray-800/30">
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Mitglied</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Anzahl</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erhalten</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Verbraucht bis</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tage übrig</th>
-                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>}
+                    <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Mitglied</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Anzahl</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Erhalten</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Verbraucht bis</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Tage übrig</th>
+                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktionen</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-800/50">
+                  <tbody className="divide-y divide-zinc-800/50">
                     {vests.map((vest: Vest) => {
                       const daysRemaining = getDaysRemaining(vest.expectedEmptyAt);
                       return (
-                        <tr key={vest.id} className="group hover:bg-blue-950/20 transition-colors">
+                        <tr key={vest.id} className="group hover:bg-orange-950/20 transition-colors">
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
                               {vest.user.avatarUrl ? (
                                 <img src={vest.user.avatarUrl} alt={vest.user.username} className="w-8 h-8 rounded-full" />
                               ) : (
-                                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                                  <User className="h-4 w-4 text-gray-400" />
+                                <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center">
+                                  <User className="h-4 w-4 text-zinc-400" />
                                 </div>
                               )}
                               <span className="font-medium text-white">
@@ -835,20 +835,20 @@ export default function EquipmentPage() {
                             </div>
                           </td>
                           <td className="py-4 px-4">
-                            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                            <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">
                               {vest.quantity} Westen
                             </Badge>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="text-gray-300 text-sm">{formatDate(vest.receivedAt)}</span>
+                            <span className="text-zinc-300 text-sm">{formatDate(vest.receivedAt)}</span>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="text-gray-300 text-sm">{formatDate(vest.expectedEmptyAt)}</span>
+                            <span className="text-zinc-300 text-sm">{formatDate(vest.expectedEmptyAt)}</span>
                           </td>
                           <td className="py-4 px-4">
                             <Badge className={`${
                               daysRemaining <= 3 ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                              daysRemaining <= 7 ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
+                              daysRemaining <= 7 ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
                               'bg-green-500/20 text-green-300 border-green-500/30'
                             }`}>
                               {daysRemaining > 0 ? `${daysRemaining} Tage` : 'Verbraucht'}
@@ -883,36 +883,36 @@ export default function EquipmentPage() {
 
       {/* Ammo Table */}
       {(viewMode === 'ammo' || viewMode === 'overview') && (
-        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-          <CardHeader className="border-b border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+          <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white flex items-center gap-2">
               <Target className="h-5 w-5 text-red-400" />
               Munition ({ammo.length})
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Munitions-Zuteilungen (2 Pakete pro Tag)
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {ammo.length === 0 ? (
               <div className="py-16 text-center">
-                <Target className="h-16 w-16 mx-auto text-gray-600 mb-4" />
-                <p className="text-gray-400">Keine Munition eingetragen</p>
+                <Target className="h-16 w-16 mx-auto text-zinc-600 mb-4" />
+                <p className="text-zinc-400">Keine Munition eingetragen</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-800 bg-gray-800/30">
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Mitglied</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Anzahl</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erhalten</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Verbraucht bis</th>
-                      <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tage übrig</th>
-                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>}
+                    <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                      <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Mitglied</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Anzahl</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Erhalten</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Verbraucht bis</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Tage übrig</th>
+                      {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktionen</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-800/50">
+                  <tbody className="divide-y divide-zinc-800/50">
                     {ammo.map((a: Ammo) => {
                       const daysRemaining = getDaysRemaining(a.expectedEmptyAt);
                       return (
@@ -922,8 +922,8 @@ export default function EquipmentPage() {
                               {a.user.avatarUrl ? (
                                 <img src={a.user.avatarUrl} alt={a.user.username} className="w-8 h-8 rounded-full" />
                               ) : (
-                                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                                  <User className="h-4 w-4 text-gray-400" />
+                                <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center">
+                                  <User className="h-4 w-4 text-zinc-400" />
                                 </div>
                               )}
                               <span className="font-medium text-white">
@@ -939,15 +939,15 @@ export default function EquipmentPage() {
                             </Badge>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="text-gray-300 text-sm">{formatDate(a.receivedAt)}</span>
+                            <span className="text-zinc-300 text-sm">{formatDate(a.receivedAt)}</span>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="text-gray-300 text-sm">{formatDate(a.expectedEmptyAt)}</span>
+                            <span className="text-zinc-300 text-sm">{formatDate(a.expectedEmptyAt)}</span>
                           </td>
                           <td className="py-4 px-4">
                             <Badge className={`${
                               daysRemaining <= 3 ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                              daysRemaining <= 7 ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
+                              daysRemaining <= 7 ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
                               'bg-green-500/20 text-green-300 border-green-500/30'
                             }`}>
                               {daysRemaining > 0 ? `${daysRemaining} Tage` : 'Verbraucht'}
@@ -984,11 +984,11 @@ export default function EquipmentPage() {
       {showWeaponModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-amber-500/20 to-amber-600/20 blur-xl rounded-2xl" />
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-amber-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 blur-xl rounded-2xl" />
+            <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Swords className="h-5 w-5 text-amber-400" />
+                  <Swords className="h-5 w-5 text-orange-400" />
                   {editingWeapon ? 'Waffe bearbeiten' : 'Waffe eintragen'}
                 </CardTitle>
               </CardHeader>
@@ -997,25 +997,25 @@ export default function EquipmentPage() {
                   {/* User Search */}
                   {!editingWeapon && (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <User className="h-4 w-4 text-amber-400" />
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                        <User className="h-4 w-4 text-orange-400" />
                         Mitglied auswählen
                       </label>
                       {selectedUserId ? (
                         getSelectedUserDisplay()
                       ) : (
                         <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                           <Input
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Name suchen..."
-                            className="bg-gray-800/50 border-gray-700 pl-10 text-white h-11 focus:border-amber-500"
+                            className="bg-zinc-800/50 border-zinc-700 pl-10 text-white h-11 focus:border-orange-500"
                           />
                           {searchResults.length > 0 && searchQuery.length >= 2 && (
-                            <div className="absolute z-10 w-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
-                              <div className="p-2 border-b border-gray-700/50">
-                                <span className="text-xs text-gray-500 uppercase tracking-wider px-2">
+                            <div className="absolute z-10 w-full mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
+                              <div className="p-2 border-b border-zinc-700/50">
+                                <span className="text-xs text-zinc-500 uppercase tracking-wider px-2">
                                   {searchResults.length} Ergebnisse
                                 </span>
                               </div>
@@ -1024,20 +1024,20 @@ export default function EquipmentPage() {
                                   key={u.id}
                                   type="button"
                                   onClick={() => selectUser(u.id)}
-                                  className="w-full px-3 py-3 flex items-center gap-3 hover:bg-amber-500/10 transition-all text-left border-b border-gray-800/50 last:border-0"
+                                  className="w-full px-3 py-3 flex items-center gap-3 hover:bg-orange-500/10 transition-all text-left border-b border-zinc-800/50 last:border-0"
                                 >
                                   {u.avatarUrl ? (
-                                    <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-gray-700" />
+                                    <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-zinc-700" />
                                   ) : (
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ring-2 ring-gray-700">
-                                      <User className="h-5 w-5 text-gray-400" />
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center ring-2 ring-zinc-700">
+                                      <User className="h-5 w-5 text-zinc-400" />
                                     </div>
                                   )}
                                   <div className="flex flex-col">
                                     <span className="text-white font-medium">
                                       {u.icFirstName && u.icLastName ? `${u.icFirstName} ${u.icLastName}` : u.username}
                                     </span>
-                                    <span className="text-xs text-gray-500">@{u.username}</span>
+                                    <span className="text-xs text-zinc-500">@{u.username}</span>
                                   </div>
                                 </button>
                               ))}
@@ -1050,28 +1050,28 @@ export default function EquipmentPage() {
 
                   {/* Weapon Type */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Crosshair className="h-4 w-4 text-amber-400" />
+                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                      <Crosshair className="h-4 w-4 text-orange-400" />
                       Waffentyp
                     </label>
                     <Select
                       value={weaponData.weaponType}
                       onValueChange={(value) => setWeaponData({ ...weaponData, weaponType: value })}
                     >
-                      <SelectTrigger className="w-full h-11 bg-gray-800/50 border-gray-700 text-white hover:border-amber-500/50 focus:border-amber-500 focus:ring-amber-500/20">
+                      <SelectTrigger className="w-full h-11 bg-zinc-800/50 border-zinc-700 text-white hover:border-orange-500/50 focus:border-orange-500 focus:ring-orange-500/20">
                         <SelectValue placeholder="Waffentyp auswählen">
                           <div className="flex items-center gap-2">
-                            <span className="text-amber-400">⚔️</span>
+                            <span className="text-orange-400">⚔️</span>
                             <span>{WEAPON_TYPE_NAMES[weaponData.weaponType] || weaponData.weaponType}</span>
                           </div>
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-900 border-gray-700 shadow-xl shadow-black/50">
+                      <SelectContent className="bg-zinc-900 border-zinc-700 shadow-xl shadow-black/50">
                         {weaponTypes.map((type: WeaponType) => (
                           <SelectItem 
                             key={type.key} 
                             value={type.key}
-                            className="text-white hover:bg-amber-500/20 focus:bg-amber-500/20 focus:text-amber-300 cursor-pointer py-3"
+                            className="text-white hover:bg-orange-500/20 focus:bg-orange-500/20 focus:text-orange-300 cursor-pointer py-3"
                           >
                             <div className="flex items-center gap-3">
                               <span className="text-lg">
@@ -1085,7 +1085,7 @@ export default function EquipmentPage() {
                               </span>
                               <div className="flex flex-col">
                                 <span className="font-medium">{type.name}</span>
-                                <span className="text-xs text-gray-400">{type.description}</span>
+                                <span className="text-xs text-zinc-400">{type.description}</span>
                               </div>
                             </div>
                           </SelectItem>
@@ -1097,7 +1097,7 @@ export default function EquipmentPage() {
                   {/* Dates */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-green-400" />
                         Erhalten am
                       </label>
@@ -1105,12 +1105,12 @@ export default function EquipmentPage() {
                         type="date"
                         value={weaponData.receivedAt}
                         onChange={(e) => setWeaponData({ ...weaponData, receivedAt: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 text-white h-11 focus:border-green-500 focus:ring-green-500/20"
+                        className="bg-zinc-800/50 border-zinc-700 text-white h-11 focus:border-green-500 focus:ring-green-500/20"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-red-400" />
                         Letzter Verlust
                       </label>
@@ -1118,15 +1118,15 @@ export default function EquipmentPage() {
                         type="date"
                         value={weaponData.lastLostAt}
                         onChange={(e) => setWeaponData({ ...weaponData, lastLostAt: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 text-white h-11 focus:border-red-500 focus:ring-red-500/20"
+                        className="bg-zinc-800/50 border-zinc-700 text-white h-11 focus:border-red-500 focus:ring-red-500/20"
                       />
                     </div>
                   </div>
 
                   {/* Attachments */}
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Package className="h-4 w-4 text-amber-400" />
+                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                      <Package className="h-4 w-4 text-orange-400" />
                       Aufsätze
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -1145,8 +1145,8 @@ export default function EquipmentPage() {
                             className={`
                               relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border
                               ${isChecked 
-                                ? 'bg-amber-500/20 border-amber-500/50 shadow-lg shadow-amber-500/10' 
-                                : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600 hover:bg-gray-800/50'
+                                ? 'bg-orange-500/20 border-orange-500/50 shadow-lg shadow-orange-500/10' 
+                                : 'bg-zinc-800/30 border-zinc-700/50 hover:border-zinc-600 hover:bg-zinc-800/50'
                               }
                             `}
                           >
@@ -1155,14 +1155,14 @@ export default function EquipmentPage() {
                               onCheckedChange={(checked) => 
                                 setWeaponData({ ...weaponData, [att.key]: checked })
                               }
-                              className={isChecked ? 'border-amber-500 data-[state=checked]:bg-amber-500' : ''}
+                              className={isChecked ? 'border-orange-500 data-[state=checked]:bg-orange-500' : ''}
                             />
                             <span className="text-xl">{att.icon}</span>
                             <div className="flex flex-col">
-                              <span className={`text-sm font-medium ${isChecked ? 'text-amber-300' : 'text-gray-300'}`}>
+                              <span className={`text-sm font-medium ${isChecked ? 'text-orange-300' : 'text-zinc-300'}`}>
                                 {att.label}
                               </span>
-                              <span className="text-xs text-gray-500">{att.desc}</span>
+                              <span className="text-xs text-zinc-500">{att.desc}</span>
                             </div>
                           </label>
                         );
@@ -1172,24 +1172,24 @@ export default function EquipmentPage() {
 
                   {/* Note */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Notiz (optional)</label>
+                    <label className="text-sm font-medium text-zinc-300">Notiz (optional)</label>
                     <Textarea
                       value={weaponData.note}
                       onChange={(e) => setWeaponData({ ...weaponData, note: e.target.value })}
                       placeholder="Zusätzliche Informationen..."
-                      className="!bg-gray-800/50 border-gray-700 text-white resize-none"
+                      className="!bg-zinc-800/50 border-zinc-700 text-white resize-none"
                       rows={2}
                     />
                   </div>
 
                   {/* Buttons */}
                   <div className="flex gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={resetWeaponForm} className="flex-1 border-gray-600 hover:bg-gray-800 text-gray-300">
+                    <Button type="button" variant="outline" onClick={resetWeaponForm} className="flex-1 border-zinc-600 hover:bg-zinc-800 text-zinc-300">
                       Abbrechen
                     </Button>
                     <Button 
                       type="submit" 
-                      className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+                      className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
                       disabled={(!selectedUserId && !editingWeapon) || createWeaponMutation.isPending || updateWeaponMutation.isPending}
                     >
                       {editingWeapon ? 'Speichern' : 'Eintragen'}
@@ -1206,14 +1206,14 @@ export default function EquipmentPage() {
       {showVestModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-blue-500/20 to-blue-600/20 blur-xl rounded-2xl" />
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-blue-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 blur-xl rounded-2xl" />
+            <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-blue-400" />
+                  <Shield className="h-5 w-5 text-orange-400" />
                   Westen eintragen
                 </CardTitle>
-                <CardDescription className="text-blue-200/70">
+                <CardDescription className="text-orange-200/70">
                   Verbrauch: 1 Weste pro Tag
                 </CardDescription>
               </CardHeader>
@@ -1221,25 +1221,25 @@ export default function EquipmentPage() {
                 <form onSubmit={handleVestSubmit} className="space-y-4">
                   {/* User Search */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <User className="h-4 w-4 text-blue-400" />
+                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                      <User className="h-4 w-4 text-orange-400" />
                       Mitglied auswählen
                     </label>
                     {selectedUserId ? (
                       getSelectedUserDisplay()
                     ) : (
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Name suchen..."
-                          className="bg-gray-800/50 border-gray-700 pl-10 text-white h-11 focus:border-blue-500"
+                          className="bg-zinc-800/50 border-zinc-700 pl-10 text-white h-11 focus:border-orange-500"
                         />
                         {searchResults.length > 0 && searchQuery.length >= 2 && (
-                          <div className="absolute z-10 w-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
-                            <div className="p-2 border-b border-gray-700/50">
-                              <span className="text-xs text-gray-500 uppercase tracking-wider px-2">
+                          <div className="absolute z-10 w-full mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
+                            <div className="p-2 border-b border-zinc-700/50">
+                              <span className="text-xs text-zinc-500 uppercase tracking-wider px-2">
                                 {searchResults.length} Ergebnisse
                               </span>
                             </div>
@@ -1248,20 +1248,20 @@ export default function EquipmentPage() {
                                 key={u.id}
                                 type="button"
                                 onClick={() => selectUser(u.id)}
-                                className="w-full px-3 py-3 flex items-center gap-3 hover:bg-blue-500/10 transition-all text-left border-b border-gray-800/50 last:border-0"
+                                className="w-full px-3 py-3 flex items-center gap-3 hover:bg-orange-500/10 transition-all text-left border-b border-zinc-800/50 last:border-0"
                               >
                                 {u.avatarUrl ? (
-                                  <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-gray-700" />
+                                  <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-zinc-700" />
                                 ) : (
-                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ring-2 ring-gray-700">
-                                    <User className="h-5 w-5 text-gray-400" />
+                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center ring-2 ring-zinc-700">
+                                    <User className="h-5 w-5 text-zinc-400" />
                                   </div>
                                 )}
                                 <div className="flex flex-col">
                                   <span className="text-white font-medium">
                                     {u.icFirstName && u.icLastName ? `${u.icFirstName} ${u.icLastName}` : u.username}
                                   </span>
-                                  <span className="text-xs text-gray-500">@{u.username}</span>
+                                  <span className="text-xs text-zinc-500">@{u.username}</span>
                                 </div>
                               </button>
                             ))}
@@ -1273,8 +1273,8 @@ export default function EquipmentPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-blue-400" />
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-orange-400" />
                         Anzahl Westen
                       </label>
                       <Input
@@ -1282,52 +1282,52 @@ export default function EquipmentPage() {
                         min="1"
                         value={vestData.quantity}
                         onChange={(e) => setVestData({ ...vestData, quantity: parseInt(e.target.value) || 1 })}
-                        className="bg-gray-800/50 border-gray-700 text-white h-11"
+                        className="bg-zinc-800/50 border-zinc-700 text-white h-11"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-blue-400" />
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-orange-400" />
                         Erhalten am
                       </label>
                       <Input
                         type="date"
                         value={vestData.receivedAt}
                         onChange={(e) => setVestData({ ...vestData, receivedAt: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 text-white h-11"
+                        className="bg-zinc-800/50 border-zinc-700 text-white h-11"
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl">
-                    <p className="text-blue-300 text-sm flex items-center gap-3">
-                      <div className="p-2 bg-blue-500/20 rounded-lg">
-                        <Clock className="h-5 w-5 text-blue-400" />
+                  <div className="p-4 bg-gradient-to-r from-orange-500/10 to-orange-500/10 border border-orange-500/30 rounded-xl">
+                    <p className="text-orange-300 text-sm flex items-center gap-3">
+                      <div className="p-2 bg-orange-500/20 rounded-lg">
+                        <Clock className="h-5 w-5 text-orange-400" />
                       </div>
                       Voraussichtlich verbraucht in <strong>{vestData.quantity}</strong> Tagen
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Notiz (optional)</label>
+                    <label className="text-sm font-medium text-zinc-300">Notiz (optional)</label>
                     <Textarea
                       value={vestData.note}
                       onChange={(e) => setVestData({ ...vestData, note: e.target.value })}
                       placeholder="Zusätzliche Informationen..."
-                      className="!bg-gray-800/50 border-gray-700 text-white resize-none"
+                      className="!bg-zinc-800/50 border-zinc-700 text-white resize-none"
                       rows={2}
                     />
                   </div>
 
                   <div className="flex gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={resetVestForm} className="flex-1 border-gray-600 hover:bg-gray-800 text-gray-300">
+                    <Button type="button" variant="outline" onClick={resetVestForm} className="flex-1 border-zinc-600 hover:bg-zinc-800 text-zinc-300">
                       Abbrechen
                     </Button>
                     <Button 
                       type="submit" 
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                      className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
                       disabled={!selectedUserId || createVestMutation.isPending}
                     >
                       Eintragen
@@ -1346,10 +1346,10 @@ export default function EquipmentPage() {
           {/* Stats Overview */}
           {recommendationsData?.stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-              <Card className="bg-gray-800/50 border-gray-700/50">
+              <Card className="bg-zinc-800/50 border-zinc-700/50">
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-white">{recommendationsData.stats.total}</p>
-                  <p className="text-xs text-gray-400 mt-1">Gesamt</p>
+                  <p className="text-xs text-zinc-400 mt-1">Gesamt</p>
                 </CardContent>
               </Card>
               <Card className="bg-green-900/30 border-green-500/30">
@@ -1358,10 +1358,10 @@ export default function EquipmentPage() {
                   <p className="text-xs text-green-400/70 mt-1">Mit Waffe</p>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800/50 border-gray-700/50">
+              <Card className="bg-zinc-800/50 border-zinc-700/50">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-300">{recommendationsData.stats.withoutWeapon}</p>
-                  <p className="text-xs text-gray-400 mt-1">Ohne Waffe</p>
+                  <p className="text-2xl font-bold text-zinc-300">{recommendationsData.stats.withoutWeapon}</p>
+                  <p className="text-xs text-zinc-400 mt-1">Ohne Waffe</p>
                 </CardContent>
               </Card>
               <Card className="bg-purple-900/30 border-purple-500/50 ring-1 ring-purple-500/20">
@@ -1376,10 +1376,10 @@ export default function EquipmentPage() {
                   <p className="text-xs text-red-400/70 mt-1">&gt;4 Wochen</p>
                 </CardContent>
               </Card>
-              <Card className="bg-yellow-900/30 border-yellow-500/30">
+              <Card className="bg-orange-900/30 border-orange-500/30">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-yellow-400">{recommendationsData.stats.yellow}</p>
-                  <p className="text-xs text-yellow-400/70 mt-1">2-4 Wochen</p>
+                  <p className="text-2xl font-bold text-orange-400">{recommendationsData.stats.yellow}</p>
+                  <p className="text-xs text-orange-400/70 mt-1">2-4 Wochen</p>
                 </CardContent>
               </Card>
               <Card className="bg-green-900/30 border-green-500/30">
@@ -1392,10 +1392,10 @@ export default function EquipmentPage() {
           )}
 
           {/* Legend */}
-          <Card className="bg-gray-800/30 border-gray-700/50">
+          <Card className="bg-zinc-800/30 border-zinc-700/50">
             <CardContent className="p-4">
               <div className="flex flex-wrap items-center gap-6 text-sm">
-                <span className="text-gray-400 font-medium">Legende:</span>
+                <span className="text-zinc-400 font-medium">Legende:</span>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse"></div>
                   <span className="text-purple-300">SICARIO - Sofort!</span>
@@ -1405,8 +1405,8 @@ export default function EquipmentPage() {
                   <span className="text-red-300">&gt;4 Wochen ohne Waffe</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <span className="text-yellow-300">2-4 Wochen ohne Waffe</span>
+                  <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                  <span className="text-orange-300">2-4 Wochen ohne Waffe</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -1417,13 +1417,13 @@ export default function EquipmentPage() {
           </Card>
 
           {/* Main Table */}
-          <Card className="bg-gray-900/50 border-gray-800/50">
-            <CardHeader className="border-b border-gray-800/50">
+          <Card className="bg-zinc-900/50 border-zinc-800/50">
+            <CardHeader className="border-b border-zinc-800/50">
               <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
                 <TrendingUp className="h-6 w-6 text-purple-400" />
                 Waffen-Empfehlungen (Ampelsystem)
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-zinc-400">
                 Basierend auf Blood-In Datum und Sicario-Status
               </CardDescription>
             </CardHeader>
@@ -1431,37 +1431,37 @@ export default function EquipmentPage() {
               {loadingRecommendations ? (
                 <div className="py-16 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                  <p className="text-gray-400">Lade Empfehlungen...</p>
+                  <p className="text-zinc-400">Lade Empfehlungen...</p>
                 </div>
               ) : !recommendationsData?.recommendations?.length ? (
                 <div className="py-16 text-center">
-                  <TrendingUp className="h-16 w-16 mx-auto text-gray-600 mb-4" />
-                  <p className="text-gray-400">Keine aktiven Mitglieder gefunden</p>
+                  <TrendingUp className="h-16 w-16 mx-auto text-zinc-600 mb-4" />
+                  <p className="text-zinc-400">Keine aktiven Mitglieder gefunden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-800 bg-gray-800/30">
-                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                        <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Mitglied</th>
-                        <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blood-In</th>
-                        <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tage</th>
-                        <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sicario</th>
-                        <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Hat Waffe</th>
-                        <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Empfehlung</th>
-                        {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>}
+                      <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Status</th>
+                        <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Mitglied</th>
+                        <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Blood-In</th>
+                        <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Tage</th>
+                        <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Sicario</th>
+                        <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Hat Waffe</th>
+                        <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Empfehlung</th>
+                        {canManage && <th className="text-right py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktion</th>}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-800/50">
+                    <tbody className="divide-y divide-zinc-800/50">
                       {(recommendationsData.recommendations as Recommendation[]).map((rec) => (
                         <tr 
                           key={rec.bloodRecord.id} 
                           className={`group transition-colors ${
                             rec.status === 'priority' ? 'bg-purple-950/30 hover:bg-purple-950/50' :
                             rec.status === 'red' ? 'bg-red-950/20 hover:bg-red-950/30' :
-                            rec.status === 'yellow' ? 'bg-yellow-950/10 hover:bg-yellow-950/20' :
-                            'hover:bg-gray-800/30'
+                            rec.status === 'yellow' ? 'bg-orange-950/10 hover:bg-orange-950/20' :
+                            'hover:bg-zinc-800/30'
                           }`}
                         >
                           <td className="py-4 px-6">
@@ -1475,7 +1475,7 @@ export default function EquipmentPage() {
                             ) : rec.status === 'red' ? (
                               <XCircle className="h-6 w-6 text-red-400" />
                             ) : rec.status === 'yellow' ? (
-                              <AlertCircle className="h-6 w-6 text-yellow-400" />
+                              <AlertCircle className="h-6 w-6 text-orange-400" />
                             ) : (
                               <CheckCircle2 className="h-6 w-6 text-green-400" />
                             )}
@@ -1483,10 +1483,10 @@ export default function EquipmentPage() {
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
                               {rec.user?.avatarUrl ? (
-                                <img src={rec.user.avatarUrl} alt={rec.user.username} className="w-10 h-10 rounded-full ring-2 ring-gray-700" />
+                                <img src={rec.user.avatarUrl} alt={rec.user.username} className="w-10 h-10 rounded-full ring-2 ring-zinc-700" />
                               ) : (
-                                <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center ring-2 ring-gray-600">
-                                  <User className="h-5 w-5 text-gray-400" />
+                                <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center ring-2 ring-zinc-600">
+                                  <User className="h-5 w-5 text-zinc-400" />
                                 </div>
                               )}
                               <div>
@@ -1494,24 +1494,24 @@ export default function EquipmentPage() {
                                   {rec.bloodRecord.vorname} {rec.bloodRecord.nachname}
                                 </p>
                                 {rec.user && (
-                                  <p className="text-xs text-gray-500">@{rec.user.username}</p>
+                                  <p className="text-xs text-zinc-500">@{rec.user.username}</p>
                                 )}
                               </div>
                             </div>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="text-gray-300 text-sm">
+                            <span className="text-zinc-300 text-sm">
                               {new Date(rec.bloodRecord.bloodinTimestamp).toLocaleDateString('de-DE')}
                             </span>
                           </td>
                           <td className="py-4 px-4">
                             {rec.hasWeapon ? (
-                              <span className="text-gray-500">-</span>
+                              <span className="text-zinc-500">-</span>
                             ) : (
                               <Badge className={`${
                                 rec.daysSinceBloodIn >= 28 ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                                rec.daysSinceBloodIn >= 14 ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
-                                'bg-gray-600/30 text-gray-300 border-gray-500/30'
+                                rec.daysSinceBloodIn >= 14 ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                                'bg-zinc-600/30 text-zinc-300 border-zinc-500/30'
                               }`}>
                                 {rec.daysSinceBloodIn} Tage
                               </Badge>
@@ -1524,7 +1524,7 @@ export default function EquipmentPage() {
                                 SICARIO
                               </Badge>
                             ) : (
-                              <span className="text-gray-500">-</span>
+                              <span className="text-zinc-500">-</span>
                             )}
                           </td>
                           <td className="py-4 px-4">
@@ -1534,7 +1534,7 @@ export default function EquipmentPage() {
                                 Ja
                               </Badge>
                             ) : (
-                              <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30">
+                              <Badge className="bg-zinc-600/30 text-zinc-400 border-zinc-500/30">
                                 Nein
                               </Badge>
                             )}
@@ -1543,7 +1543,7 @@ export default function EquipmentPage() {
                             <Badge className={`${
                               rec.status === 'priority' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-200 border-purple-400/50 animate-pulse' :
                               rec.status === 'red' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                              rec.status === 'yellow' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
+                              rec.status === 'yellow' ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
                               'bg-green-500/20 text-green-300 border-green-500/30'
                             }`}>
                               {rec.statusText}
@@ -1558,7 +1558,7 @@ export default function EquipmentPage() {
                                     setSelectedUserId(rec.user!.id);
                                     setShowWeaponModal(true);
                                   }}
-                                  className="bg-amber-600 hover:bg-amber-700 text-gray-900"
+                                  className="bg-orange-600 hover:bg-orange-700 text-zinc-900"
                                 >
                                   <Swords className="h-4 w-4 mr-1" />
                                   Waffe zuweisen
@@ -1582,7 +1582,7 @@ export default function EquipmentPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="w-full max-w-lg relative">
             <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 via-red-500/20 to-red-600/20 blur-xl rounded-2xl" />
-            <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-red-500/30 shadow-2xl rounded-2xl overflow-hidden">
+            <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-red-500/30 shadow-2xl rounded-2xl overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Target className="h-5 w-5 text-red-400" />
@@ -1596,7 +1596,7 @@ export default function EquipmentPage() {
                 <form onSubmit={handleAmmoSubmit} className="space-y-4">
                   {/* User Search */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                       <User className="h-4 w-4 text-red-400" />
                       Mitglied auswählen
                     </label>
@@ -1604,17 +1604,17 @@ export default function EquipmentPage() {
                       getSelectedUserDisplay()
                     ) : (
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Name suchen..."
-                          className="bg-gray-800/50 border-gray-700 pl-10 text-white h-11 focus:border-red-500"
+                          className="bg-zinc-800/50 border-zinc-700 pl-10 text-white h-11 focus:border-red-500"
                         />
                         {searchResults.length > 0 && searchQuery.length >= 2 && (
-                          <div className="absolute z-10 w-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
-                            <div className="p-2 border-b border-gray-700/50">
-                              <span className="text-xs text-gray-500 uppercase tracking-wider px-2">
+                          <div className="absolute z-10 w-full mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
+                            <div className="p-2 border-b border-zinc-700/50">
+                              <span className="text-xs text-zinc-500 uppercase tracking-wider px-2">
                                 {searchResults.length} Ergebnisse
                               </span>
                             </div>
@@ -1623,20 +1623,20 @@ export default function EquipmentPage() {
                                 key={u.id}
                                 type="button"
                                 onClick={() => selectUser(u.id)}
-                                className="w-full px-3 py-3 flex items-center gap-3 hover:bg-red-500/10 transition-all text-left border-b border-gray-800/50 last:border-0"
+                                className="w-full px-3 py-3 flex items-center gap-3 hover:bg-red-500/10 transition-all text-left border-b border-zinc-800/50 last:border-0"
                               >
                                 {u.avatarUrl ? (
-                                  <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-gray-700" />
+                                  <img src={u.avatarUrl} alt={u.username} className="w-10 h-10 rounded-xl ring-2 ring-zinc-700" />
                                 ) : (
-                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ring-2 ring-gray-700">
-                                    <User className="h-5 w-5 text-gray-400" />
+                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center ring-2 ring-zinc-700">
+                                    <User className="h-5 w-5 text-zinc-400" />
                                   </div>
                                 )}
                                 <div className="flex flex-col">
                                   <span className="text-white font-medium">
                                     {u.icFirstName && u.icLastName ? `${u.icFirstName} ${u.icLastName}` : u.username}
                                   </span>
-                                  <span className="text-xs text-gray-500">@{u.username}</span>
+                                  <span className="text-xs text-zinc-500">@{u.username}</span>
                                 </div>
                               </button>
                             ))}
@@ -1648,7 +1648,7 @@ export default function EquipmentPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                         <Target className="h-4 w-4 text-red-400" />
                         Anzahl Pakete
                       </label>
@@ -1657,12 +1657,12 @@ export default function EquipmentPage() {
                         min="1"
                         value={ammoData.quantity}
                         onChange={(e) => setAmmoData({ ...ammoData, quantity: parseInt(e.target.value) || 1 })}
-                        className="bg-gray-800/50 border-gray-700 text-white h-11"
+                        className="bg-zinc-800/50 border-zinc-700 text-white h-11"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-red-400" />
                         Erhalten am
                       </label>
@@ -1670,7 +1670,7 @@ export default function EquipmentPage() {
                         type="date"
                         value={ammoData.receivedAt}
                         onChange={(e) => setAmmoData({ ...ammoData, receivedAt: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 text-white"
+                        className="bg-zinc-800/50 border-zinc-700 text-white"
                         required
                       />
                     </div>
@@ -1686,18 +1686,18 @@ export default function EquipmentPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Notiz (optional)</label>
+                    <label className="text-sm font-medium text-zinc-300">Notiz (optional)</label>
                     <Textarea
                       value={ammoData.note}
                       onChange={(e) => setAmmoData({ ...ammoData, note: e.target.value })}
                       placeholder="Zusätzliche Informationen..."
-                      className="!bg-gray-800/50 border-gray-700 text-white resize-none"
+                      className="!bg-zinc-800/50 border-zinc-700 text-white resize-none"
                       rows={2}
                     />
                   </div>
 
                   <div className="flex gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={resetAmmoForm} className="flex-1 border-gray-600 hover:bg-gray-800 text-gray-300">
+                    <Button type="button" variant="outline" onClick={resetAmmoForm} className="flex-1 border-zinc-600 hover:bg-zinc-800 text-zinc-300">
                       Abbrechen
                     </Button>
                     <Button 

@@ -44,8 +44,8 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-gray-800 rounded-lg p-6 text-center">
+        <div className="min-h-screen bg-zinc-900 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-zinc-800 rounded-lg p-6 text-center">
             <div className="flex justify-center mb-4">
               <AlertTriangle className="h-12 w-12 text-red-400" />
             </div>
@@ -54,7 +54,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Oops! Etwas ist schiefgelaufen
             </h1>
             
-            <p className="text-gray-400 mb-6">
+            <p className="text-zinc-400 mb-6">
               Es scheint, als ob die Anwendung veraltete Dateien verwendet. 
               Bitte versuchen Sie es erneut, um die neueste Version zu laden.
             </p>
@@ -79,10 +79,10 @@ export class ErrorBoundary extends Component<Props, State> {
             
             {this.state.error && (
               <details className="mt-4 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer">
+                <summary className="text-sm text-zinc-500 cursor-pointer">
                   Fehlerdetails (nur in Entwicklung)
                 </summary>
-                <pre className="text-xs text-red-400 mt-2 p-2 bg-gray-900 rounded overflow-auto">
+                <pre className="text-xs text-red-400 mt-2 p-2 bg-zinc-900 rounded overflow-auto">
                   {this.state.error.stack}
                 </pre>
               </details>

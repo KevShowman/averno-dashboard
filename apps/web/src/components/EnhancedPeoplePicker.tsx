@@ -130,7 +130,7 @@ export default function EnhancedPeoplePicker({
     <div className={`space-y-4 ${className}`}>
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
         <Input
           type="text"
           placeholder={placeholder}
@@ -149,7 +149,7 @@ export default function EnhancedPeoplePicker({
                 <div
                   key={user.id}
                   onClick={() => handleUserSelect(user)}
-                  className="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded cursor-pointer transition-colors"
+                  className="flex items-center space-x-3 p-2 hover:bg-zinc-800/50 rounded cursor-pointer transition-colors"
                 >
                   {user.avatarUrl ? (
                     <img
@@ -158,7 +158,7 @@ export default function EnhancedPeoplePicker({
                       className="h-8 w-8 rounded-full"
                     />
                   ) : (
-                    <User className="h-8 w-8 text-gray-400" />
+                    <User className="h-8 w-8 text-zinc-400" />
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">
@@ -202,7 +202,7 @@ export default function EnhancedPeoplePicker({
                 variant="ghost"
                 size="sm"
                 onClick={clearSelection}
-                className="text-gray-400 hover:text-white"
+                className="text-zinc-400 hover:text-white"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -217,13 +217,13 @@ export default function EnhancedPeoplePicker({
                   className="h-12 w-12 rounded-full"
                 />
               ) : (
-                <User className="h-12 w-12 text-gray-400" />
+                <User className="h-12 w-12 text-zinc-400" />
               )}
               <div>
                 <h3 className="text-lg font-semibold text-white">
                   {getDisplayName(selectedUser)}
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-zinc-400">
                   @{selectedUser.username}
                 </p>
               </div>
@@ -231,7 +231,7 @@ export default function EnhancedPeoplePicker({
 
             {/* Current Roles */}
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-300 mb-2">Aktuelle Rollen:</h4>
+              <h4 className="text-sm font-medium text-zinc-300 mb-2">Aktuelle Rollen:</h4>
               <div className="flex flex-wrap gap-2">
                 {selectedUser.allRoles && selectedUser.allRoles.length > 1 ? (
                   selectedUser.allRoles.map((role, index) => {
@@ -254,7 +254,7 @@ export default function EnhancedPeoplePicker({
             {/* Role Management */}
             {showRoleManagement && (
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-300">Rollen verwalten:</h4>
+                <h4 className="text-sm font-medium text-zinc-300">Rollen verwalten:</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {availableRoles.map((role) => {
                     const Icon = roleIcons[role.key as keyof typeof roleIcons] || User

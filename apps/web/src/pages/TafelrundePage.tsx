@@ -118,17 +118,17 @@ interface UserForPermission {
 const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN']
 
 const statusConfig: Record<TafelrundeStatus, { label: string; color: string; bgColor: string }> = {
-  PLANNED: { label: 'Geplant', color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
+  PLANNED: { label: 'Geplant', color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
   ACTIVE: { label: 'Aktiv', color: 'text-green-400', bgColor: 'bg-green-500/20' },
-  COMPLETED: { label: 'Abgeschlossen', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
+  COMPLETED: { label: 'Abgeschlossen', color: 'text-zinc-400', bgColor: 'bg-zinc-500/20' },
   CANCELLED: { label: 'Abgesagt', color: 'text-red-400', bgColor: 'bg-red-500/20' },
 }
 
 const attendanceConfig: Record<AttendanceStatus, { label: string; color: string; bgColor: string; icon: typeof Check }> = {
-  UNKNOWN: { label: 'Unbekannt', color: 'text-gray-400', bgColor: 'bg-gray-500/20', icon: HelpCircle },
+  UNKNOWN: { label: 'Unbekannt', color: 'text-zinc-400', bgColor: 'bg-zinc-500/20', icon: HelpCircle },
   ATTENDING: { label: 'Kommt', color: 'text-green-400', bgColor: 'bg-green-500/20', icon: Check },
   NOT_ATTENDING: { label: 'Kommt nicht', color: 'text-red-400', bgColor: 'bg-red-500/20', icon: X },
-  MAYBE: { label: 'Vielleicht', color: 'text-amber-400', bgColor: 'bg-amber-500/20', icon: HelpCircle },
+  MAYBE: { label: 'Vielleicht', color: 'text-orange-400', bgColor: 'bg-orange-500/20', icon: HelpCircle },
 }
 
 export default function TafelrundePage() {
@@ -400,7 +400,7 @@ export default function TafelrundePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Users className="h-8 w-8 text-amber-500" />
+            <Users className="h-8 w-8 text-orange-500" />
             Tafelrunde
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -413,7 +413,7 @@ export default function TafelrundePage() {
               resetForm()
               setIsCreateDialogOpen(true)
             }}
-            className="bg-amber-500 hover:bg-amber-600"
+            className="bg-orange-500 hover:bg-orange-600"
           >
             <Plus className="h-4 w-4 mr-2" />
             Neue Tafelrunde
@@ -422,13 +422,13 @@ export default function TafelrundePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-800 pb-2">
+      <div className="flex gap-2 border-b border-zinc-800 pb-2">
         <button
           onClick={() => setActiveTab('overview')}
           className={`px-4 py-2 rounded-t-lg transition-colors ${
             activeTab === 'overview'
-              ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -441,8 +441,8 @@ export default function TafelrundePage() {
             onClick={() => setActiveTab('permissions')}
             className={`px-4 py-2 rounded-t-lg transition-colors ${
               activeTab === 'permissions'
-                ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -458,17 +458,17 @@ export default function TafelrundePage() {
         <div className="space-y-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
             </div>
           ) : tafelrunden.length === 0 ? (
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card className="bg-zinc-900/50 border-zinc-800">
               <CardContent className="py-12 text-center">
-                <Users className="h-12 w-12 mx-auto mb-4 text-gray-600" />
-                <p className="text-gray-400">Noch keine Tafelrunden erstellt</p>
+                <Users className="h-12 w-12 mx-auto mb-4 text-zinc-600" />
+                <p className="text-zinc-400">Noch keine Tafelrunden erstellt</p>
                 {canManage && !isPartner && (
                   <Button
                     onClick={() => setIsCreateDialogOpen(true)}
-                    className="mt-4 bg-amber-500 hover:bg-amber-600"
+                    className="mt-4 bg-orange-500 hover:bg-orange-600"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Erste Tafelrunde erstellen
@@ -520,7 +520,7 @@ export default function TafelrundePage() {
               {/* Vergangene Tafelrunden */}
               {pastTafelrunden.length > 0 && (
                 <div className="space-y-4">
-                  <h2 className="text-lg font-semibold text-gray-400">Vergangene Tafelrunden</h2>
+                  <h2 className="text-lg font-semibold text-zinc-400">Vergangene Tafelrunden</h2>
                   <div className="grid gap-4">
                     {pastTafelrunden.map((tafelrunde) => (
                       <TafelrundeCard
@@ -564,10 +564,10 @@ export default function TafelrundePage() {
       {/* Permissions Tab */}
       {activeTab === 'permissions' && isLeadership && (
         <div className="space-y-4">
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5 text-amber-500" />
+                <Shield className="h-5 w-5 text-orange-500" />
                 Tafelrunden-Berechtigungen
               </CardTitle>
               <CardDescription>
@@ -577,13 +577,13 @@ export default function TafelrundePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Neue Berechtigung vergeben */}
-              <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Berechtigung vergeben</h4>
+              <div className="p-4 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
+                <h4 className="text-sm font-medium text-zinc-300 mb-3">Berechtigung vergeben</h4>
                 <div className="flex gap-2">
                   <select
                     value={selectedUserId}
                     onChange={(e) => setSelectedUserId(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                   >
                     <option value="">Mitglied auswählen...</option>
                     {usersWithoutPermission.map((u) => (
@@ -598,7 +598,7 @@ export default function TafelrundePage() {
                   <Button
                     onClick={() => selectedUserId && grantPermissionMutation.mutate(selectedUserId)}
                     disabled={!selectedUserId || grantPermissionMutation.isPending}
-                    className="bg-amber-500 hover:bg-amber-600"
+                    className="bg-orange-500 hover:bg-orange-600"
                   >
                     {grantPermissionMutation.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -614,18 +614,18 @@ export default function TafelrundePage() {
 
               {/* Aktuelle Berechtigungen */}
               {permissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-zinc-500">
                   <Shield className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Keine zusätzlichen Berechtigungen vergeben</p>
                   <p className="text-sm mt-1">Leadership hat automatisch Zugriff</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-400">Berechtigte Mitglieder</h4>
+                  <h4 className="text-sm font-medium text-zinc-400">Berechtigte Mitglieder</h4>
                   {permissions.map((permission) => (
                     <div
                       key={permission.id}
-                      className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                      className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50"
                     >
                       <div>
                         <p className="font-medium text-white">
@@ -634,7 +634,7 @@ export default function TafelrundePage() {
                             : permission.user.username
                           }
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-zinc-500">
                           Berechtigt von {permission.grantedBy?.username || 'System'}
                         </p>
                       </div>
@@ -666,12 +666,12 @@ export default function TafelrundePage() {
           </Card>
 
           {/* Info-Box */}
-          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <div className="p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
-              <div className="text-sm text-gray-300">
-                <p className="font-medium text-blue-400 mb-1">Hinweis zu Berechtigungen</p>
-                <ul className="list-disc list-inside space-y-1 text-gray-400">
+              <AlertCircle className="h-5 w-5 text-orange-400 mt-0.5" />
+              <div className="text-sm text-zinc-300">
+                <p className="font-medium text-orange-400 mb-1">Hinweis zu Berechtigungen</p>
+                <ul className="list-disc list-inside space-y-1 text-zinc-400">
                   <li>Leadership (Patron, Don, Capo) hat automatisch Zugriff</li>
                   <li>Berechtigte Mitglieder können Tafelrunden erstellen und verwalten</li>
                   <li>Partner können nur den Anwesenheitsstatus von Familien ändern</li>
@@ -691,18 +691,18 @@ export default function TafelrundePage() {
           resetForm()
         }
       }}>
-        <DialogContent className={`bg-gray-900 border-gray-700 ${createStep === 1 ? 'max-w-4xl' : 'max-w-lg'}`}>
+        <DialogContent className={`bg-zinc-900 border-zinc-700 ${createStep === 1 ? 'max-w-4xl' : 'max-w-lg'}`}>
           {/* Step Indicator */}
           <div className="flex items-center gap-4 mb-4">
-            <div className={`flex items-center gap-2 ${createStep >= 1 ? 'text-amber-400' : 'text-gray-500'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${createStep >= 1 ? 'bg-amber-500 text-gray-900' : 'bg-gray-700'}`}>
+            <div className={`flex items-center gap-2 ${createStep >= 1 ? 'text-orange-400' : 'text-zinc-500'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${createStep >= 1 ? 'bg-orange-500 text-zinc-900' : 'bg-zinc-700'}`}>
                 1
               </div>
               <span className="text-sm font-medium">Treffpunkt wählen</span>
             </div>
-            <ChevronRight className="h-4 w-4 text-gray-600" />
-            <div className={`flex items-center gap-2 ${createStep >= 2 ? 'text-amber-400' : 'text-gray-500'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${createStep >= 2 ? 'bg-amber-500 text-gray-900' : 'bg-gray-700'}`}>
+            <ChevronRight className="h-4 w-4 text-zinc-600" />
+            <div className={`flex items-center gap-2 ${createStep >= 2 ? 'text-orange-400' : 'text-zinc-500'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${createStep >= 2 ? 'bg-orange-500 text-zinc-900' : 'bg-zinc-700'}`}>
                 2
               </div>
               <span className="text-sm font-medium">Details eingeben</span>
@@ -713,7 +713,7 @@ export default function TafelrundePage() {
           {createStep === 1 && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-amber-400 flex items-center gap-2">
+                <DialogTitle className="text-orange-400 flex items-center gap-2">
                   <MapPin className="h-5 w-5" />
                   Treffpunkt festlegen
                 </DialogTitle>
@@ -749,7 +749,7 @@ export default function TafelrundePage() {
           {createStep === 2 && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-amber-400 flex items-center gap-2">
+                <DialogTitle className="text-orange-400 flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
                   Tafelrunde Details
                 </DialogTitle>
@@ -775,7 +775,7 @@ export default function TafelrundePage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setCreateStep(1)}
-                  className="text-amber-400 hover:text-amber-300"
+                  className="text-orange-400 hover:text-orange-300"
                 >
                   <Edit className="h-4 w-4 mr-1" />
                   Ändern
@@ -790,7 +790,7 @@ export default function TafelrundePage() {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="z.B. Bündnis Abstimmung"
-                    className="bg-gray-800 border-gray-600"
+                    className="bg-zinc-800 border-zinc-600"
                   />
                 </div>
                 
@@ -802,7 +802,7 @@ export default function TafelrundePage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Worum geht es bei dieser Tafelrunde?"
                     rows={2}
-                    className="bg-gray-800 border-gray-600 resize-none"
+                    className="bg-zinc-800 border-zinc-600 resize-none"
                   />
                 </div>
                 
@@ -814,7 +814,7 @@ export default function TafelrundePage() {
                       type="date"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="bg-gray-800 border-gray-600"
+                      className="bg-zinc-800 border-zinc-600"
                     />
                   </div>
                   <div className="space-y-2">
@@ -824,41 +824,41 @@ export default function TafelrundePage() {
                       type="time"
                       value={formData.time}
                       onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      className="bg-gray-800 border-gray-600"
+                      className="bg-zinc-800 border-zinc-600"
                     />
                   </div>
                 </div>
 
                 {/* Taxi-Zeitplanung */}
-                <div className="space-y-3 pt-3 border-t border-gray-700">
-                  <Label className="text-yellow-400 flex items-center gap-2">
+                <div className="space-y-3 pt-3 border-t border-zinc-700">
+                  <Label className="text-orange-400 flex items-center gap-2">
                     <Car className="h-4 w-4" />
                     Taxi-Zeitplanung
                   </Label>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="pickupStartTime" className="text-gray-400 text-sm">Abholung ab</Label>
+                      <Label htmlFor="pickupStartTime" className="text-zinc-400 text-sm">Abholung ab</Label>
                       <Input
                         id="pickupStartTime"
                         type="time"
                         value={formData.pickupStartTime}
                         onChange={(e) => setFormData({ ...formData, pickupStartTime: e.target.value })}
                         placeholder="z.B. 17:30"
-                        className="bg-gray-800 border-gray-600"
+                        className="bg-zinc-800 border-zinc-600"
                       />
-                      <p className="text-xs text-gray-500">Wann sollen Fahrer anfangen abzuholen?</p>
+                      <p className="text-xs text-zinc-500">Wann sollen Fahrer anfangen abzuholen?</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="arrivalDeadline" className="text-gray-400 text-sm">Spätestens am Treffpunkt</Label>
+                      <Label htmlFor="arrivalDeadline" className="text-zinc-400 text-sm">Spätestens am Treffpunkt</Label>
                       <Input
                         id="arrivalDeadline"
                         type="time"
                         value={formData.arrivalDeadline}
                         onChange={(e) => setFormData({ ...formData, arrivalDeadline: e.target.value })}
                         placeholder="z.B. 18:00"
-                        className="bg-gray-800 border-gray-600"
+                        className="bg-zinc-800 border-zinc-600"
                       />
-                      <p className="text-xs text-gray-500">Bis wann müssen alle am Treffpunkt sein?</p>
+                      <p className="text-xs text-zinc-500">Bis wann müssen alle am Treffpunkt sein?</p>
                     </div>
                   </div>
                 </div>
@@ -870,7 +870,7 @@ export default function TafelrundePage() {
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="z.B. Vor der Casa, Parkplatz hinten"
-                    className="bg-gray-800 border-gray-600"
+                    className="bg-zinc-800 border-zinc-600"
                   />
                 </div>
               </div>
@@ -886,7 +886,7 @@ export default function TafelrundePage() {
                 <Button
                   onClick={() => createMutation.mutate(formData)}
                   disabled={!formData.title || !formData.date || !formData.meetingPointMapName || createMutation.isPending}
-                  className="bg-amber-500 hover:bg-amber-600"
+                  className="bg-orange-500 hover:bg-orange-600"
                 >
                   {createMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -903,9 +903,9 @@ export default function TafelrundePage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700">
+        <DialogContent className="bg-zinc-900 border-zinc-700">
           <DialogHeader>
-            <DialogTitle className="text-amber-400">Tafelrunde bearbeiten</DialogTitle>
+            <DialogTitle className="text-orange-400">Tafelrunde bearbeiten</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -914,7 +914,7 @@ export default function TafelrundePage() {
                 id="edit-title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-gray-800 border-gray-600"
+                className="bg-zinc-800 border-zinc-600"
               />
             </div>
             <div className="space-y-2">
@@ -924,7 +924,7 @@ export default function TafelrundePage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-gray-800 border-gray-600 resize-none"
+                className="bg-zinc-800 border-zinc-600 resize-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -935,7 +935,7 @@ export default function TafelrundePage() {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-gray-800 border-gray-600"
+                  className="bg-zinc-800 border-zinc-600"
                 />
               </div>
               <div className="space-y-2">
@@ -945,7 +945,7 @@ export default function TafelrundePage() {
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="bg-gray-800 border-gray-600"
+                  className="bg-zinc-800 border-zinc-600"
                 />
               </div>
             </div>
@@ -955,7 +955,7 @@ export default function TafelrundePage() {
                 id="edit-location"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="bg-gray-800 border-gray-600"
+                className="bg-zinc-800 border-zinc-600"
               />
             </div>
             <div className="space-y-2">
@@ -971,7 +971,7 @@ export default function TafelrundePage() {
                   }
                 }}
               >
-                <SelectTrigger className="bg-gray-800 border-gray-600">
+                <SelectTrigger className="bg-zinc-800 border-zinc-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -997,7 +997,7 @@ export default function TafelrundePage() {
                 }
               }}
               disabled={!formData.title || !formData.date || updateMutation.isPending}
-              className="bg-amber-500 hover:bg-amber-600"
+              className="bg-orange-500 hover:bg-orange-600"
             >
               {updateMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -1012,7 +1012,7 @@ export default function TafelrundePage() {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700">
+        <DialogContent className="bg-zinc-900 border-zinc-700">
           <DialogHeader>
             <DialogTitle className="text-red-400">Tafelrunde löschen</DialogTitle>
             <DialogDescription>
@@ -1092,7 +1092,7 @@ function TafelrundeCard({
   }
 
   return (
-    <Card className="bg-gray-900/50 border-gray-800">
+    <Card className="bg-zinc-900/50 border-zinc-800">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -1102,7 +1102,7 @@ function TafelrundeCard({
                 {status.label}
               </span>
             </div>
-            <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+            <div className="flex items-center gap-4 mt-2 text-sm text-zinc-400">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 {new Date(tafelrunde.date).toLocaleDateString('de-DE', {
@@ -1150,12 +1150,12 @@ function TafelrundeCard({
         
         {/* Summary */}
         <div className="flex items-center gap-4 mt-3 text-sm">
-          <span className="text-gray-500">{tafelrunde.families.length} Familien</span>
+          <span className="text-zinc-500">{tafelrunde.families.length} Familien</span>
           {tafelrunde.families.length > 0 && (
             <>
               <span className="text-green-400">{summary.attending} kommen</span>
               <span className="text-red-400">{summary.notAttending} nicht</span>
-              <span className="text-gray-400">{summary.unknown} offen</span>
+              <span className="text-zinc-400">{summary.unknown} offen</span>
             </>
           )}
         </div>
@@ -1164,7 +1164,7 @@ function TafelrundeCard({
       {isExpanded && (
         <CardContent className="pt-0">
           {tafelrunde.description && (
-            <p className="text-gray-400 text-sm mb-4 p-3 bg-gray-800/50 rounded-lg">
+            <p className="text-zinc-400 text-sm mb-4 p-3 bg-zinc-800/50 rounded-lg">
               {tafelrunde.description}
             </p>
           )}
@@ -1172,7 +1172,7 @@ function TafelrundeCard({
           {/* Familien Liste */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-gray-300">Eingeladene Familien</h4>
+              <h4 className="text-sm font-medium text-zinc-300">Eingeladene Familien</h4>
               {canManage && (
                 <Button size="sm" variant="ghost" onClick={onAddFamilies}>
                   <Plus className="h-4 w-4 mr-1" />
@@ -1182,7 +1182,7 @@ function TafelrundeCard({
             </div>
 
             {tafelrunde.families.length === 0 ? (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-6 text-zinc-500">
                 <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p>Noch keine Familien eingeladen</p>
               </div>
@@ -1195,7 +1195,7 @@ function TafelrundeCard({
                   return (
                     <div
                       key={family.id}
-                      className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg"
                     >
                       <div className="flex items-center gap-3">
                         <div className={`p-1.5 rounded-full ${attConfig.bgColor}`}>
@@ -1204,7 +1204,7 @@ function TafelrundeCard({
                         <div>
                           <p className="font-medium text-white">{family.familyContact.familyName}</p>
                           {family.familyContact.propertyZip && (
-                            <p className="text-xs text-gray-500">PLZ: {family.familyContact.propertyZip}</p>
+                            <p className="text-xs text-zinc-500">PLZ: {family.familyContact.propertyZip}</p>
                           )}
                         </div>
                       </div>
@@ -1214,7 +1214,7 @@ function TafelrundeCard({
                           <Button
                             size="sm"
                             variant="ghost"
-                            className={family.attendanceStatus === 'ATTENDING' ? 'bg-green-500/20 text-green-400' : 'text-gray-400'}
+                            className={family.attendanceStatus === 'ATTENDING' ? 'bg-green-500/20 text-green-400' : 'text-zinc-400'}
                             onClick={() => onUpdateAttendance(family.familyContactId, 'ATTENDING')}
                             title="Kommt"
                           >
@@ -1223,7 +1223,7 @@ function TafelrundeCard({
                           <Button
                             size="sm"
                             variant="ghost"
-                            className={family.attendanceStatus === 'NOT_ATTENDING' ? 'bg-red-500/20 text-red-400' : 'text-gray-400'}
+                            className={family.attendanceStatus === 'NOT_ATTENDING' ? 'bg-red-500/20 text-red-400' : 'text-zinc-400'}
                             onClick={() => onUpdateAttendance(family.familyContactId, 'NOT_ATTENDING')}
                             title="Kommt nicht"
                           >
@@ -1232,7 +1232,7 @@ function TafelrundeCard({
                           <Button
                             size="sm"
                             variant="ghost"
-                            className={family.attendanceStatus === 'MAYBE' ? 'bg-amber-500/20 text-amber-400' : 'text-gray-400'}
+                            className={family.attendanceStatus === 'MAYBE' ? 'bg-orange-500/20 text-orange-400' : 'text-zinc-400'}
                             onClick={() => onUpdateAttendance(family.familyContactId, 'MAYBE')}
                             title="Vielleicht"
                           >
@@ -1302,23 +1302,23 @@ function AddFamiliesDialog({
       if (!isOpen) setSelectedFamilies([])
       onOpenChange(isOpen)
     }}>
-      <DialogContent className="bg-gray-900 border-gray-700 max-w-lg max-h-[80vh]">
+      <DialogContent className="bg-zinc-900 border-zinc-700 max-w-lg max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle className="text-amber-400">Familien hinzufügen</DialogTitle>
+          <DialogTitle className="text-orange-400">Familien hinzufügen</DialogTitle>
           <DialogDescription>
             Wähle Familien aus, die zur Tafelrunde "{tafelrunde?.title}" eingeladen werden sollen
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           {availableFamilies.length === 0 ? (
-            <div className="text-center py-6 text-gray-500">
+            <div className="text-center py-6 text-zinc-500">
               <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>Alle bekannten Familien wurden bereits eingeladen</p>
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-zinc-400">
                   {selectedFamilies.length} von {availableFamilies.length} ausgewählt
                 </span>
                 <Button size="sm" variant="ghost" onClick={handleSelectAll}>
@@ -1331,15 +1331,15 @@ function AddFamiliesDialog({
                     key={family.id}
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                       selectedFamilies.includes(family.id)
-                        ? 'bg-amber-500/20 border border-amber-500/50'
-                        : 'bg-gray-800/50 border border-transparent hover:bg-gray-800'
+                        ? 'bg-orange-500/20 border border-orange-500/50'
+                        : 'bg-zinc-800/50 border border-transparent hover:bg-zinc-800'
                     }`}
                     onClick={() => handleToggleFamily(family.id)}
                   >
                     <div className={`w-5 h-5 rounded border flex items-center justify-center ${
                       selectedFamilies.includes(family.id)
-                        ? 'bg-amber-500 border-amber-500'
-                        : 'border-gray-600'
+                        ? 'bg-orange-500 border-orange-500'
+                        : 'border-zinc-600'
                     }`}>
                       {selectedFamilies.includes(family.id) && (
                         <Check className="h-3 w-3 text-black" />
@@ -1348,7 +1348,7 @@ function AddFamiliesDialog({
                     <div className="flex-1">
                       <p className="font-medium text-white">{family.familyName}</p>
                       {family.propertyZip && (
-                        <p className="text-xs text-gray-500">PLZ: {family.propertyZip}</p>
+                        <p className="text-xs text-zinc-500">PLZ: {family.propertyZip}</p>
                       )}
                     </div>
                   </div>
@@ -1364,7 +1364,7 @@ function AddFamiliesDialog({
           <Button
             onClick={() => onAdd(selectedFamilies)}
             disabled={selectedFamilies.length === 0 || isPending}
-            className="bg-amber-500 hover:bg-amber-600"
+            className="bg-orange-500 hover:bg-orange-600"
           >
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />

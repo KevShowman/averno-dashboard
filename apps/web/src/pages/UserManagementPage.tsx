@@ -140,7 +140,7 @@ export default function UserManagementPage() {
           <CardContent className="p-8 text-center">
             <Crown className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Zugriff verweigert</h2>
-            <p className="text-gray-400">
+            <p className="text-zinc-400">
               Nur Patron kann die Benutzerverwaltung zugreifen.
             </p>
           </CardContent>
@@ -153,7 +153,7 @@ export default function UserManagementPage() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-400">Lade Benutzerdaten...</div>
+          <div className="text-zinc-400">Lade Benutzerdaten...</div>
         </div>
       </div>
     )
@@ -168,7 +168,7 @@ export default function UserManagementPage() {
             <Users className="h-8 w-8" />
             Benutzerverwaltung
           </h1>
-          <p className="text-gray-400 mt-2">
+          <p className="text-zinc-400 mt-2">
             Verwalte Benutzer-Rollen und Berechtigungen
           </p>
         </div>
@@ -177,7 +177,7 @@ export default function UserManagementPage() {
             onClick={() => syncDiscordMutation.mutate()}
             disabled={syncDiscordMutation.isPending}
             variant="outline"
-            className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+            className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${syncDiscordMutation.isPending ? 'animate-spin' : ''}`} />
             Discord Sync
@@ -194,7 +194,7 @@ export default function UserManagementPage() {
                 <Users className="h-5 w-5 text-primary" />
                 <div>
                   <div className="text-2xl font-bold text-white">{userStats.totalUsers}</div>
-                  <div className="text-sm text-gray-400">Gesamt Benutzer</div>
+                  <div className="text-sm text-zinc-400">Gesamt Benutzer</div>
                 </div>
               </div>
             </CardContent>
@@ -209,7 +209,7 @@ export default function UserManagementPage() {
                     <Icon className="h-5 w-5 text-primary" />
                     <div>
                       <div className="text-2xl font-bold text-white">{roleStat.count}</div>
-                      <div className="text-sm text-gray-400">{roleStat.name}</div>
+                      <div className="text-sm text-zinc-400">{roleStat.name}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -227,7 +227,7 @@ export default function UserManagementPage() {
               <UserIcon className="h-5 w-5" />
               Benutzer auswählen
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Wähle einen Benutzer aus, um dessen Rollen zu verwalten
             </CardDescription>
           </CardHeader>
@@ -249,7 +249,7 @@ export default function UserManagementPage() {
               <Users className="h-5 w-5" />
               Alle Benutzer
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Übersicht aller registrierten Benutzer
             </CardDescription>
           </CardHeader>
@@ -258,15 +258,15 @@ export default function UserManagementPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-gray-400">Benutzer</TableHead>
-                    <TableHead className="text-gray-400">Rollen</TableHead>
-                    <TableHead className="text-gray-400">Beigetreten</TableHead>
-                    <TableHead className="text-gray-400">Aktionen</TableHead>
+                    <TableHead className="text-zinc-400">Benutzer</TableHead>
+                    <TableHead className="text-zinc-400">Rollen</TableHead>
+                    <TableHead className="text-zinc-400">Beigetreten</TableHead>
+                    <TableHead className="text-zinc-400">Aktionen</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {allUsers.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-gray-800/50">
+                    <TableRow key={user.id} className="hover:bg-zinc-800/50">
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           {user.avatarUrl ? (
@@ -276,13 +276,13 @@ export default function UserManagementPage() {
                               className="h-6 w-6 rounded-full"
                             />
                           ) : (
-                            <UserIcon className="h-6 w-6 text-gray-400" />
+                            <UserIcon className="h-6 w-6 text-zinc-400" />
                           )}
                           <div>
                             <div className="text-white text-sm font-medium">
                               {getDisplayName(user)}
                             </div>
-                            <div className="text-gray-400 text-xs">
+                            <div className="text-zinc-400 text-xs">
                               @{getDisplayName(user)}
                             </div>
                           </div>
@@ -307,7 +307,7 @@ export default function UserManagementPage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300 text-sm">
+                      <TableCell className="text-zinc-300 text-sm">
                         {formatDate(user.createdAt)}
                       </TableCell>
                       <TableCell>
@@ -316,7 +316,7 @@ export default function UserManagementPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleUserSelect(user)}
-                            className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+                            className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
                           >
                             <Zap className="h-3 w-3 mr-1" />
                             Verwalten

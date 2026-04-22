@@ -167,8 +167,8 @@ const MAP_CONFIG = {
 }
 
 const STATUS_CONFIG = {
-  PENDING: { label: 'Ausstehend', color: 'bg-gray-500', textColor: 'text-gray-400' },
-  ASSIGNED: { label: 'Zugewiesen', color: 'bg-yellow-500', textColor: 'text-yellow-400' },
+  PENDING: { label: 'Ausstehend', color: 'bg-zinc-500', textColor: 'text-zinc-400' },
+  ASSIGNED: { label: 'Zugewiesen', color: 'bg-orange-500', textColor: 'text-orange-400' },
   EN_ROUTE: { label: 'Unterwegs', color: 'bg-orange-600', textColor: 'text-orange-400' },
   PICKED_UP: { label: 'Abgeholt', color: 'bg-purple-500', textColor: 'text-purple-400' },
   DELIVERED: { label: 'Abgeliefert', color: 'bg-green-500', textColor: 'text-green-400' },
@@ -362,10 +362,10 @@ export default function TaxiDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Car className="h-8 w-8 text-yellow-400" />
+            <Car className="h-8 w-8 text-orange-400" />
             Taxi-System
           </h1>
-          <p className="text-gray-400 mt-1">
+          <p className="text-zinc-400 mt-1">
             {isLeadership 
               ? 'Management-Zugang' 
               : (isTaxiLead ? 'Taxi-Leitung' : 'Fahrer')
@@ -375,8 +375,8 @@ export default function TaxiDashboardPage() {
         
         {(isTaxiLead || isLeadership) && (
           <Badge variant="outline" className={isLeadership 
-            ? "border-amber-500/50 text-amber-400" 
-            : "border-yellow-500/50 text-yellow-400"
+            ? "border-orange-500/50 text-orange-400" 
+            : "border-orange-500/50 text-orange-400"
           }>
             <Crown className="h-3 w-3 mr-1" />
             {isLeadership ? 'Leadership' : 'Leitungsebene'}
@@ -385,15 +385,15 @@ export default function TaxiDashboardPage() {
       </div>
 
       {/* Tabs - Normale Fahrer sehen nur "Meine Fahrten" */}
-      <div className="flex gap-2 border-b border-gray-700 pb-2">
+      <div className="flex gap-2 border-b border-zinc-700 pb-2">
         {/* "Meine Fahrten" für Taxi-User */}
         {isTaxiUser && (
           <button
             onClick={() => setActiveTab('assignments')}
             className={`px-4 py-2 rounded-t-lg transition-colors ${
               activeTab === 'assignments'
-                ? 'bg-yellow-500/20 text-yellow-400 border-b-2 border-yellow-400'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-400'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <Navigation className="h-4 w-4 inline mr-2" />
@@ -406,8 +406,8 @@ export default function TaxiDashboardPage() {
             onClick={() => setActiveTab('tafelrunden')}
             className={`px-4 py-2 rounded-t-lg transition-colors ${
               activeTab === 'tafelrunden'
-                ? 'bg-yellow-500/20 text-yellow-400 border-b-2 border-yellow-400'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-400'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <Calendar className="h-4 w-4 inline mr-2" />
@@ -419,8 +419,8 @@ export default function TaxiDashboardPage() {
             onClick={() => setActiveTab('keys')}
             className={`px-4 py-2 rounded-t-lg transition-colors ${
               activeTab === 'keys'
-                ? 'bg-yellow-500/20 text-yellow-400 border-b-2 border-yellow-400'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-400'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <Key className="h-4 w-4 inline mr-2" />
@@ -434,14 +434,14 @@ export default function TaxiDashboardPage() {
         <div className="space-y-4">
           {assignmentsLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-yellow-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
             </div>
           ) : myAssignments.length === 0 ? (
-            <Card className="bg-gray-800/50 border-gray-700">
+            <Card className="bg-zinc-800/50 border-zinc-700">
               <CardContent className="py-12 text-center">
-                <Car className="h-12 w-12 mx-auto mb-4 text-gray-500" />
-                <p className="text-gray-400">Keine Fahrten zugewiesen</p>
-                <p className="text-gray-500 text-sm mt-1">
+                <Car className="h-12 w-12 mx-auto mb-4 text-zinc-500" />
+                <p className="text-zinc-400">Keine Fahrten zugewiesen</p>
+                <p className="text-zinc-500 text-sm mt-1">
                   Deine zugewiesenen Abholungen erscheinen hier
                 </p>
               </CardContent>
@@ -450,12 +450,12 @@ export default function TaxiDashboardPage() {
             <div className="grid lg:grid-cols-3 gap-4">
               {/* Karte mit allen Abholungen - 2/3 */}
               <div className="lg:col-span-2">
-                <Card className="bg-gray-800/30 border-gray-700/50 overflow-hidden">
+                <Card className="bg-zinc-800/30 border-zinc-700/50 overflow-hidden">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Map className="h-4 w-4 text-yellow-400" />
+                      <Map className="h-4 w-4 text-orange-400" />
                       Deine Abholungen
-                      <span className="text-sm font-normal text-gray-500">
+                      <span className="text-sm font-normal text-zinc-500">
                         ({myAssignments.filter(a => a.status !== 'DELIVERED' && a.status !== 'CANCELLED').length} offen)
                       </span>
                     </CardTitle>
@@ -463,13 +463,13 @@ export default function TaxiDashboardPage() {
                     {myAssignments[0]?.tafelrunde && (myAssignments[0].tafelrunde.pickupStartTime || myAssignments[0].tafelrunde.arrivalDeadline) && (
                       <div className="flex flex-wrap items-center gap-4 mt-2 text-xs">
                         {myAssignments[0].tafelrunde.pickupStartTime && (
-                          <span className="flex items-center gap-1.5 text-yellow-300 bg-yellow-500/10 px-2 py-1 rounded">
+                          <span className="flex items-center gap-1.5 text-orange-300 bg-orange-500/10 px-2 py-1 rounded">
                             <Clock className="h-3 w-3" />
                             Abholung ab: <strong>{myAssignments[0].tafelrunde.pickupStartTime}</strong>
                           </span>
                         )}
                         {myAssignments[0].tafelrunde.arrivalDeadline && (
-                          <span className="flex items-center gap-1.5 text-amber-300 bg-amber-500/10 px-2 py-1 rounded">
+                          <span className="flex items-center gap-1.5 text-orange-300 bg-orange-500/10 px-2 py-1 rounded">
                             <MapPin className="h-3 w-3" />
                             Alle am Treffpunkt bis: <strong>{myAssignments[0].tafelrunde.arrivalDeadline}</strong>
                           </span>
@@ -515,15 +515,15 @@ export default function TaxiDashboardPage() {
                         <>
                           {/* Karten-Tabs wenn es mehrere Karten gibt - jetzt klickbar */}
                           {Object.keys(mapGroups).length > 1 && (
-                            <div className="px-4 py-2 bg-gray-900/50 border-b border-gray-700/50 flex gap-2">
+                            <div className="px-4 py-2 bg-zinc-900/50 border-b border-zinc-700/50 flex gap-2">
                               {Object.entries(mapGroups).map(([mapName, items]) => (
                                 <button
                                   key={mapName}
                                   onClick={() => setDriverSelectedMap(mapName as keyof typeof MAP_CONFIG)}
                                   className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
                                     mapName === activeMap 
-                                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
-                                      : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50 hover:text-gray-300'
+                                      ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' 
+                                      : 'bg-zinc-700/50 text-zinc-400 hover:bg-zinc-600/50 hover:text-zinc-300'
                                   }`}
                                 >
                                   {MAP_CONFIG[mapName as keyof typeof MAP_CONFIG]?.name}: {items.length}
@@ -591,15 +591,15 @@ export default function TaxiDashboardPage() {
                                         {statusConfig.label}
                                       </div>
                                       {item.familyContact.propertyZip && (
-                                        <div className="text-sm text-gray-500">PLZ: {item.familyContact.propertyZip}</div>
+                                        <div className="text-sm text-zinc-500">PLZ: {item.familyContact.propertyZip}</div>
                                       )}
                                       {item.familyContact.contact1Phone && (
-                                        <div className="text-sm text-gray-500 mt-1">
+                                        <div className="text-sm text-zinc-500 mt-1">
                                           📞 {item.familyContact.contact1Phone}
                                         </div>
                                       )}
                                       {item.pickupNotes && (
-                                        <div className="mt-2 p-2 bg-yellow-500/10 rounded text-sm text-yellow-400">
+                                        <div className="mt-2 p-2 bg-orange-500/10 rounded text-sm text-orange-400">
                                           💡 {item.pickupNotes}
                                         </div>
                                       )}
@@ -670,11 +670,11 @@ export default function TaxiDashboardPage() {
                                   <Popup>
                                     <div className="min-w-[180px] p-2">
                                       <div className="font-bold text-lg mb-1 text-green-600">🎯 ZIEL: {mp.title}</div>
-                                      <div className="text-sm text-gray-600 mb-2">
+                                      <div className="text-sm text-zinc-600 mb-2">
                                         Hier alle Familien hinbringen!
                                       </div>
                                       {mp.location && (
-                                        <div className="text-sm text-gray-500">
+                                        <div className="text-sm text-zinc-500">
                                           📍 {mp.location}
                                         </div>
                                       )}
@@ -688,25 +688,25 @@ export default function TaxiDashboardPage() {
                             })()}
                           </MapContainer>
                           {/* Legende */}
-                          <div className="px-4 py-2 bg-gray-900/80 border-t border-gray-700/50 flex flex-wrap items-center gap-4 text-xs">
-                            <span className="text-gray-500">Status:</span>
+                          <div className="px-4 py-2 bg-zinc-900/80 border-t border-zinc-700/50 flex flex-wrap items-center gap-4 text-xs">
+                            <span className="text-zinc-500">Status:</span>
                             <div className="flex items-center gap-1.5">
-                              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                              <span className="text-gray-400">Zugewiesen</span>
+                              <div className="w-3 h-3 rounded-full bg-orange-500" />
+                              <span className="text-zinc-400">Zugewiesen</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <div className="w-3 h-3 rounded-full bg-orange-600" />
-                              <span className="text-gray-400">Unterwegs</span>
+                              <span className="text-zinc-400">Unterwegs</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <div className="w-3 h-3 rounded-full bg-purple-500" />
-                              <span className="text-gray-400">Abgeholt</span>
+                              <span className="text-zinc-400">Abgeholt</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <div className="w-3 h-3 rounded-full bg-green-500" />
-                              <span className="text-gray-400">Abgeliefert</span>
+                              <span className="text-zinc-400">Abgeliefert</span>
                             </div>
-                            <span className="text-gray-600">|</span>
+                            <span className="text-zinc-600">|</span>
                             <div className="flex items-center gap-1.5">
                               <div className="w-4 h-4 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-white" />
                               <span className="text-emerald-400 font-medium">🎯 Treffpunkt</span>
@@ -721,7 +721,7 @@ export default function TaxiDashboardPage() {
 
               {/* Fahrten-Liste - 1/3 */}
               <div className="lg:col-span-1 space-y-3">
-                <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-zinc-400 flex items-center gap-2">
                   <Navigation className="h-4 w-4" />
                   Fahrten-Liste
                 </h3>
@@ -731,7 +731,7 @@ export default function TaxiDashboardPage() {
                   const annotation = assignment.familyContact.mapAnnotations?.[0]
                   
                   return (
-                    <Card key={assignment.id} className="bg-gray-800/50 border-gray-700">
+                    <Card key={assignment.id} className="bg-zinc-800/50 border-zinc-700">
                       <CardContent className="p-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
@@ -745,7 +745,7 @@ export default function TaxiDashboardPage() {
                               {assignment.familyContact.familyName}
                             </h3>
                             
-                            <div className="mt-1 space-y-0.5 text-xs text-gray-400">
+                            <div className="mt-1 space-y-0.5 text-xs text-zinc-400">
                               {assignment.familyContact.propertyZip && (
                                 <div className="flex items-center gap-1">
                                   <MapPin className="h-3 w-3" />
@@ -767,7 +767,7 @@ export default function TaxiDashboardPage() {
                             </div>
                             
                             {assignment.pickupNotes && (
-                              <div className="mt-2 p-2 bg-yellow-500/10 rounded text-xs text-yellow-400">
+                              <div className="mt-2 p-2 bg-orange-500/10 rounded text-xs text-orange-400">
                                 💡 {assignment.pickupNotes}
                               </div>
                             )}
@@ -783,7 +783,7 @@ export default function TaxiDashboardPage() {
                                   status: nextStatus,
                                 })}
                                 disabled={updateStatusMutation.isPending}
-                                className="h-8 px-2 text-xs bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 border border-yellow-500/30"
+                                className="h-8 px-2 text-xs bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 border border-orange-500/30"
                               >
                                 {updateStatusMutation.isPending ? (
                                   <Loader2 className="h-3 w-3 animate-spin" />
@@ -820,19 +820,19 @@ export default function TaxiDashboardPage() {
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Tafelrunde Dropdown */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-gray-400">
-                <Calendar className="h-5 w-5 text-yellow-400" />
+              <div className="flex items-center gap-2 text-zinc-400">
+                <Calendar className="h-5 w-5 text-orange-400" />
                 <span className="text-sm font-medium">Tafelrunde:</span>
               </div>
               {tafelrundenLoading ? (
-                <div className="px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                  <Loader2 className="h-4 w-4 animate-spin text-yellow-400" />
+                <div className="px-4 py-2 bg-zinc-800/50 rounded-lg border border-zinc-700">
+                  <Loader2 className="h-4 w-4 animate-spin text-orange-400" />
                 </div>
               ) : (
                 <select
                   value={selectedTafelrunde || ''}
                   onChange={(e) => setSelectedTafelrunde(e.target.value || null)}
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/20 min-w-[200px]"
+                  className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 min-w-[200px]"
                 >
                   <option value="">Tafelrunde wählen...</option>
                   {tafelrunden.map((t) => (
@@ -847,7 +847,7 @@ export default function TaxiDashboardPage() {
                   size="sm"
                   variant="ghost"
                   onClick={() => queryClient.invalidateQueries({ queryKey: ['taxi-tafelrunde'] })}
-                  className="text-gray-400 hover:text-white"
+                  className="text-zinc-400 hover:text-white"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
@@ -855,15 +855,15 @@ export default function TaxiDashboardPage() {
               
               {/* Zeitinfo aus Tafelrunde */}
               {tafelrundeDetails && (tafelrundeDetails.pickupStartTime || tafelrundeDetails.arrivalDeadline) && (
-                <div className="flex items-center gap-4 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-sm">
+                <div className="flex items-center gap-4 px-3 py-1.5 bg-orange-500/10 border border-orange-500/30 rounded-lg text-sm">
                   {tafelrundeDetails.pickupStartTime && (
-                    <span className="flex items-center gap-1.5 text-yellow-300">
+                    <span className="flex items-center gap-1.5 text-orange-300">
                       <Clock className="h-3.5 w-3.5" />
                       Abholung ab: <strong>{tafelrundeDetails.pickupStartTime}</strong>
                     </span>
                   )}
                   {tafelrundeDetails.arrivalDeadline && (
-                    <span className="flex items-center gap-1.5 text-amber-300">
+                    <span className="flex items-center gap-1.5 text-orange-300">
                       <MapPin className="h-3.5 w-3.5" />
                       Spätestens da: <strong>{tafelrundeDetails.arrivalDeadline}</strong>
                     </span>
@@ -873,7 +873,7 @@ export default function TaxiDashboardPage() {
             </div>
 
             {/* Map Switcher */}
-            <div className="flex items-center gap-2 bg-gray-800/50 p-1 rounded-lg border border-gray-700">
+            <div className="flex items-center gap-2 bg-zinc-800/50 p-1 rounded-lg border border-zinc-700">
               {(Object.entries(MAP_CONFIG) as [keyof typeof MAP_CONFIG, typeof MAP_CONFIG[keyof typeof MAP_CONFIG]][]).map(([key, config]) => {
                 // Zähle Familien auf dieser Karte
                 const familiesOnMap = tafelrundeDetails?.families.filter(tf => 
@@ -886,15 +886,15 @@ export default function TaxiDashboardPage() {
                     onClick={() => setSelectedMapName(key)}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
                       selectedMapName === key
-                        ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                        ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                        : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
                     }`}
                   >
                     <Map className="h-4 w-4" />
                     {config.name}
                     {familiesOnMap > 0 && (
                       <span className={`px-1.5 py-0.5 rounded-full text-xs ${
-                        selectedMapName === key ? 'bg-yellow-500/30' : 'bg-gray-700'
+                        selectedMapName === key ? 'bg-orange-500/30' : 'bg-zinc-700'
                       }`}>
                         {familiesOnMap}
                       </span>
@@ -907,21 +907,21 @@ export default function TaxiDashboardPage() {
 
           {/* Main Content */}
           {!selectedTafelrunde ? (
-            <Card className="bg-gray-800/30 border-gray-700/50">
+            <Card className="bg-zinc-800/30 border-zinc-700/50">
               <CardContent className="py-16 text-center">
                 <div className="relative inline-block mb-4">
-                  <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-xl" />
-                  <Calendar className="h-16 w-16 text-gray-500 relative" />
+                  <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl" />
+                  <Calendar className="h-16 w-16 text-zinc-500 relative" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-300 mb-2">Keine Tafelrunde ausgewählt</h3>
-                <p className="text-gray-500">Wähle oben eine Tafelrunde aus, um die Abholungen zu sehen</p>
+                <h3 className="text-xl font-semibold text-zinc-300 mb-2">Keine Tafelrunde ausgewählt</h3>
+                <p className="text-zinc-500">Wähle oben eine Tafelrunde aus, um die Abholungen zu sehen</p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid lg:grid-cols-4 gap-4">
               {/* Map - 3/4 width */}
               <div className="lg:col-span-3">
-                <Card className="bg-gray-800/30 border-gray-700/50 overflow-hidden">
+                <Card className="bg-zinc-800/30 border-zinc-700/50 overflow-hidden">
                   <CardContent className="p-0">
                     {(() => {
                       const config = MAP_CONFIG[selectedMapName]
@@ -1015,7 +1015,7 @@ export default function TaxiDashboardPage() {
                                       {statusConfig.label}
                                     </div>
                                     {annotation.assignment?.driver && (
-                                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                                      <div className="flex items-center gap-2 text-sm text-zinc-500 mb-2">
                                         <User className="h-4 w-4" />
                                         {annotation.assignment.driver.icFirstName || annotation.assignment.driver.username}
                                       </div>
@@ -1050,8 +1050,8 @@ export default function TaxiDashboardPage() {
                                         }}
                                         className={`w-full mt-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                                           annotation.assignment?.driver
-                                            ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30'
-                                            : 'bg-yellow-500 text-gray-900 hover:bg-yellow-400'
+                                            ? 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 border border-orange-500/30'
+                                            : 'bg-orange-500 text-zinc-900 hover:bg-orange-400'
                                         }`}
                                       >
                                         {annotation.assignment?.driver ? 'Fahrer ändern' : 'Fahrer zuweisen'}
@@ -1099,11 +1099,11 @@ export default function TaxiDashboardPage() {
                               <Popup>
                                 <div className="min-w-[180px] p-2">
                                   <div className="font-bold text-lg mb-1 text-green-600">🎯 Treffpunkt</div>
-                                  <div className="text-sm text-gray-600 mb-2">
+                                  <div className="text-sm text-zinc-600 mb-2">
                                     Hier werden alle Familien hingebracht.
                                   </div>
                                   {tafelrundeDetails?.location && (
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm text-zinc-500">
                                       {tafelrundeDetails.location}
                                     </div>
                                   )}
@@ -1119,29 +1119,29 @@ export default function TaxiDashboardPage() {
                     })()}
                     
                     {/* Map Legend */}
-                    <div className="px-4 py-3 bg-gray-900/80 border-t border-gray-700/50 flex flex-wrap items-center gap-4 text-xs">
-                      <span className="text-gray-500 font-medium">Legende:</span>
+                    <div className="px-4 py-3 bg-zinc-900/80 border-t border-zinc-700/50 flex flex-wrap items-center gap-4 text-xs">
+                      <span className="text-zinc-500 font-medium">Legende:</span>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-gray-500" />
-                        <span className="text-gray-400">Ausstehend</span>
+                        <div className="w-3 h-3 rounded-full bg-zinc-500" />
+                        <span className="text-zinc-400">Ausstehend</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <span className="text-gray-400">Zugewiesen</span>
+                        <div className="w-3 h-3 rounded-full bg-orange-500" />
+                        <span className="text-zinc-400">Zugewiesen</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-orange-600" />
-                        <span className="text-gray-400">Unterwegs</span>
+                        <span className="text-zinc-400">Unterwegs</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-purple-500" />
-                        <span className="text-gray-400">Abgeholt</span>
+                        <span className="text-zinc-400">Abgeholt</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-green-500" />
-                        <span className="text-gray-400">Abgeliefert</span>
+                        <span className="text-zinc-400">Abgeliefert</span>
                       </div>
-                      <span className="text-gray-600">|</span>
+                      <span className="text-zinc-600">|</span>
                       <div className="flex items-center gap-1.5">
                         <div className="w-4 h-4 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-white" />
                         <span className="text-emerald-400 font-medium">🎯 Treffpunkt</span>
@@ -1153,14 +1153,14 @@ export default function TaxiDashboardPage() {
 
               {/* Family List - 1/4 width */}
               <div className="lg:col-span-1">
-                <Card className="bg-gray-800/30 border-gray-700/50 h-full">
+                <Card className="bg-zinc-800/30 border-zinc-700/50 h-full">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center justify-between">
                       <span className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-yellow-400" />
+                        <Users className="h-4 w-4 text-orange-400" />
                         Familien
                       </span>
-                      <span className="text-sm font-normal text-gray-500">
+                      <span className="text-sm font-normal text-zinc-500">
                         {tafelrundeDetails?.families.length || 0}
                       </span>
                     </CardTitle>
@@ -1182,8 +1182,8 @@ export default function TaxiDashboardPage() {
                             key={family.id}
                             className={`p-3 rounded-lg border transition-all ${
                               isOnCurrentMap 
-                                ? 'bg-yellow-500/5 border-yellow-500/20' 
-                                : 'bg-gray-900/30 border-gray-700/50'
+                                ? 'bg-orange-500/5 border-orange-500/20' 
+                                : 'bg-zinc-900/30 border-zinc-700/50'
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -1192,7 +1192,7 @@ export default function TaxiDashboardPage() {
                                   {family.familyName}
                                 </div>
                                 {assignment?.driver && (
-                                  <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
+                                  <div className="flex items-center gap-1 text-xs text-zinc-400 mt-0.5">
                                     <User className="h-3 w-3" />
                                     {assignment.driver.icFirstName || assignment.driver.username}
                                   </div>
@@ -1224,7 +1224,7 @@ export default function TaxiDashboardPage() {
                                       })
                                       setIsAssignDialogOpen(true)
                                     }}
-                                    className="text-xs text-yellow-400 hover:text-yellow-300"
+                                    className="text-xs text-orange-400 hover:text-orange-300"
                                   >
                                     Zuweisen
                                   </button>
@@ -1247,11 +1247,11 @@ export default function TaxiDashboardPage() {
                                         })
                                         setIsAssignDialogOpen(true)
                                       }}
-                                      className="text-xs text-blue-400 hover:text-blue-300"
+                                      className="text-xs text-orange-400 hover:text-orange-300"
                                     >
                                       Bearbeiten
                                     </button>
-                                    <span className="text-gray-600">|</span>
+                                    <span className="text-zinc-600">|</span>
                                     <button
                                       onClick={() => {
                                         if (confirm('Zuweisung wirklich entfernen?')) {
@@ -1276,7 +1276,7 @@ export default function TaxiDashboardPage() {
                                       })
                                     }}
                                     disabled={updateStatusMutation.isPending}
-                                    className="mt-1 text-xs bg-gray-800 border border-gray-600 rounded px-1 py-0.5 text-gray-300"
+                                    className="mt-1 text-xs bg-zinc-800 border border-zinc-600 rounded px-1 py-0.5 text-zinc-300"
                                   >
                                     <option value="PENDING">Ausstehend</option>
                                     <option value="ASSIGNED">Zugewiesen</option>
@@ -1293,7 +1293,7 @@ export default function TaxiDashboardPage() {
                       })}
                       
                       {(!tafelrundeDetails?.families || tafelrundeDetails.families.length === 0) && (
-                        <div className="text-center py-8 text-gray-500 text-sm">
+                        <div className="text-center py-8 text-zinc-500 text-sm">
                           Keine Familien zugesagt
                         </div>
                       )}
@@ -1313,7 +1313,7 @@ export default function TaxiDashboardPage() {
             <h3 className="text-lg font-semibold text-white">Zugangsschlüssel verwalten</h3>
             <Button
               onClick={() => setIsKeyDialogOpen(true)}
-              className="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 border border-yellow-500/30"
+              className="bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 border border-orange-500/30"
             >
               <Plus className="h-4 w-4 mr-2" />
               Neuen Key erstellen
@@ -1322,24 +1322,24 @@ export default function TaxiDashboardPage() {
 
           {keysLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-orange-400" />
             </div>
           ) : keys.length === 0 ? (
-            <Card className="bg-gray-800/50 border-gray-700">
+            <Card className="bg-zinc-800/50 border-zinc-700">
               <CardContent className="py-12 text-center">
-                <Key className="h-12 w-12 mx-auto mb-4 text-gray-500" />
-                <p className="text-gray-400">Keine Zugangsschlüssel erstellt</p>
+                <Key className="h-12 w-12 mx-auto mb-4 text-zinc-500" />
+                <p className="text-zinc-400">Keine Zugangsschlüssel erstellt</p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-3">
               {keys.map((key) => (
-                <Card key={key.id} className="bg-gray-800/50 border-gray-700">
+                <Card key={key.id} className="bg-zinc-800/50 border-zinc-700">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-lg font-mono text-yellow-400">{key.key}</code>
+                          <code className="text-lg font-mono text-orange-400">{key.key}</code>
                           <Button
                             size="sm"
                             variant="ghost"
@@ -1355,12 +1355,12 @@ export default function TaxiDashboardPage() {
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 mt-2 text-xs text-zinc-500">
                           <span className={`px-2 py-0.5 rounded ${
                             key.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' :
-                            key.status === 'USED' ? 'bg-blue-500/20 text-blue-400' :
+                            key.status === 'USED' ? 'bg-orange-500/20 text-orange-400' :
                             key.status === 'REVOKED' ? 'bg-red-500/20 text-red-400' :
-                            'bg-gray-500/20 text-gray-400'
+                            'bg-zinc-500/20 text-zinc-400'
                           }`}>
                             {key.status}
                           </span>
@@ -1368,7 +1368,7 @@ export default function TaxiDashboardPage() {
                           {key.note && <span>• {key.note}</span>}
                         </div>
                         {key.usedBy && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-zinc-500 mt-1">
                             Verwendet von: {key.usedBy.icFirstName || key.usedBy.username}
                           </div>
                         )}
@@ -1401,9 +1401,9 @@ export default function TaxiDashboardPage() {
           setSelectedFamily(null)
         }
       }}>
-        <DialogContent className="bg-gray-900 border-gray-700">
+        <DialogContent className="bg-zinc-900 border-zinc-700">
           <DialogHeader>
-            <DialogTitle className="text-yellow-400">
+            <DialogTitle className="text-orange-400">
               {editingAssignment ? 'Zuweisung bearbeiten' : 'Fahrer zuweisen'}
             </DialogTitle>
             <DialogDescription>
@@ -1419,7 +1419,7 @@ export default function TaxiDashboardPage() {
                 id="driver-select"
                 value={assignmentData.driverId}
                 onChange={(e) => setAssignmentData({ ...assignmentData, driverId: e.target.value })}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-full items-center justify-between rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">
                   {driversLoading ? "Lädt..." : "Fahrer wählen..."}
@@ -1439,7 +1439,7 @@ export default function TaxiDashboardPage() {
                 value={assignmentData.pickupTime}
                 onChange={(e) => setAssignmentData({ ...assignmentData, pickupTime: e.target.value })}
                 placeholder="z.B. 18:30"
-                className="bg-gray-800 border-gray-700"
+                className="bg-zinc-800 border-zinc-700"
               />
             </div>
             
@@ -1449,7 +1449,7 @@ export default function TaxiDashboardPage() {
                 value={assignmentData.pickupNotes}
                 onChange={(e) => setAssignmentData({ ...assignmentData, pickupNotes: e.target.value })}
                 placeholder="Hinweise zur Abholung..."
-                className="bg-gray-800 border-gray-700"
+                className="bg-zinc-800 border-zinc-700"
               />
             </div>
           </div>
@@ -1484,7 +1484,7 @@ export default function TaxiDashboardPage() {
                 }
               }}
               disabled={(editingAssignment ? false : !assignmentData.driverId) || assignDriverMutation.isPending || updateAssignmentMutation.isPending}
-              className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
+              className="bg-orange-500 text-zinc-900 hover:bg-orange-400"
             >
               {(assignDriverMutation.isPending || updateAssignmentMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {editingAssignment ? 'Speichern' : 'Zuweisen'}
@@ -1495,9 +1495,9 @@ export default function TaxiDashboardPage() {
 
       {/* Create Key Dialog */}
       <Dialog open={isKeyDialogOpen} onOpenChange={setIsKeyDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700">
+        <DialogContent className="bg-zinc-900 border-zinc-700">
           <DialogHeader>
-            <DialogTitle className="text-yellow-400">Neuen Zugangsschlüssel erstellen</DialogTitle>
+            <DialogTitle className="text-orange-400">Neuen Zugangsschlüssel erstellen</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
@@ -1508,7 +1508,7 @@ export default function TaxiDashboardPage() {
                 id="key-type-select"
                 value={newKeyData.type}
                 onChange={(e) => setNewKeyData({ ...newKeyData, type: e.target.value as any })}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="flex h-10 w-full items-center justify-between rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="SINGLE_USE">Einmalig</option>
                 <option value="MULTI_USE">Mehrfach</option>
@@ -1522,7 +1522,7 @@ export default function TaxiDashboardPage() {
                 id="masterKey"
                 checked={newKeyData.isMasterKey}
                 onChange={(e) => setNewKeyData({ ...newKeyData, isMasterKey: e.target.checked })}
-                className="rounded border-gray-700"
+                className="rounded border-zinc-700"
               />
               <Label htmlFor="masterKey" className="flex items-center gap-2">
                 <Crown className="h-4 w-4 text-purple-400" />
@@ -1536,7 +1536,7 @@ export default function TaxiDashboardPage() {
                 value={newKeyData.note}
                 onChange={(e) => setNewKeyData({ ...newKeyData, note: e.target.value })}
                 placeholder="z.B. Für Max Mustermann"
-                className="bg-gray-800 border-gray-700"
+                className="bg-zinc-800 border-zinc-700"
               />
             </div>
           </div>
@@ -1548,7 +1548,7 @@ export default function TaxiDashboardPage() {
             <Button
               onClick={() => createKeyMutation.mutate(newKeyData)}
               disabled={createKeyMutation.isPending}
-              className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
+              className="bg-orange-500 text-zinc-900 hover:bg-orange-400"
             >
               {createKeyMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Key erstellen

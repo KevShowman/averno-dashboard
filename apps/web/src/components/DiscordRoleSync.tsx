@@ -55,7 +55,7 @@ export default function DiscordRoleSync() {
             <Shield className="h-5 w-5" />
             Discord-Rollen-Synchronisation
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Lade Rollen-Informationen...
           </CardDescription>
         </CardHeader>
@@ -71,7 +71,7 @@ export default function DiscordRoleSync() {
             <Shield className="h-5 w-5" />
             Discord-Rollen-Synchronisation
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Fehler beim Laden der Rollen-Informationen
           </CardDescription>
         </CardHeader>
@@ -86,7 +86,7 @@ export default function DiscordRoleSync() {
           <Shield className="h-5 w-5" />
           Discord-Rollen-Synchronisation
         </CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-zinc-400">
           Deine Discord-Server-Rollen werden automatisch mit deiner System-Rolle synchronisiert
         </CardDescription>
       </CardHeader>
@@ -119,7 +119,7 @@ export default function DiscordRoleSync() {
         {/* Aktuelle System-Rolle */}
         <div>
           <h4 className="text-white font-medium mb-2">Aktuelle System-Rolle</h4>
-          <Badge variant="outline" className="bg-blue-900/20 text-blue-400 border-blue-400">
+          <Badge variant="outline" className="bg-orange-900/20 text-orange-400 border-orange-400">
             {roleInfo.currentRole}
           </Badge>
         </div>
@@ -153,7 +153,7 @@ export default function DiscordRoleSync() {
                 </Badge>
               ))
             ) : (
-              <span className="text-gray-500 text-sm">
+              <span className="text-zinc-500 text-sm">
                 Keine Discord-Rollen gefunden
               </span>
             )}
@@ -162,7 +162,7 @@ export default function DiscordRoleSync() {
 
         {/* Synchronisations-Button */}
         {roleInfo.hasAccess && (
-          <div className="pt-4 border-t border-gray-700">
+          <div className="pt-4 border-t border-zinc-700">
             <Button
               onClick={handleSyncRole}
               disabled={syncRoleMutation.isPending || isSyncing}
@@ -172,7 +172,7 @@ export default function DiscordRoleSync() {
               <RefreshCw className={`h-4 w-4 mr-2 ${(syncRoleMutation.isPending || isSyncing) ? 'animate-spin' : ''}`} />
               Rolle synchronisieren
             </Button>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-zinc-500 mt-2">
               Synchronisiert deine Discord-Rollen mit deinen System-Rollen (alle Rollen werden berücksichtigt)
             </p>
           </div>

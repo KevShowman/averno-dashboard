@@ -352,14 +352,14 @@ export default function SettingsPage() {
               <Users className="mr-2 h-5 w-5" />
               IC-Name ändern
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Ändere deinen In-Character Namen
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-zinc-400 mb-2 block">
                   IC Vorname
                 </label>
                 <Input
@@ -369,7 +369,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-zinc-400 mb-2 block">
                   IC Nachname
                 </label>
                 <Input
@@ -399,13 +399,13 @@ export default function SettingsPage() {
               <FlaskConical className="mr-2 h-5 w-5" />
               Paket-System-Einstellungen
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Konfiguriere Preise und Einstellungen für das Paket-Deposit-System
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm text-gray-400 mb-2 block">
+              <label className="text-sm text-zinc-400 mb-2 block">
                 Preis pro Paket (Schwarzgeld)
               </label>
               <div className="flex space-x-2">
@@ -425,7 +425,7 @@ export default function SettingsPage() {
                   Speichern
                 </Button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-zinc-500 mt-1">
                 Aktueller Preis: {formatCurrency(packagePriceData?.price || 1000)} pro Paket
               </p>
             </div>
@@ -441,7 +441,7 @@ export default function SettingsPage() {
               <Package className="mr-2 h-5 w-5" />
               Wochenabgabe-Einstellungen
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Konfiguriere die wöchentlichen Paket-Abgaben
             </CardDescription>
           </CardHeader>
@@ -449,7 +449,7 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">
+                  <label className="text-sm font-medium text-zinc-300">
                     Pakete pro Woche
                   </label>
                   <Input
@@ -457,15 +457,15 @@ export default function SettingsPage() {
                     value={weeklyDeliveryPackages}
                     onChange={(e) => setWeeklyDeliveryPackages(Number(e.target.value))}
                     placeholder="300"
-                    className="bg-gray-700 border-gray-600 text-white"
+                    className="bg-zinc-700 border-zinc-600 text-white"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-500">
                     Anzahl der Pakete, die wöchentlich abgegeben werden müssen
                   </p>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">
+                  <label className="text-sm font-medium text-zinc-300">
                     Schwarzgeld pro Paket
                   </label>
                   <Input
@@ -473,9 +473,9 @@ export default function SettingsPage() {
                     value={weeklyDeliveryMoneyPerPackage}
                     onChange={(e) => setWeeklyDeliveryMoneyPerPackage(Number(e.target.value))}
                     placeholder="1000"
-                    className="bg-gray-700 border-gray-600 text-white"
+                    className="bg-zinc-700 border-zinc-600 text-white"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-500">
                     Schwarzgeld-Betrag pro Paket für Wochenabgaben
                   </p>
                 </div>
@@ -504,17 +504,17 @@ export default function SettingsPage() {
               <Skull className="mr-2 h-5 w-5 text-red-500" />
               Blood List Discord-Channels
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Konfiguriere die Discord-Channels für Blood In/Out Ankündigungen
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!bloodListSettings?.isConfigured && (
-              <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg flex items-start gap-2">
-                <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div className="mb-4 p-3 bg-orange-900/20 border border-orange-500/30 rounded-lg flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-yellow-400 font-medium">Channels nicht konfiguriert</p>
-                  <p className="text-yellow-200/70 text-sm">
+                  <p className="text-orange-400 font-medium">Channels nicht konfiguriert</p>
+                  <p className="text-orange-200/70 text-sm">
                     Blood In/Out Funktionen sind deaktiviert, bis beide Channels ausgewählt wurden.
                   </p>
                 </div>
@@ -524,17 +524,17 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                     <Hash className="h-4 w-4 text-green-500" />
                     Blood In Ankündigungs-Channel
                   </label>
                   {loadingChannels ? (
-                    <div className="text-gray-400 text-sm">Lade Channels...</div>
+                    <div className="text-zinc-400 text-sm">Lade Channels...</div>
                   ) : (
                     <select
                       value={bloodInChannelId}
                       onChange={(e) => setBloodInChannelId(e.target.value)}
-                      className="w-full h-10 px-3 bg-gray-700 border border-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-full h-10 px-3 bg-zinc-700 border border-zinc-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <option value="">Channel auswählen...</option>
                       {discordChannels?.channels?.map((channel: any) => (
@@ -544,23 +544,23 @@ export default function SettingsPage() {
                       ))}
                     </select>
                   )}
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-500">
                     In diesem Channel werden Blood In Ankündigungen gepostet
                   </p>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                     <Hash className="h-4 w-4 text-red-500" />
                     Blood Out Ankündigungs-Channel
                   </label>
                   {loadingChannels ? (
-                    <div className="text-gray-400 text-sm">Lade Channels...</div>
+                    <div className="text-zinc-400 text-sm">Lade Channels...</div>
                   ) : (
                     <select
                       value={bloodOutChannelId}
                       onChange={(e) => setBloodOutChannelId(e.target.value)}
-                      className="w-full h-10 px-3 bg-gray-700 border border-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-full h-10 px-3 bg-zinc-700 border border-zinc-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <option value="">Channel auswählen...</option>
                       {discordChannels?.channels?.map((channel: any) => (
@@ -570,7 +570,7 @@ export default function SettingsPage() {
                       ))}
                     </select>
                   )}
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-500">
                     In diesem Channel werden Blood Out Ankündigungen gepostet + User wird gekickt
                   </p>
                 </div>
@@ -599,14 +599,14 @@ export default function SettingsPage() {
               <UserPlus className="mr-2 h-5 w-5 text-green-500" />
               Blood In Discord Rollen
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Diese Discord Rollen werden automatisch bei einem Blood In zugewiesen (nur Patron)
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {loadingRoles ? (
-                <div className="text-gray-400 text-sm">Lade Discord Rollen...</div>
+                <div className="text-zinc-400 text-sm">Lade Discord Rollen...</div>
               ) : discordRoles?.roles?.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-80 overflow-y-auto p-2">
                   {discordRoles.roles.map((role: { id: string; name: string; color: number }) => {
@@ -620,13 +620,13 @@ export default function SettingsPage() {
                         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                           isSelected 
                             ? 'bg-green-900/30 border-green-500/50' 
-                            : 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
+                            : 'bg-zinc-800/50 border-zinc-700 hover:border-zinc-600'
                         }`}
                       >
                         <Checkbox 
                           checked={isSelected} 
                           onCheckedChange={() => handleToggleBloodInRole(role.id)}
-                          className="border-gray-500"
+                          className="border-zinc-500"
                         />
                         <div 
                           className="w-3 h-3 rounded-full flex-shrink-0" 
@@ -638,7 +638,7 @@ export default function SettingsPage() {
                   })}
                 </div>
               ) : (
-                <div className="text-gray-400 text-sm">Keine Discord Rollen gefunden</div>
+                <div className="text-zinc-400 text-sm">Keine Discord Rollen gefunden</div>
               )}
 
               {bloodInRoleIds.length > 0 && (
@@ -686,34 +686,34 @@ export default function SettingsPage() {
         <Card className="lasanta-card">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
-              <Car className="mr-2 h-5 w-5 text-blue-500" />
+              <Car className="mr-2 h-5 w-5 text-orange-500" />
               Xiao Motors
             </CardTitle>
-            <CardDescription className="text-gray-400">
-              Konfiguriere das Codewort für Xiao Motors (oder leer lassen für "La Santa Calavera")
+            <CardDescription className="text-zinc-400">
+              Konfiguriere das Codewort für Xiao Motors (oder leer lassen für "El Averno Cartel")
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">
+                <label className="text-sm font-medium text-zinc-300">
                   Codewort (optional)
                 </label>
                 <Input
                   value={xiaoMotorsCodewort}
                   onChange={(e) => setXiaoMotorsCodewort(e.target.value)}
                   placeholder="Leer = Kein Codewort benötigt"
-                  className="bg-gray-700 border-gray-600 text-white"
+                  className="bg-zinc-700 border-zinc-600 text-white"
                 />
-                <p className="text-xs text-gray-500">
-                  Wenn leer: "Einfach sagen, dass man zu La Santa Calavera gehört"
+                <p className="text-xs text-zinc-500">
+                  Wenn leer: "Einfach sagen, dass man zu El Averno Cartel gehört"
                 </p>
               </div>
               
               {!xiaoMotorsCodewort && xiaoMotorsSettings?.codewort === '' && (
                 <div className="p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
                   <p className="text-green-400 text-sm">
-                    ✅ Aktuell kein Codewort - Mitglieder sagen einfach, dass sie zu La Santa Calavera gehören.
+                    ✅ Aktuell kein Codewort - Mitglieder sagen einfach, dass sie zu El Averno Cartel gehören.
                   </p>
                 </div>
               )}
@@ -758,21 +758,21 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-gray-800/50 rounded-lg">
+            <div className="text-center p-4 bg-zinc-800/50 rounded-lg">
               <div className="text-2xl font-bold text-white">
                 {users?.length || 0}
               </div>
-              <div className="text-sm text-gray-400">Registrierte Benutzer</div>
+              <div className="text-sm text-zinc-400">Registrierte Benutzer</div>
             </div>
             
-            <div className="text-center p-4 bg-gray-800/50 rounded-lg">
+            <div className="text-center p-4 bg-zinc-800/50 rounded-lg">
               <div className="text-2xl font-bold text-white">v1.2.0</div>
-              <div className="text-sm text-gray-400">System-Version</div>
+              <div className="text-sm text-zinc-400">System-Version</div>
             </div>
             
-            <div className="text-center p-4 bg-gray-800/50 rounded-lg">
+            <div className="text-center p-4 bg-zinc-800/50 rounded-lg">
               <div className="text-2xl font-bold text-accent">💀</div>
-              <div className="text-sm text-gray-400">LaSanta Calavera</div>
+              <div className="text-sm text-zinc-400">LaSanta Calavera</div>
             </div>
           </div>
         </CardContent>

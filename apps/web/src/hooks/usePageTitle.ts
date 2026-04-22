@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const BASE_TITLE = 'La Santa Calavera'
+const BASE_TITLE = 'El Averno Cartel'
 
 export function usePageTitle(pageTitle?: string) {
   useEffect(() => {

@@ -5,64 +5,64 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 3.7% 15.9%;
+    --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 3.7% 15.9%;
+    --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 3.7% 15.9%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 240 3.7% 15.9%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 240 5.9% 96%;
-    --secondary-foreground: 240 3.7% 15.9%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 240 5.9% 96%;
-    --muted-foreground: 240 3.7% 46%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 240 5.9% 96%;
-    --accent-foreground: 240 3.7% 15.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 3.7% 15.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 240 3.7% 15.9%;
-    --foreground: 0 0% 98%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 240 3.7% 15.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 240 3.7% 15.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 3.7% 15.9%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 240 3.8% 17.6%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 3.8% 17.6%;
-    --muted-foreground: 240 5.9% 65.9%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 240 3.8% 17.6%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 3.8% 17.6%;
-    --input: 240 3.8% 17.6%;
-    --ring: 0 0% 83.9%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -71,7 +71,7 @@
     @apply border-border;
   }
   html, body, #root {
-    background-color: rgb(0, 0, 0) !important; /* gray-900 */
+    background-color: rgb(255, 255, 255) !important; /* gray-900 */
     background-image: none !important;
     min-height: 100vh;
   }
@@ -91,14 +91,14 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgb(251, 111, 36, 0.6) 0%, rgb(245, 81, 11, 0.6) 100%);
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.4) 0%, rgba(245, 158, 11, 0.4) 100%);
     border-radius: 4px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, rgba(251, 111, 36, 0.9) 0%, rgba(245, 81, 11, 0.9) 100%);
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.7) 0%, rgba(245, 158, 11, 0.7) 100%);
     background-clip: padding-box;
   }
   
@@ -109,13 +109,13 @@
   /* Firefox scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(251, 81, 36, 0.4) rgba(17, 17, 17, 0.5);
+    scrollbar-color: rgba(251, 191, 36, 0.4) rgba(17, 17, 17, 0.5);
   }
 }
 
 /* Custom LaSanta Calavera styles */
 .lasanta-gradient {
-  background: linear-gradient(135deg, #d46f37 0%, #16161A 100%);
+  background: linear-gradient(135deg, #D4AF37 0%, #16161A 100%);
 }
 
 .lasanta-card {
@@ -125,7 +125,7 @@
 }
 
 .lasanta-button-primary {
-  background: ##d46f37;
+  background: #D4AF37;
   @apply hover:bg-opacity-90 text-black font-semibold;
 }
 
@@ -135,12 +135,12 @@
 }
 
 .lasanta-accent {
-  color: #ff6f00;
+  color: #FFD700;
 }
 
 .lasanta-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #d46f37 #16161A;
+  scrollbar-color: #D4AF37 #16161A;
 }
 
 .lasanta-scrollbar::-webkit-scrollbar {
@@ -152,18 +152,18 @@
 }
 
 .lasanta-scrollbar::-webkit-scrollbar-thumb {
-  background: #d46f37;
+  background: #D4AF37;
   border-radius: 4px;
 }
 
 .lasanta-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #ff6f00;
+  background: #FFD700;
 }
 
 /* Custom scrollbar for lists */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgb(212, 111, 55, 0.5) rgba(22, 22, 26, 0.5);
+  scrollbar-color: rgba(212, 175, 55, 0.5) rgba(22, 22, 26, 0.5);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -176,19 +176,19 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(212, 111, 55, 0.5);
+  background: rgba(212, 175, 55, 0.5);
   border-radius: 3px;
   transition: background 0.2s;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 111, 0, 0.8);
+  background: rgba(255, 215, 0, 0.8);
 }
 
 /* Modern sidebar scrollbar */
 .sidebar-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(251, 111, 36, 0.3) transparent;
+  scrollbar-color: rgba(251, 191, 36, 0.3) transparent;
 }
 
 .sidebar-scrollbar::-webkit-scrollbar {
@@ -201,13 +201,13 @@
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(251, 111, 36, 0.3);
+  background: rgba(251, 191, 36, 0.3);
   border-radius: 4px;
   transition: background 0.2s ease;
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(251, 111, 36, 0.6);
+  background: rgba(251, 191, 36, 0.6);
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-button {

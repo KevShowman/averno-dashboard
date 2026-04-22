@@ -68,15 +68,15 @@ const getRoleDisplayName = (role: string) => {
 
 const getRoleBadgeColor = (role: string) => {
   if (['PATRON', 'DON', 'CAPO'].includes(role)) {
-    return 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+    return 'bg-orange-500/20 text-orange-300 border-orange-500/30'
   }
   if (role === 'SICARIO') {
     return 'bg-red-500/20 text-red-300 border-red-500/30'
   }
   if (role === 'PARTNER') {
-    return 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+    return 'bg-orange-500/20 text-orange-300 border-orange-500/30'
   }
-  return 'bg-gray-500/20 text-gray-300 border-gray-500/30'
+  return 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30'
 }
 
 interface NavItem {
@@ -263,14 +263,14 @@ function NavGroupComponent({
         className={cn(
           "w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
           hasActiveItem
-            ? "bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-300"
-            : "text-gray-400 hover:text-white hover:bg-white/5"
+            ? "bg-gradient-to-r from-orange-500/20 to-orange-500/10 text-orange-300"
+            : "text-zinc-400 hover:text-white hover:bg-white/5"
         )}
       >
         <div className="flex items-center gap-3">
           <group.icon className={cn(
             "h-4 w-4",
-            hasActiveItem ? "text-amber-400" : "text-gray-500"
+            hasActiveItem ? "text-orange-400" : "text-zinc-500"
           )} />
           <span>{group.name}</span>
         </div>
@@ -293,13 +293,13 @@ function NavGroupComponent({
               className={cn(
                 "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200",
                 isActive(item.href)
-                  ? "bg-gradient-to-r from-amber-600/90 to-orange-600/90 text-white shadow-lg shadow-amber-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  ? "bg-gradient-to-r from-orange-600/90 to-orange-600/90 text-white shadow-lg shadow-orange-500/20"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
               <item.icon className={cn(
                 "h-4 w-4",
-                isActive(item.href) ? "text-white" : "text-gray-500"
+                isActive(item.href) ? "text-white" : "text-zinc-500"
               )} />
               <span>{item.name}</span>
             </Link>
@@ -400,7 +400,7 @@ export default function Layout({ children }: LayoutProps) {
 
   // Don't render navigation if not authenticated
   if (!isAuthenticated) {
-    return <div className="min-h-screen bg-gray-900">{children}</div>
+    return <div className="min-h-screen bg-zinc-900">{children}</div>
   }
 
   const SidebarContent = ({ onLinkClick, navRef }: { onLinkClick?: () => void; navRef?: React.RefObject<HTMLElement> }) => {
@@ -421,25 +421,25 @@ export default function Layout({ children }: LayoutProps) {
       <div className="p-5 border-b border-white/5">
         <Link to={isTaxiUser ? "/taxi" : (isPartnerUser ? "/app/partner" : "/app")} className="flex items-center gap-3 group" onClick={handleLinkClick}>
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/40 to-amber-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/40 to-orange-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
             <div className="relative w-14 h-14 flex items-center justify-center">
               <img 
                 src="/logo.png" 
-                alt="La Santa Calavera" 
+                alt="El Averno Cartel" 
                 className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(251,191,36,0.5)] group-hover:drop-shadow-[0_0_20px_rgba(251,191,36,0.7)] transition-all duration-300 group-hover:scale-105"
               />
             </div>
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white tracking-tight">La Santa</h1>
-            <p className="text-xs text-amber-400/80 font-medium -mt-0.5">Calavera</p>
+            <h1 className="text-lg font-bold text-white tracking-tight">El Averno</h1>
+            <p className="text-xs text-orange-400/80 font-medium -mt-0.5">Cartel</p>
             {isPartnerUser && (
-              <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-gray-700/50 text-gray-400 border border-gray-600/30">
+              <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-zinc-700/50 text-zinc-400 border border-zinc-600/30">
                 Partner-Zugang
               </span>
             )}
             {isTaxiUser && (
-              <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+              <span className="inline-flex px-1.5 py-0.5 mt-1 rounded text-[9px] font-medium bg-orange-500/20 text-orange-400 border border-orange-500/30">
                 🚕 Taxi{user?.isTaxiLead ? '-Leitung' : '-Fahrer'}
               </span>
             )}
@@ -469,18 +469,18 @@ export default function Layout({ children }: LayoutProps) {
       {user && (
         <div className="p-4 border-t border-white/5">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-red-500/10 rounded-2xl blur-xl" />
-            <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/5 p-4">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-2xl blur-xl" />
+            <div className="relative bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-xl rounded-2xl border border-white/5 p-4">
               <div className="flex items-center gap-3">
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
                     alt={getDisplayName(user)}
-                    className="h-11 w-11 rounded-xl object-cover ring-2 ring-amber-500/30"
+                    className="h-11 w-11 rounded-xl object-cover ring-2 ring-orange-500/30"
                   />
                 ) : (
-                  <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center ring-2 ring-amber-500/30">
-                    <User className="h-5 w-5 text-amber-400" />
+                  <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/20 flex items-center justify-center ring-2 ring-orange-500/30">
+                    <User className="h-5 w-5 text-orange-400" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -509,7 +509,7 @@ export default function Layout({ children }: LayoutProps) {
                       </span>
                     )}
                     {user.allRoles && user.allRoles.length > 2 && (
-                      <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-700/50 text-gray-400">
+                      <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-700/50 text-zinc-400">
                         +{user.allRoles.length - 2}
                       </span>
                     )}
@@ -519,7 +519,7 @@ export default function Layout({ children }: LayoutProps) {
               <Button
                 variant="ghost"
                 onClick={logout}
-                className="w-full mt-3 h-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl text-sm"
+                className="w-full mt-3 h-9 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl text-sm"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Abmelden
@@ -532,7 +532,7 @@ export default function Layout({ children }: LayoutProps) {
   )}
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-zinc-900">
       {/* Mobile sidebar backdrop */}
       <div 
         className={cn(
@@ -547,13 +547,13 @@ export default function Layout({ children }: LayoutProps) {
         "fixed left-0 top-0 bottom-0 z-50 w-72 transform transition-transform duration-300 ease-out lg:hidden",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5 shadow-2xl">
+        <div className="h-full flex flex-col bg-gradient-to-b from-zinc-900 via-zinc-900 to-zinc-950 border-r border-white/5 shadow-2xl">
           {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(false)}
-            className="absolute right-3 top-5 text-gray-400 hover:text-white z-10"
+            className="absolute right-3 top-5 text-zinc-400 hover:text-white z-10"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -564,7 +564,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-72">
-        <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5">
+        <div className="h-full flex flex-col bg-gradient-to-b from-zinc-900 via-zinc-900 to-zinc-950 border-r border-white/5">
           <SidebarContent navRef={desktopNavRef} />
         </div>
       </div>
@@ -572,12 +572,12 @@ export default function Layout({ children }: LayoutProps) {
       {/* Main content */}
       <div className="lg:pl-72">
         {/* Mobile top bar */}
-        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 bg-gray-900/80 backdrop-blur-xl border-b border-white/5 px-4 lg:hidden">
+        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 bg-zinc-900/80 backdrop-blur-xl border-b border-white/5 px-4 lg:hidden">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(true)}
-            className="text-gray-400 hover:text-white"
+            className="text-zinc-400 hover:text-white"
           >
             <Menu className="h-6 w-6" />
           </Button>
@@ -586,10 +586,10 @@ export default function Layout({ children }: LayoutProps) {
             <Link to="/app" className="flex items-center gap-2">
               <img 
                 src="/logo.png" 
-                alt="La Santa Calavera" 
+                alt="El Averno Cartel" 
                 className="h-9 w-9 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
               />
-              <span className="font-bold text-white">La Santa Calavera</span>
+              <span className="font-bold text-white">El Averno Cartel</span>
             </Link>
           </div>
 
@@ -597,7 +597,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="p-4 lg:p-6 min-h-[calc(100vh-4rem)] lg:min-h-screen bg-gray-900">
+        <main className="p-4 lg:p-6 min-h-[calc(100vh-4rem)] lg:min-h-screen bg-zinc-900">
           {children}
         </main>
       </div>

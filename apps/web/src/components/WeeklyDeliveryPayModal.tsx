@@ -55,7 +55,7 @@ export default function WeeklyDeliveryPayModal({
         {/* Glow Effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-green-500/20 to-emerald-600/20 blur-xl rounded-2xl" />
         
-        <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-emerald-500/30 shadow-2xl rounded-2xl overflow-hidden">
+        <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-emerald-500/30 shadow-2xl rounded-2xl overflow-hidden">
           {/* Header mit Gradient */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/50 via-green-800/30 to-transparent" />
@@ -78,11 +78,11 @@ export default function WeeklyDeliveryPayModal({
 
           <CardContent className="pt-2 pb-6 space-y-5">
             {/* Info Banner */}
-            <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 flex items-start gap-3">
-              <Package className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-orange-900/20 border border-orange-500/30 rounded-xl p-4 flex items-start gap-3">
+              <Package className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="text-blue-300 font-medium">Hinweis</p>
-                <p className="text-blue-200/70 mt-1">
+                <p className="text-orange-300 font-medium">Hinweis</p>
+                <p className="text-orange-200/70 mt-1">
                   Für die Wochenabgabe können nur Schwarzgeld-Zahlungen verwendet werden.
                 </p>
               </div>
@@ -90,35 +90,35 @@ export default function WeeklyDeliveryPayModal({
 
             {/* Status Cards */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-xs text-gray-400 uppercase tracking-wider">Bezahlt</span>
+                  <span className="text-xs text-zinc-400 uppercase tracking-wider">Bezahlt</span>
                 </div>
                 <p className="text-xl font-bold text-green-400">
                   {currentPaidMoney.toLocaleString('de-DE')}
                 </p>
-                <p className="text-xs text-gray-500">Schwarzgeld</p>
+                <p className="text-xs text-zinc-500">Schwarzgeld</p>
               </div>
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="h-4 w-4 text-yellow-400" />
-                  <span className="text-xs text-gray-400 uppercase tracking-wider">Offen</span>
+                  <AlertCircle className="h-4 w-4 text-orange-400" />
+                  <span className="text-xs text-zinc-400 uppercase tracking-wider">Offen</span>
                 </div>
-                <p className="text-xl font-bold text-yellow-400">
+                <p className="text-xl font-bold text-orange-400">
                   {Math.max(0, remainingMoney).toLocaleString('de-DE')}
                 </p>
-                <p className="text-xs text-gray-500">Schwarzgeld</p>
+                <p className="text-xs text-zinc-500">Schwarzgeld</p>
               </div>
             </div>
 
             {/* Divider */}
             <div className="relative py-1">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700/50" />
+                <div className="w-full border-t border-zinc-700/50" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-gray-900 px-3 text-xs text-gray-500 uppercase tracking-wider">
+                <span className="bg-zinc-900 px-3 text-xs text-zinc-500 uppercase tracking-wider">
                   Zahlung
                 </span>
               </div>
@@ -126,12 +126,12 @@ export default function WeeklyDeliveryPayModal({
 
             {/* Payment Input */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+              <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                 <Banknote className="h-4 w-4 text-emerald-400" />
                 Schwarzgeld-Betrag
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-zinc-500" />
                 <Input
                   type="number"
                   min={minimumPayment}
@@ -139,41 +139,41 @@ export default function WeeklyDeliveryPayModal({
                   value={paidMoney || ''}
                   onChange={(e) => setPaidMoney(Number(e.target.value) || 0)}
                   disabled={isLoading}
-                  className="pl-10 bg-gray-800/50 border-gray-700 focus:border-emerald-500 focus:ring-emerald-500/20 text-white placeholder:text-gray-500 h-12 text-lg"
+                  className="pl-10 bg-zinc-800/50 border-zinc-700 focus:border-emerald-500 focus:ring-emerald-500/20 text-white placeholder:text-zinc-500 h-12 text-lg"
                 />
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-zinc-500">
                 Minimum: {minimumPayment.toLocaleString('de-DE')} Schwarzgeld ({requiredPackages} Pakete × {moneyPerPackage.toLocaleString('de-DE')})
               </p>
             </div>
 
             {/* Summary */}
             {paidMoney > 0 && (
-              <div className={`rounded-xl p-4 border ${isFullyPaid ? 'bg-green-900/20 border-green-500/30' : 'bg-yellow-900/20 border-yellow-500/30'}`}>
+              <div className={`rounded-xl p-4 border ${isFullyPaid ? 'bg-green-900/20 border-green-500/30' : 'bg-orange-900/20 border-orange-500/30'}`}>
                 <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
                   {isFullyPaid ? (
                     <CheckCircle className="h-4 w-4 text-green-400" />
                   ) : (
-                    <AlertCircle className="h-4 w-4 text-yellow-400" />
+                    <AlertCircle className="h-4 w-4 text-orange-400" />
                   )}
                   Zusammenfassung
                 </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Bereits bezahlt</span>
+                    <span className="text-zinc-400">Bereits bezahlt</span>
                     <span className="text-white">{currentPaidMoney.toLocaleString('de-DE')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">+ Neue Zahlung</span>
+                    <span className="text-zinc-400">+ Neue Zahlung</span>
                     <span className="text-emerald-400 font-medium">+{paidMoney.toLocaleString('de-DE')}</span>
                   </div>
-                  <div className="flex justify-between border-t border-gray-700/50 pt-2">
-                    <span className="text-gray-400">Gesamt</span>
+                  <div className="flex justify-between border-t border-zinc-700/50 pt-2">
+                    <span className="text-zinc-400">Gesamt</span>
                     <span className="text-white font-bold">{totalPaidMoney.toLocaleString('de-DE')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Status</span>
-                    <span className={`font-semibold ${isFullyPaid ? 'text-green-400' : 'text-yellow-400'}`}>
+                    <span className="text-zinc-400">Status</span>
+                    <span className={`font-semibold ${isFullyPaid ? 'text-green-400' : 'text-orange-400'}`}>
                       {isFullyPaid ? '✓ Vollständig' : 'Teilzahlung'}
                     </span>
                   </div>
@@ -187,7 +187,7 @@ export default function WeeklyDeliveryPayModal({
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
                 disabled={isLoading}
               >
                 Abbrechen

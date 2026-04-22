@@ -69,7 +69,7 @@ export function TourCountModal({
         {/* Glow Effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-500/20 to-emerald-600/20 blur-xl rounded-2xl" />
         
-        <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-emerald-500/30 shadow-2xl rounded-2xl overflow-hidden">
+        <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-emerald-500/30 shadow-2xl rounded-2xl overflow-hidden">
           {/* Header mit Gradient */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/50 via-teal-800/30 to-transparent" />
@@ -94,7 +94,7 @@ export function TourCountModal({
                   size="icon"
                   onClick={handleClose}
                   disabled={isSaving}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                  className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -104,8 +104,8 @@ export function TourCountModal({
 
           <CardContent className="pt-2 pb-6 space-y-6">
             {/* User Info */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4 text-center">
-              <p className="text-gray-400 text-sm">Touren für</p>
+            <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4 text-center">
+              <p className="text-zinc-400 text-sm">Touren für</p>
               <p className="text-white font-semibold text-lg mt-1">{userName}</p>
             </div>
 
@@ -115,7 +115,7 @@ export function TourCountModal({
               <Button
                 onClick={handleDecrement}
                 disabled={tourCount <= 1 || isSaving}
-                className="h-16 w-16 rounded-full bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:from-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed transition-all shadow-lg shadow-red-500/25 disabled:shadow-none"
+                className="h-16 w-16 rounded-full bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:from-zinc-700 disabled:to-zinc-800 disabled:cursor-not-allowed transition-all shadow-lg shadow-red-500/25 disabled:shadow-none"
                 variant="default"
               >
                 <Minus className="h-8 w-8 text-white" />
@@ -126,7 +126,7 @@ export function TourCountModal({
                 <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 tabular-nums">
                   {tourCount}
                 </div>
-                <div className="text-sm text-gray-400 mt-2 font-medium">
+                <div className="text-sm text-zinc-400 mt-2 font-medium">
                   {tourCount === 1 ? 'Tour' : 'Touren'}
                 </div>
               </div>
@@ -135,7 +135,7 @@ export function TourCountModal({
               <Button
                 onClick={handleIncrement}
                 disabled={isSaving}
-                className="h-16 w-16 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-500/25 disabled:shadow-none"
+                className="h-16 w-16 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-zinc-700 disabled:to-zinc-800 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-500/25 disabled:shadow-none"
                 variant="default"
               >
                 <Plus className="h-8 w-8 text-white" />
@@ -145,7 +145,7 @@ export function TourCountModal({
             {/* Change Indicator */}
             {tourCount !== currentTourCount && (
               <div className="text-center text-sm">
-                <span className="text-gray-400">Änderung: </span>
+                <span className="text-zinc-400">Änderung: </span>
                 <span className={tourCount > currentTourCount ? 'text-green-400' : 'text-red-400'}>
                   {tourCount > currentTourCount ? '+' : ''}{tourCount - currentTourCount} Tour{Math.abs(tourCount - currentTourCount) !== 1 ? 'en' : ''}
                 </span>
@@ -158,7 +158,7 @@ export function TourCountModal({
                 onClick={handleClose}
                 disabled={isSaving}
                 variant="outline"
-                className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
               >
                 Abbrechen
               </Button>

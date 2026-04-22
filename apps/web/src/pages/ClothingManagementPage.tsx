@@ -174,17 +174,17 @@ export default function ClothingManagementPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+          <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
             <Settings className="h-8 w-8 text-white" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Kleidungsverwaltung</h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-zinc-400 mt-1">
               Verwalte die 5 Männer-Outfits und Sicario-Kleidung
             </p>
           </div>
@@ -192,15 +192,15 @@ export default function ClothingManagementPage() {
       </div>
 
       {/* Tab Selector */}
-      <Card className="bg-gray-900/50 border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <button
               onClick={() => setActiveTab('outfits')}
               className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
                 activeTab === 'outfits'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-lg shadow-amber-500/25' 
-                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
+                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
               }`}
             >
               <User className="mr-2 h-4 w-4" />
@@ -210,8 +210,8 @@ export default function ClothingManagementPage() {
               onClick={() => setActiveTab('sicario')}
               className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
                 activeTab === 'sicario'
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-gray-900 shadow-lg shadow-orange-500/25' 
-                  : 'border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
+                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
               }`}
             >
               <Crosshair className="mr-2 h-4 w-4" />
@@ -225,10 +225,10 @@ export default function ClothingManagementPage() {
       {activeTab === 'outfits' && (
         <>
           {/* Outfit Selector */}
-          <Card className="bg-gray-900/50 border-gray-800">
-            <CardHeader className="border-b border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
+            <CardHeader className="border-b border-zinc-800">
               <CardTitle className="text-white flex items-center gap-2">
-                <Shirt className="h-5 w-5 text-amber-400" />
+                <Shirt className="h-5 w-5 text-orange-400" />
                 Outfit auswählen
               </CardTitle>
             </CardHeader>
@@ -263,8 +263,8 @@ export default function ClothingManagementPage() {
                       }}
                       className={`p-4 rounded-xl border transition-all ${
                         selectedOutfit === num
-                          ? 'border-amber-500 bg-amber-500/10'
-                          : 'border-gray-700 bg-gray-800/30 hover:border-gray-600'
+                          ? 'border-orange-500 bg-orange-500/10'
+                          : 'border-zinc-700 bg-zinc-800/30 hover:border-zinc-600'
                       }`}
                     >
                       <img
@@ -287,21 +287,21 @@ export default function ClothingManagementPage() {
 
           {/* Outfit Editor */}
           {outfitsLoading ? (
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card className="bg-zinc-900/50 border-zinc-800">
               <CardContent className="flex items-center justify-center py-16">
                 <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-                  <p className="text-gray-400">Lade Outfits...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+                  <p className="text-zinc-400">Lade Outfits...</p>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-              <CardHeader className="border-b border-gray-800">
+            <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+              <CardHeader className="border-b border-zinc-800">
                 <CardTitle className="text-white">
                   Outfit {selectedOutfit} bearbeiten
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-zinc-400">
                   Lege für jedes Kleidungsstück die Item-ID und Variation fest.
                 </CardDescription>
               </CardHeader>
@@ -309,29 +309,29 @@ export default function ClothingManagementPage() {
                 {/* Name & Image Preview */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-gray-300">Outfit Name</Label>
+                    <Label className="text-zinc-300">Outfit Name</Label>
                     <Input
                       type="text"
                       placeholder="z.B. Business Casual"
                       value={outfitForm.name || ''}
                       onChange={(e) => handleOutfitChange('name', e.target.value)}
-                      className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
+                      className="bg-zinc-800/50 border-zinc-700 text-white h-10 focus:border-orange-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-gray-300">Outfit Bild</Label>
+                    <Label className="text-zinc-300">Outfit Bild</Label>
                     <div className="flex gap-3 items-center">
                       <img
                         src={`/outfit-images/outfit-${selectedOutfit}.png`}
                         alt={`Outfit ${selectedOutfit}`}
-                        className="h-20 w-20 rounded-lg object-cover border border-gray-700"
+                        className="h-20 w-20 rounded-lg object-cover border border-zinc-700"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
                         }}
                       />
-                      <p className="text-gray-500 text-sm">
+                      <p className="text-zinc-500 text-sm">
                         Bilder werden statisch über<br />
-                        <code className="text-amber-400">/outfit-images/outfit-{selectedOutfit}.png</code><br />
+                        <code className="text-orange-400">/outfit-images/outfit-{selectedOutfit}.png</code><br />
                         bereitgestellt.
                       </p>
                     </div>
@@ -340,27 +340,27 @@ export default function ClothingManagementPage() {
 
                 {/* Clothing Parts */}
                 {clothingParts.map((part) => (
-                  <div key={part.id} className="space-y-4 border-b border-gray-800 pb-6 last:border-0">
+                  <div key={part.id} className="space-y-4 border-b border-zinc-800 pb-6 last:border-0">
                     <h3 className="text-lg font-semibold text-white">{part.label}</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-gray-300 text-sm">Item</Label>
+                        <Label className="text-zinc-300 text-sm">Item</Label>
                         <Input
                           type="number"
                           placeholder="z.B. 1"
                           value={outfitForm[part.itemKey as keyof MaleOutfit] ?? ''}
                           onChange={(e) => handleOutfitChange(part.itemKey, e.target.value ? parseInt(e.target.value) : null)}
-                          className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
+                          className="bg-zinc-800/50 border-zinc-700 text-white h-10 focus:border-orange-500"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-gray-300 text-sm">Variation</Label>
+                        <Label className="text-zinc-300 text-sm">Variation</Label>
                         <Input
                           type="number"
                           placeholder="z.B. 0"
                           value={outfitForm[part.varKey as keyof MaleOutfit] ?? ''}
                           onChange={(e) => handleOutfitChange(part.varKey, e.target.value ? parseInt(e.target.value) : null)}
-                          className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-amber-500"
+                          className="bg-zinc-800/50 border-zinc-700 text-white h-10 focus:border-orange-500"
                         />
                       </div>
                     </div>
@@ -371,7 +371,7 @@ export default function ClothingManagementPage() {
                   <Button
                     onClick={handleSaveOutfit}
                     disabled={updateOutfitMutation.isPending}
-                    className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900 h-11 px-6"
+                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-zinc-900 h-11 px-6"
                   >
                     {updateOutfitMutation.isPending ? (
                       <>
@@ -394,13 +394,13 @@ export default function ClothingManagementPage() {
 
       {/* Sicario Tab */}
       {activeTab === 'sicario' && (
-        <Card className="bg-gray-900/50 border-orange-500/30 overflow-hidden">
+        <Card className="bg-zinc-900/50 border-orange-500/30 overflow-hidden">
           <CardHeader className="border-b border-orange-500/20">
             <CardTitle className="text-white flex items-center gap-2">
               <Crosshair className="h-5 w-5 text-orange-400" />
               Sicario Kleidung (Männlich)
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Lege die spezielle Sicario-Kleidung fest. Frauen haben automatisch freie Wahl.
             </CardDescription>
           </CardHeader>
@@ -415,7 +415,7 @@ export default function ClothingManagementPage() {
                   const partData = sicarioForm[part.id] || { item: null, variation: null, customizable: false, color: null }
                   
                   return (
-                    <div key={part.id} className="space-y-4 border-b border-gray-800 pb-6 last:border-0">
+                    <div key={part.id} className="space-y-4 border-b border-zinc-800 pb-6 last:border-0">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-white">{part.label}</h3>
                         {partData.customizable && (
@@ -424,7 +424,7 @@ export default function ClothingManagementPage() {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-gray-300 text-sm">Item</Label>
+                          <Label className="text-zinc-300 text-sm">Item</Label>
                           <Input
                             type="number"
                             placeholder="z.B. 1"
@@ -434,11 +434,11 @@ export default function ClothingManagementPage() {
                               [part.id]: { ...partData, item: e.target.value ? parseInt(e.target.value) : null }
                             }))}
                             disabled={partData.customizable}
-                            className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-orange-500"
+                            className="bg-zinc-800/50 border-zinc-700 text-white h-10 focus:border-orange-500"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-gray-300 text-sm">Variation</Label>
+                          <Label className="text-zinc-300 text-sm">Variation</Label>
                           <Input
                             type="number"
                             placeholder="z.B. 0"
@@ -448,11 +448,11 @@ export default function ClothingManagementPage() {
                               [part.id]: { ...partData, variation: e.target.value ? parseInt(e.target.value) : null }
                             }))}
                             disabled={partData.customizable}
-                            className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-orange-500"
+                            className="bg-zinc-800/50 border-zinc-700 text-white h-10 focus:border-orange-500"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-gray-300 text-sm">Farbname</Label>
+                          <Label className="text-zinc-300 text-sm">Farbname</Label>
                           <Input
                             type="text"
                             placeholder="z.B. schwarz"
@@ -462,7 +462,7 @@ export default function ClothingManagementPage() {
                               [part.id]: { ...partData, color: e.target.value || null }
                             }))}
                             disabled={!partData.customizable}
-                            className="bg-gray-800/50 border-gray-700 text-white h-10 focus:border-orange-500"
+                            className="bg-zinc-800/50 border-zinc-700 text-white h-10 focus:border-orange-500"
                           />
                         </div>
                         <div className="flex items-end">
@@ -482,7 +482,7 @@ export default function ClothingManagementPage() {
                                 }))
                               }}
                             />
-                            <Label htmlFor={`sicario-${part.id}-customizable`} className="text-sm text-gray-300 cursor-pointer">
+                            <Label htmlFor={`sicario-${part.id}-customizable`} className="text-sm text-zinc-300 cursor-pointer">
                               Anpassbar
                             </Label>
                           </div>
@@ -518,12 +518,12 @@ export default function ClothingManagementPage() {
       )}
 
       {/* Info Box */}
-      <Card className="bg-blue-500/10 border-blue-500/30">
+      <Card className="bg-orange-500/10 border-orange-500/30">
         <CardContent className="p-4 flex items-start gap-3">
-          <Shirt className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-300">
+          <Shirt className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-orange-300">
             <p className="font-medium mb-1">Hinweis zum neuen Kleidungssystem:</p>
-            <ul className="list-disc list-inside space-y-1 text-blue-200/80">
+            <ul className="list-disc list-inside space-y-1 text-orange-200/80">
               <li><strong>Männer</strong> wählen eines der 5 vordefinierten Outfits</li>
               <li><strong>Frauen</strong> haben automatisch freie Klamottenwahl</li>
               <li><strong>Sicarios</strong> haben zusätzlich Zugriff auf die spezielle Sicario-Kleidung</li>

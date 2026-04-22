@@ -88,13 +88,13 @@ export default function DiscordMembersManager() {
     switch (role) {
       case 'PATRON': return 'bg-red-900/20 text-red-400 border-red-400'
       case 'DON': return 'bg-purple-900/20 text-purple-400 border-purple-400'
-      case 'CAPO': return 'bg-blue-900/20 text-blue-400 border-blue-400'
-      case 'LOGISTICA': return 'bg-cyan-900/20 text-cyan-400 border-cyan-400'
+      case 'CAPO': return 'bg-orange-900/20 text-orange-400 border-orange-400'
+      case 'LOGISTICA': return 'bg-orange-900/20 text-orange-400 border-orange-400'
       case 'ROUTENVERWALTUNG': return 'bg-orange-900/20 text-orange-400 border-orange-400'
-      case 'SICARIO': return 'bg-yellow-900/20 text-yellow-400 border-yellow-400'
-      case 'LINCE': return 'bg-gray-900/20 text-gray-400 border-gray-400'
+      case 'SICARIO': return 'bg-orange-900/20 text-orange-400 border-orange-400'
+      case 'LINCE': return 'bg-zinc-900/20 text-zinc-400 border-zinc-400'
       case 'FUTURO': return 'bg-slate-900/20 text-slate-500 border-slate-600'
-      default: return 'bg-gray-900/20 text-gray-400 border-gray-400'
+      default: return 'bg-zinc-900/20 text-zinc-400 border-zinc-400'
     }
   }
 
@@ -130,7 +130,7 @@ export default function DiscordMembersManager() {
             <Users className="h-5 w-5" />
             Discord-Server-Mitglieder
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Lade Discord-Server-Mitglieder...
           </CardDescription>
         </CardHeader>
@@ -146,7 +146,7 @@ export default function DiscordMembersManager() {
             <Users className="h-5 w-5" />
             Discord-Server-Mitglieder
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Fehler beim Laden der Discord-Server-Mitglieder
           </CardDescription>
         </CardHeader>
@@ -175,7 +175,7 @@ export default function DiscordMembersManager() {
               <Users className="h-5 w-5" />
               Discord-Server-Mitglieder
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Mitglieder mit erlaubten Discord-Rollen ({members.length} gefunden)
             </CardDescription>
           </div>
@@ -205,10 +205,10 @@ export default function DiscordMembersManager() {
       <CardContent>
         {/* Statistiken */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-blue-900/20 border border-blue-400/20 rounded-lg p-4">
+          <div className="bg-orange-900/20 border border-orange-400/20 rounded-lg p-4">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-blue-400" />
-              <span className="text-blue-400 text-sm font-medium">Gesamt</span>
+              <Users className="h-4 w-4 text-orange-400" />
+              <span className="text-orange-400 text-sm font-medium">Gesamt</span>
             </div>
             <div className="text-2xl font-bold text-white mt-1">{members.length}</div>
           </div>
@@ -234,12 +234,12 @@ export default function DiscordMembersManager() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-gray-400">Benutzer</TableHead>
-                  <TableHead className="text-gray-400">Discord-Rollen</TableHead>
-                  <TableHead className="text-gray-400">System-Rolle</TableHead>
-                  <TableHead className="text-gray-400">Beigetreten</TableHead>
-                  <TableHead className="text-gray-400">Status</TableHead>
-                  <TableHead className="text-gray-400">Aktionen</TableHead>
+                  <TableHead className="text-zinc-400">Benutzer</TableHead>
+                  <TableHead className="text-zinc-400">Discord-Rollen</TableHead>
+                  <TableHead className="text-zinc-400">System-Rolle</TableHead>
+                  <TableHead className="text-zinc-400">Beigetreten</TableHead>
+                  <TableHead className="text-zinc-400">Status</TableHead>
+                  <TableHead className="text-zinc-400">Aktionen</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -254,7 +254,7 @@ export default function DiscordMembersManager() {
                             className="w-8 h-8 rounded-full"
                           />
                         ) : (
-                          <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-zinc-600 rounded-full flex items-center justify-center">
                             <span className="text-xs text-white">
                               {member.username.charAt(0).toUpperCase()}
                             </span>
@@ -265,7 +265,7 @@ export default function DiscordMembersManager() {
                             {member.username}
                             {member.discriminator !== '0' && `#${member.discriminator}`}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500">
                             ID: {member.discordId}
                           </div>
                         </div>
@@ -292,11 +292,11 @@ export default function DiscordMembersManager() {
                       >
                         {getRoleDisplayName(member.highestSystemRole)}
                       </Badge>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-zinc-500 mt-1">
                         {member.highestRoleName}
                       </div>
                     </TableCell>
-                    <TableCell className="text-gray-400 text-sm">
+                    <TableCell className="text-zinc-400 text-sm">
                       {formatDate(member.joinedAt)}
                     </TableCell>
                     <TableCell>
@@ -332,11 +332,11 @@ export default function DiscordMembersManager() {
           </div>
         ) : (
           <div className="text-center py-8">
-            <Users className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">
+            <Users className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
+            <p className="text-zinc-400">
               Keine Discord-Server-Mitglieder mit erlaubten Rollen gefunden
             </p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-zinc-500 text-sm mt-2">
               Stelle sicher, dass der Discord Bot die richtigen Berechtigungen hat
             </p>
           </div>

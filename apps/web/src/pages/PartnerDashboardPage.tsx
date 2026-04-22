@@ -10,16 +10,16 @@ export default function PartnerDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent rounded-2xl border border-amber-500/20 p-6">
+      <div className="bg-gradient-to-r from-orange-500/10 via-orange-600/5 to-transparent rounded-2xl border border-orange-500/20 p-6">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-amber-500/20 rounded-xl">
-            <Shield className="h-8 w-8 text-amber-400" />
+          <div className="p-3 bg-orange-500/20 rounded-xl">
+            <Shield className="h-8 w-8 text-orange-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">
               Willkommen, {user?.username}!
             </h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-zinc-400 mt-1">
               Partner-Bereich mit vollem Zugang
             </p>
           </div>
@@ -31,7 +31,7 @@ export default function PartnerDashboardPage() {
         <div className="flex items-start gap-3">
           <Star className="h-5 w-5 text-emerald-400 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-gray-300 text-sm">
+            <p className="text-zinc-300 text-sm">
               Als Partner hast du vollen Zugang zur interaktiven Karte und zur Listenführung. 
               Du kannst Standorte direkt erstellen, bearbeiten und Familien-Kontakte verwalten.
             </p>
@@ -44,21 +44,21 @@ export default function PartnerDashboardPage() {
         {/* Interactive Map */}
         <Link 
           to="/karte"
-          className="group bg-gray-800/50 hover:bg-gray-800/70 rounded-2xl border border-gray-700/50 hover:border-amber-500/30 p-6 transition-all duration-300"
+          className="group bg-zinc-800/50 hover:bg-zinc-800/70 rounded-2xl border border-zinc-700/50 hover:border-orange-500/30 p-6 transition-all duration-300"
         >
           <div className="flex items-start gap-4">
             <div className="p-4 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl group-hover:from-emerald-500/30 group-hover:to-emerald-600/20 transition-all">
               <Map className="h-8 w-8 text-emerald-400" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-white group-hover:text-amber-400 transition-colors">
+              <h2 className="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors">
                 Interaktive Karte
               </h2>
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="text-zinc-400 text-sm mt-2">
                 Verwalte alle Familien-Standorte auf der Karte. 
                 Erstelle neue Markierungen und bearbeite bestehende Einträge.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-amber-400 text-sm font-medium">
+              <div className="mt-4 flex items-center gap-2 text-orange-400 text-sm font-medium">
                 <span>Zur Karte</span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </div>
@@ -69,21 +69,21 @@ export default function PartnerDashboardPage() {
         {/* List Management */}
         <Link 
           to="/listenfuehrung"
-          className="group bg-gray-800/50 hover:bg-gray-800/70 rounded-2xl border border-gray-700/50 hover:border-amber-500/30 p-6 transition-all duration-300"
+          className="group bg-zinc-800/50 hover:bg-zinc-800/70 rounded-2xl border border-zinc-700/50 hover:border-orange-500/30 p-6 transition-all duration-300"
         >
           <div className="flex items-start gap-4">
-            <div className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl group-hover:from-blue-500/30 group-hover:to-blue-600/20 transition-all">
-              <List className="h-8 w-8 text-blue-400" />
+            <div className="p-4 bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl group-hover:from-orange-500/30 group-hover:to-orange-600/20 transition-all">
+              <List className="h-8 w-8 text-orange-400" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-white group-hover:text-amber-400 transition-colors">
+              <h2 className="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors">
                 Listenführung
               </h2>
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="text-zinc-400 text-sm mt-2">
                 Verwalte Familien-Kontakte und deren Informationen. 
                 Erstelle neue Einträge und aktualisiere bestehende Daten.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-amber-400 text-sm font-medium">
+              <div className="mt-4 flex items-center gap-2 text-orange-400 text-sm font-medium">
                 <span>Zur Listenführung</span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </div>
@@ -93,9 +93,9 @@ export default function PartnerDashboardPage() {
       </div>
 
       {/* Guidelines */}
-      <div className="bg-gray-800/30 rounded-2xl border border-gray-700/50 p-6">
+      <div className="bg-zinc-800/30 rounded-2xl border border-zinc-700/50 p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Hinweise für Partner</h3>
-        <ul className="space-y-3 text-gray-400 text-sm">
+        <ul className="space-y-3 text-zinc-400 text-sm">
           <li className="flex items-start gap-2">
             <span className="text-emerald-400 mt-1">✓</span>
             <span>Du hast vollen Zugang zur Karte und Listenführung</span>
@@ -109,11 +109,11 @@ export default function PartnerDashboardPage() {
             <span>Verwalte Familien-Kontakte in der Listenführung</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber-400 mt-1">•</span>
+            <span className="text-orange-400 mt-1">•</span>
             <span>Kontaktdaten (Telefon, Namen) sind aus Datenschutzgründen nicht sichtbar</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber-400 mt-1">•</span>
+            <span className="text-orange-400 mt-1">•</span>
             <span>Bei Fragen wende dich an die Leadership</span>
           </li>
         </ul>

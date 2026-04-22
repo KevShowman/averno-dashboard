@@ -202,7 +202,7 @@ export default function SicarioPage() {
       <div className="flex items-center justify-center h-96">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
-          <span className="text-gray-400 text-lg">Zugang wird geprüft...</span>
+          <span className="text-zinc-400 text-lg">Zugang wird geprüft...</span>
         </div>
       </div>
     )
@@ -213,13 +213,13 @@ export default function SicarioPage() {
       <div className="flex items-center justify-center h-96">
         <div className="relative">
           <div className="absolute -inset-4 bg-gradient-to-r from-red-500/20 via-rose-500/20 to-red-500/20 blur-xl opacity-70 pointer-events-none" />
-          <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-2 border-red-500/50 max-w-md">
+          <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border-2 border-red-500/50 max-w-md">
             <CardContent className="pt-8 pb-8 text-center">
               <div className="p-4 bg-red-500/20 rounded-2xl w-fit mx-auto mb-4">
                 <Lock className="h-16 w-16 text-red-500" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Zugang verweigert</h2>
-              <p className="text-gray-400">
+              <p className="text-zinc-400">
                 Dieser Bereich ist nur für Sicarios und Leaderschaft zugänglich.
               </p>
             </CardContent>
@@ -234,7 +234,7 @@ export default function SicarioPage() {
       <div className="flex items-center justify-center h-96">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
-          <span className="text-gray-400 text-lg">Lädt Sicario-Daten...</span>
+          <span className="text-zinc-400 text-lg">Lädt Sicario-Daten...</span>
         </div>
       </div>
     )
@@ -292,7 +292,7 @@ export default function SicarioPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-red-500/20">
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-red-500/20">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-rose-500/20 rounded-lg">
                   <Skull className="h-5 w-5 text-rose-400" />
@@ -347,7 +347,7 @@ export default function SicarioPage() {
                 return (
                   <div
                     key={auf.id}
-                    className="group/item flex items-center justify-between p-4 bg-gray-900/50 backdrop-blur-sm rounded-xl cursor-pointer hover:bg-gray-800/70 transition-all duration-300 border border-red-600/30 hover:border-red-500/60 hover:shadow-lg hover:shadow-red-500/10"
+                    className="group/item flex items-center justify-between p-4 bg-zinc-900/50 backdrop-blur-sm rounded-xl cursor-pointer hover:bg-zinc-800/70 transition-all duration-300 border border-red-600/30 hover:border-red-500/60 hover:shadow-lg hover:shadow-red-500/10"
                     onClick={() => setSelectedAufstellung(auf.id)}
                   >
                     <div className="flex items-center gap-4 flex-1">
@@ -358,7 +358,7 @@ export default function SicarioPage() {
                         <div className="text-white font-semibold text-lg group-hover/item:text-red-400 transition-colors">
                           {auf.reason}
                         </div>
-                        <div className="flex items-center gap-3 text-gray-300 text-sm mt-1 flex-wrap">
+                        <div className="flex items-center gap-3 text-zinc-300 text-sm mt-1 flex-wrap">
                           <span className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5 text-red-400" />
                             {date}
@@ -441,7 +441,7 @@ export default function SicarioPage() {
                     className={`group relative overflow-hidden cursor-pointer transition-all duration-300 rounded-xl border ${
                       isSelected
                         ? 'bg-gradient-to-br from-red-900/50 to-rose-900/40 border-red-500 shadow-lg shadow-red-500/20 scale-[1.02]'
-                        : 'bg-gray-900/50 border-gray-800 hover:border-red-500/50 hover:bg-gray-900/80 hover:shadow-md'
+                        : 'bg-zinc-900/50 border-zinc-800 hover:border-red-500/50 hover:bg-zinc-900/80 hover:shadow-md'
                     }`}
                     onClick={() => setSelectedAufstellung(auf.id)}
                   >
@@ -457,30 +457,30 @@ export default function SicarioPage() {
                             <h3 className={`font-semibold text-lg mb-1 transition-colors ${isSelected ? 'text-red-300' : 'text-white group-hover:text-red-300'}`}>
                               {auf.reason}
                             </h3>
-                            <p className="text-sm text-gray-400 flex items-center gap-1">
+                            <p className="text-sm text-zinc-400 flex items-center gap-1">
                               <Users className="h-3 w-3" />
                               {getDisplayName(auf.createdBy)}
                             </p>
                           </div>
                         </div>
                         {deadlinePassed && (
-                          <Badge className="bg-gray-800 text-gray-400 border-gray-600 text-xs shrink-0">
+                          <Badge className="bg-zinc-800 text-zinc-400 border-zinc-600 text-xs shrink-0">
                             Vorbei
                           </Badge>
                         )}
                       </div>
 
                       <div className="flex items-center gap-4 text-sm mt-4 flex-wrap">
-                        <span className="flex items-center gap-1.5 text-gray-300">
+                        <span className="flex items-center gap-1.5 text-zinc-300">
                           <Calendar className="h-4 w-4 text-red-400" />
                           {date}
                         </span>
-                        <span className="flex items-center gap-1.5 text-gray-300">
+                        <span className="flex items-center gap-1.5 text-zinc-300">
                           <Clock className="h-4 w-4 text-red-400" />
                           {time} Uhr
                         </span>
                         {auf.location && (
-                          <span className="flex items-center gap-1.5 text-gray-300">
+                          <span className="flex items-center gap-1.5 text-zinc-300">
                             <MapPin className="h-4 w-4 text-red-400" />
                             {auf.location}
                           </span>
@@ -490,7 +490,7 @@ export default function SicarioPage() {
                       <div className="mt-3">
                         {myResponse ? (
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Deine Antwort:</span>
+                            <span className="text-xs text-zinc-500">Deine Antwort:</span>
                             {myResponse.status === 'COMING' && (
                               <Badge className="bg-green-900/40 text-green-300 border-green-500/50">
                                 <CheckCircle2 className="mr-1 h-3 w-3" />
@@ -498,7 +498,7 @@ export default function SicarioPage() {
                               </Badge>
                             )}
                             {myResponse.status === 'COMING_LATE' && (
-                              <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                              <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                                 <Clock className="mr-1 h-3 w-3" />
                                 Komme später
                               </Badge>
@@ -510,7 +510,7 @@ export default function SicarioPage() {
                               </Badge>
                             )}
                             {myResponse.status === 'UNSURE' && (
-                              <Badge className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50">
+                              <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                                 <HelpCircle className="mr-1 h-3 w-3" />
                                 Unsicher
                               </Badge>
@@ -526,7 +526,7 @@ export default function SicarioPage() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-4 pt-3 mt-3 border-t border-gray-800">
+                      <div className="flex items-center gap-4 pt-3 mt-3 border-t border-zinc-800">
                         <div className="flex items-center gap-1.5 text-sm">
                           <div className="p-1 bg-green-900/40 rounded">
                             <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
@@ -536,10 +536,10 @@ export default function SicarioPage() {
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-sm">
-                          <div className="p-1 bg-blue-900/40 rounded">
-                            <Clock className="h-3.5 w-3.5 text-blue-400" />
+                          <div className="p-1 bg-orange-900/40 rounded">
+                            <Clock className="h-3.5 w-3.5 text-orange-400" />
                           </div>
-                          <span className="text-blue-400 font-medium">
+                          <span className="text-orange-400 font-medium">
                             {auf.responses?.filter(r => r.status === 'COMING_LATE').length || 0}
                           </span>
                         </div>
@@ -552,15 +552,15 @@ export default function SicarioPage() {
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-sm">
-                          <div className="p-1 bg-yellow-900/40 rounded">
-                            <HelpCircle className="h-3.5 w-3.5 text-yellow-400" />
+                          <div className="p-1 bg-orange-900/40 rounded">
+                            <HelpCircle className="h-3.5 w-3.5 text-orange-400" />
                           </div>
-                          <span className="text-yellow-400 font-medium">
+                          <span className="text-orange-400 font-medium">
                             {auf.responses?.filter(r => r.status === 'UNSURE').length || 0}
                           </span>
                         </div>
                         <div className="ml-auto">
-                          <Eye className="h-4 w-4 text-gray-500 group-hover:text-red-400 transition-colors" />
+                          <Eye className="h-4 w-4 text-zinc-500 group-hover:text-red-400 transition-colors" />
                         </div>
                       </div>
                     </div>
@@ -573,7 +573,7 @@ export default function SicarioPage() {
                 <div className="space-y-3">
                   <button
                     onClick={() => setShowOlderAufstellungen(!showOlderAufstellungen)}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-900/50 hover:bg-gray-800/70 border border-gray-800 hover:border-red-500/30 rounded-xl text-gray-300 hover:text-white transition-all"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-zinc-900/50 hover:bg-zinc-800/70 border border-zinc-800 hover:border-red-500/30 rounded-xl text-zinc-300 hover:text-white transition-all"
                   >
                     <History className="h-4 w-4 text-red-400" />
                     <span className="text-sm font-medium">
@@ -599,7 +599,7 @@ export default function SicarioPage() {
                         className={`group relative overflow-hidden cursor-pointer transition-all duration-300 rounded-xl border ${
                           isSelected
                             ? 'bg-gradient-to-br from-red-900/50 to-rose-900/40 border-red-500 shadow-lg shadow-red-500/20 scale-[1.02]'
-                            : 'bg-gray-900/50 border-gray-800 hover:border-red-500/50 hover:bg-gray-900/80 hover:shadow-md'
+                            : 'bg-zinc-900/50 border-zinc-800 hover:border-red-500/50 hover:bg-zinc-900/80 hover:shadow-md'
                         }`}
                         onClick={() => setSelectedAufstellung(auf.id)}
                       >
@@ -615,30 +615,30 @@ export default function SicarioPage() {
                                 <h3 className={`font-semibold text-lg mb-1 transition-colors ${isSelected ? 'text-red-300' : 'text-white group-hover:text-red-300'}`}>
                                   {auf.reason}
                                 </h3>
-                                <p className="text-sm text-gray-400 flex items-center gap-1">
+                                <p className="text-sm text-zinc-400 flex items-center gap-1">
                                   <Users className="h-3 w-3" />
                                   {getDisplayName(auf.createdBy)}
                                 </p>
                               </div>
                             </div>
                             {deadlinePassed && (
-                              <Badge className="bg-gray-800 text-gray-400 border-gray-600 text-xs shrink-0">
+                              <Badge className="bg-zinc-800 text-zinc-400 border-zinc-600 text-xs shrink-0">
                                 Vorbei
                               </Badge>
                             )}
                           </div>
 
                           <div className="flex items-center gap-4 text-sm mt-4 flex-wrap">
-                            <span className="flex items-center gap-1.5 text-gray-300">
+                            <span className="flex items-center gap-1.5 text-zinc-300">
                               <Calendar className="h-4 w-4 text-red-400" />
                               {date}
                             </span>
-                            <span className="flex items-center gap-1.5 text-gray-300">
+                            <span className="flex items-center gap-1.5 text-zinc-300">
                               <Clock className="h-4 w-4 text-red-400" />
                               {time} Uhr
                             </span>
                             {auf.location && (
-                              <span className="flex items-center gap-1.5 text-gray-300">
+                              <span className="flex items-center gap-1.5 text-zinc-300">
                                 <MapPin className="h-4 w-4 text-red-400" />
                                 {auf.location}
                               </span>
@@ -647,7 +647,7 @@ export default function SicarioPage() {
 
                           {myResponse ? (
                             <div className="flex items-center gap-2 mt-3">
-                              <span className="text-xs text-gray-500">Deine Antwort:</span>
+                              <span className="text-xs text-zinc-500">Deine Antwort:</span>
                               {myResponse.status === 'COMING' && (
                                 <Badge className="bg-green-900/40 text-green-300 border-green-500/50">
                                   <CheckCircle2 className="mr-1 h-3 w-3" />
@@ -655,7 +655,7 @@ export default function SicarioPage() {
                                 </Badge>
                               )}
                               {myResponse.status === 'COMING_LATE' && (
-                                <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                                <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                                   <Clock className="mr-1 h-3 w-3" />
                                   Komme später
                                 </Badge>
@@ -667,7 +667,7 @@ export default function SicarioPage() {
                                 </Badge>
                               )}
                               {myResponse.status === 'UNSURE' && (
-                                <Badge className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50">
+                                <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                                   <HelpCircle className="mr-1 h-3 w-3" />
                                   Unsicher
                                 </Badge>
@@ -682,7 +682,7 @@ export default function SicarioPage() {
                             )
                           )}
 
-                          <div className="flex items-center gap-4 pt-3 mt-3 border-t border-gray-800">
+                          <div className="flex items-center gap-4 pt-3 mt-3 border-t border-zinc-800">
                             <div className="flex items-center gap-1.5 text-sm">
                               <div className="p-1 bg-green-900/40 rounded">
                                 <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
@@ -692,10 +692,10 @@ export default function SicarioPage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-1.5 text-sm">
-                              <div className="p-1 bg-blue-900/40 rounded">
-                                <Clock className="h-3.5 w-3.5 text-blue-400" />
+                              <div className="p-1 bg-orange-900/40 rounded">
+                                <Clock className="h-3.5 w-3.5 text-orange-400" />
                               </div>
-                              <span className="text-blue-400 font-medium">
+                              <span className="text-orange-400 font-medium">
                                 {auf.responses?.filter(r => r.status === 'COMING_LATE').length || 0}
                               </span>
                             </div>
@@ -708,10 +708,10 @@ export default function SicarioPage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-1.5 text-sm">
-                              <div className="p-1 bg-yellow-900/40 rounded">
-                                <HelpCircle className="h-3.5 w-3.5 text-yellow-400" />
+                              <div className="p-1 bg-orange-900/40 rounded">
+                                <HelpCircle className="h-3.5 w-3.5 text-orange-400" />
                               </div>
-                              <span className="text-yellow-400 font-medium">
+                              <span className="text-orange-400 font-medium">
                                 {auf.responses?.filter(r => r.status === 'UNSURE').length || 0}
                               </span>
                             </div>
@@ -724,12 +724,12 @@ export default function SicarioPage() {
               )}
             </>
           ) : (
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
-              <div className="p-4 bg-gray-800/50 rounded-2xl w-fit mx-auto mb-4">
-                <Crosshair className="h-12 w-12 text-gray-600" />
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-12 text-center">
+              <div className="p-4 bg-zinc-800/50 rounded-2xl w-fit mx-auto mb-4">
+                <Crosshair className="h-12 w-12 text-zinc-600" />
               </div>
-              <p className="text-gray-400 text-lg">Keine Sicario-Einsätze</p>
-              <p className="text-gray-500 text-sm mt-1">Erstelle den ersten Einsatz für das Team</p>
+              <p className="text-zinc-400 text-lg">Keine Sicario-Einsätze</p>
+              <p className="text-zinc-500 text-sm mt-1">Erstelle den ersten Einsatz für das Team</p>
             </div>
           )}
         </div>
@@ -748,16 +748,16 @@ export default function SicarioPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setSelectedAufstellung(null)}
-                className="text-gray-400 hover:text-white hover:bg-gray-800"
+                className="text-zinc-400 hover:text-white hover:bg-zinc-800"
               >
                 <XCircle className="h-4 w-4" />
               </Button>
             </div>
 
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-800/80 border-red-500/30 shadow-xl">
+            <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800/80 border-red-500/30 shadow-xl">
               <CardHeader className="border-b border-red-500/20 pb-4">
                 <CardTitle className="text-2xl text-red-300 mb-2">{aufstellungDetails.reason}</CardTitle>
-                <div className="flex items-center gap-4 text-gray-300 flex-wrap">
+                <div className="flex items-center gap-4 text-zinc-300 flex-wrap">
                   <span className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-red-400" />
                     {formatDateTime(aufstellungDetails.date).date}
@@ -781,7 +781,7 @@ export default function SicarioPage() {
               <CardContent className="pt-6 space-y-6">
                 {/* Meine Reaktion */}
                 {!isDeadlinePassed(aufstellungDetails.deadline) && (
-                  <div className="bg-gray-800/50 p-4 rounded-xl border border-red-500/20">
+                  <div className="bg-zinc-800/50 p-4 rounded-xl border border-red-500/20">
                     <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                       <Zap className="h-5 w-5 text-red-400" />
                       Deine Antwort
@@ -804,8 +804,8 @@ export default function SicarioPage() {
                         variant={getMyResponse(aufstellungDetails)?.status === 'COMING_LATE' ? 'default' : 'outline'}
                         className={`h-12 transition-all ${
                           getMyResponse(aufstellungDetails)?.status === 'COMING_LATE'
-                            ? 'bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 border-blue-500 shadow-lg shadow-blue-500/20 text-white'
-                            : 'border-blue-500/30 hover:border-blue-500 hover:bg-blue-900/20 text-blue-400'
+                            ? 'bg-gradient-to-r from-orange-600 to-sky-600 hover:from-orange-500 hover:to-sky-500 border-orange-500 shadow-lg shadow-orange-500/20 text-white'
+                            : 'border-orange-500/30 hover:border-orange-500 hover:bg-orange-900/20 text-orange-400'
                         }`}
                         onClick={() => respondMutation.mutate({ id: selectedAufstellung, status: 'COMING_LATE' })}
                         disabled={respondMutation.isPending}
@@ -830,8 +830,8 @@ export default function SicarioPage() {
                         variant={getMyResponse(aufstellungDetails)?.status === 'UNSURE' ? 'default' : 'outline'}
                         className={`h-12 transition-all ${
                           getMyResponse(aufstellungDetails)?.status === 'UNSURE'
-                            ? 'bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 border-yellow-500 shadow-lg shadow-yellow-500/20 text-white'
-                            : 'border-yellow-500/30 hover:border-yellow-500 hover:bg-yellow-900/20 text-yellow-400'
+                            ? 'bg-gradient-to-r from-orange-600 to-orange-600 hover:from-orange-500 hover:to-orange-500 border-orange-500 shadow-lg shadow-orange-500/20 text-white'
+                            : 'border-orange-500/30 hover:border-orange-500 hover:bg-orange-900/20 text-orange-400'
                         }`}
                         onClick={() => respondMutation.mutate({ id: selectedAufstellung, status: 'UNSURE' })}
                         disabled={respondMutation.isPending}
@@ -845,7 +845,7 @@ export default function SicarioPage() {
 
                 {/* Statistik */}
                 {aufstellungDetails.stats && (
-                  <div className="bg-gray-800/50 p-4 rounded-xl border border-red-500/20">
+                  <div className="bg-zinc-800/50 p-4 rounded-xl border border-red-500/20">
                     <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-red-400" />
                       Team-Status
@@ -858,12 +858,12 @@ export default function SicarioPage() {
                         </div>
                         <div className="text-xs text-green-300/70 uppercase tracking-wide">Dabei</div>
                       </div>
-                      <div className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 p-4 rounded-xl border border-blue-500/30">
-                        <Clock className="h-5 w-5 text-blue-400 mb-2" />
-                        <div className="text-3xl font-bold text-blue-400 mb-1">
+                      <div className="bg-gradient-to-br from-orange-900/50 to-orange-800/30 p-4 rounded-xl border border-orange-500/30">
+                        <Clock className="h-5 w-5 text-orange-400 mb-2" />
+                        <div className="text-3xl font-bold text-orange-400 mb-1">
                           {aufstellungDetails.stats.comingLate || 0}
                         </div>
-                        <div className="text-xs text-blue-300/70 uppercase tracking-wide">Später</div>
+                        <div className="text-xs text-orange-300/70 uppercase tracking-wide">Später</div>
                       </div>
                       <div className="bg-gradient-to-br from-red-900/50 to-red-800/30 p-4 rounded-xl border border-red-500/30">
                         <XCircle className="h-5 w-5 text-red-400 mb-2" />
@@ -872,12 +872,12 @@ export default function SicarioPage() {
                         </div>
                         <div className="text-xs text-red-300/70 uppercase tracking-wide">Nicht</div>
                       </div>
-                      <div className="bg-gradient-to-br from-yellow-900/50 to-yellow-800/30 p-4 rounded-xl border border-yellow-500/30">
-                        <HelpCircle className="h-5 w-5 text-yellow-400 mb-2" />
-                        <div className="text-3xl font-bold text-yellow-400 mb-1">
+                      <div className="bg-gradient-to-br from-orange-900/50 to-orange-800/30 p-4 rounded-xl border border-orange-500/30">
+                        <HelpCircle className="h-5 w-5 text-orange-400 mb-2" />
+                        <div className="text-3xl font-bold text-orange-400 mb-1">
                           {aufstellungDetails.stats.unsure}
                         </div>
-                        <div className="text-xs text-yellow-300/70 uppercase tracking-wide">Unsicher</div>
+                        <div className="text-xs text-orange-300/70 uppercase tracking-wide">Unsicher</div>
                       </div>
                       <div className="col-span-2 bg-gradient-to-br from-orange-900/50 to-orange-800/30 p-4 rounded-xl border border-orange-500/30">
                         <UserX className="h-5 w-5 text-orange-400 mb-2" />
@@ -894,7 +894,7 @@ export default function SicarioPage() {
                 {aufstellungDetails.responses && (
                   <div className="space-y-3">
                     {aufstellungDetails.responses.filter((r: any) => r.status === 'COMING').length > 0 && (
-                      <div className="bg-gray-800/50 p-4 rounded-xl border border-green-500/30">
+                      <div className="bg-zinc-800/50 p-4 rounded-xl border border-green-500/30">
                         <h3 className="text-white font-semibold mb-3 flex items-center justify-between">
                           <span className="flex items-center gap-2">
                             <CheckCircle2 className="h-5 w-5 text-green-400" />
@@ -923,13 +923,13 @@ export default function SicarioPage() {
                     )}
 
                     {aufstellungDetails.responses.filter((r: any) => r.status === 'COMING_LATE').length > 0 && (
-                      <div className="bg-gray-800/50 p-4 rounded-xl border border-blue-500/30">
+                      <div className="bg-zinc-800/50 p-4 rounded-xl border border-orange-500/30">
                         <h3 className="text-white font-semibold mb-3 flex items-center justify-between">
                           <span className="flex items-center gap-2">
-                            <Clock className="h-5 w-5 text-blue-400" />
+                            <Clock className="h-5 w-5 text-orange-400" />
                             Kommen später
                           </span>
-                          <Badge className="bg-blue-900/40 text-blue-300 border-blue-500/50">
+                          <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                             {aufstellungDetails.responses.filter((r: any) => r.status === 'COMING_LATE').length}
                           </Badge>
                         </h3>
@@ -939,10 +939,10 @@ export default function SicarioPage() {
                             .map((r: any) => (
                               <div
                                 key={r.id}
-                                className="flex items-center gap-2 bg-blue-900/20 hover:bg-blue-900/30 border border-blue-500/30 p-3 rounded-lg text-sm text-blue-200 transition-colors"
+                                className="flex items-center gap-2 bg-orange-900/20 hover:bg-orange-900/30 border border-orange-500/30 p-3 rounded-lg text-sm text-orange-200 transition-colors"
                               >
-                                <div className="p-1 bg-blue-500/20 rounded">
-                                  <User className="h-3 w-3 text-blue-400" />
+                                <div className="p-1 bg-orange-500/20 rounded">
+                                  <User className="h-3 w-3 text-orange-400" />
                                 </div>
                                 {getDisplayName(r.user)}
                               </div>
@@ -952,7 +952,7 @@ export default function SicarioPage() {
                     )}
 
                     {aufstellungDetails.responses.filter((r: any) => r.status === 'NOT_COMING').length > 0 && (
-                      <div className="bg-gray-800/50 p-4 rounded-xl border border-red-500/30">
+                      <div className="bg-zinc-800/50 p-4 rounded-xl border border-red-500/30">
                         <h3 className="text-white font-semibold mb-3 flex items-center justify-between">
                           <span className="flex items-center gap-2">
                             <XCircle className="h-5 w-5 text-red-400" />
@@ -981,13 +981,13 @@ export default function SicarioPage() {
                     )}
 
                     {aufstellungDetails.responses.filter((r: any) => r.status === 'UNSURE').length > 0 && (
-                      <div className="bg-gray-800/50 p-4 rounded-xl border border-yellow-500/30">
+                      <div className="bg-zinc-800/50 p-4 rounded-xl border border-orange-500/30">
                         <h3 className="text-white font-semibold mb-3 flex items-center justify-between">
                           <span className="flex items-center gap-2">
-                            <HelpCircle className="h-5 w-5 text-yellow-400" />
+                            <HelpCircle className="h-5 w-5 text-orange-400" />
                             Unsicher
                           </span>
-                          <Badge className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50">
+                          <Badge className="bg-orange-900/40 text-orange-300 border-orange-500/50">
                             {aufstellungDetails.responses.filter((r: any) => r.status === 'UNSURE').length}
                           </Badge>
                         </h3>
@@ -997,10 +997,10 @@ export default function SicarioPage() {
                             .map((r: any) => (
                               <div
                                 key={r.id}
-                                className="flex items-center gap-2 bg-yellow-900/20 hover:bg-yellow-900/30 border border-yellow-500/30 p-3 rounded-lg text-sm text-yellow-200 transition-colors"
+                                className="flex items-center gap-2 bg-orange-900/20 hover:bg-orange-900/30 border border-orange-500/30 p-3 rounded-lg text-sm text-orange-200 transition-colors"
                               >
-                                <div className="p-1 bg-yellow-500/20 rounded">
-                                  <User className="h-3 w-3 text-yellow-400" />
+                                <div className="p-1 bg-orange-500/20 rounded">
+                                  <User className="h-3 w-3 text-orange-400" />
                                 </div>
                                 {getDisplayName(r.user)}
                               </div>
@@ -1011,7 +1011,7 @@ export default function SicarioPage() {
 
                     {aufstellungDetails.sicariosWithoutResponse &&
                       aufstellungDetails.sicariosWithoutResponse.length > 0 && (
-                        <div className="bg-gray-800/50 p-4 rounded-xl border border-orange-500/30">
+                        <div className="bg-zinc-800/50 p-4 rounded-xl border border-orange-500/30">
                           <h3 className="text-white font-semibold mb-3 flex items-center justify-between">
                             <span className="flex items-center gap-2">
                               <UserX className="h-5 w-5 text-orange-400" />
@@ -1041,7 +1041,7 @@ export default function SicarioPage() {
 
                 {/* Admin Aktionen */}
                 {accessData?.isLeadership && (
-                  <div className="bg-gray-800/50 p-4 rounded-xl border border-red-500/20">
+                  <div className="bg-zinc-800/50 p-4 rounded-xl border border-red-500/20">
                     <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                       <Shield className="h-5 w-5 text-red-400" />
                       Admin-Aktionen
@@ -1069,7 +1069,7 @@ export default function SicarioPage() {
 
       {/* Team Übersicht */}
       {team && team.members && (
-        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-red-500/30">
+        <Card className="bg-gradient-to-br from-zinc-900/80 to-zinc-800/50 border-red-500/30">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <div className="p-2 bg-red-500/20 rounded-lg">

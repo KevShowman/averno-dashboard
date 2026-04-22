@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"#[0-9a-fA-F]\\\\{3,8\\\\}\" \"F:\\\\documents\\\\Hetzner\\\\Averno-Dashboard\\\\averno-dashboard\\\\apps\\\\web\\\\src\" --include=\"*.tsx\" --include=\"*.ts\")"
+    ]
+  }
+}

@@ -103,9 +103,9 @@ interface ListPermission {
 }
 
 const statusConfig: Record<FamilyContactStatus, { label: string; color: string; bgColor: string; icon: typeof Circle }> = {
-  UNKNOWN: { label: 'Unbekannt', color: 'text-gray-400', bgColor: 'bg-gray-500/20', icon: HelpCircle },
+  UNKNOWN: { label: 'Unbekannt', color: 'text-zinc-400', bgColor: 'bg-zinc-500/20', icon: HelpCircle },
   ACTIVE: { label: 'Aktiv', color: 'text-green-400', bgColor: 'bg-green-500/20', icon: CheckCircle },
-  ENDANGERED: { label: 'Gefährdet', color: 'text-yellow-400', bgColor: 'bg-yellow-500/20', icon: AlertCircle },
+  ENDANGERED: { label: 'Gefährdet', color: 'text-orange-400', bgColor: 'bg-orange-500/20', icon: AlertCircle },
   DISSOLVED: { label: 'Aufgelöst', color: 'text-red-400', bgColor: 'bg-red-500/20', icon: XCircle },
 }
 
@@ -322,19 +322,19 @@ export default function ListenfuehrungPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-amber-500/20 rounded-xl">
-              <BookOpen className="h-8 w-8 text-amber-400" />
+            <div className="p-3 bg-orange-500/20 rounded-xl">
+              <BookOpen className="h-8 w-8 text-orange-400" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Listenführung</h1>
-              <p className="text-gray-400 mt-1">
+              <p className="text-zinc-400 mt-1">
                 Zentrale Kontaktliste der Familien in Narco City
               </p>
             </div>
@@ -344,7 +344,7 @@ export default function ListenfuehrungPage() {
             <Button
               onClick={handleExport}
               variant="outline"
-              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+              className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
             >
               <Download className="h-4 w-4 mr-2" />
               Export CSV
@@ -355,7 +355,7 @@ export default function ListenfuehrungPage() {
                   resetForm()
                   setIsCreateDialogOpen(true)
                 }}
-                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white"
+                className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-500 hover:to-orange-600 text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Familie hinzufügen
@@ -367,13 +367,13 @@ export default function ListenfuehrungPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-        <TabsList className="bg-gray-800/50 border border-gray-700">
-          <TabsTrigger value="liste" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
+        <TabsList className="bg-zinc-800/50 border border-zinc-700">
+          <TabsTrigger value="liste" className="data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-300">
             <BookOpen className="h-4 w-4 mr-2" />
             Familienliste
           </TabsTrigger>
           {isLeadership && (
-            <TabsTrigger value="berechtigungen" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
+            <TabsTrigger value="berechtigungen" className="data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-300">
               <Shield className="h-4 w-4 mr-2" />
               Berechtigungen
             </TabsTrigger>
@@ -384,17 +384,17 @@ export default function ListenfuehrungPage() {
           {/* Search & Stats */}
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <Input
                 placeholder="Suche nach Familie, Kontakt..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                className="pl-10 bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
               />
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-              <Users className="h-4 w-4 text-amber-400" />
-              <span className="text-gray-400">
+            <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 rounded-lg border border-zinc-700">
+              <Users className="h-4 w-4 text-orange-400" />
+              <span className="text-zinc-400">
                 <span className="text-white font-medium">{filteredContacts.length}</span> Familien
               </span>
             </div>
@@ -402,11 +402,11 @@ export default function ListenfuehrungPage() {
 
           {/* Info for non-manage users */}
           {!canViewDetails && (
-            <Card className="bg-blue-500/10 border-blue-500/30">
+            <Card className="bg-orange-500/10 border-orange-500/30">
               <CardContent className="p-4 flex items-start gap-3">
-                <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <Info className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-blue-300 text-sm">
+                  <p className="text-orange-300 text-sm">
                     Du siehst nur die Familiennamen. Kontaktdaten sind nur für berechtigte Mitglieder sichtbar.
                   </p>
                 </div>
@@ -417,16 +417,16 @@ export default function ListenfuehrungPage() {
           {/* Contacts Grid */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
         </div>
       ) : filteredContacts.length === 0 ? (
-        <Card className="bg-gray-900/50 border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800">
           <CardContent className="p-12 text-center">
-            <Building2 className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-400 mb-2">
+            <Building2 className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-zinc-400 mb-2">
               {searchTerm ? 'Keine Treffer gefunden' : 'Noch keine Familien eingetragen'}
             </h3>
-            <p className="text-gray-500 text-sm">
+            <p className="text-zinc-500 text-sm">
               {searchTerm 
                 ? 'Versuche einen anderen Suchbegriff'
                 : canManage 
@@ -440,20 +440,20 @@ export default function ListenfuehrungPage() {
           {filteredContacts.map((contact: FamilyContact) => (
             <Card 
               key={contact.id} 
-              className="bg-gray-900/50 border-amber-500/10 hover:border-amber-500/30 transition-all group"
+              className="bg-zinc-900/50 border-orange-500/10 hover:border-orange-500/30 transition-all group"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-500/10 rounded-lg group-hover:bg-amber-500/20 transition-colors">
-                      <Building2 className="h-5 w-5 text-amber-400" />
+                    <div className="p-2 bg-orange-500/10 rounded-lg group-hover:bg-orange-500/20 transition-colors">
+                      <Building2 className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg text-white group-hover:text-amber-300 transition-colors flex items-center gap-2">
+                      <CardTitle className="text-lg text-white group-hover:text-orange-300 transition-colors flex items-center gap-2">
                         {contact.familyName}
                         {/* Schlüsselfamilie Badge */}
                         {contact.isKeyFamily && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Schlüsselfamilie">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30" title="Schlüsselfamilie">
                             <Key className="h-3 w-3" />
                           </span>
                         )}
@@ -478,7 +478,7 @@ export default function ListenfuehrungPage() {
                         })()}
                         {/* PLZ Badge */}
                         {contact.propertyZip && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-700/50 text-gray-300">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-700/50 text-zinc-300">
                             <MapPin className="h-3 w-3" />
                             {contact.propertyZip}
                           </span>
@@ -503,7 +503,7 @@ export default function ListenfuehrungPage() {
                         }
                       }}
                       disabled={markOutdatedMutation.isPending}
-                      className={`h-8 w-8 p-0 ${contact.isOutdated ? 'text-red-400 hover:text-red-300' : 'text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100'} transition-all`}
+                      className={`h-8 w-8 p-0 ${contact.isOutdated ? 'text-red-400 hover:text-red-300' : 'text-zinc-400 hover:text-red-400 opacity-0 group-hover:opacity-100'} transition-all`}
                       title={contact.isOutdated ? 'Als aktuell markieren' : 'Als veraltet markieren'}
                     >
                       <Clock className="h-4 w-4" />
@@ -514,7 +514,7 @@ export default function ListenfuehrungPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => openEditDialog(contact)}
-                          className="h-8 w-8 p-0 text-gray-400 hover:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-8 w-8 p-0 text-zinc-400 hover:text-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -522,7 +522,7 @@ export default function ListenfuehrungPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => openDeleteDialog(contact)}
-                          className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-8 w-8 p-0 text-zinc-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -536,8 +536,8 @@ export default function ListenfuehrungPage() {
                   <>
                     {/* Ansprechpartner 1 */}
                     {(contact.contact1FirstName || contact.contact1LastName || contact.contact1Phone) && (
-                      <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                        <div className="flex items-center gap-2 text-xs text-amber-400/70 mb-2">
+                      <div className="p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
+                        <div className="flex items-center gap-2 text-xs text-orange-400/70 mb-2">
                           <User className="h-3 w-3" />
                           <span>Ansprechpartner 1</span>
                         </div>
@@ -547,7 +547,7 @@ export default function ListenfuehrungPage() {
                           </p>
                         )}
                         {contact.contact1Phone && (
-                          <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
+                          <div className="flex items-center gap-2 mt-1 text-zinc-400 text-sm">
                             <Phone className="h-3 w-3" />
                             <span>{contact.contact1Phone}</span>
                           </div>
@@ -557,8 +557,8 @@ export default function ListenfuehrungPage() {
 
                     {/* Ansprechpartner 2 */}
                     {(contact.contact2FirstName || contact.contact2LastName || contact.contact2Phone) && (
-                      <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                        <div className="flex items-center gap-2 text-xs text-amber-400/70 mb-2">
+                      <div className="p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
+                        <div className="flex items-center gap-2 text-xs text-orange-400/70 mb-2">
                           <User className="h-3 w-3" />
                           <span>Ansprechpartner 2</span>
                         </div>
@@ -568,7 +568,7 @@ export default function ListenfuehrungPage() {
                           </p>
                         )}
                         {contact.contact2Phone && (
-                          <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
+                          <div className="flex items-center gap-2 mt-1 text-zinc-400 text-sm">
                             <Phone className="h-3 w-3" />
                             <span>{contact.contact2Phone}</span>
                           </div>
@@ -578,35 +578,35 @@ export default function ListenfuehrungPage() {
 
                     {/* Führung/Patron */}
                     {contact.leadershipInfo && (
-                      <div className="p-3 bg-amber-500/5 rounded-lg border border-amber-500/20">
-                        <div className="flex items-center gap-2 text-xs text-amber-400 mb-1">
+                      <div className="p-3 bg-orange-500/5 rounded-lg border border-orange-500/20">
+                        <div className="flex items-center gap-2 text-xs text-orange-400 mb-1">
                           <Crown className="h-3 w-3" />
                           <span>Führung / Patron</span>
                         </div>
-                        <p className="text-amber-200 text-sm">{contact.leadershipInfo}</p>
+                        <p className="text-orange-200 text-sm">{contact.leadershipInfo}</p>
                       </div>
                     )}
 
                     {/* Notizen */}
                     {contact.notes && (
-                      <div className="pt-2 border-t border-gray-800">
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                      <div className="pt-2 border-t border-zinc-800">
+                        <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1">
                           <FileText className="h-3 w-3" />
                           <span>Notizen</span>
                         </div>
-                        <p className="text-gray-400 text-sm line-clamp-2">{contact.notes}</p>
+                        <p className="text-zinc-400 text-sm line-clamp-2">{contact.notes}</p>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-4 text-gray-500 text-sm">
+                  <div className="text-center py-4 text-zinc-500 text-sm">
                     Keine Berechtigung für Kontaktdetails
                   </div>
                 )}
 
                 {/* Veraltet-Info - für alle sichtbar */}
                 {contact.isOutdated && (
-                  <div className="pt-2 border-t border-gray-800">
+                  <div className="pt-2 border-t border-zinc-800">
                     <div className="flex flex-col gap-1 text-xs text-red-400/70">
                       <div className="flex items-center gap-2">
                         <Clock className="h-3 w-3" />
@@ -632,13 +632,13 @@ export default function ListenfuehrungPage() {
         {/* Permissions Tab */}
         {isLeadership && (
           <TabsContent value="berechtigungen" className="space-y-6 mt-6">
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card className="bg-zinc-900/50 border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-amber-400" />
+                  <Shield className="h-5 w-5 text-orange-400" />
                   Listenführung-Berechtigungen
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-zinc-400">
                   Verwalte wer Zugriff auf die Familienkontakte hat und bearbeiten darf.
                 </CardDescription>
               </CardHeader>
@@ -646,10 +646,10 @@ export default function ListenfuehrungPage() {
                 {/* Add new permission */}
                 <div className="flex gap-3">
                   <Select value={selectedNewPermissionUser} onValueChange={setSelectedNewPermissionUser}>
-                    <SelectTrigger className="flex-1 bg-gray-800/50 border-gray-700">
+                    <SelectTrigger className="flex-1 bg-zinc-800/50 border-zinc-700">
                       <SelectValue placeholder="Benutzer auswählen..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectContent className="bg-zinc-800 border-zinc-700">
                       {allUsers
                         .filter((u: any) => 
                           !listPermissions.some(p => p.userId === u.id) &&
@@ -667,7 +667,7 @@ export default function ListenfuehrungPage() {
                   <Button
                     onClick={() => selectedNewPermissionUser && addListPermissionMutation.mutate(selectedNewPermissionUser)}
                     disabled={!selectedNewPermissionUser || addListPermissionMutation.isPending}
-                    className="bg-amber-600 hover:bg-amber-500"
+                    className="bg-orange-600 hover:bg-orange-500"
                   >
                     {addListPermissionMutation.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -681,19 +681,19 @@ export default function ListenfuehrungPage() {
                 {/* Existing permissions */}
                 {permissionsLoading ? (
                   <div className="flex justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                    <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
                   </div>
                 ) : listPermissions.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-zinc-500">
                     Keine zusätzlichen Berechtigungen vergeben.
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {listPermissions.map((permission) => (
-                      <div key={permission.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                      <div key={permission.id} className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
-                            <User className="h-4 w-4 text-amber-400" />
+                          <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center">
+                            <User className="h-4 w-4 text-orange-400" />
                           </div>
                           <div>
                             <p className="text-white font-medium">
@@ -701,7 +701,7 @@ export default function ListenfuehrungPage() {
                                 ? `${permission.user.icFirstName} ${permission.user.icLastName}`
                                 : permission.user.username}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-zinc-500">
                               Hinzugefügt von {permission.grantedBy.icFirstName || permission.grantedBy.username}
                               {' • '}
                               {new Date(permission.grantedAt).toLocaleDateString('de-DE')}
@@ -735,23 +735,23 @@ export default function ListenfuehrungPage() {
           setSelectedContact(null)
         }
       }}>
-        <DialogContent className="bg-gray-900 border-red-500/30">
+        <DialogContent className="bg-zinc-900 border-red-500/30">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Clock className="h-5 w-5 text-red-400" />
               Als veraltet markieren
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               Markiere "{selectedContact?.familyName}" als veraltet. Du kannst optional einen Kommentar hinzufügen.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Label className="text-gray-300">Kommentar (optional)</Label>
+            <Label className="text-zinc-300">Kommentar (optional)</Label>
             <Textarea
               placeholder="z.B. Telefonnummer nicht mehr erreichbar..."
               value={outdatedComment}
               onChange={(e) => setOutdatedComment(e.target.value)}
-              className="mt-2 bg-gray-800/50 border-gray-700 focus:border-red-500/50"
+              className="mt-2 bg-zinc-800/50 border-zinc-700 focus:border-red-500/50"
               rows={3}
             />
           </div>
@@ -759,7 +759,7 @@ export default function ListenfuehrungPage() {
             <Button
               variant="outline"
               onClick={() => setIsOutdatedDialogOpen(false)}
-              className="border-gray-700"
+              className="border-zinc-700"
             >
               Abbrechen
             </Button>
@@ -792,13 +792,13 @@ export default function ListenfuehrungPage() {
           resetForm()
         }
       }}>
-        <DialogContent className="bg-gray-900 border-amber-500/20 max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-zinc-900 border-orange-500/20 max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-amber-400" />
+              <Building2 className="h-5 w-5 text-orange-400" />
               {isEditDialogOpen ? 'Familie bearbeiten' : 'Neue Familie hinzufügen'}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               Erfasse die Kontaktdaten der Familie für die zentrale Liste.
             </DialogDescription>
           </DialogHeader>
@@ -807,24 +807,24 @@ export default function ListenfuehrungPage() {
             {/* Familienname + Status */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-gray-300">Familienname *</Label>
+                <Label className="text-zinc-300">Familienname *</Label>
                 <Input
                   placeholder="z.B. Narco City Cartel"
                   value={formData.familyName}
                   onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
-                  className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                  className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-gray-300">Status</Label>
+                <Label className="text-zinc-300">Status</Label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, status: 'UNKNOWN' })}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm ${
                       formData.status === 'UNKNOWN'
-                        ? 'bg-gray-500/20 border-gray-400/50 text-gray-300'
-                        : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                        ? 'bg-zinc-500/20 border-zinc-400/50 text-zinc-300'
+                        : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600'
                     }`}
                   >
                     <HelpCircle className="h-4 w-4" />
@@ -836,7 +836,7 @@ export default function ListenfuehrungPage() {
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm ${
                       formData.status === 'ACTIVE'
                         ? 'bg-green-500/20 border-green-400/50 text-green-300'
-                        : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                        : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600'
                     }`}
                   >
                     <CheckCircle className="h-4 w-4" />
@@ -847,8 +847,8 @@ export default function ListenfuehrungPage() {
                     onClick={() => setFormData({ ...formData, status: 'ENDANGERED' })}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm ${
                       formData.status === 'ENDANGERED'
-                        ? 'bg-yellow-500/20 border-yellow-400/50 text-yellow-300'
-                        : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                        ? 'bg-orange-500/20 border-orange-400/50 text-orange-300'
+                        : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600'
                     }`}
                   >
                     <AlertCircle className="h-4 w-4" />
@@ -860,7 +860,7 @@ export default function ListenfuehrungPage() {
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm ${
                       formData.status === 'DISSOLVED'
                         ? 'bg-red-500/20 border-red-400/50 text-red-300'
-                        : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                        : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600'
                     }`}
                   >
                     <XCircle className="h-4 w-4" />
@@ -873,8 +873,8 @@ export default function ListenfuehrungPage() {
             {/* Anwesen PLZ */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-amber-400" />
-                <Label className="text-gray-300">Anwesen PLZ</Label>
+                <MapPin className="h-4 w-4 text-orange-400" />
+                <Label className="text-zinc-300">Anwesen PLZ</Label>
               </div>
               <Input
                 placeholder="z.B. 123456"
@@ -885,9 +885,9 @@ export default function ListenfuehrungPage() {
                   setFormData({ ...formData, propertyZip: value })
                 }}
                 maxLength={6}
-                className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50 max-w-xs"
+                className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50 max-w-xs"
               />
-              <p className="text-xs text-gray-500">Maximal 6-stellige Nummer</p>
+              <p className="text-xs text-zinc-500">Maximal 6-stellige Nummer</p>
             </div>
 
             {/* Kontaktdetails nur für Berechtigte */}
@@ -895,36 +895,36 @@ export default function ListenfuehrungPage() {
               <>
                 {/* Ansprechpartner 1 */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                  <div className="flex items-center gap-2 text-orange-400 text-sm font-medium">
                     <User className="h-4 w-4" />
                     Ansprechpartner 1
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-2">
-                      <Label className="text-gray-400 text-xs">Vorname</Label>
+                      <Label className="text-zinc-400 text-xs">Vorname</Label>
                       <Input
                         placeholder="Vorname"
                         value={formData.contact1FirstName}
                         onChange={(e) => setFormData({ ...formData, contact1FirstName: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                        className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-gray-400 text-xs">Nachname</Label>
+                      <Label className="text-zinc-400 text-xs">Nachname</Label>
                       <Input
                         placeholder="Nachname"
                         value={formData.contact1LastName}
                         onChange={(e) => setFormData({ ...formData, contact1LastName: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                        className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-gray-400 text-xs">IC Rufnummer</Label>
+                      <Label className="text-zinc-400 text-xs">IC Rufnummer</Label>
                       <Input
                         placeholder="123-4567"
                         value={formData.contact1Phone}
                         onChange={(e) => setFormData({ ...formData, contact1Phone: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                        className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                       />
                     </div>
                   </div>
@@ -932,36 +932,36 @@ export default function ListenfuehrungPage() {
 
                 {/* Ansprechpartner 2 */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                  <div className="flex items-center gap-2 text-orange-400 text-sm font-medium">
                     <User className="h-4 w-4" />
                     Ansprechpartner 2
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-2">
-                      <Label className="text-gray-400 text-xs">Vorname</Label>
+                      <Label className="text-zinc-400 text-xs">Vorname</Label>
                       <Input
                         placeholder="Vorname"
                         value={formData.contact2FirstName}
                         onChange={(e) => setFormData({ ...formData, contact2FirstName: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                        className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-gray-400 text-xs">Nachname</Label>
+                      <Label className="text-zinc-400 text-xs">Nachname</Label>
                       <Input
                         placeholder="Nachname"
                         value={formData.contact2LastName}
                         onChange={(e) => setFormData({ ...formData, contact2LastName: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                        className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-gray-400 text-xs">IC Rufnummer</Label>
+                      <Label className="text-zinc-400 text-xs">IC Rufnummer</Label>
                       <Input
                         placeholder="123-4567"
                         value={formData.contact2Phone}
                         onChange={(e) => setFormData({ ...formData, contact2Phone: e.target.value })}
-                        className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                        className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                       />
                     </div>
                   </div>
@@ -970,23 +970,23 @@ export default function ListenfuehrungPage() {
                 {/* Führung/Patron */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Crown className="h-4 w-4 text-amber-400" />
-                    <Label className="text-gray-300">Kontaktdaten Patron / Führung</Label>
+                    <Crown className="h-4 w-4 text-orange-400" />
+                    <Label className="text-zinc-300">Kontaktdaten Patron / Führung</Label>
                   </div>
                   <Input
                     placeholder="Name oder Telefonnummer der Führung"
                     value={formData.leadershipInfo}
                     onChange={(e) => setFormData({ ...formData, leadershipInfo: e.target.value })}
-                    className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50"
+                    className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-500">
                     Kann Vorname, Nachname oder Telefonnummer sein
                   </p>
                 </div>
               </>
             ) : (
-              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
-                <p className="text-sm text-gray-500 flex items-center gap-2">
+              <div className="p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50">
+                <p className="text-sm text-zinc-500 flex items-center gap-2">
                   <Shield className="h-4 w-4" />
                   Kontaktdaten sind nur für berechtigte Benutzer sichtbar
                 </p>
@@ -996,14 +996,14 @@ export default function ListenfuehrungPage() {
             {/* Notizen */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-gray-400" />
-                <Label className="text-gray-300">Notizen</Label>
+                <FileText className="h-4 w-4 text-zinc-400" />
+                <Label className="text-zinc-300">Notizen</Label>
               </div>
               <Textarea
                 placeholder="Zusätzliche Informationen..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="bg-gray-800/50 border-gray-700 focus:border-amber-500/50 min-h-[80px]"
+                className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50 min-h-[80px]"
               />
             </div>
 
@@ -1015,11 +1015,11 @@ export default function ListenfuehrungPage() {
                   onClick={() => setFormData({ ...formData, isKeyFamily: !formData.isKeyFamily })}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
                     formData.isKeyFamily
-                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
-                      : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                      ? 'bg-orange-500/20 border-orange-500/50 text-orange-300'
+                      : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600'
                   }`}
                 >
-                  <Key className={`h-5 w-5 ${formData.isKeyFamily ? 'text-amber-400' : 'text-gray-500'}`} />
+                  <Key className={`h-5 w-5 ${formData.isKeyFamily ? 'text-orange-400' : 'text-zinc-500'}`} />
                   <div className="text-left">
                     <div className="font-medium">Schlüsselfamilie</div>
                     <div className="text-xs opacity-70">
@@ -1040,7 +1040,7 @@ export default function ListenfuehrungPage() {
                 setSelectedContact(null)
                 resetForm()
               }}
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
             >
               Abbrechen
             </Button>
@@ -1057,7 +1057,7 @@ export default function ListenfuehrungPage() {
                 }
               }}
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white"
+              className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-500 hover:to-orange-600 text-white"
             >
               {createMutation.isPending || updateMutation.isPending ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
@@ -1070,13 +1070,13 @@ export default function ListenfuehrungPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-gray-900 border-red-500/20">
+        <DialogContent className="bg-zinc-900 border-red-500/20">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-red-400" />
               Familie löschen
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               Möchtest du <span className="text-white font-medium">{selectedContact?.familyName}</span> wirklich aus der Liste entfernen? Diese Aktion kann nicht rückgängig gemacht werden.
             </DialogDescription>
           </DialogHeader>
@@ -1084,7 +1084,7 @@ export default function ListenfuehrungPage() {
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
             >
               Abbrechen
             </Button>

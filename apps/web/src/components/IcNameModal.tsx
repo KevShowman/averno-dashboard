@@ -61,14 +61,14 @@ export default function IcNameModal({ isOpen, onClose, username }: IcNameModalPr
           <CardTitle className="text-2xl font-bold text-white">
             Willkommen bei LaSanta Calavera!
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Hallo <span className="text-accent">{username}</span>!<br/>
             Bitte gib deinen IC-Namen (In-Character Name) an, der in den Listen verwendet wird.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-zinc-400 mb-2 block">
               IC Vorname
             </label>
             <Input
@@ -81,7 +81,7 @@ export default function IcNameModal({ isOpen, onClose, username }: IcNameModalPr
             />
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-zinc-400 mb-2 block">
               IC Nachname
             </label>
             <Input
@@ -93,8 +93,8 @@ export default function IcNameModal({ isOpen, onClose, username }: IcNameModalPr
             />
           </div>
           
-          <div className="bg-gray-800/50 p-3 rounded-lg">
-            <p className="text-xs text-gray-400">
+          <div className="bg-zinc-800/50 p-3 rounded-lg">
+            <p className="text-xs text-zinc-400">
               <strong>Hinweis:</strong> Dein IC-Name wird in allen Listen und Berichten anstelle deines Discord-Namens verwendet. 
               Du kannst ihn später in den Einstellungen ändern.
             </p>

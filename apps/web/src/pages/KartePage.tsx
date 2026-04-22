@@ -868,36 +868,36 @@ export default function KartePage() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-6">
+    <div className="min-h-screen bg-zinc-900 p-4 md:p-6">
       {/* Background Glow */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-600/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl" />
       </div>
       
       <div className="relative max-w-[1800px] mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/20">
-              <MapIcon className="h-7 w-7 text-amber-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 border border-orange-500/20">
+              <MapIcon className="h-7 w-7 text-orange-400" />
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-white">Interaktive Karte</h1>
-              <p className="text-gray-400 text-sm">Territorien und Familien-Standorte</p>
+              <p className="text-zinc-400 text-sm">Territorien und Familien-Standorte</p>
             </div>
           </div>
           
           {/* Map Tabs */}
-          <div className="flex gap-2 bg-gray-800/50 p-1 rounded-lg border border-gray-700">
+          <div className="flex gap-2 bg-zinc-800/50 p-1 rounded-lg border border-zinc-700">
             {(Object.entries(MAP_CONFIG) as [MapName, typeof MAP_CONFIG[MapName]][]).map(([key, config]) => (
               <button
                 key={key}
                 onClick={() => setActiveMap(key)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   activeMap === key
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
                 }`}
               >
                 {config.name}
@@ -913,14 +913,14 @@ export default function KartePage() {
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
                 isFilterActive 
-                  ? 'bg-amber-500/20 border-amber-500/40 text-amber-400' 
-                  : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600'
+                  ? 'bg-orange-500/20 border-orange-500/40 text-orange-400' 
+                  : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-600'
               }`}
             >
               <Filter className="h-4 w-4" />
               <span className="font-medium">Filter</span>
               {isFilterActive && (
-                <Badge className="ml-1 bg-amber-500 text-black text-xs px-1.5">
+                <Badge className="ml-1 bg-orange-500 text-black text-xs px-1.5">
                   aktiv
                 </Badge>
               )}
@@ -930,7 +930,7 @@ export default function KartePage() {
             {isFilterActive && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                className="flex items-center gap-1 px-3 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Zurücksetzen
@@ -938,17 +938,17 @@ export default function KartePage() {
             )}
             
             {/* Quick filter count */}
-            <span className="text-sm text-gray-500 ml-auto">
+            <span className="text-sm text-zinc-500 ml-auto">
               {filteredAnnotations.length} / {annotations.length} POIs sichtbar
             </span>
           </div>
           
           {/* Filter Panel */}
           {isFilterOpen && (
-            <div className="mt-3 p-4 rounded-xl bg-gray-800/70 border border-gray-700 space-y-4">
+            <div className="mt-3 p-4 rounded-xl bg-zinc-800/70 border border-zinc-700 space-y-4">
               {/* Link Status Filter */}
               <div>
-                <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                <label className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
                   <Link className="h-4 w-4" />
                   Verknüpfung
                 </label>
@@ -965,8 +965,8 @@ export default function KartePage() {
                         onClick={() => setFilterLinkStatus(option.value as typeof filterLinkStatus)}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all ${
                           filterLinkStatus === option.value
-                            ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400'
-                            : 'bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-500'
+                            ? 'bg-orange-500/20 border border-orange-500/40 text-orange-400'
+                            : 'bg-zinc-700/50 border border-zinc-600 text-zinc-400 hover:text-white hover:border-zinc-500'
                         }`}
                       >
                         <Icon className="h-3.5 w-3.5" />
@@ -980,7 +980,7 @@ export default function KartePage() {
               {/* Status Filter (only when not filtering for unlinked only) */}
               {filterLinkStatus !== 'unlinked' && (
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
                     <AlertCircle className="h-4 w-4" />
                     Familien-Status
                   </label>
@@ -995,7 +995,7 @@ export default function KartePage() {
                           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all border ${
                             isActive
                               ? 'border-opacity-40'
-                              : 'bg-gray-700/30 border-gray-600 text-gray-500 opacity-50'
+                              : 'bg-zinc-700/30 border-zinc-600 text-zinc-500 opacity-50'
                           }`}
                           style={isActive ? {
                             backgroundColor: `${config.color}20`,
@@ -1021,7 +1021,7 @@ export default function KartePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Outdated Filter */}
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
                     <Clock className="h-4 w-4 text-red-400" />
                     Veraltet
                   </label>
@@ -1038,8 +1038,8 @@ export default function KartePage() {
                           filterOutdated === option.value
                             ? option.value === 'only'
                               ? 'bg-red-500/20 border border-red-500/40 text-red-400'
-                              : 'bg-amber-500/20 border border-amber-500/40 text-amber-400'
-                            : 'bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-500'
+                              : 'bg-orange-500/20 border border-orange-500/40 text-orange-400'
+                            : 'bg-zinc-700/50 border border-zinc-600 text-zinc-400 hover:text-white hover:border-zinc-500'
                         }`}
                       >
                         {option.label}
@@ -1050,8 +1050,8 @@ export default function KartePage() {
                 
                 {/* Key Family Filter */}
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                    <Key className="h-4 w-4 text-amber-400" />
+                  <label className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
+                    <Key className="h-4 w-4 text-orange-400" />
                     Schlüsselfamilien
                   </label>
                   <div className="flex gap-2 mt-2">
@@ -1066,9 +1066,9 @@ export default function KartePage() {
                         className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                           filterKeyFamily === option.value
                             ? option.value === 'only'
-                              ? 'bg-amber-500/30 border border-amber-500/50 text-amber-300'
-                              : 'bg-amber-500/20 border border-amber-500/40 text-amber-400'
-                            : 'bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-500'
+                              ? 'bg-orange-500/30 border border-orange-500/50 text-orange-300'
+                              : 'bg-orange-500/20 border border-orange-500/40 text-orange-400'
+                            : 'bg-zinc-700/50 border border-zinc-600 text-zinc-400 hover:text-white hover:border-zinc-500'
                         }`}
                       >
                         {option.label}
@@ -1097,7 +1097,7 @@ export default function KartePage() {
                   onClick={handleUndoPoint}
                   disabled={drawingPoints.length === 0}
                   variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
                 >
                   <RotateCcw className="h-4 w-4 mr-1" />
                   Rückgängig
@@ -1122,7 +1122,7 @@ export default function KartePage() {
             </>
           ) : (
             <>
-              <div className="flex-1 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm flex items-center gap-2">
+              <div className="flex-1 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-300 text-sm flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 <span>
                   {canManage 
@@ -1141,7 +1141,7 @@ export default function KartePage() {
                   </Button>
                   <Button
                     onClick={() => setIsSuggestionsPanelOpen(!isSuggestionsPanelOpen)}
-                    className="bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30 relative"
+                    className="bg-orange-500/20 border border-orange-500/30 text-orange-300 hover:bg-orange-500/30 relative"
                   >
                     <Lightbulb className="h-4 w-4 mr-2" />
                     Vorschläge
@@ -1159,9 +1159,9 @@ export default function KartePage() {
         
         {/* Suggestions Panel */}
         {isSuggestionsPanelOpen && canManage && (
-          <div className="mb-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+          <div className="mb-4 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-cyan-300 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-orange-300 flex items-center gap-2">
                 <Lightbulb className="h-5 w-5" />
                 Offene Vorschläge ({suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').length})
               </h3>
@@ -1169,17 +1169,17 @@ export default function KartePage() {
                 variant="ghost"
                 size="sm"
                 onClick={handleCloseSuggestionsPanel}
-                className="text-cyan-400 hover:text-cyan-300"
+                className="text-orange-400 hover:text-orange-300"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
             {suggestionsLoading ? (
               <div className="flex justify-center py-4">
-                <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
+                <Loader2 className="h-6 w-6 animate-spin text-orange-400" />
               </div>
             ) : suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').length === 0 ? (
-              <p className="text-cyan-400/70 text-center py-4">Keine offenen Vorschläge</p>
+              <p className="text-orange-400/70 text-center py-4">Keine offenen Vorschläge</p>
             ) : (
               <div className="space-y-3 max-h-[300px] overflow-y-auto">
                 {suggestions.filter((s: MapSuggestion) => s.status === 'PENDING').map((suggestion: MapSuggestion) => (
@@ -1187,8 +1187,8 @@ export default function KartePage() {
                     key={suggestion.id} 
                     className={`p-3 rounded-lg border transition-all ${
                       previewSuggestion?.id === suggestion.id 
-                        ? 'bg-cyan-500/20 border-cyan-500' 
-                        : 'bg-gray-800/50 border-gray-700'
+                        ? 'bg-orange-500/20 border-orange-500' 
+                        : 'bg-zinc-800/50 border-zinc-700'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -1202,14 +1202,14 @@ export default function KartePage() {
                           {suggestion.label && `: ${suggestion.label}`}
                         </p>
                         {suggestion.familyContact && (
-                          <p className="text-amber-400 text-sm">→ {suggestion.familyContact.familyName}</p>
+                          <p className="text-orange-400 text-sm">→ {suggestion.familyContact.familyName}</p>
                         )}
-                        <p className="text-gray-500 text-xs mt-1">
+                        <p className="text-zinc-500 text-xs mt-1">
                           von {suggestion.createdBy.icFirstName || suggestion.createdBy.username}
                           {' • '}
                           {new Date(suggestion.createdAt).toLocaleDateString('de-DE')}
                         </p>
-                        <p className="text-cyan-400/60 text-xs mt-1 flex items-center gap-1">
+                        <p className="text-orange-400/60 text-xs mt-1 flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
                           Klicken für Vorschau
                         </p>
@@ -1218,7 +1218,7 @@ export default function KartePage() {
                         <Button
                           size="sm"
                           onClick={() => handlePreviewSuggestion(suggestion)}
-                          className={`${previewSuggestion?.id === suggestion.id ? 'bg-cyan-500 text-white' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
+                          className={`${previewSuggestion?.id === suggestion.id ? 'bg-orange-500 text-white' : 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30'}`}
                           title="Position anzeigen"
                         >
                           <MapPin className="h-4 w-4" />
@@ -1238,7 +1238,7 @@ export default function KartePage() {
                               placeholder="Grund"
                               value={rejectNote}
                               onChange={(e) => setRejectNote(e.target.value)}
-                              className="h-8 w-24 bg-gray-700 border-gray-600 text-sm"
+                              className="h-8 w-24 bg-zinc-700 border-zinc-600 text-sm"
                             />
                             <Button
                               size="sm"
@@ -1276,10 +1276,10 @@ export default function KartePage() {
         )}
         
         {/* Map Container */}
-        <div className="rounded-xl overflow-hidden border border-gray-700 bg-gray-800/50 shadow-2xl" style={{ height: 'calc(100vh - 240px)' }}>
+        <div className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800/50 shadow-2xl" style={{ height: 'calc(100vh - 240px)' }}>
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400" />
             </div>
           ) : (
             <MapContainer
@@ -1410,7 +1410,7 @@ export default function KartePage() {
                   })}
                 >
                   <Tooltip direction="top" offset={[0, -40]} opacity={1} permanent>
-                    <div className="text-sm font-bold text-cyan-500">
+                    <div className="text-sm font-bold text-orange-500">
                       📍 Vorschlag: {ICON_OPTIONS.find(i => i.value === previewSuggestion.icon)?.label || previewSuggestion.icon}
                       {previewSuggestion.label && ` - ${previewSuggestion.label}`}
                     </div>
@@ -1445,16 +1445,16 @@ export default function KartePage() {
                   {/* Hover Tooltip */}
                   <Tooltip direction="top" offset={[0, -20]} opacity={0.95}>
                     <div className="text-sm">
-                      <div className="font-bold text-amber-500">
+                      <div className="font-bold text-orange-500">
                         {annotation.familyContact?.familyName || annotation.label || 'Unbenannt'}
                       </div>
                       {annotation.familyContact && (
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-zinc-400">
                           {statusConfig[annotation.familyContact.status].label}
                         </div>
                       )}
                       {annotation.createdBy && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-zinc-500 mt-1">
                           von {annotation.createdBy.icFirstName || annotation.createdBy.username}
                         </div>
                       )}
@@ -1500,7 +1500,7 @@ export default function KartePage() {
                           </div>
                           
                           {annotation.familyContact.propertyZip && (
-                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-1 text-sm text-zinc-600">
                               <MapPin className="h-3 w-3" />
                               PLZ: {annotation.familyContact.propertyZip}
                             </div>
@@ -1511,12 +1511,12 @@ export default function KartePage() {
                             <>
                               {(annotation.familyContact.contact1FirstName || annotation.familyContact.contact1Phone) && (
                                 <div className="border-t pt-2 mt-2">
-                                  <div className="text-xs text-gray-500 mb-1">Ansprechpartner 1:</div>
+                                  <div className="text-xs text-zinc-500 mb-1">Ansprechpartner 1:</div>
                                   <div className="text-sm">
                                     {annotation.familyContact.contact1FirstName} {annotation.familyContact.contact1LastName}
                                   </div>
                                   {annotation.familyContact.contact1Phone && (
-                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                    <div className="flex items-center gap-1 text-xs text-zinc-500">
                                       <Phone className="h-3 w-3" />
                                       {annotation.familyContact.contact1Phone}
                                     </div>
@@ -1526,12 +1526,12 @@ export default function KartePage() {
                               
                               {(annotation.familyContact.contact2FirstName || annotation.familyContact.contact2Phone) && (
                                 <div className="border-t pt-2">
-                                  <div className="text-xs text-gray-500 mb-1">Ansprechpartner 2:</div>
+                                  <div className="text-xs text-zinc-500 mb-1">Ansprechpartner 2:</div>
                                   <div className="text-sm">
                                     {annotation.familyContact.contact2FirstName} {annotation.familyContact.contact2LastName}
                                   </div>
                                   {annotation.familyContact.contact2Phone && (
-                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                    <div className="flex items-center gap-1 text-xs text-zinc-500">
                                       <Phone className="h-3 w-3" />
                                       {annotation.familyContact.contact2Phone}
                                     </div>
@@ -1541,16 +1541,16 @@ export default function KartePage() {
                               
                               {annotation.familyContact.leadershipInfo && (
                                 <div className="border-t pt-2">
-                                  <div className="text-xs text-gray-500 mb-1">Führung:</div>
+                                  <div className="text-xs text-zinc-500 mb-1">Führung:</div>
                                   <div className="text-sm flex items-center gap-1">
-                                    <Crown className="h-3 w-3 text-amber-500" />
+                                    <Crown className="h-3 w-3 text-orange-500" />
                                     {annotation.familyContact.leadershipInfo}
                                   </div>
                                 </div>
                               )}
                             </>
                           ) : (
-                            <div className="border-t pt-2 mt-2 text-xs text-gray-500 italic">
+                            <div className="border-t pt-2 mt-2 text-xs text-zinc-500 italic">
                               Kontaktdetails nur für Berechtigte sichtbar
                             </div>
                           )}
@@ -1580,7 +1580,7 @@ export default function KartePage() {
                               )}
                             </div>
                           </div>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-zinc-500 mt-1">
                             Erstellt von {annotation.createdBy?.icFirstName || annotation.createdBy?.username}
                           </div>
                         </div>
@@ -1600,7 +1600,7 @@ export default function KartePage() {
                               })
                               setIsEditDialogOpen(true)
                             }}
-                            className="flex-1 px-2 py-1 text-xs bg-amber-500/20 text-amber-500 rounded hover:bg-amber-500/30 flex items-center justify-center gap-1"
+                            className="flex-1 px-2 py-1 text-xs bg-orange-500/20 text-orange-500 rounded hover:bg-orange-500/30 flex items-center justify-center gap-1"
                           >
                             <Pencil className="h-3 w-3" />
                             Bearbeiten
@@ -1632,7 +1632,7 @@ export default function KartePage() {
                             <Trash2 className="h-3 w-3" />
                             Löschvorschlag einreichen
                           </button>
-                          <p className="text-xs text-gray-500 mt-1 text-center">
+                          <p className="text-xs text-zinc-500 mt-1 text-center">
                             Wird von der Leadership geprüft
                           </p>
                         </div>
@@ -1649,8 +1649,8 @@ export default function KartePage() {
         {/* Legend and Stats Row */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
           {/* Legend */}
-          <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-            <span className="font-medium text-gray-300">Status:</span>
+          <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
+            <span className="font-medium text-zinc-300">Status:</span>
             {(Object.entries(statusConfig) as [FamilyContactStatus, typeof statusConfig[FamilyContactStatus]][]).map(([key, config]) => (
               <div key={key} className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: config.color }} />
@@ -1661,31 +1661,31 @@ export default function KartePage() {
 
           {/* POI Link Stats */}
           {poiStats && (
-            <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div className="flex items-center gap-3 px-4 py-2 bg-zinc-800/50 rounded-lg border border-zinc-700">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-amber-400" />
-                <span className="text-sm text-gray-300 font-medium">POIs:</span>
+                <MapPin className="h-4 w-4 text-orange-400" />
+                <span className="text-sm text-zinc-300 font-medium">POIs:</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <div className="flex items-center gap-1.5">
                   <Link className="h-4 w-4 text-green-400" />
                   <span className="text-green-400 font-medium">{poiStats.linked}</span>
-                  <span className="text-gray-500">verknüpft</span>
+                  <span className="text-zinc-500">verknüpft</span>
                 </div>
-                <span className="text-gray-600">|</span>
+                <span className="text-zinc-600">|</span>
                 <div className="flex items-center gap-1.5">
                   <Unlink className="h-4 w-4 text-orange-400" />
                   <span className="text-orange-400 font-medium">{poiStats.unlinked}</span>
-                  <span className="text-gray-500">ohne Familie</span>
+                  <span className="text-zinc-500">ohne Familie</span>
                 </div>
-                <span className="text-gray-600">|</span>
-                <div className="px-2 py-0.5 rounded bg-gray-700 text-gray-300 font-medium">
+                <span className="text-zinc-600">|</span>
+                <div className="px-2 py-0.5 rounded bg-zinc-700 text-zinc-300 font-medium">
                   {poiStats.total} gesamt
                 </div>
-                <span className="text-gray-600">|</span>
+                <span className="text-zinc-600">|</span>
                 <div className={`px-2 py-0.5 rounded font-medium ${
                   poiStats.percentage >= 75 ? 'bg-green-500/20 text-green-400' :
-                  poiStats.percentage >= 50 ? 'bg-amber-500/20 text-amber-400' :
+                  poiStats.percentage >= 50 ? 'bg-orange-500/20 text-orange-400' :
                   'bg-red-500/20 text-red-400'
                 }`}>
                   {poiStats.percentage}%
@@ -1698,13 +1698,13 @@ export default function KartePage() {
       
       {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-amber-400">
+            <DialogTitle className="flex items-center gap-2 text-orange-400">
               {canManage ? <Plus className="h-5 w-5" /> : <Lightbulb className="h-5 w-5" />}
               {canManage ? 'Neue Markierung' : 'Vorschlag einreichen'}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               {canManage 
                 ? `Position: X: ${newMarkerPosition?.x.toFixed(3)}, Y: ${newMarkerPosition?.y.toFixed(3)}`
                 : 'Dein Vorschlag wird von einem Berechtigten überprüft.'}
@@ -1714,7 +1714,7 @@ export default function KartePage() {
           <div className="space-y-4">
             {/* Icon Selection */}
             <div>
-              <Label className="text-gray-300">Icon</Label>
+              <Label className="text-zinc-300">Icon</Label>
               <div className="grid grid-cols-4 gap-2 mt-2">
                 {ICON_OPTIONS.map(option => {
                   const Icon = option.icon
@@ -1724,8 +1724,8 @@ export default function KartePage() {
                       onClick={() => setFormData({ ...formData, icon: option.value })}
                       className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
                         formData.icon === option.value
-                          ? 'border-amber-500 bg-amber-500/20 text-amber-400'
-                          : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-500'
+                          ? 'border-orange-500 bg-orange-500/20 text-orange-400'
+                          : 'border-zinc-600 bg-zinc-700/50 text-zinc-400 hover:border-zinc-500'
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -1738,22 +1738,22 @@ export default function KartePage() {
             
             {/* Label */}
             <div>
-              <Label className="text-gray-300">Beschriftung (optional)</Label>
+              <Label className="text-zinc-300">Beschriftung (optional)</Label>
               <Input
                 value={formData.label}
                 onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                 placeholder="z.B. Hauptquartier"
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-zinc-700 border-zinc-600 text-white"
               />
             </div>
             
             {/* Family Contact Link */}
             <div>
-              <Label className="text-gray-300">Mit Familie verknüpfen (optional)</Label>
+              <Label className="text-zinc-300">Mit Familie verknüpfen (optional)</Label>
               <select
                 value={formData.familyContactId}
                 onChange={(e) => setFormData({ ...formData, familyContactId: e.target.value })}
-                className="mt-1 w-full px-3 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="mt-1 w-full px-3 py-2 rounded-md bg-zinc-700 border border-zinc-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               >
                 <option value="">Keine Verknüpfung</option>
                 {familyContacts.map((contact: FamilyContact) => (
@@ -1771,8 +1771,8 @@ export default function KartePage() {
                   onClick={() => setFormData({ ...formData, isKeyFamily: !formData.isKeyFamily })}
                   className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
                     formData.isKeyFamily
-                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                      : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                      ? 'bg-orange-500/20 border-orange-500/40 text-orange-400'
+                      : 'bg-zinc-700/50 border-zinc-600 text-zinc-400 hover:border-zinc-500'
                   }`}
                 >
                   <Key className="h-4 w-4" />
@@ -1783,7 +1783,7 @@ export default function KartePage() {
                   className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
                     formData.isOutdated
                       ? 'bg-red-500/20 border-red-500/40 text-red-400'
-                      : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                      : 'bg-zinc-700/50 border-zinc-600 text-zinc-400 hover:border-zinc-500'
                   }`}
                 >
                   <Clock className="h-4 w-4" />
@@ -1801,14 +1801,14 @@ export default function KartePage() {
                 setNewMarkerPosition(null)
                 resetForm()
               }}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
             >
               Abbrechen
             </Button>
             <Button
               onClick={handleCreate}
               disabled={createMutation.isPending || createSuggestionMutation.isPending}
-              className={canManage ? "bg-amber-500 hover:bg-amber-600 text-black" : "bg-cyan-500 hover:bg-cyan-600 text-black"}
+              className={canManage ? "bg-orange-500 hover:bg-orange-600 text-black" : "bg-orange-500 hover:bg-orange-600 text-black"}
             >
               {(createMutation.isPending || createSuggestionMutation.isPending) 
                 ? (canManage ? 'Erstelle...' : 'Sende...') 
@@ -1820,9 +1820,9 @@ export default function KartePage() {
       
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-amber-400">
+            <DialogTitle className="flex items-center gap-2 text-orange-400">
               <Pencil className="h-5 w-5" />
               Markierung bearbeiten
             </DialogTitle>
@@ -1831,7 +1831,7 @@ export default function KartePage() {
           <div className="space-y-4">
             {/* Icon Selection */}
             <div>
-              <Label className="text-gray-300">Icon</Label>
+              <Label className="text-zinc-300">Icon</Label>
               <div className="grid grid-cols-4 gap-2 mt-2">
                 {ICON_OPTIONS.map(option => {
                   const Icon = option.icon
@@ -1841,8 +1841,8 @@ export default function KartePage() {
                       onClick={() => setFormData({ ...formData, icon: option.value })}
                       className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
                         formData.icon === option.value
-                          ? 'border-amber-500 bg-amber-500/20 text-amber-400'
-                          : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-500'
+                          ? 'border-orange-500 bg-orange-500/20 text-orange-400'
+                          : 'border-zinc-600 bg-zinc-700/50 text-zinc-400 hover:border-zinc-500'
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -1855,22 +1855,22 @@ export default function KartePage() {
             
             {/* Label */}
             <div>
-              <Label className="text-gray-300">Beschriftung</Label>
+              <Label className="text-zinc-300">Beschriftung</Label>
               <Input
                 value={formData.label}
                 onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                 placeholder="z.B. Hauptquartier"
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-zinc-700 border-zinc-600 text-white"
               />
             </div>
             
             {/* Family Contact Link */}
             <div>
-              <Label className="text-gray-300">Mit Familie verknüpfen</Label>
+              <Label className="text-zinc-300">Mit Familie verknüpfen</Label>
               <select
                 value={formData.familyContactId}
                 onChange={(e) => setFormData({ ...formData, familyContactId: e.target.value })}
-                className="mt-1 w-full px-3 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="mt-1 w-full px-3 py-2 rounded-md bg-zinc-700 border border-zinc-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               >
                 <option value="">Keine Verknüpfung</option>
                 {familyContacts.map((contact: FamilyContact) => (
@@ -1887,8 +1887,8 @@ export default function KartePage() {
                 onClick={() => setFormData({ ...formData, isKeyFamily: !formData.isKeyFamily })}
                 className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
                   formData.isKeyFamily
-                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                    : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                    ? 'bg-orange-500/20 border-orange-500/40 text-orange-400'
+                    : 'bg-zinc-700/50 border-zinc-600 text-zinc-400 hover:border-zinc-500'
                 }`}
               >
                 <Key className="h-4 w-4" />
@@ -1899,7 +1899,7 @@ export default function KartePage() {
                 className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-2 ${
                   formData.isOutdated
                     ? 'bg-red-500/20 border-red-500/40 text-red-400'
-                    : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
+                    : 'bg-zinc-700/50 border-zinc-600 text-zinc-400 hover:border-zinc-500'
                 }`}
               >
                 <Clock className="h-4 w-4" />
@@ -1909,14 +1909,14 @@ export default function KartePage() {
             
             {/* Info about combined flags */}
             {selectedAnnotation?.familyContact && (selectedAnnotation.familyContact.isKeyFamily || selectedAnnotation.familyContact.isOutdated) && (
-              <div className="p-3 bg-gray-700/30 rounded-lg text-xs text-gray-400">
+              <div className="p-3 bg-zinc-700/30 rounded-lg text-xs text-zinc-400">
                 <p className="flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
                   Hinweis: Die verknüpfte Familie hat auch Flags gesetzt:
                 </p>
                 <div className="flex gap-2 mt-1">
                   {selectedAnnotation.familyContact.isKeyFamily && (
-                    <span className="text-amber-400">🔑 Schlüsselfamilie</span>
+                    <span className="text-orange-400">🔑 Schlüsselfamilie</span>
                   )}
                   {selectedAnnotation.familyContact.isOutdated && (
                     <span className="text-red-400">⏰ Veraltet</span>
@@ -1934,14 +1934,14 @@ export default function KartePage() {
                 setSelectedAnnotation(null)
                 resetForm()
               }}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
             >
               Abbrechen
             </Button>
             <Button
               onClick={handleUpdate}
               disabled={updateMutation.isPending}
-              className="bg-amber-500 hover:bg-amber-600 text-black"
+              className="bg-orange-500 hover:bg-orange-600 text-black"
             >
               {updateMutation.isPending ? 'Speichere...' : 'Speichern'}
             </Button>
@@ -1951,16 +1951,16 @@ export default function KartePage() {
       
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-400">
               <Trash2 className="h-5 w-5" />
               Markierung löschen
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               Bist du sicher, dass du diese Markierung löschen möchtest?
               {selectedAnnotation?.familyContact && (
-                <span className="block mt-2 text-amber-400">
+                <span className="block mt-2 text-orange-400">
                   Verknüpft mit: {selectedAnnotation.familyContact.familyName}
                 </span>
               )}
@@ -1974,7 +1974,7 @@ export default function KartePage() {
                 setIsDeleteDialogOpen(false)
                 setSelectedAnnotation(null)
               }}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
             >
               Abbrechen
             </Button>
@@ -1991,13 +1991,13 @@ export default function KartePage() {
       
       {/* Create Area Dialog */}
       <Dialog open={isAreaDialogOpen} onOpenChange={setIsAreaDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-violet-400">
               <Hexagon className="h-5 w-5" />
               Neues Gebiet
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               {drawingPoints.length} Punkte gezeichnet
             </DialogDescription>
           </DialogHeader>
@@ -2005,18 +2005,18 @@ export default function KartePage() {
           <div className="space-y-4">
             {/* Label */}
             <div>
-              <Label className="text-gray-300">Gebietsname *</Label>
+              <Label className="text-zinc-300">Gebietsname *</Label>
               <Input
                 value={areaFormData.label}
                 onChange={(e) => setAreaFormData({ ...areaFormData, label: e.target.value })}
                 placeholder="z.B. Territorium Nord"
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-zinc-700 border-zinc-600 text-white"
               />
             </div>
             
             {/* Color Selection */}
             <div>
-              <Label className="text-gray-300">Farbe</Label>
+              <Label className="text-zinc-300">Farbe</Label>
               <div className="grid grid-cols-4 gap-2 mt-2">
                 {AREA_COLORS.map(color => (
                   <button
@@ -2025,14 +2025,14 @@ export default function KartePage() {
                     className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
                       areaFormData.color === color.value
                         ? 'border-white bg-white/10'
-                        : 'border-gray-600 bg-gray-700/50 hover:border-gray-500'
+                        : 'border-zinc-600 bg-zinc-700/50 hover:border-zinc-500'
                     }`}
                   >
                     <div 
                       className="w-6 h-6 rounded-full" 
                       style={{ backgroundColor: color.value }}
                     />
-                    <span className="text-xs text-gray-300">{color.label}</span>
+                    <span className="text-xs text-zinc-300">{color.label}</span>
                   </button>
                 ))}
               </div>
@@ -2045,7 +2045,7 @@ export default function KartePage() {
               onClick={() => {
                 setIsAreaDialogOpen(false)
               }}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
             >
               Abbrechen
             </Button>
@@ -2062,7 +2062,7 @@ export default function KartePage() {
       
       {/* Edit Area Dialog */}
       <Dialog open={isEditAreaDialogOpen} onOpenChange={setIsEditAreaDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-violet-400">
               <Pencil className="h-5 w-5" />
@@ -2073,18 +2073,18 @@ export default function KartePage() {
           <div className="space-y-4">
             {/* Label */}
             <div>
-              <Label className="text-gray-300">Gebietsname</Label>
+              <Label className="text-zinc-300">Gebietsname</Label>
               <Input
                 value={areaFormData.label}
                 onChange={(e) => setAreaFormData({ ...areaFormData, label: e.target.value })}
                 placeholder="z.B. Territorium Nord"
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-zinc-700 border-zinc-600 text-white"
               />
             </div>
             
             {/* Color Selection */}
             <div>
-              <Label className="text-gray-300">Farbe</Label>
+              <Label className="text-zinc-300">Farbe</Label>
               <div className="grid grid-cols-4 gap-2 mt-2">
                 {AREA_COLORS.map(color => (
                   <button
@@ -2093,14 +2093,14 @@ export default function KartePage() {
                     className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1 ${
                       areaFormData.color === color.value
                         ? 'border-white bg-white/10'
-                        : 'border-gray-600 bg-gray-700/50 hover:border-gray-500'
+                        : 'border-zinc-600 bg-zinc-700/50 hover:border-zinc-500'
                     }`}
                   >
                     <div 
                       className="w-6 h-6 rounded-full" 
                       style={{ backgroundColor: color.value }}
                     />
-                    <span className="text-xs text-gray-300">{color.label}</span>
+                    <span className="text-xs text-zinc-300">{color.label}</span>
                   </button>
                 ))}
               </div>
@@ -2125,7 +2125,7 @@ export default function KartePage() {
                 setIsEditAreaDialogOpen(false)
                 setSelectedArea(null)
               }}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
             >
               Abbrechen
             </Button>
@@ -2151,13 +2151,13 @@ export default function KartePage() {
       
       {/* Delete Area Confirmation Dialog */}
       <Dialog open={isDeleteAreaDialogOpen} onOpenChange={setIsDeleteAreaDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-400">
               <Trash2 className="h-5 w-5" />
               Gebiet löschen
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               Bist du sicher, dass du das Gebiet "{selectedArea?.label}" löschen möchtest?
             </DialogDescription>
           </DialogHeader>
@@ -2169,7 +2169,7 @@ export default function KartePage() {
                 setIsDeleteAreaDialogOpen(false)
                 setSelectedArea(null)
               }}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
             >
               Abbrechen
             </Button>
@@ -2186,7 +2186,7 @@ export default function KartePage() {
       
       {/* Partner Delete Suggestion Dialog */}
       <Dialog open={isPartnerDeleteDialogOpen} onOpenChange={setIsPartnerDeleteDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700">
+        <DialogContent className="bg-zinc-900 border-zinc-700">
           <DialogHeader>
             <DialogTitle className="text-red-400 flex items-center gap-2">
               <Trash2 className="h-5 w-5" />
@@ -2199,20 +2199,20 @@ export default function KartePage() {
           
           {partnerDeleteAnnotation && (
             <div className="space-y-4">
-              <div className="p-3 bg-gray-800/50 rounded-lg">
-                <p className="text-sm text-gray-400">Familie:</p>
+              <div className="p-3 bg-zinc-800/50 rounded-lg">
+                <p className="text-sm text-zinc-400">Familie:</p>
                 <p className="font-medium text-white">
                   {partnerDeleteAnnotation.familyContact?.familyName || partnerDeleteAnnotation.label || 'Unbenannt'}
                 </p>
                 {partnerDeleteAnnotation.familyContact?.propertyZip && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-zinc-500 mt-1">
                     PLZ: {partnerDeleteAnnotation.familyContact.propertyZip}
                   </p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="partnerDeleteReason" className="text-gray-300">
+                <Label htmlFor="partnerDeleteReason" className="text-zinc-300">
                   Begründung für die Löschung <span className="text-red-400">*</span>
                 </Label>
                 <Textarea
@@ -2221,12 +2221,12 @@ export default function KartePage() {
                   onChange={(e) => setPartnerDeleteReason(e.target.value)}
                   placeholder="Warum soll dieser Eintrag entfernt werden?"
                   rows={3}
-                  className="bg-gray-800 border-gray-600"
+                  className="bg-zinc-800 border-zinc-600"
                 />
               </div>
               
-              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                <div className="flex items-center gap-2 text-amber-400 text-sm">
+              <div className="p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                <div className="flex items-center gap-2 text-orange-400 text-sm">
                   <AlertTriangle className="h-4 w-4" />
                   Der Löschvorschlag muss von der Leadership genehmigt werden
                 </div>

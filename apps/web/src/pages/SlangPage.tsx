@@ -137,36 +137,36 @@ const slangWords: SlangWord[] = [
 const categories = [
   { name: "Grüße", icon: MessageCircle, color: "from-emerald-500 to-green-600" },
   { name: "Höflichkeit", icon: Heart, color: "from-pink-500 to-rose-600" },
-  { name: "Funk", icon: Phone, color: "from-cyan-500 to-blue-600" },
-  { name: "Familie", icon: Users, color: "from-amber-500 to-orange-600" },
+  { name: "Funk", icon: Phone, color: "from-orange-500 to-orange-600" },
+  { name: "Familie", icon: Users, color: "from-orange-500 to-orange-600" },
   { name: "Konflikte", icon: Shield, color: "from-red-500 to-rose-700" },
   { name: "Orte", icon: MapPin, color: "from-violet-500 to-purple-600" },
   { name: "Geschäft", icon: Banknote, color: "from-green-500 to-emerald-600" },
-  { name: "Ausrüstung", icon: Car, color: "from-slate-500 to-gray-600" },
-  { name: "Zeit", icon: Clock, color: "from-blue-500 to-indigo-600" },
-  { name: "Phrasen", icon: Star, color: "from-yellow-500 to-amber-600" },
+  { name: "Ausrüstung", icon: Car, color: "from-slate-500 to-zinc-600" },
+  { name: "Zeit", icon: Clock, color: "from-orange-500 to-indigo-600" },
+  { name: "Phrasen", icon: Star, color: "from-orange-500 to-orange-600" },
 ];
 
 export default function SlangPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-900/40 via-orange-900/30 to-red-900/40 border border-amber-500/20 p-8">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-900/40 via-orange-900/30 to-red-900/40 border border-orange-500/20 p-8">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
         
         <div className="relative flex items-start gap-6">
-          <div className="hidden sm:flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-amber-500/30 shadow-xl shadow-amber-500/10">
-            <Languages className="h-10 w-10 text-amber-400" />
+          <div className="hidden sm:flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500/30 to-orange-500/30 border border-orange-500/30 shadow-xl shadow-orange-500/10">
+            <Languages className="h-10 w-10 text-orange-400" />
           </div>
           
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold text-white">Acento de la Familia</h1>
-              <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+              <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">
                 {slangWords.length} Wörter
               </Badge>
             </div>
-            <p className="text-gray-300 text-lg max-w-3xl">
+            <p className="text-zinc-300 text-lg max-w-3xl">
               Kurzer Überblick über unseren sprachlichen Akzent – für die Fraktionsverwaltung und neue Mitglieder.
               Nutze diese Wörter, um den authentischen Cartel-Lingo in deinem Roleplay zu verwenden.
             </p>
@@ -175,7 +175,7 @@ export default function SlangPage() {
 
         {/* Decorative skull */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-10">
-          <Skull className="h-32 w-32 text-amber-500" />
+          <Skull className="h-32 w-32 text-orange-500" />
         </div>
       </div>
 
@@ -188,10 +188,10 @@ export default function SlangPage() {
           { de: "Vámonos", es: "Lass uns gehen", icon: "🚗" },
           { de: "¡Ayuda!", es: "Hilfe!", icon: "🚨" },
         ].map((item, index) => (
-          <Card key={index} className="bg-gray-800/50 border-gray-700/50 p-4 text-center hover:bg-gray-800/70 transition-colors">
+          <Card key={index} className="bg-zinc-800/50 border-zinc-700/50 p-4 text-center hover:bg-zinc-800/70 transition-colors">
             <div className="text-2xl mb-2">{item.icon}</div>
-            <div className="text-lg font-bold text-amber-400">{item.de}</div>
-            <div className="text-sm text-gray-400">{item.es}</div>
+            <div className="text-lg font-bold text-orange-400">{item.de}</div>
+            <div className="text-sm text-zinc-400">{item.es}</div>
           </Card>
         ))}
       </div>
@@ -205,7 +205,7 @@ export default function SlangPage() {
           const Icon = category.icon;
           
           return (
-            <Card key={category.name} className="bg-gray-800/40 border-gray-700/50 overflow-hidden">
+            <Card key={category.name} className="bg-zinc-800/40 border-zinc-700/50 overflow-hidden">
               {/* Category Header */}
               <div className={`bg-gradient-to-r ${category.color} p-4 flex items-center gap-3`}>
                 <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center">
@@ -223,22 +223,22 @@ export default function SlangPage() {
                   {categoryWords.map((word, index) => (
                     <div 
                       key={index} 
-                      className="group relative bg-gray-900/50 hover:bg-gray-900/80 border border-gray-700/50 hover:border-amber-500/30 rounded-xl p-4 transition-all duration-200"
+                      className="group relative bg-zinc-900/50 hover:bg-zinc-900/80 border border-zinc-700/50 hover:border-orange-500/30 rounded-xl p-4 transition-all duration-200"
                     >
                       <div className="flex flex-col gap-2">
                         <div>
-                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Deutsch</span>
+                          <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Deutsch</span>
                           <p className="text-white font-medium">{word.german}</p>
                         </div>
-                        <div className="h-px bg-gradient-to-r from-amber-500/50 via-amber-500/20 to-transparent" />
+                        <div className="h-px bg-gradient-to-r from-orange-500/50 via-orange-500/20 to-transparent" />
                         <div>
-                          <span className="text-xs font-medium text-amber-500/70 uppercase tracking-wider">Español</span>
-                          <p className="text-amber-400 font-bold text-lg">{word.spanish}</p>
+                          <span className="text-xs font-medium text-orange-500/70 uppercase tracking-wider">Español</span>
+                          <p className="text-orange-400 font-bold text-lg">{word.spanish}</p>
                         </div>
                       </div>
                       
                       {/* Hover effect */}
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/5 transition-all duration-300 pointer-events-none" />
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:to-orange-500/5 transition-all duration-300 pointer-events-none" />
                     </div>
                   ))}
                 </div>
@@ -249,20 +249,20 @@ export default function SlangPage() {
       </div>
 
       {/* Footer Note */}
-      <Card className="bg-gradient-to-r from-amber-900/20 to-orange-900/20 border-amber-500/20 p-6">
+      <Card className="bg-gradient-to-r from-orange-900/20 to-orange-900/20 border-orange-500/20 p-6">
         <div className="flex items-start gap-4">
-          <div className="h-10 w-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="h-5 w-5 text-amber-400" />
+          <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="h-5 w-5 text-orange-400" />
           </div>
           <div>
-            <h3 className="font-bold text-amber-300 mb-2">Hinweis zur Verwendung</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <h3 className="font-bold text-orange-300 mb-2">Hinweis zur Verwendung</h3>
+            <p className="text-zinc-300 text-sm leading-relaxed">
               Akzente, Interpunktion und Groß-/Kleinschreibung im Spanischen sind beabsichtigt 
-              (z. B. <span className="text-amber-400 font-medium">¿Cómo?</span>, <span className="text-amber-400 font-medium">¡Ayuda!</span>). 
+              (z. B. <span className="text-orange-400 font-medium">¿Cómo?</span>, <span className="text-orange-400 font-medium">¡Ayuda!</span>). 
               Beachte die umgekehrten Frage- und Ausrufezeichen am Satzanfang – das ist typisch für die spanische Sprache!
             </p>
-            <p className="text-gray-400 text-sm mt-3">
-              <span className="text-amber-400">Tipp:</span> Beginne mit einfachen Wörtern wie "Hola", "Hermano" und "Gracias" 
+            <p className="text-zinc-400 text-sm mt-3">
+              <span className="text-orange-400">Tipp:</span> Beginne mit einfachen Wörtern wie "Hola", "Hermano" und "Gracias" 
               und erweitere deinen Wortschatz nach und nach. Authentizität kommt mit der Übung!
             </p>
           </div>

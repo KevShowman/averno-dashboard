@@ -190,36 +190,36 @@ export default function TickerPage() {
       switch (action) {
         case 'IN': return <Plus className="h-4 w-4 text-green-400" />
         case 'OUT': return <Minus className="h-4 w-4 text-red-400" />
-        case 'ADJUST': return <RotateCcw className="h-4 w-4 text-yellow-400" />
-        default: return <Package className="h-4 w-4 text-amber-400" />
+        case 'ADJUST': return <RotateCcw className="h-4 w-4 text-orange-400" />
+        default: return <Package className="h-4 w-4 text-orange-400" />
       }
     } else if (type === 'kasse') {
       switch (action) {
         case 'EINZAHLUNG': return <TrendingUp className="h-4 w-4 text-green-400" />
         case 'AUSZAHLUNG': return <TrendingDown className="h-4 w-4 text-red-400" />
-        default: return <DollarSign className="h-4 w-4 text-amber-400" />
+        default: return <DollarSign className="h-4 w-4 text-orange-400" />
       }
     } else if (type === 'packages') {
       switch (action) {
-        case 'PENDING': return <Clock className="h-4 w-4 text-yellow-400" />
+        case 'PENDING': return <Clock className="h-4 w-4 text-orange-400" />
         case 'CONFIRMED': return <CheckCircle className="h-4 w-4 text-green-400" />
         case 'REJECTED': return <XCircle className="h-4 w-4 text-red-400" />
-        default: return <FlaskConical className="h-4 w-4 text-amber-400" />
+        default: return <FlaskConical className="h-4 w-4 text-orange-400" />
       }
     } else if (type === 'weekly-delivery') {
       switch (action) {
         case 'PAID': return <CheckCircle className="h-4 w-4 text-green-400" />
         case 'OVERDUE': return <XCircle className="h-4 w-4 text-red-400" />
-        default: return <Calendar className="h-4 w-4 text-yellow-400" />
+        default: return <Calendar className="h-4 w-4 text-orange-400" />
       }
     } else if (type === 'sanctions') {
       switch (action) {
         case 'ACTIVE': return <AlertTriangle className="h-4 w-4 text-red-400" />
         case 'PAID': return <CheckCircle className="h-4 w-4 text-green-400" />
-        default: return <Activity className="h-4 w-4 text-amber-400" />
+        default: return <Activity className="h-4 w-4 text-orange-400" />
       }
     }
-    return <Activity className="h-4 w-4 text-amber-400" />
+    return <Activity className="h-4 w-4 text-orange-400" />
   }
 
   const getActionDisplay = (type: string, action: string) => {
@@ -253,18 +253,18 @@ export default function TickerPage() {
   return (
     <div className="space-y-6">
       {/* Header - Gold Theme */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+            <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
               <Activity className="h-8 w-8 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Live-Ticker</h1>
-              <p className="text-gray-400 mt-1">
+              <p className="text-zinc-400 mt-1">
                 Alle Aktivitäten in Echtzeit
               </p>
             </div>
@@ -278,8 +278,8 @@ export default function TickerPage() {
                 onClick={() => setSelectedFilter(btn.key as typeof selectedFilter)}
                 size="sm"
                 className={selectedFilter === btn.key 
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 border-0 font-medium' 
-                  : 'border-gray-700 hover:bg-gray-800 hover:border-amber-500/50'}
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 border-0 font-medium' 
+                  : 'border-zinc-700 hover:bg-zinc-800 hover:border-orange-500/50'}
               >
                 <btn.icon className="mr-1.5 h-4 w-4" />
                 {btn.label}
@@ -291,52 +291,52 @@ export default function TickerPage() {
 
       {/* Stats Cards - All Gold with subtle variations */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/30">
           <CardContent className="p-4">
-            <p className="text-amber-300/70 text-xs uppercase tracking-wider">Heute</p>
-            <p className="text-2xl font-bold text-amber-400 mt-1">{todayCount}</p>
+            <p className="text-orange-300/70 text-xs uppercase tracking-wider">Heute</p>
+            <p className="text-2xl font-bold text-orange-400 mt-1">{todayCount}</p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20">
           <CardContent className="p-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Lager</p>
+            <p className="text-zinc-400 text-xs uppercase tracking-wider">Lager</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'lager').length}
             </p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20">
           <CardContent className="p-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Kasse</p>
+            <p className="text-zinc-400 text-xs uppercase tracking-wider">Kasse</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'kasse').length}
             </p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20">
           <CardContent className="p-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Pakete</p>
+            <p className="text-zinc-400 text-xs uppercase tracking-wider">Pakete</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'packages').length}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20">
           <CardContent className="p-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Wochenabgabe</p>
+            <p className="text-zinc-400 text-xs uppercase tracking-wider">Wochenabgabe</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'weekly-delivery').length}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20">
           <CardContent className="p-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Sanktionen</p>
+            <p className="text-zinc-400 text-xs uppercase tracking-wider">Sanktionen</p>
             <p className="text-2xl font-bold text-white mt-1">
               {allActivities.filter(a => a.type === 'sanctions').length}
             </p>
@@ -345,10 +345,10 @@ export default function TickerPage() {
       </div>
 
       {/* Activities Feed */}
-      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-        <CardHeader className="border-b border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+        <CardHeader className="border-b border-zinc-800">
           <CardTitle className="text-white">Aktivitäts-Feed</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             {allActivities.filter(a => selectedFilter === 'all' || a.type === selectedFilter).length} Aktivitäten
           </CardDescription>
         </CardHeader>
@@ -356,38 +356,38 @@ export default function TickerPage() {
           {isLoading ? (
             <div className="flex justify-center py-16">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-                <p className="text-gray-400">Lade Aktivitäten...</p>
+                <div className="h-8 w-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+                <p className="text-zinc-400">Lade Aktivitäten...</p>
               </div>
             </div>
           ) : allActivities.length === 0 ? (
             <div className="py-16 text-center">
-              <Activity className="h-16 w-16 mx-auto text-gray-600 mb-4" />
-              <p className="text-gray-400">Keine Aktivitäten gefunden</p>
+              <Activity className="h-16 w-16 mx-auto text-zinc-600 mb-4" />
+              <p className="text-zinc-400">Keine Aktivitäten gefunden</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-800 bg-gray-800/30">
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Zeit</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Typ</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktion</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Benutzer</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Details</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Notiz</th>
+                  <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Zeit</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Typ</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktion</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Benutzer</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Details</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Notiz</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800/50">
+                <tbody className="divide-y divide-zinc-800/50">
                   {allActivities
                     .filter(activity => selectedFilter === 'all' || activity.type === selectedFilter)
                     .map((activity) => (
-                    <tr key={activity.id} className="group hover:bg-amber-950/20 transition-colors">
+                    <tr key={activity.id} className="group hover:bg-orange-950/20 transition-colors">
                       <td className="py-4 px-6">
-                        <span className="text-gray-400 text-sm">{formatDate(activity.timestamp)}</span>
+                        <span className="text-zinc-400 text-sm">{formatDate(activity.timestamp)}</span>
                       </td>
                       <td className="py-4 px-4">
-                        <Badge variant="outline" className="border-amber-500/30 text-amber-400">
+                        <Badge variant="outline" className="border-orange-500/30 text-orange-400">
                           {activity.type === 'lager' ? 'Lager' : 
                            activity.type === 'kasse' ? 'Kasse' :
                            activity.type === 'packages' ? 'Pakete' :
@@ -399,14 +399,14 @@ export default function TickerPage() {
                         <div className="flex items-center gap-2">
                           {getActivityIcon(activity.type, activity.action)}
                           <Badge className={
-                            activity.isPending ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
+                            activity.isPending ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
                             activity.type === 'lager' ? getMovementTypeColor(activity.action) :
                             activity.type === 'packages' ? (
                               activity.action === 'CONFIRMED' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
                               activity.action === 'REJECTED' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                              'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                              'bg-orange-500/20 text-orange-300 border-orange-500/30'
                             ) :
-                            'bg-gray-500/20 text-gray-300 border-gray-500/30'
+                            'bg-zinc-500/20 text-zinc-300 border-zinc-500/30'
                           }>
                             {activity.isPending ? '[ANGEFRAGT] ' : ''}{getActionDisplay(activity.type, activity.action)}
                           </Badge>
@@ -424,21 +424,21 @@ export default function TickerPage() {
                         {activity.type === 'lager' ? (
                           <div>
                             <div className="text-white font-medium">{activity.details.itemName}</div>
-                            <div className="text-sm text-gray-400">Menge: {activity.details.quantity}</div>
+                            <div className="text-sm text-zinc-400">Menge: {activity.details.quantity}</div>
                           </div>
                         ) : activity.type === 'packages' ? (
                           <div className="text-white font-medium">{activity.details.packages} Pakete</div>
                         ) : activity.type === 'sanctions' ? (
                           <div>
                             <div className="text-white font-medium">Level {activity.details.level}</div>
-                            <div className="text-sm text-gray-400">{activity.details.amount?.toLocaleString('de-DE')} Schwarzgeld</div>
+                            <div className="text-sm text-zinc-400">{activity.details.amount?.toLocaleString('de-DE')} Schwarzgeld</div>
                           </div>
                         ) : (
                           <div className="text-white font-medium">{formatCurrency(activity.details.amount)}</div>
                         )}
                       </td>
                       <td className="py-4 px-4 max-w-xs">
-                        <span className="text-gray-400 text-sm truncate block">{activity.details.note || '-'}</span>
+                        <span className="text-zinc-400 text-sm truncate block">{activity.details.note || '-'}</span>
                       </td>
                     </tr>
                   ))}

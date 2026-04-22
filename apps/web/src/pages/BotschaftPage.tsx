@@ -12,15 +12,15 @@ export default function BotschaftPage() {
         <h1 className="text-4xl font-bold text-primary">
           🌹 Ceremonia de Iniciación
         </h1>
-        <p className="text-xl text-gray-300">
+        <p className="text-xl text-zinc-300">
           LaSanta Calavera
         </p>
       </div>
 
       {/* Einleitung */}
-      <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-primary/20">
+      <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-primary/20">
         <CardContent className="pt-6">
-          <p className="text-gray-200 text-lg leading-relaxed italic">
+          <p className="text-zinc-200 text-lg leading-relaxed italic">
             <strong>Hermanos y Hermanas,</strong> ab heute wird es anders. Dies ist nicht irgendeine Vorstellung, 
             kein loses Gespräch, kein bedeutungsloser Moment. Dies ist eine Zeremonie – ein Ritual, das tief in 
             unserer Geschichte verwurzelt ist. Ein Moment, der wie ein Film in Erinnerung bleiben soll, der sich 
@@ -30,7 +30,7 @@ export default function BotschaftPage() {
       </Card>
 
       {/* Schritt 1: Die Vorstellung */}
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
             <Flower2 className="h-6 w-6" />
@@ -38,12 +38,12 @@ export default function BotschaftPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-gray-300 leading-relaxed">
+          <p className="text-zinc-300 leading-relaxed">
             Der Vorstellende beginnt. Er erzählt von seiner Reise, seinen Beweggründen, von dem Weg, 
             der ihn hierhergeführt hat.
           </p>
           <div className="p-4 bg-primary/10 border-l-4 border-primary rounded">
-            <p className="text-gray-200 font-medium">
+            <p className="text-zinc-200 font-medium">
               👉 Leitfrage: „Was hat dich zu den Toren der LaSanta Calavera gebracht? Warum gerade wir?"
             </p>
           </div>
@@ -51,7 +51,7 @@ export default function BotschaftPage() {
       </Card>
 
       {/* Schritt 2: Die Fragen der Familie */}
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
             <Sword className="h-6 w-6" />
@@ -59,7 +59,7 @@ export default function BotschaftPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-gray-300 leading-relaxed mb-4">
+          <p className="text-zinc-300 leading-relaxed mb-4">
             Jede Frage ist ein Schnitt, der tiefer geht als Worte.
           </p>
           <ul className="space-y-3">
@@ -71,9 +71,9 @@ export default function BotschaftPage() {
               'Was bist du bereit aufzugeben, um ein Teil dieser Familie zu werden?',
               'Was unterscheidet dich von denen, die vor dir standen – und nie wieder herauskamen?',
             ].map((question, index) => (
-              <li key={index} className="flex items-start gap-3 p-3 bg-gray-800/50 rounded border border-gray-700">
+              <li key={index} className="flex items-start gap-3 p-3 bg-zinc-800/50 rounded border border-zinc-700">
                 <span className="text-primary font-bold">•</span>
-                <span className="text-gray-200">{question}</span>
+                <span className="text-zinc-200">{question}</span>
               </li>
             ))}
           </ul>
@@ -81,7 +81,7 @@ export default function BotschaftPage() {
       </Card>
 
       {/* Schritt 3: Die Rede der Familie */}
-      <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-primary/30">
+      <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-primary/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
             <ScrollText className="h-6 w-6" />
@@ -90,35 +90,35 @@ export default function BotschaftPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="prose prose-invert max-w-none">
-            <p className="text-gray-200 text-lg font-semibold mb-4">
+            <p className="text-zinc-200 text-lg font-semibold mb-4">
               Das Leben im <span className="text-primary">LaSanta Calavera</span> …
             </p>
             
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-zinc-300 leading-relaxed">
               … ist wie das Wachsen einer Rose im Schatten der Welt.
             </p>
 
             <ul className="space-y-2 my-4">
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-zinc-300">
                 <Flower2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <span>Die <strong>Familie</strong> ist die Blüte – schön, stark, unser Stolz.</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-zinc-300">
                 <Shield className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <span>Die <strong>Führung</strong> ist der Stiel – aufrecht, standhaft, das Rückgrat.</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-zinc-300">
                 <Sword className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <span>Der <strong>Patrón</strong> ist der Dorn – scharf, wachsam, der Schutz gegen jede Gefahr.</span>
               </li>
             </ul>
 
-            <p className="text-gray-300 leading-relaxed italic border-l-4 border-primary/50 pl-4 my-4">
+            <p className="text-zinc-300 leading-relaxed italic border-l-4 border-primary/50 pl-4 my-4">
               Doch eine Rose lebt nur, wenn Blut den Boden nährt, in dem sie wächst. Jedes Opfer, jeder Tropfen, 
               jede Wunde – sie sind die Nahrung, die uns unsterblich macht.
             </p>
 
-            <div className="space-y-3 text-gray-300 leading-relaxed">
+            <div className="space-y-3 text-zinc-300 leading-relaxed">
               <p>
                 Das Leben im Kartell ist kein einfaches Leben. Es ist ein Weg voller Schatten, Gefahren und Versuchungen. 
                 Doch inmitten dieser Dunkelheit trägt jeder von uns das Licht der Familie.
@@ -150,7 +150,7 @@ export default function BotschaftPage() {
                 Ein Erbe, das stärker ist als der Tod.
               </p>
 
-              <p className="text-lg font-semibold text-gray-200 mt-6">
+              <p className="text-lg font-semibold text-zinc-200 mt-6">
                 Und nun frage ich dich:
               </p>
 
@@ -178,17 +178,17 @@ export default function BotschaftPage() {
       </Card>
 
       {/* Schritt 4: Das "Sí" */}
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
             🩸 Schritt 4: Das „Sí" – Das Schwurwort
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-300 leading-relaxed">
+          <p className="text-zinc-300 leading-relaxed">
             Wenn du bereit bist, dann sprich dein <strong className="text-primary">Sí</strong>.
           </p>
-          <p className="text-gray-300 leading-relaxed mt-3">
+          <p className="text-zinc-300 leading-relaxed mt-3">
             Mit diesem Sí gehst du nicht nur einen Weg – du schließt einen Pakt. Einen Pakt, den man nicht bricht, 
             ohne den Preis mit Blut zu zahlen.
           </p>
@@ -196,7 +196,7 @@ export default function BotschaftPage() {
       </Card>
 
       {/* Schritt 5: Die Machete */}
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
             <Sword className="h-6 w-6" />
@@ -204,29 +204,29 @@ export default function BotschaftPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-300 leading-relaxed">
+          <p className="text-zinc-300 leading-relaxed">
             Du legst deine Hand auf die Machete. Du schwörst deine Treue – nicht mit bloßen Worten, 
             sondern mit dem Gewicht deiner Seele.
           </p>
-          <p className="text-gray-300 leading-relaxed mt-3">
+          <p className="text-zinc-300 leading-relaxed mt-3">
             Dein Schwur wird zu einer Kette, die dich für immer an uns bindet.
           </p>
         </CardContent>
       </Card>
 
       {/* Schritt 6: Blood-In */}
-      <Card className="bg-gradient-to-br from-red-950/30 to-gray-900 border-primary/30">
+      <Card className="bg-gradient-to-br from-red-950/30 to-zinc-900 border-primary/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary text-2xl">
             ☠️ Schritt 6: Blood-In – Der letzte Schritt
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-200 leading-relaxed text-lg">
+          <p className="text-zinc-200 leading-relaxed text-lg">
             Dies ist dein <strong className="text-primary">Blood-In</strong>.
           </p>
           
-          <div className="space-y-2 text-gray-300 leading-relaxed">
+          <div className="space-y-2 text-zinc-300 leading-relaxed">
             <p>Von diesem Moment an gehörst du nicht mehr dir.</p>
             <p>Von diesem Moment an gehörst du uns.</p>
             <p>Dein Blut nährt unsere Rose.</p>
@@ -238,7 +238,7 @@ export default function BotschaftPage() {
       </Card>
 
       {/* Abschluss */}
-      <Card className="bg-gradient-to-br from-gray-900 to-primary/10 border-primary/50">
+      <Card className="bg-gradient-to-br from-zinc-900 to-primary/10 border-primary/50">
         <CardContent className="py-8">
           <div className="text-center space-y-3">
             <Flower2 className="h-12 w-12 text-primary mx-auto" />

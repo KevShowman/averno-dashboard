@@ -45,23 +45,23 @@ export function formatCurrency(amount: number | string) {
 export function getRoleColor(role: string) {
   switch (role) {
     case 'PATRON':
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'DON':
     case 'CAPO':
-      return 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'ROUTENVERWALTUNG':
     case 'RUTAS':
       return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
     case 'LOGISTICA':
-      return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'SICARIO':
       return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'LINCE':
-      return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30'
     case 'FUTURO':
       return 'bg-slate-600/20 text-slate-500 border-slate-600/30'
     default:
-      return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30'
   }
 }
 
@@ -164,13 +164,13 @@ export function getMovementTypeColor(type: string) {
     case 'OUT':
       return 'bg-red-500/20 text-red-400 border-red-500/30'
     case 'ADJUST':
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'RESERVE':
-      return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'RELEASE':
       return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
     default:
-      return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30'
   }
 }
 
@@ -179,10 +179,10 @@ export function getTransactionStatusColor(status: string) {
     case 'APPROVED':
       return 'bg-green-500/20 text-green-400 border-green-500/30'
     case 'PENDING':
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     case 'REJECTED':
       return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     default:
-      return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30'
   }
 }

@@ -293,7 +293,7 @@ export default function PartnerManagementPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">Ausstehend</span>
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">Ausstehend</span>
       case 'APPROVED':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400 border border-green-500/30">Genehmigt</span>
       case 'REJECTED':
@@ -308,11 +308,11 @@ export default function PartnerManagementPage() {
       case 'ACTIVE':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Aktiv</span>
       case 'ENDANGERED':
-        return <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500/20 text-yellow-400">Gefährdet</span>
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400">Gefährdet</span>
       case 'DISSOLVED':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">Aufgelöst</span>
       default:
-        return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-400">Unbekannt</span>
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-500/20 text-zinc-400">Unbekannt</span>
     }
   }
 
@@ -321,7 +321,7 @@ export default function PartnerManagementPage() {
       case 'CREATE':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Neu</span>
       case 'UPDATE':
-        return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">Änderung</span>
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400">Änderung</span>
       case 'DELETE':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">Löschung</span>
       default:
@@ -348,7 +348,7 @@ export default function PartnerManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Users className="h-8 w-8 text-amber-500" />
+            <Users className="h-8 w-8 text-orange-500" />
             Partner-Verwaltung
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -358,20 +358,20 @@ export default function PartnerManagementPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-800 pb-2">
+      <div className="flex gap-2 border-b border-zinc-800 pb-2">
         <button
           onClick={() => setActiveTab('requests')}
           className={`px-4 py-2 rounded-t-lg transition-colors ${
             activeTab === 'requests'
-              ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Anfragen
             {pendingRequests.length > 0 && (
-              <span className="px-1.5 py-0.5 text-xs rounded-full bg-amber-500 text-black">
+              <span className="px-1.5 py-0.5 text-xs rounded-full bg-orange-500 text-black">
                 {pendingRequests.length}
               </span>
             )}
@@ -381,14 +381,14 @@ export default function PartnerManagementPage() {
           onClick={() => setActiveTab('partners')}
           className={`px-4 py-2 rounded-t-lg transition-colors ${
             activeTab === 'partners'
-              ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Aktive Partner
-            <span className="px-1.5 py-0.5 text-xs rounded-full bg-gray-700 text-gray-300">
+            <span className="px-1.5 py-0.5 text-xs rounded-full bg-zinc-700 text-zinc-300">
               {activePartners.length}
             </span>
           </div>
@@ -397,15 +397,15 @@ export default function PartnerManagementPage() {
           onClick={() => setActiveTab('suggestions')}
           className={`px-4 py-2 rounded-t-lg transition-colors ${
             activeTab === 'suggestions'
-              ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <div className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Vorschläge
             {pendingSuggestions.length > 0 && (
-              <span className="px-1.5 py-0.5 text-xs rounded-full bg-amber-500 text-black">
+              <span className="px-1.5 py-0.5 text-xs rounded-full bg-orange-500 text-black">
                 {pendingSuggestions.length}
               </span>
             )}
@@ -416,8 +416,8 @@ export default function PartnerManagementPage() {
             onClick={() => setActiveTab('permissions')}
             className={`px-4 py-2 rounded-t-lg transition-colors ${
               activeTab === 'permissions'
-                ? 'bg-amber-500/20 text-amber-400 border-b-2 border-amber-500'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -432,10 +432,10 @@ export default function PartnerManagementPage() {
       {activeTab === 'requests' && (
         <div className="space-y-4">
           {/* Pending Requests */}
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Clock className="h-5 w-5 text-amber-500" />
+                <Clock className="h-5 w-5 text-orange-500" />
                 Ausstehende Anfragen
               </CardTitle>
               <CardDescription>
@@ -445,10 +445,10 @@ export default function PartnerManagementPage() {
             <CardContent>
               {loadingRequests ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
                 </div>
               ) : pendingRequests.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-zinc-500">
                   <Check className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Keine ausstehenden Anfragen</p>
                 </div>
@@ -457,7 +457,7 @@ export default function PartnerManagementPage() {
                   {pendingRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                      className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg border border-zinc-700/50"
                     >
                       <div className="flex items-center gap-3">
                         {request.avatarUrl ? (
@@ -467,13 +467,13 @@ export default function PartnerManagementPage() {
                             className="w-10 h-10 rounded-full"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                            <Users className="h-5 w-5 text-gray-400" />
+                          <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center">
+                            <Users className="h-5 w-5 text-zinc-400" />
                           </div>
                         )}
                         <div>
                           <p className="font-medium text-white">{request.username}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-zinc-500">
                             Angefragt am {formatDate(request.createdAt)}
                           </p>
                         </div>
@@ -486,7 +486,7 @@ export default function PartnerManagementPage() {
                               placeholder="Ablehnungsgrund (optional)"
                               value={rejectNote}
                               onChange={(e) => setRejectNote(e.target.value)}
-                              className="px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+                              className="px-3 py-1.5 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                             />
                             <Button
                               size="sm"
@@ -549,32 +549,32 @@ export default function PartnerManagementPage() {
           </Card>
 
           {/* All Requests History */}
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gray-500" />
+                <FileText className="h-5 w-5 text-zinc-500" />
                 Anfragen-Verlauf
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loadingAllRequests ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
                 </div>
               ) : (
                 <div className="space-y-2">
                   {allRequests.filter(r => r.status !== 'PENDING').map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-lg"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                          <Users className="h-4 w-4 text-gray-400" />
+                        <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center">
+                          <Users className="h-4 w-4 text-zinc-400" />
                         </div>
                         <div>
                           <p className="text-sm text-white">{request.username}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-zinc-500">
                             {request.reviewedAt && formatDate(request.reviewedAt)}
                             {request.reviewedBy && ` von ${request.reviewedBy.icFirstName || request.reviewedBy.username}`}
                           </p>
@@ -583,7 +583,7 @@ export default function PartnerManagementPage() {
                       <div className="flex items-center gap-2">
                         {getStatusBadge(request.status)}
                         {request.reviewNote && (
-                          <span className="text-xs text-gray-500 max-w-48 truncate" title={request.reviewNote}>
+                          <span className="text-xs text-zinc-500 max-w-48 truncate" title={request.reviewNote}>
                             {request.reviewNote}
                           </span>
                         )}
@@ -598,7 +598,7 @@ export default function PartnerManagementPage() {
       )}
 
       {activeTab === 'partners' && (
-        <Card className="bg-gray-900/50 border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Users className="h-5 w-5 text-green-500" />
@@ -611,10 +611,10 @@ export default function PartnerManagementPage() {
           <CardContent>
             {loadingPartners ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
               </div>
             ) : activePartners.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-zinc-500">
                 <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>Keine aktiven Partner</p>
               </div>
@@ -623,7 +623,7 @@ export default function PartnerManagementPage() {
                 {activePartners.map((partner) => (
                   <div
                     key={partner.id}
-                    className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                    className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg border border-zinc-700/50"
                   >
                     <div className="flex items-center gap-3">
                       {partner.avatarUrl ? (
@@ -633,8 +633,8 @@ export default function PartnerManagementPage() {
                           className="w-10 h-10 rounded-full"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                          <Users className="h-5 w-5 text-gray-400" />
+                        <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center">
+                          <Users className="h-5 w-5 text-zinc-400" />
                         </div>
                       )}
                       <div>
@@ -648,14 +648,14 @@ export default function PartnerManagementPage() {
                           {partner.isTaxi && (
                             <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${
                               partner.isTaxiLead 
-                                ? 'bg-amber-500/20 text-amber-400' 
-                                : 'bg-blue-500/20 text-blue-400'
+                                ? 'bg-orange-500/20 text-orange-400' 
+                                : 'bg-orange-500/20 text-orange-400'
                             }`}>
                               {partner.isTaxiLead ? 'Taxi Lead' : 'Taxi'}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-zinc-500">
                           Seit {formatDate(partner.createdAt)}
                         </p>
                       </div>
@@ -673,11 +673,11 @@ export default function PartnerManagementPage() {
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                           partner.partnerCanViewContacts
                             ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                            : 'bg-gray-700/50 text-gray-400 border border-gray-600/50 hover:bg-gray-700'
+                            : 'bg-zinc-700/50 text-zinc-400 border border-zinc-600/50 hover:bg-zinc-700'
                         }`}
                         title={partner.partnerCanViewContacts ? 'Kontaktdetails-Zugriff aktiv' : 'Kontaktdetails-Zugriff deaktiviert'}
                       >
-                        <Eye className={`h-3.5 w-3.5 ${partner.partnerCanViewContacts ? 'text-emerald-400' : 'text-gray-500'}`} />
+                        <Eye className={`h-3.5 w-3.5 ${partner.partnerCanViewContacts ? 'text-emerald-400' : 'text-zinc-500'}`} />
                         {partner.partnerCanViewContacts ? 'Kontakte ✓' : 'Kontakte'}
                       </button>
                       <Button
@@ -710,10 +710,10 @@ export default function PartnerManagementPage() {
       )}
 
       {activeTab === 'suggestions' && (
-        <Card className="bg-gray-900/50 border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <FileText className="h-5 w-5 text-amber-500" />
+              <FileText className="h-5 w-5 text-orange-500" />
               Partner-Vorschläge
             </CardTitle>
             <CardDescription>
@@ -723,10 +723,10 @@ export default function PartnerManagementPage() {
           <CardContent>
             {loadingSuggestions ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
               </div>
             ) : pendingSuggestions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-zinc-500">
                 <Check className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>Keine ausstehenden Vorschläge</p>
               </div>
@@ -735,17 +735,17 @@ export default function PartnerManagementPage() {
                 {pendingSuggestions.map((suggestion) => (
                   <div
                     key={suggestion.id}
-                    className="bg-gray-800/50 rounded-lg border border-gray-700/50 overflow-hidden"
+                    className="bg-zinc-800/50 rounded-lg border border-zinc-700/50 overflow-hidden"
                   >
                     <div
-                      className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-800/70 transition-colors"
+                      className="flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-800/70 transition-colors"
                       onClick={() => setExpandedSuggestion(expandedSuggestion === suggestion.id ? null : suggestion.id)}
                     >
                       <div className="flex items-center gap-3">
                         {expandedSuggestion === suggestion.id ? (
-                          <ChevronDown className="h-4 w-4 text-gray-400" />
+                          <ChevronDown className="h-4 w-4 text-zinc-400" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                          <ChevronRight className="h-4 w-4 text-zinc-400" />
                         )}
                         <div>
                           <div className="flex items-center gap-2">
@@ -753,10 +753,10 @@ export default function PartnerManagementPage() {
                             {getSuggestionTypeBadge(suggestion.type)}
                             {suggestion.type !== 'DELETE' && getFamilyStatusBadge(suggestion.familyStatus)}
                           </div>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-zinc-500">
                             Von {suggestion.createdBy.username} • {formatDate(suggestion.createdAt)}
                             {suggestion.mapName && (
-                              <span className="ml-2 text-amber-400">• Hat Kartenstandort</span>
+                              <span className="ml-2 text-orange-400">• Hat Kartenstandort</span>
                             )}
                           </p>
                         </div>
@@ -769,7 +769,7 @@ export default function PartnerManagementPage() {
                               placeholder="Ablehnungsgrund (optional)"
                               value={rejectNote}
                               onChange={(e) => setRejectNote(e.target.value)}
-                              className="px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+                              className="px-3 py-1.5 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                             />
                             <Button
                               size="sm"
@@ -817,14 +817,14 @@ export default function PartnerManagementPage() {
                     </div>
                     
                     {expandedSuggestion === suggestion.id && (
-                      <div className="px-4 pb-4 pt-2 border-t border-gray-700/50 space-y-3">
+                      <div className="px-4 pb-4 pt-2 border-t border-zinc-700/50 space-y-3">
                         {suggestion.type === 'DELETE' && (
                           <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
                             <div className="flex items-center gap-2 text-red-400">
                               <Trash2 className="h-4 w-4" />
                               <span className="font-medium">Löschvorschlag</span>
                             </div>
-                            <p className="text-sm text-gray-400 mt-1">
+                            <p className="text-sm text-zinc-400 mt-1">
                               Der Partner schlägt vor, diesen Eintrag zu löschen.
                             </p>
                           </div>
@@ -832,8 +832,8 @@ export default function PartnerManagementPage() {
                         
                         {suggestion.propertyZip && (
                           <div className="flex items-center gap-2 text-sm">
-                            <MapPin className="h-4 w-4 text-gray-500" />
-                            <span className="text-gray-400">PLZ:</span>
+                            <MapPin className="h-4 w-4 text-zinc-500" />
+                            <span className="text-zinc-400">PLZ:</span>
                             <span className="text-white">{suggestion.propertyZip}</span>
                           </div>
                         )}
@@ -854,8 +854,8 @@ export default function PartnerManagementPage() {
                           
                           return (
                             <div className="flex items-center gap-2 text-sm">
-                              <MapPin className="h-4 w-4 text-amber-400" />
-                              <span className="text-gray-400">Karte:</span>
+                              <MapPin className="h-4 w-4 text-orange-400" />
+                              <span className="text-zinc-400">Karte:</span>
                               <span className="text-white">
                                 {(displayMapName || 'Unbekannt').replace('_', ' ')}
                               </span>
@@ -863,7 +863,7 @@ export default function PartnerManagementPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-6 px-2 text-amber-400 hover:text-amber-300"
+                                  className="h-6 px-2 text-orange-400 hover:text-orange-300"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     navigateToMap(displayMapName, displayMapX, displayMapY)
@@ -879,15 +879,15 @@ export default function PartnerManagementPage() {
 
                         {/* Kontaktdaten (nur für Leadership) */}
                         {(suggestion.contact1FirstName || suggestion.contact1Phone || suggestion.contact2FirstName || suggestion.contact2Phone) && (
-                          <div className="p-3 bg-gray-900/50 rounded-lg space-y-2">
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                              <Phone className="h-4 w-4 text-gray-500" />
+                          <div className="p-3 bg-zinc-900/50 rounded-lg space-y-2">
+                            <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+                              <Phone className="h-4 w-4 text-zinc-500" />
                               Kontaktdaten
                             </div>
                             {(suggestion.contact1FirstName || suggestion.contact1LastName || suggestion.contact1Phone) && (
                               <div className="flex items-center gap-2 text-sm pl-6">
-                                <User className="h-3 w-3 text-gray-500" />
-                                <span className="text-gray-400">Kontakt 1:</span>
+                                <User className="h-3 w-3 text-zinc-500" />
+                                <span className="text-zinc-400">Kontakt 1:</span>
                                 <span className="text-white">
                                   {[suggestion.contact1FirstName, suggestion.contact1LastName].filter(Boolean).join(' ')}
                                   {suggestion.contact1Phone && ` - ${suggestion.contact1Phone}`}
@@ -896,8 +896,8 @@ export default function PartnerManagementPage() {
                             )}
                             {(suggestion.contact2FirstName || suggestion.contact2LastName || suggestion.contact2Phone) && (
                               <div className="flex items-center gap-2 text-sm pl-6">
-                                <User className="h-3 w-3 text-gray-500" />
-                                <span className="text-gray-400">Kontakt 2:</span>
+                                <User className="h-3 w-3 text-zinc-500" />
+                                <span className="text-zinc-400">Kontakt 2:</span>
                                 <span className="text-white">
                                   {[suggestion.contact2FirstName, suggestion.contact2LastName].filter(Boolean).join(' ')}
                                   {suggestion.contact2Phone && ` - ${suggestion.contact2Phone}`}
@@ -909,8 +909,8 @@ export default function PartnerManagementPage() {
 
                         {suggestion.notes && (
                           <div className="text-sm">
-                            <span className="text-gray-400">Notizen:</span>
-                            <p className="text-white mt-1 bg-gray-900/50 p-2 rounded">
+                            <span className="text-zinc-400">Notizen:</span>
+                            <p className="text-white mt-1 bg-zinc-900/50 p-2 rounded">
                               {suggestion.notes}
                             </p>
                           </div>
@@ -918,7 +918,7 @@ export default function PartnerManagementPage() {
                         
                         {(suggestion.type === 'UPDATE' || suggestion.type === 'DELETE') && suggestion.familyContact && (
                           <div className="text-sm">
-                            <span className="text-gray-400">Bezieht sich auf:</span>
+                            <span className="text-zinc-400">Bezieht sich auf:</span>
                             <p className="text-white">{suggestion.familyContact.familyName}</p>
                           </div>
                         )}
@@ -935,10 +935,10 @@ export default function PartnerManagementPage() {
       {/* Berechtigungen Tab (nur Patron) */}
       {activeTab === 'permissions' && isElPatron && (
         <div className="space-y-4">
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5 text-amber-500" />
+                <Shield className="h-5 w-5 text-orange-500" />
                 Partner-Verwaltungs-Berechtigungen
               </CardTitle>
               <CardDescription>
@@ -948,13 +948,13 @@ export default function PartnerManagementPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Neue Berechtigung vergeben */}
-              <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Berechtigung vergeben</h4>
+              <div className="p-4 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
+                <h4 className="text-sm font-medium text-zinc-300 mb-3">Berechtigung vergeben</h4>
                 <div className="flex gap-2">
                   <select
                     value={selectedUserId}
                     onChange={(e) => setSelectedUserId(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                   >
                     <option value="">Mitglied auswählen...</option>
                     {usersWithoutPermission.map((u) => (
@@ -969,7 +969,7 @@ export default function PartnerManagementPage() {
                   <Button
                     onClick={() => selectedUserId && grantPermissionMutation.mutate(selectedUserId)}
                     disabled={!selectedUserId || grantPermissionMutation.isPending}
-                    className="bg-amber-500 hover:bg-amber-600"
+                    className="bg-orange-500 hover:bg-orange-600"
                   >
                     {grantPermissionMutation.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -986,21 +986,21 @@ export default function PartnerManagementPage() {
               {/* Aktuelle Berechtigungen */}
               {loadingPermissions ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
                 </div>
               ) : permissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-zinc-500">
                   <Shield className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Keine zusätzlichen Berechtigungen vergeben</p>
                   <p className="text-sm mt-1">Leadership hat automatisch Zugriff</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-400">Berechtigte Mitglieder</h4>
+                  <h4 className="text-sm font-medium text-zinc-400">Berechtigte Mitglieder</h4>
                   {permissions.map((permission) => (
                     <div
                       key={permission.id}
-                      className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                      className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50"
                     >
                       <div>
                         <p className="font-medium text-white">
@@ -1009,7 +1009,7 @@ export default function PartnerManagementPage() {
                             : permission.user.username
                           }
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-zinc-500">
                           Berechtigt von {permission.grantedBy.icFirstName || permission.grantedBy.username} 
                           {' • '}{formatDate(permission.createdAt)}
                         </p>
@@ -1042,12 +1042,12 @@ export default function PartnerManagementPage() {
           </Card>
 
           {/* Info-Box */}
-          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <div className="p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
-              <div className="text-sm text-gray-300">
-                <p className="font-medium text-blue-400 mb-1">Hinweis zu Berechtigungen</p>
-                <ul className="list-disc list-inside space-y-1 text-gray-400">
+              <AlertCircle className="h-5 w-5 text-orange-400 mt-0.5" />
+              <div className="text-sm text-zinc-300">
+                <p className="font-medium text-orange-400 mb-1">Hinweis zu Berechtigungen</p>
+                <ul className="list-disc list-inside space-y-1 text-zinc-400">
                   <li>Leadership (Patron, Don, Capo, Capo) hat automatisch Zugriff</li>
                   <li>Berechtigte Mitglieder können Partner-Anfragen annehmen/ablehnen</li>
                   <li>Berechtigte Mitglieder können Partner-Vorschläge prüfen</li>

@@ -124,25 +124,25 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header with Welcome */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative">
           <div className="flex items-center gap-4 mb-2">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-amber-600/30 rounded-full blur-xl scale-125 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-orange-600/30 rounded-full blur-xl scale-125 pointer-events-none" />
               <img 
                 src="/logo.png" 
-                alt="La Santa Calavera" 
+                alt="El Averno Cartel" 
                 className="relative h-14 w-14 object-contain drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]"
               />
             </div>
-            <h1 className="text-4xl font-bold text-white">La Santa Calavera</h1>
+            <h1 className="text-4xl font-bold text-white">El Averno Cartel</h1>
           </div>
-          <p className="text-gray-400 text-lg max-w-2xl">
-            Willkommen zurück, <span className="text-amber-400 font-medium">{user?.icFirstName || user?.username}</span>. 
+          <p className="text-zinc-400 text-lg max-w-2xl">
+            Willkommen zurück, <span className="text-orange-400 font-medium">{user?.icFirstName || user?.username}</span>. 
             Hier ist dein Überblick über die Familiengeschäfte.
           </p>
         </div>
@@ -151,7 +151,7 @@ export default function DashboardPage() {
       {/* Quick Stats - Semantic Colors Only */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Balance - Green for money */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20 hover:border-amber-500/40 transition-colors">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20 hover:border-orange-500/40 transition-colors">
           <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
@@ -165,18 +165,18 @@ export default function DashboardPage() {
                 </Badge>
               )}
             </div>
-            <p className="text-gray-400 text-sm mb-1">Gesamtsaldo</p>
+            <p className="text-zinc-400 text-sm mb-1">Gesamtsaldo</p>
             <p className="text-2xl font-bold text-green-400">{formatCurrency(stats.currentBalance)}</p>
           </CardContent>
         </Card>
 
         {/* Critical Items - Red only when critical */}
-        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${stats.criticalItems > 0 ? 'border-red-500/30' : 'border-amber-500/20'} hover:border-amber-500/40 transition-colors`}>
-          <div className={`absolute top-0 right-0 w-20 h-20 ${stats.criticalItems > 0 ? 'bg-red-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl pointer-events-none`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 ${stats.criticalItems > 0 ? 'border-red-500/30' : 'border-orange-500/20'} hover:border-orange-500/40 transition-colors`}>
+          <div className={`absolute top-0 right-0 w-20 h-20 ${stats.criticalItems > 0 ? 'bg-red-500/10' : 'bg-orange-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <div className={`p-2 ${stats.criticalItems > 0 ? 'bg-red-500/20' : 'bg-amber-500/20'} rounded-lg`}>
-                <Boxes className={`h-5 w-5 ${stats.criticalItems > 0 ? 'text-red-400' : 'text-amber-400'}`} />
+              <div className={`p-2 ${stats.criticalItems > 0 ? 'bg-red-500/20' : 'bg-orange-500/20'} rounded-lg`}>
+                <Boxes className={`h-5 w-5 ${stats.criticalItems > 0 ? 'text-red-400' : 'text-orange-400'}`} />
               </div>
               {stats.criticalItems > 0 && (
                 <Badge className="bg-red-500/20 text-red-300 border-0 animate-pulse">
@@ -185,49 +185,49 @@ export default function DashboardPage() {
                 </Badge>
               )}
             </div>
-            <p className="text-gray-400 text-sm mb-1">Lagerbestand</p>
+            <p className="text-zinc-400 text-sm mb-1">Lagerbestand</p>
             <p className="text-2xl font-bold text-white">
               {stats.criticalItems > 0 ? (
                 <span className="text-red-400">{stats.criticalItems} kritisch</span>
               ) : (
-                <span className="text-amber-400">{stats.totalItems} Artikel</span>
+                <span className="text-orange-400">{stats.totalItems} Artikel</span>
               )}
             </p>
           </CardContent>
         </Card>
 
         {/* Pending - Yellow only when pending */}
-        <Card className={`relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 ${stats.pendingTransactions > 0 ? 'border-yellow-500/30' : 'border-amber-500/20'} hover:border-amber-500/40 transition-colors`}>
-          <div className={`absolute top-0 right-0 w-20 h-20 ${stats.pendingTransactions > 0 ? 'bg-yellow-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl pointer-events-none`} />
+        <Card className={`relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 ${stats.pendingTransactions > 0 ? 'border-orange-500/30' : 'border-orange-500/20'} hover:border-orange-500/40 transition-colors`}>
+          <div className={`absolute top-0 right-0 w-20 h-20 ${stats.pendingTransactions > 0 ? 'bg-orange-500/10' : 'bg-orange-500/10'} rounded-full blur-2xl pointer-events-none`} />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <div className={`p-2 ${stats.pendingTransactions > 0 ? 'bg-yellow-500/20' : 'bg-amber-500/20'} rounded-lg`}>
-                <Clock className={`h-5 w-5 ${stats.pendingTransactions > 0 ? 'text-yellow-400' : 'text-amber-400'}`} />
+              <div className={`p-2 ${stats.pendingTransactions > 0 ? 'bg-orange-500/20' : 'bg-orange-500/20'} rounded-lg`}>
+                <Clock className={`h-5 w-5 ${stats.pendingTransactions > 0 ? 'text-orange-400' : 'text-orange-400'}`} />
               </div>
               {stats.pendingTransactions > 0 && (
-                <Badge className="bg-yellow-500/20 text-yellow-300 border-0">
+                <Badge className="bg-orange-500/20 text-orange-300 border-0">
                   Ausstehend
                 </Badge>
               )}
             </div>
-            <p className="text-gray-400 text-sm mb-1">Genehmigungen</p>
-            <p className={`text-2xl font-bold ${stats.pendingTransactions > 0 ? 'text-yellow-400' : 'text-amber-400'}`}>{stats.pendingTransactions}</p>
+            <p className="text-zinc-400 text-sm mb-1">Genehmigungen</p>
+            <p className={`text-2xl font-bold ${stats.pendingTransactions > 0 ? 'text-orange-400' : 'text-orange-400'}`}>{stats.pendingTransactions}</p>
           </CardContent>
         </Card>
 
         {/* Week Change */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20 hover:border-amber-500/40 transition-colors">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20 hover:border-orange-500/40 transition-colors">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-2 bg-amber-500/20 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-amber-400" />
+              <div className="p-2 bg-orange-500/20 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-orange-400" />
               </div>
               <Badge className={`${stats.weekChange >= 0 ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'} border-0`}>
                 {stats.weekChange >= 0 ? 'Profit' : 'Loss'}
               </Badge>
             </div>
-            <p className="text-gray-400 text-sm mb-1">Diese Woche</p>
+            <p className="text-zinc-400 text-sm mb-1">Diese Woche</p>
             <p className={`text-2xl font-bold ${stats.weekChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {stats.weekChange >= 0 ? '+' : ''}{formatCurrency(stats.weekChange)}
             </p>
@@ -238,8 +238,8 @@ export default function DashboardPage() {
       {/* Modules - All Gold Theme */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-amber-500/20 rounded-lg">
-            <Calendar className="h-5 w-5 text-amber-400" />
+          <div className="p-2 bg-orange-500/20 rounded-lg">
+            <Calendar className="h-5 w-5 text-orange-400" />
           </div>
           <h2 className="text-xl font-semibold text-white">Module</h2>
         </div>
@@ -247,18 +247,18 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {modules.map((module) => (
             <Link key={module.key} to={`/${module.key}`}>
-              <Card className="h-full bg-gray-900/50 border-amber-500/10 hover:border-amber-500/40 hover:bg-gray-800/50 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300 group cursor-pointer">
+              <Card className="h-full bg-zinc-900/50 border-orange-500/10 hover:border-orange-500/40 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-orange-500/10 transition-all duration-300 group cursor-pointer">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="p-2.5 bg-amber-500/10 group-hover:bg-amber-500/20 rounded-xl transition-colors">
-                      <module.icon className="h-5 w-5 text-amber-400" />
+                    <div className="p-2.5 bg-orange-500/10 group-hover:bg-orange-500/20 rounded-xl transition-colors">
+                      <module.icon className="h-5 w-5 text-orange-400" />
                     </div>
-                    <ArrowUpRight className="h-4 w-4 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                    <ArrowUpRight className="h-4 w-4 text-zinc-600 group-hover:text-orange-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <h3 className="text-white font-semibold mb-1 group-hover:text-amber-300 transition-colors">
+                  <h3 className="text-white font-semibold mb-1 group-hover:text-orange-300 transition-colors">
                     {module.name}
                   </h3>
-                  <p className="text-gray-500 text-sm">{module.desc}</p>
+                  <p className="text-zinc-500 text-sm">{module.desc}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -267,8 +267,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Footer Info */}
-      <Card className="bg-gray-900/30 border-gray-800">
-        <CardContent className="p-4 flex items-center justify-between text-sm text-gray-500">
+      <Card className="bg-zinc-900/30 border-zinc-800">
+        <CardContent className="p-4 flex items-center justify-between text-sm text-zinc-500">
           <div className="flex items-center gap-2">
             <img 
               src="/logo.png" 

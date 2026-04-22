@@ -105,15 +105,15 @@ export default function CreateExclusionModal({
   if (!isOpen) return null
 
   const accentColor = type === 'aufstellung' ? 'purple' : 'cyan'
-  const gradientFrom = type === 'aufstellung' ? 'from-purple-600' : 'from-cyan-600'
-  const gradientTo = type === 'aufstellung' ? 'to-violet-600' : 'to-blue-600'
-  const borderColor = type === 'aufstellung' ? 'border-purple-500/30' : 'border-cyan-500/30'
-  const glowFrom = type === 'aufstellung' ? 'from-purple-600/20' : 'from-cyan-600/20'
-  const glowVia = type === 'aufstellung' ? 'via-violet-500/20' : 'via-blue-500/20'
-  const headerBg = type === 'aufstellung' ? 'from-purple-900/50 via-violet-800/30' : 'from-cyan-900/50 via-blue-800/30'
-  const iconColor = type === 'aufstellung' ? 'text-purple-400' : 'text-cyan-400'
-  const focusBorder = type === 'aufstellung' ? 'focus:border-purple-500 focus:ring-purple-500/20' : 'focus:border-cyan-500 focus:ring-cyan-500/20'
-  const shadowColor = type === 'aufstellung' ? 'shadow-purple-500/25 hover:shadow-purple-500/40' : 'shadow-cyan-500/25 hover:shadow-cyan-500/40'
+  const gradientFrom = type === 'aufstellung' ? 'from-purple-600' : 'from-orange-600'
+  const gradientTo = type === 'aufstellung' ? 'to-violet-600' : 'to-orange-600'
+  const borderColor = type === 'aufstellung' ? 'border-purple-500/30' : 'border-orange-500/30'
+  const glowFrom = type === 'aufstellung' ? 'from-purple-600/20' : 'from-orange-600/20'
+  const glowVia = type === 'aufstellung' ? 'via-violet-500/20' : 'via-orange-500/20'
+  const headerBg = type === 'aufstellung' ? 'from-purple-900/50 via-violet-800/30' : 'from-orange-900/50 via-orange-800/30'
+  const iconColor = type === 'aufstellung' ? 'text-purple-400' : 'text-orange-400'
+  const focusBorder = type === 'aufstellung' ? 'focus:border-purple-500 focus:ring-purple-500/20' : 'focus:border-orange-500 focus:ring-orange-500/20'
+  const shadowColor = type === 'aufstellung' ? 'shadow-purple-500/25 hover:shadow-purple-500/40' : 'shadow-orange-500/25 hover:shadow-orange-500/40'
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
@@ -121,7 +121,7 @@ export default function CreateExclusionModal({
         {/* Glow Effect */}
         <div className={`absolute inset-0 bg-gradient-to-r ${glowFrom} ${glowVia} ${glowFrom} blur-xl rounded-2xl`} />
         
-        <Card className={`relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 ${borderColor} shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto`}>
+        <Card className={`relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 ${borderColor} shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto`}>
           {/* Header mit Gradient */}
           <div className="relative">
             <div className={`absolute inset-0 bg-gradient-to-r ${headerBg} to-transparent`} />
@@ -135,7 +135,7 @@ export default function CreateExclusionModal({
                     <CardTitle className="text-2xl font-bold text-white">
                       Ausschluss erstellen
                     </CardTitle>
-                    <CardDescription className={`${type === 'aufstellung' ? 'text-purple-200/70' : 'text-cyan-200/70'} mt-1`}>
+                    <CardDescription className={`${type === 'aufstellung' ? 'text-purple-200/70' : 'text-orange-200/70'} mt-1`}>
                       {type === 'aufstellung' 
                         ? 'Von Aufstellungen ausschließen'
                         : 'Von Wochenabgabe ausschließen'
@@ -148,7 +148,7 @@ export default function CreateExclusionModal({
                   size="icon"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                  className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -159,7 +159,7 @@ export default function CreateExclusionModal({
           <CardContent className="pt-2 pb-6 space-y-5">
             {/* User Selection */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+              <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                 <User className={`h-4 w-4 ${iconColor}`} />
                 Benutzer auswählen
               </label>
@@ -167,18 +167,18 @@ export default function CreateExclusionModal({
               {!selectedUser ? (
                 <div className="space-y-2">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
                     <Input
                       placeholder="Name eingeben..."
                       value={searchUser}
                       onChange={(e) => setSearchUser(e.target.value)}
-                      className={`pl-10 bg-gray-800/50 border-gray-700 ${focusBorder} text-white h-11`}
+                      className={`pl-10 bg-zinc-800/50 border-zinc-700 ${focusBorder} text-white h-11`}
                       disabled={isLoading}
                     />
                   </div>
                   
                   {searchResults.length > 0 && (
-                    <div className="max-h-48 overflow-y-auto border border-gray-700 rounded-xl bg-gray-800/80 backdrop-blur-sm divide-y divide-gray-700/50">
+                    <div className="max-h-48 overflow-y-auto border border-zinc-700 rounded-xl bg-zinc-800/80 backdrop-blur-sm divide-y divide-zinc-700/50">
                       {searchResults.map((user) => (
                         <button
                           key={user.id}
@@ -190,21 +190,21 @@ export default function CreateExclusionModal({
                           </div>
                           <div>
                             <div className="text-white font-medium">{getDisplayName(user)}</div>
-                            <div className="text-gray-400 text-sm">
+                            <div className="text-zinc-400 text-sm">
                               {user.icFirstName && user.icLastName 
                                 ? `${user.icFirstName} ${user.icLastName}`
                                 : 'Kein IC-Name'
                               }
                             </div>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-gray-500 ml-auto" />
+                          <ChevronRight className="h-4 w-4 text-zinc-500 ml-auto" />
                         </button>
                       ))}
                     </div>
                   )}
                   
                   {isSearching && (
-                    <div className="flex items-center gap-2 text-gray-400 text-sm p-2">
+                    <div className="flex items-center gap-2 text-zinc-400 text-sm p-2">
                       <div className={`h-4 w-4 border-2 border-${accentColor}-500/30 border-t-${accentColor}-500 rounded-full animate-spin`} />
                       Suche...
                     </div>
@@ -240,12 +240,12 @@ export default function CreateExclusionModal({
 
             {/* Reason */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+              <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                 <FileText className={`h-4 w-4 ${iconColor}`} />
                 Grund für den Ausschluss
               </label>
               <Textarea
-                className={`w-full p-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${focusBorder} resize-none transition-all`}
+                className={`w-full p-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${focusBorder} resize-none transition-all`}
                 rows={3}
                 placeholder="Beschreibe den Grund..."
                 value={reason}
@@ -257,7 +257,7 @@ export default function CreateExclusionModal({
             {/* Date Range */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                   <Calendar className={`h-4 w-4 ${iconColor}`} />
                   Von
                 </label>
@@ -266,31 +266,31 @@ export default function CreateExclusionModal({
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                   disabled={isLoading}
-                  className={`bg-gray-800/50 border-gray-700 ${focusBorder} text-white h-11 [color-scheme:dark]`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${focusBorder} text-white h-11 [color-scheme:dark]`}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                   <CalendarRange className={`h-4 w-4 ${iconColor}`} />
-                  Bis <span className="text-gray-500 font-normal">(optional)</span>
+                  Bis <span className="text-zinc-500 font-normal">(optional)</span>
                 </label>
                 <Input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   disabled={isLoading}
-                  className={`bg-gray-800/50 border-gray-700 ${focusBorder} text-white h-11 [color-scheme:dark]`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${focusBorder} text-white h-11 [color-scheme:dark]`}
                 />
               </div>
             </div>
 
             {/* Info */}
-            <div className={`bg-gradient-to-r ${type === 'aufstellung' ? 'from-purple-900/30 to-violet-900/20 border-purple-500/30' : 'from-cyan-900/30 to-blue-900/20 border-cyan-500/30'} border p-4 rounded-xl`}>
+            <div className={`bg-gradient-to-r ${type === 'aufstellung' ? 'from-purple-900/30 to-violet-900/20 border-purple-500/30' : 'from-orange-900/30 to-orange-900/20 border-orange-500/30'} border p-4 rounded-xl`}>
               <div className="flex items-start gap-3">
                 <AlertTriangle className={`h-5 w-5 ${iconColor} flex-shrink-0 mt-0.5`} />
                 <div className="text-sm">
-                  <p className={`${type === 'aufstellung' ? 'text-purple-300' : 'text-cyan-300'} font-medium mb-1`}>Hinweis</p>
-                  <p className="text-gray-300/80">
+                  <p className={`${type === 'aufstellung' ? 'text-purple-300' : 'text-orange-300'} font-medium mb-1`}>Hinweis</p>
+                  <p className="text-zinc-300/80">
                     {type === 'aufstellung'
                       ? 'Der Benutzer wird von Aufstellungen ausgeschlossen und nicht automatisch sanktioniert.'
                       : 'Der Benutzer wird von der Wochenabgabe ausgeschlossen.'
@@ -307,7 +307,7 @@ export default function CreateExclusionModal({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
               >
                 Abbrechen
               </Button>

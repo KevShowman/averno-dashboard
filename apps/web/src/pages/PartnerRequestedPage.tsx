@@ -6,11 +6,11 @@ export default function PartnerRequestedPage() {
   usePageTitle('Partner-Anfrage gesendet')
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 overflow-hidden relative">
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 overflow-hidden relative">
       {/* Animated Background */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         <div 
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -18,14 +18,14 @@ export default function PartnerRequestedPage() {
             backgroundSize: '50px 50px'
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/50 to-gray-950" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/50 to-zinc-950" />
       </div>
 
       {/* Main Content */}
       <div className="relative w-full max-w-lg">
-        <div className="absolute -inset-4 bg-gradient-to-r from-green-500/10 via-amber-500/10 to-green-500/10 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
+        <div className="absolute -inset-4 bg-gradient-to-r from-green-500/10 via-orange-500/10 to-green-500/10 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
         
-        <div className="relative bg-gradient-to-br from-gray-900/90 via-gray-900/95 to-gray-950/90 backdrop-blur-xl rounded-3xl border border-gray-700/30 shadow-2xl overflow-hidden">
+        <div className="relative bg-gradient-to-br from-zinc-900/90 via-zinc-900/95 to-zinc-950/90 backdrop-blur-xl rounded-3xl border border-zinc-700/30 shadow-2xl overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
           
           <div className="p-8 md:p-12">
@@ -49,10 +49,10 @@ export default function PartnerRequestedPage() {
               <div className="flex items-start gap-3">
                 <Shield className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-zinc-300 text-sm">
                     Deine Partner-Zugangsanfrage wurde erfolgreich gesendet. Ein Mitglied der Führung wird deine Anfrage prüfen.
                   </p>
-                  <p className="text-gray-500 text-xs mt-2">
+                  <p className="text-zinc-500 text-xs mt-2">
                     Du erhältst Zugang zur interaktiven Karte und Listenführung, sobald deine Anfrage genehmigt wurde.
                   </p>
                 </div>
@@ -61,18 +61,18 @@ export default function PartnerRequestedPage() {
 
             {/* What's Next */}
             <div className="space-y-3 mb-8">
-              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Was passiert jetzt?</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
+              <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">Was passiert jetzt?</h3>
+              <ul className="space-y-2 text-sm text-zinc-300">
                 <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 bg-amber-500 rounded-full" />
+                  <div className="h-1.5 w-1.5 bg-orange-500 rounded-full" />
                   <span>Deine Anfrage wird von der Führung geprüft</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 bg-amber-500 rounded-full" />
+                  <div className="h-1.5 w-1.5 bg-orange-500 rounded-full" />
                   <span>Bei Genehmigung erhältst du eingeschränkten Zugang</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 bg-amber-500 rounded-full" />
+                  <div className="h-1.5 w-1.5 bg-orange-500 rounded-full" />
                   <span>Du kannst dann Familien auf der Karte sehen und Vorschläge machen</span>
                 </li>
               </ul>
@@ -81,7 +81,7 @@ export default function PartnerRequestedPage() {
             {/* Back to Login */}
             <Link
               to="/login"
-              className="flex items-center justify-center gap-2 py-3 px-4 text-gray-400 hover:text-white transition-colors"
+              className="flex items-center justify-center gap-2 py-3 px-4 text-zinc-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Zurück zur Anmeldung</span>

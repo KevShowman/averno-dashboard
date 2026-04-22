@@ -95,28 +95,28 @@ export default function StockMovementModal({
           title: 'Bestandskorrektur',
           description: 'Bestand manuell korrigieren',
           icon: RefreshCw,
-          gradient: 'from-yellow-600 to-amber-600',
-          border: 'border-yellow-500/30',
-          glow: 'from-yellow-600/20 via-amber-500/20 to-yellow-600/20',
-          headerBg: 'from-yellow-900/50 via-amber-800/30',
-          iconBg: 'text-yellow-400',
-          text: 'text-yellow-200/70',
-          ring: 'focus:ring-yellow-500/20 focus:border-yellow-500',
-          shadow: 'shadow-yellow-500/25 hover:shadow-yellow-500/40',
+          gradient: 'from-orange-600 to-orange-600',
+          border: 'border-orange-500/30',
+          glow: 'from-orange-600/20 via-orange-500/20 to-orange-600/20',
+          headerBg: 'from-orange-900/50 via-orange-800/30',
+          iconBg: 'text-orange-400',
+          text: 'text-orange-200/70',
+          ring: 'focus:ring-orange-500/20 focus:border-orange-500',
+          shadow: 'shadow-orange-500/25 hover:shadow-orange-500/40',
         }
       case 'RESERVE':
         return {
           title: 'Reservierung',
           description: 'Artikel für bestimmten Zweck reservieren',
           icon: Lock,
-          gradient: 'from-blue-600 to-cyan-600',
-          border: 'border-blue-500/30',
-          glow: 'from-blue-600/20 via-cyan-500/20 to-blue-600/20',
-          headerBg: 'from-blue-900/50 via-cyan-800/30',
-          iconBg: 'text-blue-400',
-          text: 'text-blue-200/70',
-          ring: 'focus:ring-blue-500/20 focus:border-blue-500',
-          shadow: 'shadow-blue-500/25 hover:shadow-blue-500/40',
+          gradient: 'from-orange-600 to-orange-600',
+          border: 'border-orange-500/30',
+          glow: 'from-orange-600/20 via-orange-500/20 to-orange-600/20',
+          headerBg: 'from-orange-900/50 via-orange-800/30',
+          iconBg: 'text-orange-400',
+          text: 'text-orange-200/70',
+          ring: 'focus:ring-blue-500/20 focus:border-orange-500',
+          shadow: 'shadow-orange-500/25 hover:shadow-orange-500/40',
         }
       case 'RELEASE':
         return {
@@ -137,14 +137,14 @@ export default function StockMovementModal({
           title: 'Lagerbewegung',
           description: 'Artikel bewegen',
           icon: Package,
-          gradient: 'from-gray-600 to-slate-600',
-          border: 'border-gray-500/30',
-          glow: 'from-gray-600/20 via-slate-500/20 to-gray-600/20',
-          headerBg: 'from-gray-900/50 via-slate-800/30',
-          iconBg: 'text-gray-400',
-          text: 'text-gray-200/70',
-          ring: 'focus:ring-gray-500/20 focus:border-gray-500',
-          shadow: 'shadow-gray-500/25 hover:shadow-gray-500/40',
+          gradient: 'from-zinc-600 to-slate-600',
+          border: 'border-zinc-500/30',
+          glow: 'from-zinc-600/20 via-slate-500/20 to-zinc-600/20',
+          headerBg: 'from-zinc-900/50 via-slate-800/30',
+          iconBg: 'text-zinc-400',
+          text: 'text-zinc-200/70',
+          ring: 'focus:ring-zinc-500/20 focus:border-zinc-500',
+          shadow: 'shadow-zinc-500/25 hover:shadow-zinc-500/40',
         }
     }
   }
@@ -160,7 +160,7 @@ export default function StockMovementModal({
         {/* Glow Effect */}
         <div className={`absolute inset-0 bg-gradient-to-r ${theme.glow} blur-xl rounded-2xl`} />
         
-        <Card className={`relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 ${theme.border} shadow-2xl rounded-2xl overflow-hidden`}>
+        <Card className={`relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 ${theme.border} shadow-2xl rounded-2xl overflow-hidden`}>
           {/* Header mit Gradient */}
           <div className="relative">
             <div className={`absolute inset-0 bg-gradient-to-r ${theme.headerBg} to-transparent`} />
@@ -184,7 +184,7 @@ export default function StockMovementModal({
                   size="icon"
                   onClick={onClose}
                   disabled={movementMutation.isPending}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                  className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -195,32 +195,32 @@ export default function StockMovementModal({
           <CardContent className="pt-2 pb-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Item Info */}
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-gray-700/50 rounded-lg">
-                    <Boxes className="h-5 w-5 text-gray-400" />
+                  <div className="p-2 bg-zinc-700/50 rounded-lg">
+                    <Boxes className="h-5 w-5 text-zinc-400" />
                   </div>
                   <div className="font-semibold text-white text-lg">{item.name}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-sm">
-                  <div className="bg-gray-900/50 rounded-lg p-2 text-center">
-                    <div className="text-gray-500 text-xs mb-1">Gesamt</div>
+                  <div className="bg-zinc-900/50 rounded-lg p-2 text-center">
+                    <div className="text-zinc-500 text-xs mb-1">Gesamt</div>
                     <div className="text-white font-medium">{item.currentStock}</div>
                   </div>
-                  <div className="bg-gray-900/50 rounded-lg p-2 text-center">
-                    <div className="text-gray-500 text-xs mb-1">Verfügbar</div>
+                  <div className="bg-zinc-900/50 rounded-lg p-2 text-center">
+                    <div className="text-zinc-500 text-xs mb-1">Verfügbar</div>
                     <div className="text-green-400 font-medium">{item.availableStock}</div>
                   </div>
-                  <div className="bg-gray-900/50 rounded-lg p-2 text-center">
-                    <div className="text-gray-500 text-xs mb-1">Reserviert</div>
-                    <div className="text-blue-400 font-medium">{item.reservedStock}</div>
+                  <div className="bg-zinc-900/50 rounded-lg p-2 text-center">
+                    <div className="text-zinc-500 text-xs mb-1">Reserviert</div>
+                    <div className="text-orange-400 font-medium">{item.reservedStock}</div>
                   </div>
                 </div>
               </div>
 
               {/* Quantity Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                   <Hash className={`h-4 w-4 ${theme.iconBg}`} />
                   {movementType === 'ADJUST' ? 'Neuer Bestand' : 'Menge'}
                 </label>
@@ -229,7 +229,7 @@ export default function StockMovementModal({
                   min="1"
                   {...register('quantity', { valueAsNumber: true })}
                   placeholder={movementType === 'ADJUST' ? item.currentStock.toString() : '1'}
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 text-lg font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${errors.quantity ? 'border-red-500' : ''}`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 text-lg font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${errors.quantity ? 'border-red-500' : ''}`}
                 />
                 {errors.quantity && (
                   <p className="text-red-400 text-xs">{errors.quantity.message}</p>
@@ -238,27 +238,27 @@ export default function StockMovementModal({
 
               {/* Reference Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                   <Link2 className={`h-4 w-4 ${theme.iconBg}`} />
-                  Referenz <span className="text-gray-500 font-normal">(optional)</span>
+                  Referenz <span className="text-zinc-500 font-normal">(optional)</span>
                 </label>
                 <Input
                   {...register('reference')}
                   placeholder="Auftrag, Person, Event..."
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 placeholder:text-gray-500`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 placeholder:text-zinc-500`}
                 />
               </div>
 
               {/* Note Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                   <FileText className={`h-4 w-4 ${theme.iconBg}`} />
-                  Notiz <span className="text-gray-500 font-normal">(optional)</span>
+                  Notiz <span className="text-zinc-500 font-normal">(optional)</span>
                 </label>
                 <Input
                   {...register('note')}
                   placeholder="Zusätzliche Informationen..."
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 placeholder:text-gray-500`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 placeholder:text-zinc-500`}
                 />
               </div>
 
@@ -268,7 +268,7 @@ export default function StockMovementModal({
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                  className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
                   disabled={movementMutation.isPending}
                 >
                   Abbrechen

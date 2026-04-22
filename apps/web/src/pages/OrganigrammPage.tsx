@@ -543,13 +543,13 @@ const assignmentRoles: AssignmentRole[] = [
     id: 'patron',
     label: 'Patrón / Jefe Supremo',
     description: 'La cabeza. El alma. Der Boss.',
-    icon: <Crown className="h-5 w-5 text-amber-400" />,
+    icon: <Crown className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'capitan',
     label: 'Don – Operaciones',
     description: 'Der, der die Maschine am Laufen hält.',
-    icon: <Briefcase className="h-5 w-5 text-blue-400" />,
+    icon: <Briefcase className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'comandante',
@@ -561,7 +561,7 @@ const assignmentRoles: AssignmentRole[] = [
     id: 'mano-derecha',
     label: 'Capo – Coordinador',
     description: 'La voz del Patrón. Koordiniert zwischen den Onces.',
-    icon: <BadgeCheck className="h-5 w-5 text-cyan-400" />,
+    icon: <BadgeCheck className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'funktionsleiter-logistica',
@@ -579,7 +579,7 @@ const assignmentRoles: AssignmentRole[] = [
     id: 'funktionsleiter-consejero',
     label: 'Consejero – Comunicación & Mediación',
     description: 'Die Stimme zwischen den Stimmen.',
-    icon: <Briefcase className="h-5 w-5 text-yellow-400" />,
+    icon: <Briefcase className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'funktionsleiter-sicarios',
@@ -591,13 +591,13 @@ const assignmentRoles: AssignmentRole[] = [
     id: 'funktionsleiter-rutas',
     label: 'Rutas – Routenverwaltung',
     description: 'Die Logistik und Routen.',
-    icon: <Package className="h-5 w-5 text-amber-400" />,
+    icon: <Package className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'funktionsleiter-formacion',
     label: 'Formación – Ausbildung',
     description: 'Training und Entwicklung.',
-    icon: <Shield className="h-5 w-5 text-blue-400" />,
+    icon: <Shield className="h-5 w-5 text-orange-400" />,
   },
   {
     id: 'funktionsleiter-contacto',
@@ -672,15 +672,15 @@ export default function OrganigrammPage() {
     const isExpanded = expandedNodes.includes(nodeId)
 
     return (
-      <div className="relative flex w-full max-w-sm flex-col rounded-2xl border border-amber-500/20 bg-gradient-to-br from-gray-800/90 to-gray-900/90 p-5 shadow-lg backdrop-blur-sm hover:border-amber-500/40 transition-colors">
+      <div className="relative flex w-full max-w-sm flex-col rounded-2xl border border-orange-500/20 bg-gradient-to-br from-zinc-800/90 to-zinc-900/90 p-5 shadow-lg backdrop-blur-sm hover:border-orange-500/40 transition-colors">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-lg font-semibold text-white">{node.label}</h3>
-            <p className="mt-1 text-sm text-gray-400">{node.summary}</p>
+            <p className="mt-1 text-sm text-zinc-400">{node.summary}</p>
           </div>
           <button
             onClick={() => toggleNode(nodeId)}
-            className="text-gray-400 hover:text-amber-400 p-2 rounded-lg hover:bg-amber-500/10 transition-colors"
+            className="text-zinc-400 hover:text-orange-400 p-2 rounded-lg hover:bg-orange-500/10 transition-colors"
             aria-label={isExpanded ? 'Details einklappen' : 'Details ausklappen'}
           >
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -693,30 +693,30 @@ export default function OrganigrammPage() {
               {assignedMembers.map((member) => (
                 <span
                   key={member.id}
-                  className="inline-flex items-center rounded-full bg-amber-500/20 border border-amber-500/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300"
+                  className="inline-flex items-center rounded-full bg-orange-500/20 border border-orange-500/30 px-2.5 py-0.5 text-xs font-semibold text-orange-300"
                 >
                   {member.displayName}
                 </span>
               ))}
             </div>
           ) : (
-            <p className="text-xs italic text-gray-500">Noch keine Mitglieder zugeordnet</p>
+            <p className="text-xs italic text-zinc-500">Noch keine Mitglieder zugeordnet</p>
           )}
         </div>
 
         {isExpanded && (
-          <div className="mt-4 space-y-3 text-left border-t border-gray-700/50 pt-4">
+          <div className="mt-4 space-y-3 text-left border-t border-zinc-700/50 pt-4">
             <div>
-              <h4 className="text-sm font-semibold text-amber-300/80">Verantwortlichkeiten</h4>
-              <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
+              <h4 className="text-sm font-semibold text-orange-300/80">Verantwortlichkeiten</h4>
+              <ul className="mt-1 space-y-1 text-sm text-zinc-300 list-disc list-inside">
                 {node.responsibilities.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-amber-300/80">Alltägliche Aufgaben</h4>
-              <ul className="mt-1 space-y-1 text-sm text-gray-300 list-disc list-inside">
+              <h4 className="text-sm font-semibold text-orange-300/80">Alltägliche Aufgaben</h4>
+              <ul className="mt-1 space-y-1 text-sm text-zinc-300 list-disc list-inside">
                 {node.dailyDuties.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
@@ -731,17 +731,17 @@ export default function OrganigrammPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-yellow-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl shadow-lg shadow-amber-500/30">
+          <div className="p-3 bg-gradient-to-br from-orange-600 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
             <Users className="h-8 w-8 text-white" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Organigramm & Rollenübersicht</h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-zinc-400 mt-1">
               Führungsstruktur des Kartells mit Verantwortlichkeiten
             </p>
           </div>
@@ -750,16 +750,16 @@ export default function OrganigrammPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border-amber-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-orange-900/30 to-orange-900/20 border-orange-500/30">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-amber-500/20 rounded-lg">
-                <Crown className="h-5 w-5 text-amber-400" />
+              <div className="p-2 bg-orange-500/20 rounded-lg">
+                <Crown className="h-5 w-5 text-orange-400" />
               </div>
             </div>
-            <p className="text-amber-300/70 text-sm">Rollen im Organigramm</p>
+            <p className="text-orange-300/70 text-sm">Rollen im Organigramm</p>
             <p className="text-2xl font-bold text-white">{assignmentRoles.length}</p>
-            <p className="text-xs text-gray-500 mt-1">Hierarchiestufen von Patrón bis Operatives Team</p>
+            <p className="text-xs text-zinc-500 mt-1">Hierarchiestufen von Patrón bis Operatives Team</p>
           </CardContent>
         </Card>
         
@@ -772,44 +772,44 @@ export default function OrganigrammPage() {
             </div>
             <p className="text-green-300/70 text-sm">Aktive Zuordnungen</p>
             <p className="text-2xl font-bold text-white">{totalAssignedMembers}</p>
-            <p className="text-xs text-gray-500 mt-1">Summe aller zugewiesenen Mitglieder</p>
+            <p className="text-xs text-zinc-500 mt-1">Summe aller zugewiesenen Mitglieder</p>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-amber-500/20">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border-orange-500/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <Shield className="h-5 w-5 text-blue-400" />
+              <div className="p-2 bg-orange-500/20 rounded-lg">
+                <Shield className="h-5 w-5 text-orange-400" />
               </div>
             </div>
-            <p className="text-blue-300/70 text-sm">Rollen mit Besetzung</p>
+            <p className="text-orange-300/70 text-sm">Rollen mit Besetzung</p>
             <p className="text-2xl font-bold text-white">{rolesWithAssignments}</p>
-            <p className="text-xs text-gray-500 mt-1">Von {assignmentRoles.length} Rollen aktuell belegt</p>
+            <p className="text-xs text-zinc-500 mt-1">Von {assignmentRoles.length} Rollen aktuell belegt</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800">
           <div>
             <CardTitle className="flex items-center gap-2 text-white">
-              <Users className="h-5 w-5 text-amber-400" />
+              <Users className="h-5 w-5 text-orange-400" />
               Organigramm der Führung
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Alle Ebenen von Patrón bis hin zu den operativen Kräften
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
             <button 
-              className="px-4 py-2 text-sm border border-gray-700 rounded-lg hover:bg-gray-800 text-gray-300 transition-colors"
+              className="px-4 py-2 text-sm border border-zinc-700 rounded-lg hover:bg-zinc-800 text-zinc-300 transition-colors"
               onClick={expandAllNodes}
             >
               Alles öffnen
             </button>
             <button 
-              className="px-4 py-2 text-sm border border-gray-700 rounded-lg hover:bg-gray-800 text-gray-300 transition-colors"
+              className="px-4 py-2 text-sm border border-zinc-700 rounded-lg hover:bg-zinc-800 text-zinc-300 transition-colors"
               onClick={collapseAllNodes}
             >
               Alles schließen
@@ -822,14 +822,14 @@ export default function OrganigrammPage() {
               {/* Verbindungslinie von vorheriger Ebene */}
               {levelIndex > 0 && (
                 <div className="flex justify-center pb-4">
-                  <div className="h-8 w-0.5 bg-gradient-to-b from-amber-500/30 to-amber-500/10"></div>
+                  <div className="h-8 w-0.5 bg-gradient-to-b from-orange-500/30 to-orange-500/10"></div>
                 </div>
               )}
               
               <div className="space-y-4 pb-8">
                 <div className="text-center">
                   <h3 className="text-xl font-semibold text-white">{level.title}</h3>
-                  {level.description && <p className="text-sm text-gray-400">{level.description}</p>}
+                  {level.description && <p className="text-sm text-zinc-400">{level.description}</p>}
                 </div>
                 
                 {/* Nodes mit Flexbox für zentrale Anordnung */}
@@ -845,7 +845,7 @@ export default function OrganigrammPage() {
               {/* Verbindungslinie zur nächsten Ebene */}
               {levelIndex < organigramLevels.length - 1 && (
                 <div className="flex justify-center">
-                  <div className="h-8 w-0.5 bg-gradient-to-b from-amber-500/10 to-amber-500/30"></div>
+                  <div className="h-8 w-0.5 bg-gradient-to-b from-orange-500/10 to-orange-500/30"></div>
                 </div>
               )}
             </section>
@@ -856,22 +856,22 @@ export default function OrganigrammPage() {
       <Card className="lasanta-card">
         <CardHeader>
           <CardTitle className="text-white">Ausführliche Rollenbeschreibungen</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             Vollständige Übersicht für alle Mitglieder mit Verantwortlichkeiten und alltäglichen Aufgaben.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
           {overviewSections.map((section) => (
-            <div key={section.id} className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
+            <div key={section.id} className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
               <div>
                 <h2 className="text-2xl font-semibold text-white">{section.title}</h2>
-                <p className="mt-2 text-gray-300">{section.description}</p>
+                <p className="mt-2 text-zinc-300">{section.description}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div>
                   <h3 className="text-lg font-semibold text-white">Verantwortlichkeiten</h3>
-                  <ul className="mt-2 space-y-2 text-sm text-gray-300 list-disc list-inside">
+                  <ul className="mt-2 space-y-2 text-sm text-zinc-300 list-disc list-inside">
                     {section.responsibilities.map((item, index) => (
                       <li key={index}>{item}</li>
                     ))}
@@ -879,7 +879,7 @@ export default function OrganigrammPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white">Alltägliche Aufgaben</h3>
-                  <ul className="mt-2 space-y-2 text-sm text-gray-300 list-disc list-inside">
+                  <ul className="mt-2 space-y-2 text-sm text-zinc-300 list-disc list-inside">
                     {section.dailyDuties.map((item, index) => (
                       <li key={index}>{item}</li>
                     ))}
@@ -890,13 +890,13 @@ export default function OrganigrammPage() {
               {section.subSections && section.subSections.length > 0 && (
                 <div className="space-y-4">
                   {section.subSections.map((sub, index) => (
-                    <div key={index} className="rounded-xl border border-gray-800 bg-gray-800/40 p-4">
+                    <div key={index} className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-4">
                       <h4 className="text-xl font-semibold text-white">{sub.title}</h4>
-                      <p className="mt-2 text-gray-300">{sub.description}</p>
+                      <p className="mt-2 text-zinc-300">{sub.description}</p>
                       {sub.responsibilities && (
                         <div className="mt-3">
-                          <h5 className="text-sm font-semibold text-gray-200">Aufgaben</h5>
-                          <ul className="mt-2 space-y-2 text-sm text-gray-300 list-disc list-inside">
+                          <h5 className="text-sm font-semibold text-zinc-200">Aufgaben</h5>
+                          <ul className="mt-2 space-y-2 text-sm text-zinc-300 list-disc list-inside">
                             {sub.responsibilities.map((item, subIndex) => (
                               <li key={subIndex}>{item}</li>
                             ))}
@@ -905,8 +905,8 @@ export default function OrganigrammPage() {
                       )}
                       {sub.dailyDuties && (
                         <div className="mt-3">
-                          <h5 className="text-sm font-semibold text-gray-200">Alltägliche Aufgaben</h5>
-                          <ul className="mt-2 space-y-2 text-sm text-gray-300 list-disc list-inside">
+                          <h5 className="text-sm font-semibold text-zinc-200">Alltägliche Aufgaben</h5>
+                          <ul className="mt-2 space-y-2 text-sm text-zinc-300 list-disc list-inside">
                             {sub.dailyDuties.map((item, subIndex) => (
                               <li key={subIndex}>{item}</li>
                             ))}

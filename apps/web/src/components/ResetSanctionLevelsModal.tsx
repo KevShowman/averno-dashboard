@@ -117,23 +117,23 @@ export default function ResetSanctionLevelsModal({
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-lg relative">
         {/* Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/20 via-amber-500/20 to-yellow-600/20 blur-xl rounded-2xl" />
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 blur-xl rounded-2xl" />
         
-        <Card className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-yellow-500/30 shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+        <Card className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30 shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
           {/* Header mit Gradient */}
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-900/50 via-amber-800/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-900/50 via-orange-800/30 to-transparent" />
             <CardHeader className="relative pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-yellow-600 to-amber-600 rounded-xl shadow-lg shadow-yellow-500/30">
+                  <div className="p-3 bg-gradient-to-br from-orange-600 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
                     <RotateCcw className="h-7 w-7 text-white" />
                   </div>
                   <div>
                     <CardTitle className="text-2xl font-bold text-white">
                       Level zurücksetzen
                     </CardTitle>
-                    <CardDescription className="text-yellow-200/70 mt-1">
+                    <CardDescription className="text-orange-200/70 mt-1">
                       Sanktionslevel auf 0 setzen
                     </CardDescription>
                   </div>
@@ -143,7 +143,7 @@ export default function ResetSanctionLevelsModal({
                   size="icon"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                  className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -154,53 +154,53 @@ export default function ResetSanctionLevelsModal({
           <CardContent className="pt-2 pb-6 space-y-5">
             {/* User Search */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                <User className="h-4 w-4 text-yellow-400" />
+              <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                <User className="h-4 w-4 text-orange-400" />
                 Benutzer auswählen
               </label>
               
               {!selectedUser ? (
                 <div className="space-y-2">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
                     <Input
                       placeholder="Name eingeben..."
                       value={searchUser}
                       onChange={(e) => setSearchUser(e.target.value)}
-                      className="pl-10 bg-gray-800/50 border-gray-700 focus:border-yellow-500 focus:ring-yellow-500/20 text-white h-11"
+                      className="pl-10 bg-zinc-800/50 border-zinc-700 focus:border-orange-500 focus:ring-orange-500/20 text-white h-11"
                       disabled={isLoading}
                     />
                   </div>
                   
                   {searchResults.length > 0 && (
-                    <div className="max-h-48 overflow-y-auto border border-gray-700 rounded-xl bg-gray-800/80 backdrop-blur-sm divide-y divide-gray-700/50">
+                    <div className="max-h-48 overflow-y-auto border border-zinc-700 rounded-xl bg-zinc-800/80 backdrop-blur-sm divide-y divide-zinc-700/50">
                       {searchResults.map((user) => (
                         <button
                           key={user.id}
                           onClick={() => handleUserSelect(user)}
-                          className="w-full text-left p-3 hover:bg-yellow-500/10 transition-colors flex items-center gap-3"
+                          className="w-full text-left p-3 hover:bg-orange-500/10 transition-colors flex items-center gap-3"
                         >
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500/20 to-amber-500/20 flex items-center justify-center">
-                            <User className="h-5 w-5 text-yellow-400" />
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-500/20 flex items-center justify-center">
+                            <User className="h-5 w-5 text-orange-400" />
                           </div>
                           <div>
                             <div className="text-white font-medium">{getDisplayName(user)}</div>
-                            <div className="text-gray-400 text-sm">
+                            <div className="text-zinc-400 text-sm">
                               {user.icFirstName && user.icLastName 
                                 ? `${user.icFirstName} ${user.icLastName}`
                                 : 'Kein IC-Name'
                               }
                             </div>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-gray-500 ml-auto" />
+                          <ChevronRight className="h-4 w-4 text-zinc-500 ml-auto" />
                         </button>
                       ))}
                     </div>
                   )}
                   
                   {isSearching && (
-                    <div className="flex items-center gap-2 text-gray-400 text-sm p-2">
-                      <div className="h-4 w-4 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
+                    <div className="flex items-center gap-2 text-zinc-400 text-sm p-2">
+                      <div className="h-4 w-4 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
                       Suche...
                     </div>
                   )}
@@ -235,8 +235,8 @@ export default function ResetSanctionLevelsModal({
 
             {/* Category Selection */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                <Scale className="h-4 w-4 text-yellow-400" />
+              <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                <Scale className="h-4 w-4 text-orange-400" />
                 Kategorie auswählen
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -249,12 +249,12 @@ export default function ResetSanctionLevelsModal({
                       disabled={isLoading}
                       className={`text-left p-3 rounded-xl border transition-all duration-200 flex items-center gap-2 ${
                         isSelected
-                          ? 'bg-yellow-500/20 border-yellow-500/50 shadow-lg shadow-yellow-500/10'
-                          : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600 hover:bg-gray-800/50'
+                          ? 'bg-orange-500/20 border-orange-500/50 shadow-lg shadow-orange-500/10'
+                          : 'bg-zinc-800/30 border-zinc-700/50 hover:border-zinc-600 hover:bg-zinc-800/50'
                       }`}
                     >
-                      <Scale className={`h-4 w-4 ${isSelected ? 'text-yellow-400' : 'text-gray-500'}`} />
-                      <span className={`text-sm font-medium ${isSelected ? 'text-yellow-300' : 'text-white'}`}>
+                      <Scale className={`h-4 w-4 ${isSelected ? 'text-orange-400' : 'text-zinc-500'}`} />
+                      <span className={`text-sm font-medium ${isSelected ? 'text-orange-300' : 'text-white'}`}>
                         {category.name}
                       </span>
                     </button>
@@ -283,14 +283,14 @@ export default function ResetSanctionLevelsModal({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
               >
                 Abbrechen
               </Button>
               <Button
                 onClick={handleReset}
                 disabled={isLoading || !selectedCategory || !selectedUser}
-                className="flex-1 h-12 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-white font-semibold shadow-lg shadow-yellow-500/25 transition-all duration-200 hover:shadow-yellow-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 h-12 bg-gradient-to-r from-orange-600 to-orange-600 hover:from-orange-500 hover:to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 transition-all duration-200 hover:shadow-orange-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

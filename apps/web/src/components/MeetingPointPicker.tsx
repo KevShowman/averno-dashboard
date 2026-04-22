@@ -116,8 +116,8 @@ export function MeetingPointPicker({ value, onChange, onCancel }: MeetingPointPi
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               selectedMap === key
-                ? 'bg-amber-500 text-gray-900'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                ? 'bg-orange-500 text-zinc-900'
+                : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
             }`}
           >
             {cfg.name}
@@ -126,16 +126,16 @@ export function MeetingPointPicker({ value, onChange, onCancel }: MeetingPointPi
       </div>
 
       {/* Anleitung */}
-      <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-        <MapPin className="h-5 w-5 text-amber-400 flex-shrink-0" />
-        <p className="text-sm text-amber-200">
+      <div className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+        <MapPin className="h-5 w-5 text-orange-400 flex-shrink-0" />
+        <p className="text-sm text-orange-200">
           <strong>Klicke auf die Karte</strong>, um den Treffpunkt festzulegen. 
           Alle Familien werden zu diesem Punkt gebracht.
         </p>
       </div>
 
       {/* Interaktive Karte */}
-      <div className="rounded-lg overflow-hidden border-2 border-gray-700" style={{ height: '450px' }}>
+      <div className="rounded-lg overflow-hidden border-2 border-zinc-700" style={{ height: '450px' }}>
         <MapContainer
           key={selectedMap}
           center={[mapHeight / 2, mapWidth / 2]}
@@ -217,7 +217,7 @@ export function MeetingPointPicker({ value, onChange, onCancel }: MeetingPointPi
           type="button"
           onClick={handleConfirm}
           disabled={!selectedPoint}
-          className="bg-amber-500 hover:bg-amber-600 text-gray-900"
+          className="bg-orange-500 hover:bg-orange-600 text-zinc-900"
         >
           <Check className="h-4 w-4 mr-2" />
           Treffpunkt bestätigen

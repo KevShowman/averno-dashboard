@@ -118,8 +118,8 @@ export default function PartnerRequestPage() {
 
   if (!partnerData) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
       </div>
     )
   }
@@ -127,18 +127,18 @@ export default function PartnerRequestPage() {
   // Success state
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 overflow-hidden relative">
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 overflow-hidden relative">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 -left-20 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/50 to-gray-950" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/50 to-zinc-950" />
         </div>
 
         <div className="relative w-full max-w-md">
           <div className="absolute -inset-4 bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-green-500/20 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
           
-          <div className="relative bg-gradient-to-br from-gray-900/90 via-gray-900/95 to-gray-950/90 backdrop-blur-xl rounded-3xl border border-green-500/20 shadow-2xl shadow-green-500/10 overflow-hidden">
+          <div className="relative bg-gradient-to-br from-zinc-900/90 via-zinc-900/95 to-zinc-950/90 backdrop-blur-xl rounded-3xl border border-green-500/20 shadow-2xl shadow-green-500/10 overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent" />
             
             <div className="p-8 text-center">
@@ -147,14 +147,14 @@ export default function PartnerRequestPage() {
                   <CheckCircle className="h-10 w-10 text-green-400" />
                 </div>
                 <h1 className="text-2xl font-bold text-white mb-2">Anfrage eingereicht!</h1>
-                <p className="text-gray-400">
+                <p className="text-zinc-400">
                   Deine Partner-Zugangsanfrage wurde erfolgreich übermittelt und wird von der Leadership geprüft.
                 </p>
               </div>
 
-              <div className="bg-gray-800/50 rounded-xl p-4 mb-6">
-                <div className="flex items-center gap-3 text-gray-300">
-                  <Clock className="h-5 w-5 text-amber-400" />
+              <div className="bg-zinc-800/50 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-3 text-zinc-300">
+                  <Clock className="h-5 w-5 text-orange-400" />
                   <span>Du wirst in {countdown} Sekunden zur Login-Seite weitergeleitet</span>
                 </div>
               </div>
@@ -162,7 +162,7 @@ export default function PartnerRequestPage() {
               <Button
                 onClick={handleCancel}
                 variant="outline"
-                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="w-full border-zinc-600 text-zinc-300 hover:bg-zinc-800"
               >
                 Jetzt zur Login-Seite
               </Button>
@@ -174,12 +174,12 @@ export default function PartnerRequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 overflow-hidden relative">
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 overflow-hidden relative">
       {/* Animated Background */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-red-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-3xl" />
         <div 
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -187,28 +187,28 @@ export default function PartnerRequestPage() {
             backgroundSize: '50px 50px'
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/50 to-gray-950" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/50 to-zinc-950" />
       </div>
 
       <div className="relative w-full max-w-lg">
-        <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-red-500/20 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
+        <div className="absolute -inset-4 bg-gradient-to-r from-orange-500/20 via-orange-500/10 to-red-500/20 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
         
-        <div className="relative bg-gradient-to-br from-gray-900/90 via-gray-900/95 to-gray-950/90 backdrop-blur-xl rounded-3xl border border-amber-500/20 shadow-2xl shadow-amber-500/10 overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+        <div className="relative bg-gradient-to-br from-zinc-900/90 via-zinc-900/95 to-zinc-950/90 backdrop-blur-xl rounded-3xl border border-orange-500/20 shadow-2xl shadow-orange-500/10 overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent" />
           
-          <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-amber-500/30 rounded-tl-lg" />
-          <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-amber-500/30 rounded-tr-lg" />
-          <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-amber-500/30 rounded-bl-lg" />
-          <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-amber-500/30 rounded-br-lg" />
+          <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-orange-500/30 rounded-tl-lg" />
+          <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-orange-500/30 rounded-tr-lg" />
+          <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-orange-500/30 rounded-bl-lg" />
+          <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-orange-500/30 rounded-br-lg" />
 
           <div className="p-8">
             {/* Header */}
             <div className="flex flex-col items-center mb-8">
               <div className="relative mb-4">
                 <div className="absolute inset-0 scale-125">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-red-500/20 rounded-full blur-xl animate-pulse" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-red-500/20 rounded-full blur-xl animate-pulse" />
                 </div>
-                <div className="relative w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center border-2 border-amber-500/30">
+                <div className="relative w-20 h-20 bg-zinc-800 rounded-full flex items-center justify-center border-2 border-orange-500/30">
                   {partnerData.avatarUrl ? (
                     <img 
                       src={partnerData.avatarUrl} 
@@ -216,16 +216,16 @@ export default function PartnerRequestPage() {
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
-                    <Users className="h-10 w-10 text-amber-400" />
+                    <Users className="h-10 w-10 text-orange-400" />
                   )}
                 </div>
               </div>
 
-              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-center">
+              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 text-center">
                 Partner-Zugang anfordern
               </h1>
-              <p className="text-gray-400 text-sm mt-2">
-                Willkommen, <span className="text-amber-400 font-medium">{partnerData.username}</span>
+              <p className="text-zinc-400 text-sm mt-2">
+                Willkommen, <span className="text-orange-400 font-medium">{partnerData.username}</span>
               </p>
             </div>
 
@@ -245,11 +245,11 @@ export default function PartnerRequestPage() {
             )}
 
             {/* Info Banner */}
-            <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mb-6">
+            <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4 mb-6">
               <div className="flex items-start gap-3">
-                <Shield className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <Shield className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-zinc-300 text-sm">
                     Beantrage Zugang zum eingeschränkten Partner-Bereich. Deine Anfrage wird von der Leadership geprüft.
                   </p>
                 </div>
@@ -259,8 +259,8 @@ export default function PartnerRequestPage() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <Users className="inline h-4 w-4 mr-1.5 text-amber-400" />
+                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                  <Users className="inline h-4 w-4 mr-1.5 text-orange-400" />
                   Von welcher Familie bist du?
                 </label>
                 <input
@@ -268,14 +268,14 @@ export default function PartnerRequestPage() {
                   value={familyName}
                   onChange={(e) => setFamilyName(e.target.value)}
                   placeholder="z.B. Narco City Cartel"
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all"
+                  className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all"
                   maxLength={100}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <FileText className="inline h-4 w-4 mr-1.5 text-amber-400" />
+                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                  <FileText className="inline h-4 w-4 mr-1.5 text-orange-400" />
                   Warum möchtest du Zugang?
                 </label>
                 <textarea
@@ -283,10 +283,10 @@ export default function PartnerRequestPage() {
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Erkläre kurz, warum du Partner-Zugang benötigst..."
                   rows={4}
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all resize-none"
+                  className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all resize-none"
                   maxLength={500}
                 />
-                <p className="text-xs text-gray-500 mt-1 text-right">{reason.length}/500</p>
+                <p className="text-xs text-zinc-500 mt-1 text-right">{reason.length}/500</p>
               </div>
 
               {error && (
@@ -300,14 +300,14 @@ export default function PartnerRequestPage() {
                   type="button"
                   onClick={handleCancel}
                   variant="outline"
-                  className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+                  className="flex-1 border-zinc-600 text-zinc-300 hover:bg-zinc-800"
                 >
                   Abbrechen
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white"
+                  className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white"
                 >
                   {isSubmitting ? (
                     <>
@@ -322,8 +322,8 @@ export default function PartnerRequestPage() {
             </form>
 
             {/* Footer */}
-            <div className="mt-6 pt-4 border-t border-gray-800/50 text-center">
-              <p className="text-gray-500 text-xs">
+            <div className="mt-6 pt-4 border-t border-zinc-800/50 text-center">
+              <p className="text-zinc-500 text-xs">
                 Mit dem Absenden stimmst du zu, dass deine Anfrage von der Leadership geprüft wird.
               </p>
             </div>

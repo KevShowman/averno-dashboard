@@ -40,7 +40,7 @@ export default function DiscordErrorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-900 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl space-y-6">
         {/* Logo/Header */}
         <div className="text-center mb-8">
@@ -68,23 +68,23 @@ export default function DiscordErrorPage() {
           <CardContent className="pt-6 space-y-6">
             {/* Reason Boxes */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <div className="p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg">
                 <div className="flex items-start gap-3">
                   <Users className="h-5 w-5 text-gold-500 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-white mb-1">Nicht im Discord</h3>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-zinc-400">
                       Du bist nicht Mitglied des LaSanta Calavera Discord-Servers
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <div className="p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg">
                 <div className="flex items-start gap-3">
                   <Shield className="h-5 w-5 text-gold-500 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-white mb-1">Keine Rollen</h3>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-zinc-400">
                       Dir wurden noch keine Rollen im Discord zugewiesen
                     </p>
                   </div>
@@ -93,12 +93,12 @@ export default function DiscordErrorPage() {
             </div>
 
             {/* Instructions */}
-            <div className="p-5 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-              <h3 className="font-semibold text-blue-300 mb-3 flex items-center gap-2">
+            <div className="p-5 bg-orange-900/20 border border-orange-500/30 rounded-lg">
+              <h3 className="font-semibold text-orange-300 mb-3 flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
                 Was kannst du tun?
               </h3>
-              <ol className="space-y-2 text-sm text-gray-300 list-decimal list-inside">
+              <ol className="space-y-2 text-sm text-zinc-300 list-decimal list-inside">
                 <li>Trete dem <strong className="text-white">LaSanta Calavera Discord-Server</strong> bei</li>
                 <li>Wende dich an die <strong className="text-gold-400">Leaderschaft</strong> (Patron, Don oder Capo)</li>
                 <li>Warte bis dir eine <strong className="text-white">Rolle zugewiesen</strong> wurde</li>
@@ -107,9 +107,9 @@ export default function DiscordErrorPage() {
             </div>
 
             {/* Auto Logout Warning */}
-            <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-              <p className="text-yellow-300 text-sm text-center">
-                ⚠️ Du wirst automatisch in <strong className="text-yellow-100">{countdown} Sekunden</strong> abgemeldet
+            <div className="p-4 bg-orange-900/20 border border-orange-500/30 rounded-lg">
+              <p className="text-orange-300 text-sm text-center">
+                ⚠️ Du wirst automatisch in <strong className="text-orange-100">{countdown} Sekunden</strong> abgemeldet
               </p>
             </div>
 
@@ -135,7 +135,7 @@ export default function DiscordErrorPage() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center text-gray-500 text-sm">
+        <div className="text-center text-zinc-500 text-sm">
           <p>Bei Fragen wende dich an die Family-Leaderschaft</p>
           <p className="mt-1">LaSanta Calavera © 2025</p>
         </div>

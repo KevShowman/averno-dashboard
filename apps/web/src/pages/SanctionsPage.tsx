@@ -207,9 +207,9 @@ export default function SanctionsPage() {
       case 'PAID':
         return <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Bezahlt</Badge>
       case 'EXPIRED':
-        return <Badge className="bg-gray-500/20 text-gray-300 border-gray-500/30">Abgelaufen</Badge>
+        return <Badge className="bg-zinc-500/20 text-zinc-300 border-zinc-500/30">Abgelaufen</Badge>
       case 'CANCELLED':
-        return <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">Storniert</Badge>
+        return <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">Storniert</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -225,7 +225,7 @@ export default function SanctionsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
-          <p className="text-gray-400">Lade Sanktionsdaten...</p>
+          <p className="text-zinc-400">Lade Sanktionsdaten...</p>
         </div>
       </div>
     )
@@ -234,7 +234,7 @@ export default function SanctionsPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-red-500/20 p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-red-500/20 p-6">
         <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-rose-500/5" />
         <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl" />
         
@@ -245,7 +245,7 @@ export default function SanctionsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Sanktionssystem</h1>
-              <p className="text-gray-400 mt-1">
+              <p className="text-zinc-400 mt-1">
                 LaFamilia se cuida, Compadres!
               </p>
             </div>
@@ -255,7 +255,7 @@ export default function SanctionsPage() {
             <Button
               variant="outline"
               onClick={() => setShowMySanctions(!showMySanctions)}
-              className="border-gray-700 hover:bg-gray-800"
+              className="border-zinc-700 hover:bg-zinc-800"
             >
               <User className="h-4 w-4 mr-2" />
               {showMySanctions ? 'Alle Sanktionen' : 'Meine Sanktionen'}
@@ -267,7 +267,7 @@ export default function SanctionsPage() {
                   variant="outline"
                   onClick={() => cleanupMutation.mutate()}
                   disabled={cleanupMutation.isPending}
-                  className="border-gray-700 hover:bg-gray-800"
+                  className="border-zinc-700 hover:bg-zinc-800"
                 >
                   <X className="h-4 w-4 mr-2" />
                   Bereinigen
@@ -277,7 +277,7 @@ export default function SanctionsPage() {
                   variant="outline"
                   onClick={() => autoSanction48hMutation.mutate()}
                   disabled={autoSanction48hMutation.isPending}
-                  className="border-gray-700 hover:bg-gray-800"
+                  className="border-zinc-700 hover:bg-zinc-800"
                 >
                   <Clock className="h-4 w-4 mr-2" />
                   48h Sanktionierung
@@ -309,14 +309,14 @@ export default function SanctionsPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900/80 to-gray-800/50 border-gray-700">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900/80 to-zinc-800/50 border-zinc-700">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-gray-500/20 rounded-lg">
-                  <Scale className="h-5 w-5 text-gray-400" />
+                <div className="p-2 bg-zinc-500/20 rounded-lg">
+                  <Scale className="h-5 w-5 text-zinc-400" />
                 </div>
               </div>
-              <p className="text-gray-400 text-sm">Gesamt</p>
+              <p className="text-zinc-400 text-sm">Gesamt</p>
               <p className="text-2xl font-bold text-white">{stats.total}</p>
             </CardContent>
           </Card>
@@ -345,14 +345,14 @@ export default function SanctionsPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900/30 to-gray-800/20 border-gray-500/30">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900/30 to-zinc-800/20 border-zinc-500/30">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-gray-500/20 rounded-lg">
-                  <Clock className="h-5 w-5 text-gray-400" />
+                <div className="p-2 bg-zinc-500/20 rounded-lg">
+                  <Clock className="h-5 w-5 text-zinc-400" />
                 </div>
               </div>
-              <p className="text-gray-400 text-sm">Abgelaufen</p>
+              <p className="text-zinc-400 text-sm">Abgelaufen</p>
               <p className="text-2xl font-bold text-white">{stats.expired}</p>
             </CardContent>
           </Card>
@@ -361,8 +361,8 @@ export default function SanctionsPage() {
 
       {/* Category Stats */}
       {stats && stats.byCategory.length > 0 && (
-        <Card className="bg-gray-900/50 border-gray-800">
-          <CardHeader className="border-b border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800">
+          <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-red-400" />
               Sanktionen nach Kategorien
@@ -371,9 +371,9 @@ export default function SanctionsPage() {
           <CardContent className="p-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {stats.byCategory.map((stat) => (
-                <div key={stat.category} className="text-center p-3 bg-gray-800/50 rounded-lg">
+                <div key={stat.category} className="text-center p-3 bg-zinc-800/50 rounded-lg">
                   <div className="text-2xl font-bold text-white">{stat._count.category}</div>
-                  <div className="text-sm text-gray-400">{getCategoryDisplayName(stat.category)}</div>
+                  <div className="text-sm text-zinc-400">{getCategoryDisplayName(stat.category)}</div>
                 </div>
               ))}
             </div>
@@ -383,11 +383,11 @@ export default function SanctionsPage() {
 
       {/* Filter */}
       {!showMySanctions && (
-        <Card className="bg-gray-900/50 border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800">
           <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <span className="text-gray-400 text-sm self-center mr-2">Status:</span>
+                <span className="text-zinc-400 text-sm self-center mr-2">Status:</span>
                 {['', 'ACTIVE', 'PAID', 'EXPIRED'].map((status) => (
                   <Button
                     key={status}
@@ -396,14 +396,14 @@ export default function SanctionsPage() {
                     onClick={() => setSelectedStatus(status)}
                     className={selectedStatus === status 
                       ? 'bg-red-600 hover:bg-red-700 text-white' 
-                      : 'border-gray-700 hover:bg-gray-800'}
+                      : 'border-zinc-700 hover:bg-zinc-800'}
                   >
                     {status === '' ? 'Alle' : status === 'ACTIVE' ? 'Aktiv' : status === 'PAID' ? 'Bezahlt' : 'Abgelaufen'}
                   </Button>
                 ))}
               </div>
               <div className="flex flex-wrap gap-2">
-                <span className="text-gray-400 text-sm self-center mr-2">Kategorie:</span>
+                <span className="text-zinc-400 text-sm self-center mr-2">Kategorie:</span>
                 {['', 'ABMELDUNG', 'RESPEKTVERHALTEN', 'FUNKCHECK', 'REAKTIONSPFLICHT'].map((cat) => (
                   <Button
                     key={cat}
@@ -412,7 +412,7 @@ export default function SanctionsPage() {
                     onClick={() => setSelectedCategory(cat)}
                     className={selectedCategory === cat 
                       ? 'bg-red-600 hover:bg-red-700 text-white' 
-                      : 'border-gray-700 hover:bg-gray-800'}
+                      : 'border-zinc-700 hover:bg-zinc-800'}
                   >
                     {cat === '' ? 'Alle' : getCategoryDisplayName(cat)}
                   </Button>
@@ -424,12 +424,12 @@ export default function SanctionsPage() {
       )}
 
       {/* Sanctions Table */}
-      <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-        <CardHeader className="border-b border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+        <CardHeader className="border-b border-zinc-800">
           <CardTitle className="text-white">
             {showMySanctions ? 'Meine Sanktionen' : 'Alle Sanktionen'}
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-zinc-400">
             {(showMySanctions ? mySanctions : sanctions).length} Einträge
           </CardDescription>
         </CardHeader>
@@ -437,33 +437,33 @@ export default function SanctionsPage() {
           {(showMySanctions ? mySanctions : sanctions).length === 0 ? (
             <div className="py-16 text-center">
               <CheckCircle className="h-16 w-16 mx-auto text-green-500/50 mb-4" />
-              <p className="text-gray-400 text-lg">Keine Sanktionen gefunden</p>
+              <p className="text-zinc-400 text-lg">Keine Sanktionen gefunden</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-800 bg-gray-800/30">
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Benutzer</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategorie</th>
-                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Level</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Beschreibung</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Strafe</th>
-                    <th className="text-center py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="text-left py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Erstellt</th>
+                  <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Benutzer</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Kategorie</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Level</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Beschreibung</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Strafe</th>
+                    <th className="text-center py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Erstellt</th>
                     {!showMySanctions && isLeadership && (
-                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Aktionen</th>
+                      <th className="text-right py-4 px-6 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Aktionen</th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800/50">
+                <tbody className="divide-y divide-zinc-800/50">
                   {(showMySanctions ? mySanctions : sanctions).map((sanction: Sanction) => (
                     <tr key={sanction.id} className="group hover:bg-red-950/20 transition-colors">
                       <td className="py-4 px-6">
                         <span className="font-medium text-white">{formatUserName(sanction.user)}</span>
                       </td>
                       <td className="py-4 px-4">
-                        <span className="text-gray-300">{getCategoryDisplayName(sanction.category)}</span>
+                        <span className="text-zinc-300">{getCategoryDisplayName(sanction.category)}</span>
                       </td>
                       <td className="py-4 px-4 text-center">
                         <Badge variant="outline" className="border-red-500/30 text-red-400">
@@ -471,26 +471,26 @@ export default function SanctionsPage() {
                         </Badge>
                       </td>
                       <td className="py-4 px-4 max-w-xs">
-                        <span className="text-gray-400 text-sm truncate block">{sanction.description}</span>
+                        <span className="text-zinc-400 text-sm truncate block">{sanction.description}</span>
                       </td>
                       <td className="py-4 px-4">
                         {sanction.amount && (
-                          <div className="flex items-center gap-1 text-amber-400">
+                          <div className="flex items-center gap-1 text-orange-400">
                             <DollarSign className="h-4 w-4" />
                             {sanction.amount.toLocaleString('de-DE')}
                           </div>
                         )}
                         {sanction.penalty && (
-                          <div className="text-sm text-yellow-400">{sanction.penalty}</div>
+                          <div className="text-sm text-orange-400">{sanction.penalty}</div>
                         )}
-                        {!sanction.amount && !sanction.penalty && <span className="text-gray-500">-</span>}
+                        {!sanction.amount && !sanction.penalty && <span className="text-zinc-500">-</span>}
                       </td>
                       <td className="py-4 px-4 text-center">
                         {getStatusBadge(sanction.status)}
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-sm text-gray-400">{formatDateTime(sanction.createdAt)}</div>
-                        <div className="text-xs text-gray-500">von {sanction.createdBy.username}</div>
+                        <div className="text-sm text-zinc-400">{formatDateTime(sanction.createdAt)}</div>
+                        <div className="text-xs text-zinc-500">von {sanction.createdBy.username}</div>
                       </td>
                       {!showMySanctions && isLeadership && (
                         <td className="py-4 px-6">
@@ -529,24 +529,24 @@ export default function SanctionsPage() {
 
       {/* Sanction Categories Info */}
       {categoriesData && (
-        <Card className="bg-gray-900/50 border-gray-800 overflow-hidden">
-          <CardHeader className="border-b border-gray-800">
+        <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+          <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white">Sanktionskategorien</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-zinc-400">
               Übersicht über die verschiedenen Sanktionskategorien und deren Strafen
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             <div className="grid gap-4 md:grid-cols-2">
               {categoriesData.categories.map((category: SanctionCategory) => (
-                <div key={category.key} className="border border-gray-700 rounded-xl p-4 bg-gray-800/30">
+                <div key={category.key} className="border border-zinc-700 rounded-xl p-4 bg-zinc-800/30">
                   <h4 className="font-semibold text-white mb-2">{category.name}</h4>
-                  <p className="text-gray-400 text-sm mb-3">{category.description}</p>
+                  <p className="text-zinc-400 text-sm mb-3">{category.description}</p>
                   <div className="flex flex-wrap gap-2">
                     {category.penalties.map((penalty) => (
-                      <div key={penalty.level} className="text-center px-3 py-2 bg-gray-800 rounded-lg">
+                      <div key={penalty.level} className="text-center px-3 py-2 bg-zinc-800 rounded-lg">
                         <div className="text-xs font-medium text-red-400">Level {penalty.level}</div>
-                        <div className="text-xs text-gray-400 mt-0.5">
+                        <div className="text-xs text-zinc-400 mt-0.5">
                           {penalty.amount ? `${penalty.amount.toLocaleString('de-DE')} SG` : 
                            penalty.penalty || 'Verwarnung'}
                         </div>

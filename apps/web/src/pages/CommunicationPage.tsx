@@ -82,8 +82,8 @@ export default function CommunicationPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-          <p className="text-gray-400">Lade Kommunikationsdaten...</p>
+          <div className="h-10 w-10 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+          <p className="text-zinc-400">Lade Kommunikationsdaten...</p>
         </div>
       </div>
     )
@@ -92,17 +92,17 @@ export default function CommunicationPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-amber-500/20 p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/30">
+          <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/30">
             <Signal className="h-8 w-8 text-white" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Kommunikation</h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-zinc-400 mt-1">
               Aktuelle Funk-Frequenz und DarkChat für die Familie
             </p>
           </div>
@@ -111,7 +111,7 @@ export default function CommunicationPage() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Funk-Frequenz */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-emerald-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-emerald-500/30">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
           <CardHeader className="relative">
             <div className="flex items-center gap-3">
@@ -120,7 +120,7 @@ export default function CommunicationPage() {
               </div>
               <div>
                 <CardTitle className="text-white">Funk-Frequenz</CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-zinc-400">
                   Für die Familien-Kommunikation
                 </CardDescription>
               </div>
@@ -133,13 +133,13 @@ export default function CommunicationPage() {
                   value={funkValue}
                   onChange={(e) => setFunkValue(e.target.value)}
                   placeholder="z.B. 00100200321"
-                  className="bg-gray-800/50 border-gray-700 focus:border-emerald-500 text-white text-center text-2xl font-mono h-14"
+                  className="bg-zinc-800/50 border-zinc-700 focus:border-emerald-500 text-white text-center text-2xl font-mono h-14"
                 />
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSaveFunk}
                     disabled={updateFunkMutation.isPending}
-                    className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900"
+                    className="flex-1 h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-zinc-900"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Speichern
@@ -147,7 +147,7 @@ export default function CommunicationPage() {
                   <Button
                     onClick={() => setEditingFunk(false)}
                     variant="outline"
-                    className="flex-1 h-11 border-gray-600 hover:bg-gray-800"
+                    className="flex-1 h-11 border-zinc-600 hover:bg-zinc-800"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Abbrechen
@@ -156,7 +156,7 @@ export default function CommunicationPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="bg-gray-800/50 border border-emerald-500/30 rounded-xl p-6 text-center">
+                <div className="bg-zinc-800/50 border border-emerald-500/30 rounded-xl p-6 text-center">
                   <div className="text-4xl font-mono font-bold text-white tracking-wider">
                     {data?.funkFrequency}
                   </div>
@@ -177,7 +177,7 @@ export default function CommunicationPage() {
         </Card>
 
         {/* DarkChat */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-purple-500/30">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-purple-500/30">
           <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" />
           <CardHeader className="relative">
             <div className="flex items-center gap-3">
@@ -186,7 +186,7 @@ export default function CommunicationPage() {
               </div>
               <div>
                 <CardTitle className="text-white">DarkChat</CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-zinc-400">
                   Verschlüsselte Kommunikation
                 </CardDescription>
               </div>
@@ -199,13 +199,13 @@ export default function CommunicationPage() {
                   value={darkChatValue}
                   onChange={(e) => setDarkChatValue(e.target.value)}
                   placeholder="z.B. LsCFuT25veRDc!2§"
-                  className="bg-gray-800/50 border-gray-700 focus:border-purple-500 text-white text-center text-xl font-mono h-14"
+                  className="bg-zinc-800/50 border-zinc-700 focus:border-purple-500 text-white text-center text-xl font-mono h-14"
                 />
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSaveDarkChat}
                     disabled={updateDarkChatMutation.isPending}
-                    className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-gray-900"
+                    className="flex-1 h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-zinc-900"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Speichern
@@ -213,7 +213,7 @@ export default function CommunicationPage() {
                   <Button
                     onClick={() => setEditingDarkChat(false)}
                     variant="outline"
-                    className="flex-1 h-11 border-gray-600 hover:bg-gray-800"
+                    className="flex-1 h-11 border-zinc-600 hover:bg-zinc-800"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Abbrechen
@@ -222,7 +222,7 @@ export default function CommunicationPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-6 text-center">
+                <div className="bg-zinc-800/50 border border-purple-500/30 rounded-xl p-6 text-center">
                   <div className="text-3xl font-mono font-bold text-white break-all">
                     {data?.darkChatName}
                   </div>
@@ -244,15 +244,15 @@ export default function CommunicationPage() {
       </div>
 
       {/* Info */}
-      <Card className="bg-gray-900/50 border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 bg-blue-500/20 rounded-lg">
-              <MessageSquare className="h-5 w-5 text-blue-400" />
+            <div className="p-2 bg-orange-500/20 rounded-lg">
+              <MessageSquare className="h-5 w-5 text-orange-400" />
             </div>
             <div>
               <h3 className="text-white font-semibold mb-1">Hinweis zur Kommunikation</h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-zinc-400 text-sm">
                 Die Funk-Frequenz und der DarkChat-Name werden regelmäßig geändert. 
                 Stelle sicher, dass du immer die aktuellen Daten verwendest. 
                 Bei Fragen wende dich an die Leaderschaft.

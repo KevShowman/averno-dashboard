@@ -100,7 +100,7 @@ export default function MoneyTransactionModal({
         {/* Glow Effect */}
         <div className={`absolute inset-0 bg-gradient-to-r ${theme.glow} blur-xl rounded-2xl`} />
         
-        <Card className={`relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 ${theme.border} shadow-2xl rounded-2xl overflow-hidden`}>
+        <Card className={`relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 ${theme.border} shadow-2xl rounded-2xl overflow-hidden`}>
           {/* Header mit Gradient */}
           <div className="relative">
             <div className={`absolute inset-0 bg-gradient-to-r ${theme.headerBg} to-transparent`} />
@@ -128,7 +128,7 @@ export default function MoneyTransactionModal({
                   size="icon"
                   onClick={onClose}
                   disabled={transactionMutation.isPending}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+                  className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -140,7 +140,7 @@ export default function MoneyTransactionModal({
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Amount Input */}
               <div className="space-y-2">
-                <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+                <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                   <DollarSign className={`h-4 w-4 ${theme.icon}`} />
                   Betrag (Schwarzgeld)
                 </label>
@@ -150,7 +150,7 @@ export default function MoneyTransactionModal({
                   step="1"
                   {...register('amount', { valueAsNumber: true })}
                   placeholder="z.B. 500000"
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 text-lg font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${errors.amount ? 'border-red-500' : ''}`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 text-lg font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${errors.amount ? 'border-red-500' : ''}`}
                 />
                 {errors.amount && (
                   <p className="text-red-400 text-xs">{errors.amount.message}</p>
@@ -159,33 +159,33 @@ export default function MoneyTransactionModal({
 
               {/* Category Input */}
               <div className="space-y-2">
-                <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+                <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                   <Tag className={`h-4 w-4 ${theme.icon}`} />
-                  Kategorie <span className="text-gray-500 font-normal">(optional)</span>
+                  Kategorie <span className="text-zinc-500 font-normal">(optional)</span>
                 </label>
                 <Input
                   {...register('category')}
                   placeholder={theme.placeholder}
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 placeholder:text-gray-500`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 placeholder:text-zinc-500`}
                 />
               </div>
 
               {/* Reference Input */}
               <div className="space-y-2">
-                <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+                <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                   <Link2 className={`h-4 w-4 ${theme.icon}`} />
-                  Referenz <span className="text-gray-500 font-normal">(optional)</span>
+                  Referenz <span className="text-zinc-500 font-normal">(optional)</span>
                 </label>
                 <Input
                   {...register('reference')}
                   placeholder="Auftrag, Person, Event..."
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 placeholder:text-gray-500`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 placeholder:text-zinc-500`}
                 />
               </div>
 
               {/* Note Input */}
               <div className="space-y-2">
-                <label className={`text-sm font-medium text-gray-300 flex items-center gap-2`}>
+                <label className={`text-sm font-medium text-zinc-300 flex items-center gap-2`}>
                   <FileText className={`h-4 w-4 ${theme.icon}`} />
                   Begründung
                 </label>
@@ -193,7 +193,7 @@ export default function MoneyTransactionModal({
                   {...register('note')}
                   placeholder="Warum wird dieses Geld ein-/ausgezahlt?"
                   required
-                  className={`bg-gray-800/50 border-gray-700 ${theme.ring} text-white h-11 placeholder:text-gray-500`}
+                  className={`bg-zinc-800/50 border-zinc-700 ${theme.ring} text-white h-11 placeholder:text-zinc-500`}
                 />
               </div>
 
@@ -203,7 +203,7 @@ export default function MoneyTransactionModal({
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="flex-1 h-12 border-gray-600 hover:bg-gray-800 hover:border-gray-500 text-gray-300"
+                  className="flex-1 h-12 border-zinc-600 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-300"
                   disabled={transactionMutation.isPending}
                 >
                   Abbrechen

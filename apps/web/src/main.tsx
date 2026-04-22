@@ -70,13 +70,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             classNames: {
               toast: 'backdrop-blur-xl',
               title: 'font-semibold',
-              description: 'text-gray-400 text-sm',
-              success: 'border-green-500/40 bg-gradient-to-r from-green-950/80 to-gray-900/80',
-              error: 'border-red-500/40 bg-gradient-to-r from-red-950/80 to-gray-900/80',
-              info: 'border-amber-500/40 bg-gradient-to-r from-amber-950/80 to-gray-900/80',
-              warning: 'border-yellow-500/40 bg-gradient-to-r from-yellow-950/80 to-gray-900/80',
-              actionButton: 'bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold rounded-lg px-3 py-1.5',
-              cancelButton: 'bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-3 py-1.5',
+              description: 'text-zinc-400 text-sm',
+              success: 'border-green-500/40 bg-gradient-to-r from-green-950/80 to-zinc-900/80',
+              error: 'border-red-500/40 bg-gradient-to-r from-red-950/80 to-zinc-900/80',
+              info: 'border-orange-500/40 bg-gradient-to-r from-orange-950/80 to-zinc-900/80',
+              warning: 'border-orange-500/40 bg-gradient-to-r from-orange-950/80 to-zinc-900/80',
+              actionButton: 'bg-orange-500 hover:bg-orange-400 text-zinc-900 font-semibold rounded-lg px-3 py-1.5',
+              cancelButton: 'bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg px-3 py-1.5',
             },
           }}
         />

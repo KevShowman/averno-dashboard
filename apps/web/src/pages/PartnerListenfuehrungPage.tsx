@@ -78,7 +78,7 @@ interface MapAnnotation {
 }
 
 const statusConfig: Record<SuggestionStatus, { label: string; color: string; bgColor: string; icon: typeof Clock }> = {
-  PENDING: { label: 'Ausstehend', color: 'text-amber-400', bgColor: 'bg-amber-500/20', icon: Clock },
+  PENDING: { label: 'Ausstehend', color: 'text-orange-400', bgColor: 'bg-orange-500/20', icon: Clock },
   APPROVED: { label: 'Genehmigt', color: 'text-green-400', bgColor: 'bg-green-500/20', icon: CheckCircle },
   REJECTED: { label: 'Abgelehnt', color: 'text-red-400', bgColor: 'bg-red-500/20', icon: XCircle },
 }
@@ -276,7 +276,7 @@ export default function PartnerListenfuehrungPage() {
       case 'CREATE':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Neu</span>
       case 'UPDATE':
-        return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">Änderung</span>
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400">Änderung</span>
       case 'DELETE':
         return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">Löschung</span>
     }
@@ -286,21 +286,21 @@ export default function PartnerListenfuehrungPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl">
-          <BookOpen className="h-8 w-8 text-blue-400" />
+        <div className="p-3 bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl">
+          <BookOpen className="h-8 w-8 text-orange-400" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Listenführung</h1>
-          <p className="text-gray-400">Schlage neue Familien-Kontakte vor</p>
+          <p className="text-zinc-400">Schlage neue Familien-Kontakte vor</p>
         </div>
       </div>
 
       {/* Info Banner */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+      <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <Shield className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+          <Shield className="h-5 w-5 text-orange-400 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-gray-300 text-sm">
+            <p className="text-zinc-300 text-sm">
               Als Partner kannst du Kontaktdaten für Familien vorschlagen. Diese werden von der Leadership 
               geprüft bevor sie in die Liste aufgenommen werden. Du kannst eingegebene Daten danach nicht 
               mehr einsehen - nur den Status deiner Vorschläge.
@@ -311,7 +311,7 @@ export default function PartnerListenfuehrungPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Submit Form */}
-        <Card className="bg-gray-800/50 border-gray-700/50">
+        <Card className="bg-zinc-800/50 border-zinc-700/50">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
               <button
@@ -319,8 +319,8 @@ export default function PartnerListenfuehrungPage() {
                 onClick={() => setActiveTab('create')}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === 'create'
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <Plus className="h-4 w-4 inline mr-1" />
@@ -332,7 +332,7 @@ export default function PartnerListenfuehrungPage() {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === 'delete'
                     ? 'bg-red-500/20 text-red-400 border border-red-500/50'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <Trash2 className="h-4 w-4 inline mr-1" />
@@ -351,7 +351,7 @@ export default function PartnerListenfuehrungPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Family Name */}
               <div className="space-y-2">
-                <Label htmlFor="familyName" className="text-gray-300">
+                <Label htmlFor="familyName" className="text-zinc-300">
                   Familienname <span className="text-red-400">*</span>
                 </Label>
                 <Input
@@ -359,18 +359,18 @@ export default function PartnerListenfuehrungPage() {
                   value={formData.familyName}
                   onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
                   placeholder="z.B. Narco City Cartel"
-                  className="bg-gray-900/50 border-gray-600"
+                  className="bg-zinc-900/50 border-zinc-600"
                 />
               </div>
 
               {/* Status */}
               <div className="space-y-2">
-                <Label className="text-gray-300">Status</Label>
+                <Label className="text-zinc-300">Status</Label>
                 <Select
                   value={formData.familyStatus}
                   onValueChange={(value) => setFormData({ ...formData, familyStatus: value })}
                 >
-                  <SelectTrigger className="bg-gray-900/50 border-gray-600">
+                  <SelectTrigger className="bg-zinc-900/50 border-zinc-600">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -384,51 +384,51 @@ export default function PartnerListenfuehrungPage() {
 
               {/* Flags: isKeyFamily & isOutdated */}
               <div className="grid grid-cols-2 gap-4">
-                <label className="flex items-center gap-3 p-3 bg-gray-900/30 rounded-lg border border-gray-700/50 cursor-pointer hover:border-amber-500/30 transition-colors">
+                <label className="flex items-center gap-3 p-3 bg-zinc-900/30 rounded-lg border border-zinc-700/50 cursor-pointer hover:border-orange-500/30 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.isKeyFamily}
                     onChange={(e) => setFormData({ ...formData, isKeyFamily: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500"
+                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-orange-500 focus:ring-orange-500"
                   />
                   <div>
-                    <span className="text-gray-200 text-sm font-medium">🔑 Schlüsselfamilie</span>
-                    <p className="text-xs text-gray-500">Offizielle Partner-Familie</p>
+                    <span className="text-zinc-200 text-sm font-medium">🔑 Schlüsselfamilie</span>
+                    <p className="text-xs text-zinc-500">Offizielle Partner-Familie</p>
                   </div>
                 </label>
-                <label className="flex items-center gap-3 p-3 bg-gray-900/30 rounded-lg border border-gray-700/50 cursor-pointer hover:border-orange-500/30 transition-colors">
+                <label className="flex items-center gap-3 p-3 bg-zinc-900/30 rounded-lg border border-zinc-700/50 cursor-pointer hover:border-orange-500/30 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.isOutdated}
                     onChange={(e) => setFormData({ ...formData, isOutdated: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-orange-500"
+                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-orange-500 focus:ring-orange-500"
                   />
                   <div>
-                    <span className="text-gray-200 text-sm font-medium">⚠️ Veraltet</span>
-                    <p className="text-xs text-gray-500">Information nicht aktuell</p>
+                    <span className="text-zinc-200 text-sm font-medium">⚠️ Veraltet</span>
+                    <p className="text-xs text-zinc-500">Information nicht aktuell</p>
                   </div>
                 </label>
               </div>
 
               {/* Property ZIP */}
               <div className="space-y-2">
-                <Label htmlFor="propertyZip" className="text-gray-300">PLZ / Standort</Label>
+                <Label htmlFor="propertyZip" className="text-zinc-300">PLZ / Standort</Label>
                 <Input
                   id="propertyZip"
                   value={formData.propertyZip}
                   onChange={(e) => setFormData({ ...formData, propertyZip: e.target.value })}
                   placeholder="z.B. 5024"
-                  className="bg-gray-900/50 border-gray-600"
+                  className="bg-zinc-900/50 border-zinc-600"
                 />
               </div>
 
               {/* Map Location - PFLICHTFELD */}
-              <div className="space-y-3 p-4 bg-amber-900/20 rounded-lg border border-amber-500/30">
-                <h4 className="text-sm font-medium text-amber-300 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-amber-400" />
+              <div className="space-y-3 p-4 bg-orange-900/20 rounded-lg border border-orange-500/30">
+                <h4 className="text-sm font-medium text-orange-300 flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-orange-400" />
                   Karten-Standort <span className="text-red-400">*</span>
                 </h4>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-zinc-400">
                   Wähle einen bestehenden, unverknüpften Standort auf der Karte aus
                 </p>
                 
@@ -437,7 +437,7 @@ export default function PartnerListenfuehrungPage() {
                   value={formData.mapName}
                   onValueChange={(value) => setFormData({ ...formData, mapName: value, linkedAnnotationId: '' })}
                 >
-                  <SelectTrigger className={`bg-gray-900/50 ${!formData.mapName ? 'border-amber-500/50' : 'border-gray-600'}`}>
+                  <SelectTrigger className={`bg-zinc-900/50 ${!formData.mapName ? 'border-orange-500/50' : 'border-zinc-600'}`}>
                     <SelectValue placeholder="Karte auswählen..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -454,7 +454,7 @@ export default function PartnerListenfuehrungPage() {
                       value={formData.linkedAnnotationId || undefined}
                       onValueChange={(value) => setFormData({ ...formData, linkedAnnotationId: value })}
                     >
-                      <SelectTrigger className={`bg-gray-900/50 ${!formData.linkedAnnotationId ? 'border-amber-500/50' : 'border-green-500/50'}`}>
+                      <SelectTrigger className={`bg-zinc-900/50 ${!formData.linkedAnnotationId ? 'border-orange-500/50' : 'border-green-500/50'}`}>
                         <SelectValue placeholder="Standort auswählen..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -480,7 +480,7 @@ export default function PartnerListenfuehrungPage() {
                       </p>
                     )}
                     {!formData.linkedAnnotationId && mapAnnotations.filter(a => !a.familyContactId).length > 0 && (
-                      <p className="text-xs text-amber-400 flex items-center gap-1">
+                      <p className="text-xs text-orange-400 flex items-center gap-1">
                         <AlertCircle className="h-3 w-3" />
                         Bitte wähle einen Standort aus
                       </p>
@@ -490,72 +490,72 @@ export default function PartnerListenfuehrungPage() {
               </div>
 
               {/* Contact 1 */}
-              <div className="space-y-3 p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-300">Kontaktperson 1</h4>
+              <div className="space-y-3 p-4 bg-zinc-900/30 rounded-lg">
+                <h4 className="text-sm font-medium text-zinc-300">Kontaktperson 1</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <Input
                     value={formData.contact1FirstName}
                     onChange={(e) => setFormData({ ...formData, contact1FirstName: e.target.value })}
                     placeholder="Vorname"
-                    className="bg-gray-900/50 border-gray-600"
+                    className="bg-zinc-900/50 border-zinc-600"
                   />
                   <Input
                     value={formData.contact1LastName}
                     onChange={(e) => setFormData({ ...formData, contact1LastName: e.target.value })}
                     placeholder="Nachname"
-                    className="bg-gray-900/50 border-gray-600"
+                    className="bg-zinc-900/50 border-zinc-600"
                   />
                 </div>
                 <Input
                   value={formData.contact1Phone}
                   onChange={(e) => setFormData({ ...formData, contact1Phone: e.target.value })}
                   placeholder="Telefonnummer"
-                  className="bg-gray-900/50 border-gray-600"
+                  className="bg-zinc-900/50 border-zinc-600"
                 />
               </div>
 
               {/* Contact 2 */}
-              <div className="space-y-3 p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-300">Kontaktperson 2</h4>
+              <div className="space-y-3 p-4 bg-zinc-900/30 rounded-lg">
+                <h4 className="text-sm font-medium text-zinc-300">Kontaktperson 2</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <Input
                     value={formData.contact2FirstName}
                     onChange={(e) => setFormData({ ...formData, contact2FirstName: e.target.value })}
                     placeholder="Vorname"
-                    className="bg-gray-900/50 border-gray-600"
+                    className="bg-zinc-900/50 border-zinc-600"
                   />
                   <Input
                     value={formData.contact2LastName}
                     onChange={(e) => setFormData({ ...formData, contact2LastName: e.target.value })}
                     placeholder="Nachname"
-                    className="bg-gray-900/50 border-gray-600"
+                    className="bg-zinc-900/50 border-zinc-600"
                   />
                 </div>
                 <Input
                   value={formData.contact2Phone}
                   onChange={(e) => setFormData({ ...formData, contact2Phone: e.target.value })}
                   placeholder="Telefonnummer"
-                  className="bg-gray-900/50 border-gray-600"
+                  className="bg-zinc-900/50 border-zinc-600"
                 />
               </div>
 
               {/* Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes" className="text-gray-300">Notizen</Label>
+                <Label htmlFor="notes" className="text-zinc-300">Notizen</Label>
                 <Textarea
                   id="notes"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Weitere Informationen..."
                   rows={3}
-                  className="bg-gray-900/50 border-gray-600 resize-none"
+                  className="bg-zinc-900/50 border-zinc-600 resize-none"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={submitMutation.isPending || !formData.familyName.trim() || !formData.mapName || !formData.linkedAnnotationId}
-                className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitMutation.isPending ? (
                   <>
@@ -581,12 +581,12 @@ export default function PartnerListenfuehrungPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-gray-300">Familie auswählen</Label>
+                  <Label className="text-zinc-300">Familie auswählen</Label>
                   <Select
                     value={selectedFamilyForDelete}
                     onValueChange={setSelectedFamilyForDelete}
                   >
-                    <SelectTrigger className="bg-gray-900/50 border-gray-600">
+                    <SelectTrigger className="bg-zinc-900/50 border-zinc-600">
                       <SelectValue placeholder="Familie auswählen..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -601,7 +601,7 @@ export default function PartnerListenfuehrungPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-gray-300">
+                  <Label className="text-zinc-300">
                     Begründung für Löschung <span className="text-red-400">*</span>
                   </Label>
                   <Textarea
@@ -609,7 +609,7 @@ export default function PartnerListenfuehrungPage() {
                     onChange={(e) => setDeleteReason(e.target.value)}
                     placeholder="Warum soll dieser Eintrag gelöscht werden?"
                     rows={4}
-                    className="bg-gray-900/50 border-gray-600 resize-none"
+                    className="bg-zinc-900/50 border-zinc-600 resize-none"
                   />
                 </div>
 
@@ -638,13 +638,13 @@ export default function PartnerListenfuehrungPage() {
         {/* Suggestions Status */}
         <div className="space-y-6">
           {/* Pending Suggestions */}
-          <Card className="bg-gray-800/50 border-gray-700/50">
+          <Card className="bg-zinc-800/50 border-zinc-700/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Clock className="h-5 w-5 text-amber-400" />
+                <Clock className="h-5 w-5 text-orange-400" />
                 Ausstehende Vorschläge
                 {pendingSuggestions.length > 0 && (
-                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-400">
+                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400">
                     {pendingSuggestions.length}
                   </span>
                 )}
@@ -656,10 +656,10 @@ export default function PartnerListenfuehrungPage() {
             <CardContent>
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                  <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
                 </div>
               ) : pendingSuggestions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-zinc-500">
                   <Info className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>Keine ausstehenden Vorschläge</p>
                 </div>
@@ -668,10 +668,10 @@ export default function PartnerListenfuehrungPage() {
                   {pendingSuggestions.map((suggestion) => (
                     <div
                       key={suggestion.id}
-                      className={`p-3 bg-gray-900/30 rounded-lg border ${
+                      className={`p-3 bg-zinc-900/30 rounded-lg border ${
                         getType(suggestion) === 'DELETE' 
                           ? 'border-red-500/30' 
-                          : 'border-gray-700/50'
+                          : 'border-zinc-700/50'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -685,24 +685,24 @@ export default function PartnerListenfuehrungPage() {
                         </span>
                       </div>
                       {suggestion.propertyZip && (
-                        <p className="text-sm text-gray-500 mt-1">PLZ: {suggestion.propertyZip}</p>
+                        <p className="text-sm text-zinc-500 mt-1">PLZ: {suggestion.propertyZip}</p>
                       )}
                       {suggestion.mapName && (
                         <div className="flex items-center gap-2 mt-1">
-                          <MapPin className="h-3 w-3 text-amber-400" />
-                          <span className="text-sm text-gray-500">
+                          <MapPin className="h-3 w-3 text-orange-400" />
+                          <span className="text-sm text-zinc-500">
                             Karte: {suggestion.mapName === 'NARCO_CITY' ? 'Narco City' : suggestion.mapName === 'ROXWOOD' ? 'Roxwood' : 'Cayo Perico'}
                           </span>
                           <button
                             onClick={() => navigateToMap(suggestion.mapName!, suggestion.mapX, suggestion.mapY)}
-                            className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                            className="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1"
                           >
                             <ExternalLink className="h-3 w-3" />
                             Anzeigen
                           </button>
                         </div>
                       )}
-                      <p className="text-xs text-gray-600 mt-2">
+                      <p className="text-xs text-zinc-600 mt-2">
                         Eingereicht: {new Date(suggestion.createdAt).toLocaleDateString('de-DE')}
                       </p>
                     </div>
@@ -713,7 +713,7 @@ export default function PartnerListenfuehrungPage() {
           </Card>
 
           {/* Processed Suggestions */}
-          <Card className="bg-gray-800/50 border-gray-700/50">
+          <Card className="bg-zinc-800/50 border-zinc-700/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <CheckCircle className="h-5 w-5 text-green-400" />
@@ -725,7 +725,7 @@ export default function PartnerListenfuehrungPage() {
             </CardHeader>
             <CardContent>
               {processedSuggestions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-zinc-500">
                   <Info className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>Keine bearbeiteten Vorschläge</p>
                 </div>
@@ -739,8 +739,8 @@ export default function PartnerListenfuehrungPage() {
                     return (
                       <div
                         key={suggestion.id}
-                        className={`p-3 bg-gray-900/30 rounded-lg border ${
-                          status === 'REJECTED' ? 'border-red-500/30' : 'border-gray-700/50'
+                        className={`p-3 bg-zinc-900/30 rounded-lg border ${
+                          status === 'REJECTED' ? 'border-red-500/30' : 'border-zinc-700/50'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -755,8 +755,8 @@ export default function PartnerListenfuehrungPage() {
                         </div>
                         {suggestion.mapName && (
                           <div className="flex items-center gap-2 mt-1">
-                            <MapPin className="h-3 w-3 text-amber-400" />
-                            <span className="text-sm text-gray-500">
+                            <MapPin className="h-3 w-3 text-orange-400" />
+                            <span className="text-sm text-zinc-500">
                               Karte: {suggestion.mapName === 'NARCO_CITY' ? 'Narco City' : suggestion.mapName === 'ROXWOOD' ? 'Roxwood' : 'Cayo Perico'}
                             </span>
                             {status === 'APPROVED' && (
@@ -764,7 +764,7 @@ export default function PartnerListenfuehrungPage() {
                                 <span className="text-green-400 text-xs">(auf Karte sichtbar)</span>
                                 <button
                                   onClick={() => navigateToMap(suggestion.mapName!, suggestion.mapX, suggestion.mapY)}
-                                  className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                                  className="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1"
                                 >
                                   <ExternalLink className="h-3 w-3" />
                                   Anzeigen
@@ -781,7 +781,7 @@ export default function PartnerListenfuehrungPage() {
                               <XCircle className="h-4 w-4" />
                               Ablehnungsgrund
                             </div>
-                            <p className="text-sm text-gray-300">
+                            <p className="text-sm text-zinc-300">
                               {suggestion.reviewNote}
                             </p>
                           </div>
@@ -789,12 +789,12 @@ export default function PartnerListenfuehrungPage() {
                         
                         {/* Genehmigungsnotiz */}
                         {status === 'APPROVED' && suggestion.reviewNote && (
-                          <p className="text-sm text-gray-400 mt-2 p-2 bg-gray-800/50 rounded">
+                          <p className="text-sm text-zinc-400 mt-2 p-2 bg-zinc-800/50 rounded">
                             {suggestion.reviewNote}
                           </p>
                         )}
                         
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-zinc-600 mt-2">
                           Bearbeitet: {suggestion.reviewedAt 
                             ? new Date(suggestion.reviewedAt).toLocaleDateString('de-DE') 
                             : 'Unbekannt'}

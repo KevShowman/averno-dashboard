@@ -387,18 +387,18 @@ export default function AttendancePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-cyan-500/20 p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-orange-500/20 p-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-cyan-500/20 rounded-xl">
-              <Calendar className="h-8 w-8 text-cyan-400" />
+            <div className="p-3 bg-orange-500/20 rounded-xl">
+              <Calendar className="h-8 w-8 text-orange-400" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Tägliche Anwesenheit</h1>
-              <p className="text-gray-400 mt-1">
+              <p className="text-zinc-400 mt-1">
                 Erfasse die Anwesenheit der Mitglieder
               </p>
             </div>
@@ -409,7 +409,7 @@ export default function AttendancePage() {
               <Button
                 onClick={() => setIsSettingsOpen(true)}
                 variant="outline"
-                className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
               >
                 <Settings className="h-4 w-4 mr-2" />
                 Berechtigungen
@@ -420,14 +420,14 @@ export default function AttendancePage() {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex gap-2 p-1 bg-gray-900/50 rounded-xl border border-gray-800 w-fit">
+      <div className="flex gap-2 p-1 bg-zinc-900/50 rounded-xl border border-zinc-800 w-fit">
         <Button
           onClick={() => setActiveTab('weekly')}
           variant="ghost"
           className={`px-6 py-2 rounded-lg transition-all ${
             activeTab === 'weekly'
-              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+              : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
           }`}
         >
           <Calendar className="h-4 w-4 mr-2" />
@@ -438,8 +438,8 @@ export default function AttendancePage() {
           variant="ghost"
           className={`px-6 py-2 rounded-lg transition-all ${
             activeTab === 'statistics'
-              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+              : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
           }`}
         >
           <BarChart3 className="h-4 w-4 mr-2" />
@@ -450,13 +450,13 @@ export default function AttendancePage() {
       {activeTab === 'weekly' && (
       <>
       {/* Week Navigation */}
-      <Card className="bg-gray-900/50 border-gray-800">
+      <Card className="bg-zinc-900/50 border-zinc-800">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <Button
               onClick={goToPreviousWeek}
               variant="outline"
-              className="border-gray-700 hover:bg-gray-800"
+              className="border-zinc-700 hover:bg-zinc-800"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Vorherige Woche
@@ -470,7 +470,7 @@ export default function AttendancePage() {
                 onClick={goToCurrentWeek}
                 variant="ghost"
                 size="sm"
-                className="text-cyan-400 hover:text-cyan-300"
+                className="text-orange-400 hover:text-orange-300"
               >
                 Heute
               </Button>
@@ -479,7 +479,7 @@ export default function AttendancePage() {
             <Button
               onClick={goToNextWeek}
               variant="outline"
-              className="border-gray-700 hover:bg-gray-800"
+              className="border-zinc-700 hover:bg-zinc-800"
             >
               Nächste Woche
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -491,25 +491,25 @@ export default function AttendancePage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Main Table */}
         <div className="lg:col-span-3">
-          <Card className="bg-gray-900/50 border-gray-800">
-            <CardHeader className="border-b border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
+            <CardHeader className="border-b border-zinc-800">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Users className="h-5 w-5 text-cyan-400" />
+                  <Users className="h-5 w-5 text-orange-400" />
                   Anwesenheits-Tabelle
                 </CardTitle>
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                     <Input
                       placeholder="Suchen..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 w-48 bg-gray-800/50 border-gray-700"
+                      className="pl-9 w-48 bg-zinc-800/50 border-zinc-700"
                     />
                   </div>
                   {canMark && selectedCells.size > 0 && (
-                    <span className="text-cyan-400 text-sm font-medium">
+                    <span className="text-orange-400 text-sm font-medium">
                       {selectedCells.size} ausgewählt
                     </span>
                   )}
@@ -519,14 +519,14 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500" />
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
                 </div>
               ) : weekData ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-800">
-                        <th className="text-left p-3 text-gray-400 font-medium sticky left-0 bg-gray-900/95 z-10">
+                      <tr className="border-b border-zinc-800">
+                        <th className="text-left p-3 text-zinc-400 font-medium sticky left-0 bg-zinc-900/95 z-10">
                           Mitglied
                         </th>
                         {weekData.days.map((day) => {
@@ -535,21 +535,21 @@ export default function AttendancePage() {
                           const dayOfWeek = date.getDay() // 0 = Sunday, 1 = Monday, ...
                           const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Convert to Monday = 0
                           return (
-                            <th key={day} className="p-3 text-center text-gray-400 font-medium min-w-[60px]">
+                            <th key={day} className="p-3 text-center text-zinc-400 font-medium min-w-[60px]">
                               <div>{DAY_NAMES[dayIndex]}</div>
                               <div className="text-xs">{formatDate(day)}</div>
                             </th>
                           )
                         })}
-                        <th className="p-3 text-center text-gray-400 font-medium">
+                        <th className="p-3 text-center text-zinc-400 font-medium">
                           Σ
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredUsers.map((ua) => (
-                        <tr key={ua.user.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                          <td className="p-3 sticky left-0 bg-gray-900/95 z-10">
+                        <tr key={ua.user.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
+                          <td className="p-3 sticky left-0 bg-zinc-900/95 z-10">
                             <div className="flex items-center gap-2">
                               {ua.user.avatarUrl ? (
                                 <img
@@ -558,7 +558,7 @@ export default function AttendancePage() {
                                   className="h-8 w-8 rounded-full"
                                 />
                               ) : (
-                                <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400">
+                                <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs text-zinc-400">
                                   {getUserName(ua.user).charAt(0)}
                                 </div>
                               )}
@@ -579,14 +579,14 @@ export default function AttendancePage() {
                                   disabled={!canMark}
                                   className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                                     isSelectedForRemoval
-                                      ? 'bg-red-500 text-white ring-2 ring-red-400 ring-offset-1 ring-offset-gray-900'
+                                      ? 'bg-red-500 text-white ring-2 ring-red-400 ring-offset-1 ring-offset-zinc-900'
                                       : isSelectedForAdd
-                                        ? 'bg-cyan-500 text-white ring-2 ring-cyan-400 ring-offset-1 ring-offset-gray-900'
+                                        ? 'bg-orange-500 text-white ring-2 ring-orange-400 ring-offset-1 ring-offset-zinc-900'
                                         : isPresent
                                           ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
                                           : canMark
-                                            ? 'bg-gray-800/50 text-gray-600 hover:bg-gray-700/50 hover:text-gray-400'
-                                            : 'bg-gray-800/30 text-gray-700'
+                                            ? 'bg-zinc-800/50 text-zinc-600 hover:bg-zinc-700/50 hover:text-zinc-400'
+                                            : 'bg-zinc-800/30 text-zinc-700'
                                   }`}
                                 >
                                   {isSelectedForRemoval ? (
@@ -603,7 +603,7 @@ export default function AttendancePage() {
                           <td className="p-3 text-center">
                             <span className={`font-bold ${
                               ua.totalDays >= 5 ? 'text-green-400' :
-                              ua.totalDays >= 3 ? 'text-yellow-400' :
+                              ua.totalDays >= 3 ? 'text-orange-400' :
                               'text-red-400'
                             }`}>
                               {ua.totalDays}
@@ -619,9 +619,9 @@ export default function AttendancePage() {
           </Card>
 
           {!canMark && (
-            <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-yellow-400" />
-              <span className="text-yellow-300 text-sm">
+            <div className="mt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-orange-400" />
+              <span className="text-orange-300 text-sm">
                 Du hast keine Berechtigung, Anwesenheiten einzutragen. Kontaktiere die Leaderschaft.
               </span>
             </div>
@@ -630,19 +630,19 @@ export default function AttendancePage() {
           {/* Floating Action Bar */}
           {selectedCells.size > 0 && (
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-              <div className="bg-gray-900 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/10 px-6 py-3 flex items-center gap-4">
+              <div className="bg-zinc-900 border border-orange-500/30 rounded-xl shadow-2xl shadow-orange-500/10 px-6 py-3 flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                    <Check className="h-4 w-4 text-cyan-400" />
+                  <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <Check className="h-4 w-4 text-orange-400" />
                   </div>
                   <span className="text-white font-medium">{selectedCells.size} ausgewählt</span>
                 </div>
-                <div className="w-px h-8 bg-gray-700" />
+                <div className="w-px h-8 bg-zinc-700" />
                 <Button
                   onClick={clearSelection}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-400 hover:text-white"
+                  className="text-zinc-400 hover:text-white"
                 >
                   Abbrechen
                 </Button>
@@ -650,7 +650,7 @@ export default function AttendancePage() {
                   onClick={openConfirmDialog}
                   size="sm"
                   className={confirmAction === 'add' 
-                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white' 
+                    ? 'bg-orange-600 hover:bg-orange-700 text-white' 
                     : 'bg-red-600 hover:bg-red-700 text-white'}
                 >
                   {confirmAction === 'add' ? 'Anwesenheit eintragen' : 'Entfernen'}
@@ -663,7 +663,7 @@ export default function AttendancePage() {
         {/* Stats Panel */}
         <div className="space-y-4">
           {/* Top Active */}
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-white text-sm flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-green-400" />
@@ -674,20 +674,20 @@ export default function AttendancePage() {
               {statsData?.topActive?.slice(0, 5).map((s: any, i: number) => (
                 <div key={s.user.id} className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-500 w-4">{i + 1}.</span>
+                    <span className="text-zinc-500 w-4">{i + 1}.</span>
                     <span className="text-white">{getUserName(s.user)}</span>
                   </div>
                   <span className="text-green-400 font-medium">{s.count}</span>
                 </div>
               ))}
               {!statsData?.topActive?.length && (
-                <p className="text-gray-500 text-sm">Keine Daten</p>
+                <p className="text-zinc-500 text-sm">Keine Daten</p>
               )}
             </CardContent>
           </Card>
 
           {/* Most Inactive */}
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-white text-sm flex items-center gap-2">
                 <TrendingDown className="h-4 w-4 text-red-400" />
@@ -698,26 +698,26 @@ export default function AttendancePage() {
               {statsData?.mostInactive?.slice(0, 5).map((s: any, i: number) => (
                 <div key={s.user.id} className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-500 w-4">{i + 1}.</span>
+                    <span className="text-zinc-500 w-4">{i + 1}.</span>
                     <span className="text-white">{getUserName(s.user)}</span>
                   </div>
                   <span className="text-red-400 font-medium">{s.count}</span>
                 </div>
               ))}
               {!statsData?.mostInactive?.length && (
-                <p className="text-gray-500 text-sm">Keine Daten</p>
+                <p className="text-zinc-500 text-sm">Keine Daten</p>
               )}
             </CardContent>
           </Card>
 
           {/* Period Info */}
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-zinc-900/50 border-zinc-800">
             <CardContent className="p-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-cyan-400">
+                <div className="text-3xl font-bold text-orange-400">
                   {statsData?.totalAttendances || 0}
                 </div>
-                <div className="text-gray-400 text-sm">
+                <div className="text-zinc-400 text-sm">
                   Anwesenheiten (4 Wochen)
                 </div>
               </div>
@@ -733,15 +733,15 @@ export default function AttendancePage() {
         <div className="space-y-6">
           {detailedStatsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin h-8 w-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+              <div className="animate-spin h-8 w-8 border-2 border-orange-500 border-t-transparent rounded-full" />
             </div>
           ) : detailedStats ? (
             <>
               {/* Tracking Info Banner */}
-              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-4 flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-cyan-400" />
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 flex items-center gap-3">
+                <Calendar className="h-5 w-5 text-orange-400" />
                 <div>
-                  <span className="text-cyan-300 text-sm">
+                  <span className="text-orange-300 text-sm">
                     Tracking seit <span className="font-bold">13.12.2025</span> • {detailedStats.overview.daysSinceTrackingStart} Tag(e) erfasst
                   </span>
                 </div>
@@ -749,39 +749,39 @@ export default function AttendancePage() {
 
               {/* Overview Cards */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardContent className="p-4 text-center">
-                    <Users className="h-6 w-6 text-cyan-400 mx-auto mb-2" />
+                    <Users className="h-6 w-6 text-orange-400 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-white">{detailedStats.overview.totalUsers}</div>
-                    <div className="text-sm text-gray-400">Gesamt Mitglieder</div>
+                    <div className="text-sm text-zinc-400">Gesamt Mitglieder</div>
                   </CardContent>
                 </Card>
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardContent className="p-4 text-center">
                     <CalendarDays className="h-6 w-6 text-green-400 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-white">{detailedStats.overview.totalAttendances}</div>
-                    <div className="text-sm text-gray-400">Anwesenheiten Total</div>
+                    <div className="text-sm text-zinc-400">Anwesenheiten Total</div>
                   </CardContent>
                 </Card>
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardContent className="p-4 text-center">
-                    <Percent className="h-6 w-6 text-amber-400 mx-auto mb-2" />
+                    <Percent className="h-6 w-6 text-orange-400 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-white">{detailedStats.overview.avgPercentage}%</div>
-                    <div className="text-sm text-gray-400">Ø Anwesenheit</div>
+                    <div className="text-sm text-zinc-400">Ø Anwesenheit</div>
                   </CardContent>
                 </Card>
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardContent className="p-4 text-center">
                     <Target className="h-6 w-6 text-purple-400 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-white">{detailedStats.overview.avgLast7Days}</div>
-                    <div className="text-sm text-gray-400">Ø Tage (letzte 7)</div>
+                    <div className="text-sm text-zinc-400">Ø Tage (letzte 7)</div>
                   </CardContent>
                 </Card>
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardContent className="p-4 text-center">
                     <Award className="h-6 w-6 text-rose-400 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-white">{detailedStats.overview.usersWithBloodIn}</div>
-                    <div className="text-sm text-gray-400">Mit Blood-In</div>
+                    <div className="text-sm text-zinc-400">Mit Blood-In</div>
                   </CardContent>
                 </Card>
               </div>
@@ -789,32 +789,32 @@ export default function AttendancePage() {
               {/* Rankings Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Top by Percentage */}
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white flex items-center gap-2 text-lg">
                       <TrendingUp className="h-5 w-5 text-green-400" />
                       Beste Anwesenheitsquote
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-zinc-400">
                       Basierend auf Tagen seit Blood-In (min. 7 Tage)
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {detailedStats.rankings.byPercentage.slice(0, 10).map((stat, index) => (
-                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            index === 0 ? 'bg-amber-500 text-black' :
-                            index === 1 ? 'bg-gray-300 text-black' :
-                            index === 2 ? 'bg-amber-700 text-white' :
-                            'bg-gray-700 text-gray-300'
+                            index === 0 ? 'bg-orange-500 text-black' :
+                            index === 1 ? 'bg-zinc-300 text-black' :
+                            index === 2 ? 'bg-orange-700 text-white' :
+                            'bg-zinc-700 text-zinc-300'
                           }`}>
                             {index + 1}
                           </div>
                           {stat.user.avatarUrl ? (
                             <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
                           ) : (
-                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                            <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm">
                               {(stat.user.icFirstName || stat.user.username).charAt(0)}
                             </div>
                           )}
@@ -824,7 +824,7 @@ export default function AttendancePage() {
                                 ? `${stat.user.icFirstName} ${stat.user.icLastName}`
                                 : stat.user.username}
                             </div>
-                            <div className="text-gray-500 text-xs">
+                            <div className="text-zinc-500 text-xs">
                               {stat.totalAttendance} von {stat.daysSinceBloodIn} Tagen
                             </div>
                           </div>
@@ -832,7 +832,7 @@ export default function AttendancePage() {
                         <div className="text-right">
                           <div className={`text-lg font-bold ${
                             stat.attendancePercentage >= 70 ? 'text-green-400' :
-                            stat.attendancePercentage >= 40 ? 'text-amber-400' :
+                            stat.attendancePercentage >= 40 ? 'text-orange-400' :
                             'text-red-400'
                           }`}>
                             {stat.attendancePercentage}%
@@ -841,25 +841,25 @@ export default function AttendancePage() {
                       </div>
                     ))}
                     {detailedStats.rankings.byPercentage.length === 0 && (
-                      <p className="text-gray-500 text-sm text-center py-4">Keine Daten verfügbar</p>
+                      <p className="text-zinc-500 text-sm text-center py-4">Keine Daten verfügbar</p>
                     )}
                   </CardContent>
                 </Card>
 
                 {/* Lowest Percentage */}
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white flex items-center gap-2 text-lg">
                       <TrendingDown className="h-5 w-5 text-red-400" />
                       Niedrigste Anwesenheitsquote
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-zinc-400">
                       Mitglieder mit Verbesserungspotenzial
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {detailedStats.rankings.lowestPercentage.slice(0, 10).map((stat, index) => (
-                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-red-900/50 text-red-300">
                             {index + 1}
@@ -867,7 +867,7 @@ export default function AttendancePage() {
                           {stat.user.avatarUrl ? (
                             <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
                           ) : (
-                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                            <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm">
                               {(stat.user.icFirstName || stat.user.username).charAt(0)}
                             </div>
                           )}
@@ -877,7 +877,7 @@ export default function AttendancePage() {
                                 ? `${stat.user.icFirstName} ${stat.user.icLastName}`
                                 : stat.user.username}
                             </div>
-                            <div className="text-gray-500 text-xs">
+                            <div className="text-zinc-500 text-xs">
                               {stat.totalAttendance} von {stat.daysSinceBloodIn} Tagen
                             </div>
                           </div>
@@ -885,7 +885,7 @@ export default function AttendancePage() {
                         <div className="text-right">
                           <div className={`text-lg font-bold ${
                             stat.attendancePercentage >= 70 ? 'text-green-400' :
-                            stat.attendancePercentage >= 40 ? 'text-amber-400' :
+                            stat.attendancePercentage >= 40 ? 'text-orange-400' :
                             'text-red-400'
                           }`}>
                             {stat.attendancePercentage}%
@@ -894,38 +894,38 @@ export default function AttendancePage() {
                       </div>
                     ))}
                     {detailedStats.rankings.lowestPercentage.length === 0 && (
-                      <p className="text-gray-500 text-sm text-center py-4">Keine Daten verfügbar</p>
+                      <p className="text-zinc-500 text-sm text-center py-4">Keine Daten verfügbar</p>
                     )}
                   </CardContent>
                 </Card>
 
                 {/* Top Streaks */}
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white flex items-center gap-2 text-lg">
                       <Flame className="h-5 w-5 text-orange-400" />
                       Aktuelle Streaks
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-zinc-400">
                       Aufeinanderfolgende aktive Tage
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {detailedStats.rankings.byStreak.filter(s => s.currentStreak > 0).slice(0, 10).map((stat, index) => (
-                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                             index === 0 ? 'bg-orange-500 text-black' :
                             index === 1 ? 'bg-orange-400 text-black' :
                             index === 2 ? 'bg-orange-300 text-black' :
-                            'bg-gray-700 text-gray-300'
+                            'bg-zinc-700 text-zinc-300'
                           }`}>
                             {index + 1}
                           </div>
                           {stat.user.avatarUrl ? (
                             <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
                           ) : (
-                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                            <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm">
                               {(stat.user.icFirstName || stat.user.username).charAt(0)}
                             </div>
                           )}
@@ -938,43 +938,43 @@ export default function AttendancePage() {
                         <div className="flex items-center gap-1 text-orange-400">
                           <Flame className="h-4 w-4" />
                           <span className="text-lg font-bold">{stat.currentStreak}</span>
-                          <span className="text-sm text-gray-400">Tage</span>
+                          <span className="text-sm text-zinc-400">Tage</span>
                         </div>
                       </div>
                     ))}
                     {detailedStats.rankings.byStreak.filter(s => s.currentStreak > 0).length === 0 && (
-                      <p className="text-gray-500 text-sm text-center py-4">Keine aktiven Streaks</p>
+                      <p className="text-zinc-500 text-sm text-center py-4">Keine aktiven Streaks</p>
                     )}
                   </CardContent>
                 </Card>
 
                 {/* Recent Days */}
-                <Card className="bg-gray-900/50 border-gray-800">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white flex items-center gap-2 text-lg">
-                      <Calendar className="h-5 w-5 text-cyan-400" />
+                      <Calendar className="h-5 w-5 text-orange-400" />
                       Letzte {detailedStats.userStats[0]?.actualLast7Days || 7} Tage
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-zinc-400">
                       Aktivste Mitglieder seit Tracking-Start
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {detailedStats.rankings.byLast7Days.slice(0, 10).map((stat, index) => (
-                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                      <div key={stat.user.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            index === 0 ? 'bg-cyan-500 text-black' :
-                            index === 1 ? 'bg-cyan-400 text-black' :
-                            index === 2 ? 'bg-cyan-300 text-black' :
-                            'bg-gray-700 text-gray-300'
+                            index === 0 ? 'bg-orange-500 text-black' :
+                            index === 1 ? 'bg-orange-400 text-black' :
+                            index === 2 ? 'bg-orange-300 text-black' :
+                            'bg-zinc-700 text-zinc-300'
                           }`}>
                             {index + 1}
                           </div>
                           {stat.user.avatarUrl ? (
                             <img src={stat.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
                           ) : (
-                            <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-sm">
+                            <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm">
                               {(stat.user.icFirstName || stat.user.username).charAt(0)}
                             </div>
                           )}
@@ -985,8 +985,8 @@ export default function AttendancePage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-lg font-bold text-cyan-400">{stat.last7Days}/{stat.actualLast7Days}</div>
-                          <div className="text-xs text-gray-500">{stat.last7DaysPercentage}%</div>
+                          <div className="text-lg font-bold text-orange-400">{stat.last7Days}/{stat.actualLast7Days}</div>
+                          <div className="text-xs text-zinc-500">{stat.last7DaysPercentage}%</div>
                         </div>
                       </div>
                     ))}
@@ -995,25 +995,25 @@ export default function AttendancePage() {
               </div>
 
               {/* All Users Table */}
-              <Card className="bg-gray-900/50 border-gray-800">
+              <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-white flex items-center gap-2">
-                        <Users className="h-5 w-5 text-cyan-400" />
+                        <Users className="h-5 w-5 text-orange-400" />
                         Alle Mitglieder Übersicht
                       </CardTitle>
-                      <CardDescription className="text-gray-400">
+                      <CardDescription className="text-zinc-400">
                         Detaillierte Statistiken aller Mitglieder
                       </CardDescription>
                     </div>
                     <div className="relative w-64">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                       <Input
                         placeholder="Suchen..."
                         value={statsSearchTerm}
                         onChange={(e) => setStatsSearchTerm(e.target.value)}
-                        className="pl-9 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
+                        className="pl-9 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
                       />
                     </div>
                   </div>
@@ -1022,15 +1022,15 @@ export default function AttendancePage() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-800">
-                          <th className="text-left text-gray-400 text-sm font-medium py-3 px-2">Mitglied</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Blood-In</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Tage</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Anwesend</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Quote</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">Streak</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">7 Tage</th>
-                          <th className="text-center text-gray-400 text-sm font-medium py-3 px-2">30 Tage</th>
+                        <tr className="border-b border-zinc-800">
+                          <th className="text-left text-zinc-400 text-sm font-medium py-3 px-2">Mitglied</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">Blood-In</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">Tage</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">Anwesend</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">Quote</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">Streak</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">7 Tage</th>
+                          <th className="text-center text-zinc-400 text-sm font-medium py-3 px-2">30 Tage</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1044,13 +1044,13 @@ export default function AttendancePage() {
                           })
                           .sort((a, b) => b.attendancePercentage - a.attendancePercentage)
                           .map((stat) => (
-                            <tr key={stat.user.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
+                            <tr key={stat.user.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
                               <td className="py-3 px-2">
                                 <div className="flex items-center gap-2">
                                   {stat.user.avatarUrl ? (
                                     <img src={stat.user.avatarUrl} alt="" className="h-7 w-7 rounded-full" />
                                   ) : (
-                                    <div className="h-7 w-7 rounded-full bg-gray-700 flex items-center justify-center text-xs">
+                                    <div className="h-7 w-7 rounded-full bg-zinc-700 flex items-center justify-center text-xs">
                                       {(stat.user.icFirstName || stat.user.username).charAt(0)}
                                     </div>
                                   )}
@@ -1063,14 +1063,14 @@ export default function AttendancePage() {
                               </td>
                               <td className="py-3 px-2 text-center">
                                 {stat.bloodInDate ? (
-                                  <span className="text-gray-300 text-sm">
+                                  <span className="text-zinc-300 text-sm">
                                     {new Date(stat.bloodInDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                                   </span>
                                 ) : (
-                                  <span className="text-gray-600 text-sm">-</span>
+                                  <span className="text-zinc-600 text-sm">-</span>
                                 )}
                               </td>
-                              <td className="py-3 px-2 text-center text-gray-300 text-sm">
+                              <td className="py-3 px-2 text-center text-zinc-300 text-sm">
                                 {stat.daysSinceBloodIn || '-'}
                               </td>
                               <td className="py-3 px-2 text-center text-white font-medium text-sm">
@@ -1079,9 +1079,9 @@ export default function AttendancePage() {
                               <td className="py-3 px-2 text-center">
                                 <span className={`font-bold text-sm ${
                                   stat.attendancePercentage >= 70 ? 'text-green-400' :
-                                  stat.attendancePercentage >= 40 ? 'text-amber-400' :
+                                  stat.attendancePercentage >= 40 ? 'text-orange-400' :
                                   stat.attendancePercentage > 0 ? 'text-red-400' :
-                                  'text-gray-600'
+                                  'text-zinc-600'
                                 }`}>
                                   {stat.bloodInDate ? `${stat.attendancePercentage}%` : '-'}
                                 </span>
@@ -1093,16 +1093,16 @@ export default function AttendancePage() {
                                     {stat.currentStreak}
                                   </span>
                                 ) : (
-                                  <span className="text-gray-600 text-sm">-</span>
+                                  <span className="text-zinc-600 text-sm">-</span>
                                 )}
                               </td>
                               <td className="py-3 px-2 text-center">
-                                <span className={`text-sm ${stat.last7DaysPercentage >= 70 ? 'text-green-400' : stat.last7DaysPercentage >= 40 ? 'text-amber-400' : 'text-gray-400'}`}>
+                                <span className={`text-sm ${stat.last7DaysPercentage >= 70 ? 'text-green-400' : stat.last7DaysPercentage >= 40 ? 'text-orange-400' : 'text-zinc-400'}`}>
                                   {stat.last7Days}/{stat.actualLast7Days}
                                 </span>
                               </td>
                               <td className="py-3 px-2 text-center">
-                                <span className={`text-sm ${stat.last30DaysPercentage >= 70 ? 'text-green-400' : stat.last30DaysPercentage >= 40 ? 'text-amber-400' : 'text-gray-400'}`}>
+                                <span className={`text-sm ${stat.last30DaysPercentage >= 70 ? 'text-green-400' : stat.last30DaysPercentage >= 40 ? 'text-orange-400' : 'text-zinc-400'}`}>
                                   {stat.last30Days}/{stat.actualLast30Days}
                                 </span>
                               </td>
@@ -1115,25 +1115,25 @@ export default function AttendancePage() {
               </Card>
             </>
           ) : (
-            <div className="text-center py-12 text-gray-400">Fehler beim Laden der Statistiken</div>
+            <div className="text-center py-12 text-zinc-400">Fehler beim Laden der Statistiken</div>
           )}
         </div>
       )}
 
       {/* Confirm Dialog */}
       <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800">
+        <DialogContent className="bg-zinc-900 border-zinc-800">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Clock className="h-5 w-5 text-cyan-400" />
+              <Clock className="h-5 w-5 text-orange-400" />
               Anwesenheit bestätigen
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               {confirmAction === 'add' ? (
                 <>
                   Bitte bestätige, dass die ausgewählten <span className="text-white font-medium">{selectedCells.size} Einträge</span>{' '}
-                  <span className="text-cyan-400 font-medium">nach 17:00 Uhr</span> für{' '}
-                  <span className="text-cyan-400 font-medium">mindestens 1 Stunde</span> aktiv waren.
+                  <span className="text-orange-400 font-medium">nach 17:00 Uhr</span> für{' '}
+                  <span className="text-orange-400 font-medium">mindestens 1 Stunde</span> aktiv waren.
                 </>
               ) : (
                 <>
@@ -1147,14 +1147,14 @@ export default function AttendancePage() {
             <Button
               variant="outline"
               onClick={() => setIsConfirmDialogOpen(false)}
-              className="border-gray-700"
+              className="border-zinc-700"
             >
               Abbrechen
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={markMutation.isPending || removeMutation.isPending}
-              className={confirmAction === 'add' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-red-600 hover:bg-red-700'}
+              className={confirmAction === 'add' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-red-600 hover:bg-red-700'}
             >
               {markMutation.isPending || removeMutation.isPending ? 'Speichere...' : 'Bestätigen'}
             </Button>
@@ -1164,13 +1164,13 @@ export default function AttendancePage() {
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-2xl">
+        <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Settings className="h-5 w-5 text-cyan-400" />
+              <Settings className="h-5 w-5 text-orange-400" />
               Berechtigungen verwalten
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-zinc-400">
               Bestimme, wer Anwesenheiten eintragen darf (zusätzlich zu Leadership und Intelligencia).
             </DialogDescription>
           </DialogHeader>
@@ -1178,23 +1178,23 @@ export default function AttendancePage() {
           <div className="space-y-4 max-h-[400px] overflow-y-auto">
             {/* Current Permissions */}
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-300">Aktuelle Berechtigungen</h3>
+              <h3 className="text-sm font-medium text-zinc-300">Aktuelle Berechtigungen</h3>
               {permissions.length === 0 ? (
-                <p className="text-gray-500 text-sm">Keine zusätzlichen Berechtigungen vergeben</p>
+                <p className="text-zinc-500 text-sm">Keine zusätzlichen Berechtigungen vergeben</p>
               ) : (
                 permissions.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                  <div key={p.id} className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg">
                     <div className="flex items-center gap-3">
                       {p.user.avatarUrl ? (
                         <img src={p.user.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs">
+                        <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs">
                           {getUserName(p.user).charAt(0)}
                         </div>
                       )}
                       <div>
                         <div className="text-white text-sm font-medium">{getUserName(p.user)}</div>
-                        <div className="text-gray-500 text-xs">
+                        <div className="text-zinc-500 text-xs">
                           Erteilt von {p.grantedBy.icFirstName || p.grantedBy.username}
                         </div>
                       </div>
@@ -1214,8 +1214,8 @@ export default function AttendancePage() {
             </div>
 
             {/* Add Permission */}
-            <div className="space-y-2 border-t border-gray-800 pt-4">
-              <h3 className="text-sm font-medium text-gray-300">Berechtigung erteilen</h3>
+            <div className="space-y-2 border-t border-zinc-800 pt-4">
+              <h3 className="text-sm font-medium text-zinc-300">Berechtigung erteilen</h3>
               <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto">
                 {allUsers
                   .filter(u => !permissions.some(p => p.userId === u.id))
@@ -1227,7 +1227,7 @@ export default function AttendancePage() {
                       size="sm"
                       onClick={() => grantPermissionMutation.mutate(u.id)}
                       disabled={grantPermissionMutation.isPending}
-                      className="justify-start border-gray-700 hover:bg-gray-800"
+                      className="justify-start border-zinc-700 hover:bg-zinc-800"
                     >
                       <Plus className="h-3 w-3 mr-2" />
                       {getUserName(u)}
