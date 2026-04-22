@@ -42,8 +42,9 @@ interface ClothingItemData {
 
 const clothingParts = [
   { id: 'mask', label: 'Maske', itemKey: 'maskItem', varKey: 'maskVariation' },
-  { id: 'torso', label: 'Torso', itemKey: 'torsoItem', varKey: 'torsoVariation' },
-  { id: 'tshirt', label: 'T-Shirt', itemKey: 'tshirtItem', varKey: 'tshirtVariation' },
+  { id: 'torso', label: 'Unterhemd', itemKey: 'torsoItem', varKey: 'torsoVariation' },
+  { id: 'tshirt', label: 'Tops', itemKey: 'tshirtItem', varKey: 'tshirtVariation' },
+  { id: 'arme', label: 'Arme', itemKey: 'armeItem', varKey: 'armeVariation' },
   { id: 'veste', label: 'Weste', itemKey: 'vesteItem', varKey: 'vesteVariation' },
   { id: 'hose', label: 'Hose', itemKey: 'hoseItem', varKey: 'hoseVariation' },
   { id: 'schuhe', label: 'Schuhe', itemKey: 'schuheItem', varKey: 'schuheVariation' },
@@ -205,17 +206,6 @@ export default function ClothingManagementPage() {
             >
               <User className="mr-2 h-4 w-4" />
               Männer Outfits (5)
-            </button>
-            <button
-              onClick={() => setActiveTab('sicario')}
-              className={`flex-1 h-12 font-medium rounded-lg flex items-center justify-center transition-all duration-200 ${
-                activeTab === 'sicario'
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
-                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
-              }`}
-            >
-              <Crosshair className="mr-2 h-4 w-4" />
-              Sicario Kleidung
             </button>
           </div>
         </CardContent>

@@ -119,8 +119,9 @@ export default function ClothingPage() {
   // Create clothing parts display for sicario
   const createClothingParts = (data: any): ClothingDisplay[] => [
     { part: 'mask', label: 'Maske', item: data?.maskItem ?? null, variation: data?.maskVariation ?? null, customizable: data?.maskCustomizable ?? false, color: data?.maskColor ?? null },
-    { part: 'torso', label: 'Torso', item: data?.torsoItem ?? null, variation: data?.torsoVariation ?? null, customizable: data?.torsoCustomizable ?? false, color: data?.torsoColor ?? null },
-    { part: 'tshirt', label: 'T-Shirt', item: data?.tshirtItem ?? null, variation: data?.tshirtVariation ?? null, customizable: data?.tshirtCustomizable ?? false, color: data?.tshirtColor ?? null },
+    { part: 'torso', label: 'Unterhemd', item: data?.torsoItem ?? null, variation: data?.torsoVariation ?? null, customizable: data?.torsoCustomizable ?? false, color: data?.torsoColor ?? null },
+    { part: 'tshirt', label: 'Tops', item: data?.tshirtItem ?? null, variation: data?.tshirtVariation ?? null, customizable: data?.tshirtCustomizable ?? false, color: data?.tshirtColor ?? null },
+    { part: 'arms', label: 'Arme', item: data?.armeItem ?? null, variation: data?.armeVariation ?? null, customizable: data?.armeCustomizable ?? false, color: data?.armeColor ?? null },
     { part: 'vest', label: 'Weste', item: data?.vesteItem ?? null, variation: data?.vesteVariation ?? null, customizable: data?.vesteCustomizable ?? false, color: data?.vesteColor ?? null },
     { part: 'pants', label: 'Hose', item: data?.hoseItem ?? null, variation: data?.hoseVariation ?? null, customizable: data?.hoseCustomizable ?? false, color: data?.hoseColor ?? null },
     { part: 'shoes', label: 'Schuhe', item: data?.schuheItem ?? null, variation: data?.schuheVariation ?? null, customizable: data?.schuheCustomizable ?? false, color: data?.schuheColor ?? null },
@@ -132,8 +133,9 @@ export default function ClothingPage() {
   // Create clothing parts from outfit
   const outfitClothingParts = currentOutfit ? [
     { label: 'Maske', item: currentOutfit.maskItem, variation: currentOutfit.maskVariation },
-    { label: 'Torso', item: currentOutfit.torsoItem, variation: currentOutfit.torsoVariation },
-    { label: 'T-Shirt', item: currentOutfit.tshirtItem, variation: currentOutfit.tshirtVariation },
+    { label: 'Unterhemd', item: currentOutfit.torsoItem, variation: currentOutfit.torsoVariation },
+    { label: 'Tops', item: currentOutfit.tshirtItem, variation: currentOutfit.tshirtVariation },
+    { label: 'Arme', item: (currentOutfit as any).armeItem, variation: (currentOutfit as any).armeVariation },
     { label: 'Weste', item: currentOutfit.vesteItem, variation: currentOutfit.vesteVariation },
     { label: 'Hose', item: currentOutfit.hoseItem, variation: currentOutfit.hoseVariation },
     { label: 'Schuhe', item: currentOutfit.schuheItem, variation: currentOutfit.schuheVariation },
@@ -245,28 +247,28 @@ export default function ClothingPage() {
               <h3 className="text-lg font-semibold text-orange-300 mb-3">Vorgeschriebene Kleidung</h3>
               <div className="grid gap-3">
                 <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">Maske</span>
+                  <span className="text-white font-medium">Unterhemd</span>
                   <div className="flex gap-4">
                     <div className="text-center">
                       <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">310</p>
+                      <p className="text-lg font-mono text-orange-400">277</p>
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">15</p>
+                      <p className="text-lg font-mono text-orange-400">2</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">Weste</span>
+                  <span className="text-white font-medium">Arme</span>
                   <div className="flex gap-4">
                     <div className="text-center">
                       <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">140</p>
+                      <p className="text-lg font-mono text-orange-400">264</p>
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">23</p>
+                      <p className="text-lg font-mono text-orange-400">0</p>
                     </div>
                   </div>
                 </div>
@@ -275,11 +277,24 @@ export default function ClothingPage() {
                   <div className="flex gap-4">
                     <div className="text-center">
                       <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">368</p>
+                      <p className="text-lg font-mono text-orange-400">243</p>
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">4</p>
+                      <p className="text-lg font-mono text-orange-400">0</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
+                  <span className="text-white font-medium">Maske</span>
+                  <div className="flex gap-4">
+                    <div className="text-center">
+                      <p className="text-xs text-zinc-500 uppercase">Item</p>
+                      <p className="text-lg font-mono text-orange-400">54</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
+                      <p className="text-lg font-mono text-orange-400">0</p>
                     </div>
                   </div>
                 </div>
@@ -293,7 +308,7 @@ export default function ClothingPage() {
                 <h3 className="text-lg font-semibold text-green-300">Freie Wahl</h3>
               </div>
               <p className="text-green-200/80">
-                Alle anderen Kleidungsstücke (Torso, T-Shirt, Schuhe, etc.) sowie <span className="text-green-300 font-medium">Accessoires</span> sind frei wählbar.
+                Alle anderen Kleidungsstücke (Schuhe, Rucksack, etc.) sowie <span className="text-green-300 font-medium">Accessoires</span> sind frei wählbar.
               </p>
             </div>
           </CardContent>
