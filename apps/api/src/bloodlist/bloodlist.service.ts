@@ -141,7 +141,7 @@ export class BloodListService {
           },
         ],
         footer: {
-          text: 'La Santa Calavera - Blood List',
+          text: 'El Averno Cartel - Blood List',
         },
         timestamp: new Date().toISOString(),
       };
@@ -341,7 +341,7 @@ export class BloodListService {
           },
         ],
         footer: {
-          text: 'La Santa Calavera - Blood List',
+          text: 'El Averno Cartel - Blood List',
         },
         timestamp: new Date().toISOString(),
       };

@@ -207,7 +207,7 @@ export class SicarioService {
           },
         ],
         footer: {
-          text: 'Sicario Division - La Santa Calavera',
+          text: 'Sicario Division - El Averno Cartel',
         },
         timestamp: new Date().toISOString(),
       };

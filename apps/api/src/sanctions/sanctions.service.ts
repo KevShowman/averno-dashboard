@@ -255,7 +255,7 @@ export class SanctionsService {
           },
         ],
         footer: {
-          text: 'La Santa Calavera - Sanktionssystem',
+          text: 'El Averno Cartel - Sanktionssystem',
         },
         timestamp: new Date().toISOString(),
       };
