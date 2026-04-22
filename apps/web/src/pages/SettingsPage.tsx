@@ -766,13 +766,13 @@ export default function SettingsPage() {
             </div>
             
             <div className="text-center p-4 bg-zinc-800/50 rounded-lg">
-              <div className="text-2xl font-bold text-white">v1.2.0</div>
+              <div className="text-2xl font-bold text-white">v1.0.0</div>
               <div className="text-sm text-zinc-400">System-Version</div>
             </div>
             
             <div className="text-center p-4 bg-zinc-800/50 rounded-lg">
               <div className="text-2xl font-bold text-accent">💀</div>
-              <div className="text-sm text-zinc-400">LaSanta Calavera</div>
+              <div className="text-sm text-zinc-400">El Averno Cartel</div>
             </div>
           </div>
         </CardContent>

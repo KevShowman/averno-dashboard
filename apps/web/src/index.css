@@ -126,7 +126,7 @@
 
 .lasanta-button-primary {
   background: ##d46f37;
-  @apply hover:bg-opacity-90 text-black font-semibold;
+  @apply hover:bg-opacity-90 text-white font-semibold;
 }
 
 .lasanta-button-secondary {

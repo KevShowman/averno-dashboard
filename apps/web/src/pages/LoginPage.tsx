@@ -226,7 +226,7 @@ export default function LoginPage() {
         <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
           <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/80 backdrop-blur-sm rounded-full border border-zinc-800">
             <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs text-zinc-500">LSC System v2.0</span>
+            <span className="text-xs text-zinc-500">El Averno System v1.0</span>
           </div>
         </div>
       </div>

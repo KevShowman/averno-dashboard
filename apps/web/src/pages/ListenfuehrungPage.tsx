@@ -335,7 +335,7 @@ export default function ListenfuehrungPage() {
             <div>
               <h1 className="text-3xl font-bold text-white">Listenführung</h1>
               <p className="text-zinc-400 mt-1">
-                Zentrale Kontaktliste der Familien in Narco City
+                Zentrale Kontaktliste der Familien auf Retro
               </p>
             </div>
           </div>
@@ -809,7 +809,7 @@ export default function ListenfuehrungPage() {
               <div className="space-y-2">
                 <Label className="text-zinc-300">Familienname *</Label>
                 <Input
-                  placeholder="z.B. Narco City Cartel"
+                  placeholder="z.B. Retro Cartel"
                   value={formData.familyName}
                   onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
                   className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500/50"

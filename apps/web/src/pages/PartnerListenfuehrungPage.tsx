@@ -358,7 +358,7 @@ export default function PartnerListenfuehrungPage() {
                   id="familyName"
                   value={formData.familyName}
                   onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
-                  placeholder="z.B. Narco City Cartel"
+                  placeholder="z.B. Retro Cartel"
                   className="bg-zinc-900/50 border-zinc-600"
                 />
               </div>
@@ -441,7 +441,7 @@ export default function PartnerListenfuehrungPage() {
                     <SelectValue placeholder="Karte auswählen..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="NARCO_CITY">Narco City</SelectItem>
+                    <SelectItem value="NARCO_CITY">Hauptstadt</SelectItem>
                     <SelectItem value="ROXWOOD">Roxwood</SelectItem>
                     <SelectItem value="CAYO_PERICO">Cayo Perico</SelectItem>
                   </SelectContent>
