@@ -96,8 +96,6 @@ export default function DashboardPage() {
     { key: 'aufstellungen', name: 'Aufstellungen', icon: CalendarCheck, desc: 'Termine & Teilnahme' },
     { key: 'abmeldungen', name: 'Abmeldungen', icon: CalendarDays, desc: 'Abwesenheiten' },
     { key: 'anwesenheit', name: 'Anwesenheitsliste', icon: Calendar, desc: 'Tägliche Aktivität' },
-    // Sicario (nur für Sicarios + Leadership)
-    ...((isSicario || isLeadership) ? [{ key: 'sicario', name: 'Sicario Bereich', icon: Crosshair, desc: 'Spezialeinheit' }] : []),
     // Mitglieder
     { key: 'bloodlist', name: 'Blood List', icon: Droplet, desc: 'Blood In / Blood Out' },
     { key: 'sanctions', name: 'Sanktionen', icon: Scale, desc: 'Verstöße & Strafen' },
@@ -277,7 +275,7 @@ export default function DashboardPage() {
             />
             <span>La Familia se cuida, Compadres!</span>
           </div>
-          <span>LSC Management System v2.0</span>
+          <span>El Averno Management System v1.0</span>
         </CardContent>
       </Card>
     </div>

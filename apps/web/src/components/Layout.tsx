@@ -129,13 +129,6 @@ const navGroups: NavGroup[] = [
     ]
   },
   {
-    name: 'Sicario Division',
-    icon: Crosshair,
-    items: [
-      { name: 'Sicario Bereich', href: '/sicario', icon: Crosshair, sicarioOnly: true },
-    ]
-  },
-  {
     name: 'Mitglieder',
     icon: Shield,
     items: [

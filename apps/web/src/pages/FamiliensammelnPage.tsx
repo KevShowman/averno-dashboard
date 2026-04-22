@@ -301,7 +301,7 @@ export default function FamiliensammelnPage() {
             Familiensammeln
           </h1>
           <p className="text-zinc-400 mt-1">
-            Mindestens 4 Tage ODER 4 Touren erforderlich
+            Sammeln für die Familie ist freiwillig. Helft gerne dabei, die Kasse zu füllen!
           </p>
         </div>
         <div className="flex gap-3">
