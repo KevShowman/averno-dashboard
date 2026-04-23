@@ -134,7 +134,7 @@ export default function DashboardPage() {
               <img 
                 src="/logo.png" 
                 alt="El Averno Cartel" 
-                className="relative h-14 w-14 object-contain drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]"
+                className="relative h-28 w-28 object-contain drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]"
               />
             </div>
             <h1 className="text-4xl font-bold text-white">El Averno Cartel</h1>
