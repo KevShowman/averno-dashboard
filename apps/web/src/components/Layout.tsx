@@ -415,7 +415,7 @@ export default function Layout({ children }: LayoutProps) {
         <Link to={isTaxiUser ? "/taxi" : (isPartnerUser ? "/app/partner" : "/app")} className="flex items-center gap-3 group" onClick={handleLinkClick}>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/40 to-orange-600/40 rounded-xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
-            <div className="relative w-36 h-36 flex items-center justify-center">
+            <div className="relative w-72 h-72 flex items-center justify-center">
               <img 
                 src="/logo.png" 
                 alt="El Averno Cartel" 
@@ -580,7 +580,7 @@ export default function Layout({ children }: LayoutProps) {
               <img 
                 src="/logo.png" 
                 alt="El Averno Cartel" 
-                className="h-24 w-24 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                className="h-48 w-48 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
               />
               <span className="font-bold text-white">El Averno Cartel</span>
             </Link>
