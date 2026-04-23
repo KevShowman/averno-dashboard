@@ -251,7 +251,7 @@ export default function CasaPage() {
         <CardHeader>
           <CardTitle className="text-primary">Impressionen</CardTitle>
           <CardDescription>
-            Bilder von La Fuente Blanca
+            Bilder der Casa
           </CardDescription>
         </CardHeader>
         <CardContent>
