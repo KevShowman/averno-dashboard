@@ -122,7 +122,7 @@ const navGroups: NavGroup[] = [
     defaultOpen: true,
     items: [
       { name: 'Wochenabgabe', href: '/weekly-delivery', icon: Calendar },
-      { name: 'Familiensammeln', href: '/familiensammeln', icon: Users },
+      // { name: 'Familiensammeln', href: '/familiensammeln', icon: Users }, // hidden
       { name: 'Aufstellungen', href: '/aufstellungen', icon: CalendarCheck },
       { name: 'Abmeldungen', href: '/abmeldungen', icon: CalendarDays },
       { name: 'Anwesenheitsliste', href: '/anwesenheit', icon: CalendarCheck },
@@ -134,7 +134,7 @@ const navGroups: NavGroup[] = [
     items: [
       { name: 'Blood List', href: '/bloodlist', icon: Droplet },
       { name: 'Sanktionen', href: '/sanctions', icon: Scale },
-      { name: 'Organisation', href: '/organigramm', icon: Network },
+      // { name: 'Organisation', href: '/organigramm', icon: Network }, // hidden
       { name: 'Aktensystem', href: '/member-files', icon: FileText, leadershipOnly: true },
       { name: 'Benutzerverwaltung', href: '/user-management', icon: Users, patronOnly: true },
     ]
@@ -146,7 +146,7 @@ const navGroups: NavGroup[] = [
       { name: 'Ausrüstung', href: '/equipment', icon: Shield },
       { name: 'Meine Kleidung', href: '/clothing', icon: Shirt },
       { name: 'Kleidungsverwaltung', href: '/clothing-management', icon: Shirt, leadershipOnly: true },
-      { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car },
+      // { name: 'Fahrzeugtuning', href: '/vehicle-tuning', icon: Car }, // hidden
     ]
   },
   {
@@ -154,7 +154,7 @@ const navGroups: NavGroup[] = [
     icon: Radio,
     items: [
       { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
-      { name: 'Botschaft', href: '/botschaft', icon: ScrollText },
+      // { name: 'Botschaft', href: '/botschaft', icon: ScrollText }, // hidden
       { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen },
       { name: 'Interaktive Karte', href: '/karte', icon: Map },
       { name: 'Tafelrunde', href: '/tafelrunde', icon: Users },

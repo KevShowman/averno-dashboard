@@ -7,7 +7,7 @@ import { MapPin, Check, X } from 'lucide-react'
 
 const MAP_CONFIG = {
   NARCO_CITY: {
-    name: 'Narco City',
+    name: 'Retro City',
     file: 'narco-city',
     width: 6144,
     height: 9216,

@@ -167,7 +167,7 @@ const AREA_COLORS = [
 
 // Map Configuration
 const MAP_CONFIG: Record<MapName, { name: string; width: number; height: number; file: string }> = {
-  NARCO_CITY: { name: 'Narco City', width: 6144, height: 9216, file: 'narco-city' },
+  NARCO_CITY: { name: 'Retro City', width: 6144, height: 9216, file: 'narco-city' },
   ROXWOOD: { name: 'Roxwood', width: 3415, height: 2362, file: 'roxwood' },
   CAYO_PERICO: { name: 'Cayo Perico', width: 1819, height: 1773, file: 'cayo-perico' },
 }

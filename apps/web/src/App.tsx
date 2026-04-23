@@ -229,6 +229,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        {/* hidden - /familiensammeln
         <Route path="/familiensammeln" element={
           <ProtectedRoute>
             <Layout>
@@ -236,6 +237,8 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        */}
+        {/* hidden - /organigramm
         <Route path="/organigramm" element={
           <ProtectedRoute>
             <Layout>
@@ -243,6 +246,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        */}
         <Route path="/clothing-management" element={
           <ProtectedRoute>
             <Layout>
@@ -271,6 +275,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        {/* hidden - /vehicle-tuning
         <Route path="/vehicle-tuning" element={
           <ProtectedRoute>
             <Layout>
@@ -278,6 +283,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        */}
         <Route path="/la-casa" element={
           <ProtectedRoute>
             <Layout>
@@ -285,6 +291,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        {/* hidden - /botschaft
         <Route path="/botschaft" element={
           <ProtectedRoute>
             <Layout>
@@ -292,6 +299,7 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        */}
         <Route path="/sicario" element={
           <ProtectedRoute>
             <Layout>
