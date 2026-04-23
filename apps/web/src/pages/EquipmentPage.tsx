@@ -180,9 +180,9 @@ export default function EquipmentPage() {
     note: '',
   });
 
-  const isLeadership = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
+  const isLeadership = user && ['PATRON', 'DON', 'CAPO', 'ADMIN'].includes(user.role);
   const canManage = user && (
-    ['PATRON', 'DON', 'CAPO'].includes(user.role as string) ||
+    ['PATRON', 'DON', 'CAPO', 'ADMIN'].includes(user.role as string) ||
     (user.allRoles && (user.allRoles as string[]).includes('LOGISTICA'))
   );
 

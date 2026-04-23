@@ -16,7 +16,7 @@ export default function CommunicationPage() {
   const [funkValue, setFunkValue] = useState('')
   const [darkChatValue, setDarkChatValue] = useState('')
 
-  const isLeadership = user?.role && ['PATRON', 'DON', 'CAPO'].includes(user.role)
+  const isLeadership = user?.role && ['PATRON', 'DON', 'CAPO', 'ADMIN'].includes(user.role)
 
   const { data, isLoading } = useQuery({
     queryKey: ['communication'],

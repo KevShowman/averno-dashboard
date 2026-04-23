@@ -67,7 +67,7 @@ const getRoleDisplayName = (role: string) => {
 }
 
 const getRoleBadgeColor = (role: string) => {
-  if (['PATRON', 'DON', 'CAPO'].includes(role)) {
+  if (['PATRON', 'DON', 'CAPO', 'ADMIN'].includes(role)) {
     return 'bg-orange-500/20 text-orange-300 border-orange-500/30'
   }
   if (role === 'SICARIO') {
@@ -228,9 +228,9 @@ function NavGroupComponent({
   isOpen: boolean
   onToggle: () => void
 }) {
-  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
   const isSicario = hasRole(user, 'SICARIO')
-  const isPatron = hasRole(user, 'PATRON')
+  const isPatron = hasRole(user, ['PATRON', 'ADMIN'])
 
   // Filter items based on permissions
   const isContacto = hasRole(user, 'CONTACTO')

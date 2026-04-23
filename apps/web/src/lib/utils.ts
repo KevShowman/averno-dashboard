@@ -130,8 +130,8 @@ export function hasAnyRole(user: any, requiredRoles: string[]) {
 }
 
 // Leaderschaft-Rollen Konstante
-export const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO']
-export const TOP_LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO']
+export const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN']
+export const TOP_LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN']
 
 // Normale Ränge 1-9 (keine Leadership, keine Funktionsrollen)
 export const RANK_1_9_ROLES = [

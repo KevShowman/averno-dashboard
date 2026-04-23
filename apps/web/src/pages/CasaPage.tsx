@@ -30,7 +30,7 @@ export default function CasaPage() {
   const [additionalInfo, setAdditionalInfo] = useState('')
   const [isEditing, setIsEditing] = useState(false)
 
-  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
 
   // Query Casa Info
   const { data: casaInfo, isLoading } = useQuery<CasaInfo>({

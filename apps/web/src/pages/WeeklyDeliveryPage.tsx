@@ -78,9 +78,9 @@ export default function WeeklyDeliveryPage() {
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   
-  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
   const isElPatron = hasRole(user, 'PATRON')
-  const canPayForOthers = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const canPayForOthers = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
 
   // Queries
   const { data: currentWeekDeliveries = [], isLoading: loadingCurrentWeek } = useQuery({

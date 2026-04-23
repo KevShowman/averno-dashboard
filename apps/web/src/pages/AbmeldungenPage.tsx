@@ -58,7 +58,7 @@ export default function AbmeldungenPage() {
   const [showStartCalendar, setShowStartCalendar] = useState(false);
   const [showEndCalendar, setShowEndCalendar] = useState(false);
 
-  const isLeadership = user && ['PATRON', 'DON', 'CAPO'].includes(user.role);
+  const isLeadership = user && ['PATRON', 'DON', 'CAPO', 'ADMIN'].includes(user.role);
 
   // Queries
   const { data: abmeldungen = [], isLoading } = useQuery({

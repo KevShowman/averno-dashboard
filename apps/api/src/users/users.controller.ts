@@ -88,7 +88,7 @@ export class UsersController {
 
   // User-Rollen aktualisieren (nur Patron)
   @Put(':id/roles')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async updateUserRoles(
     @Param('id') userId: string,
@@ -104,7 +104,7 @@ export class UsersController {
 
   // User löschen (nur Leaderschaft)
   @Delete(':id')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async deleteUser(
     @Param('id') userId: string,

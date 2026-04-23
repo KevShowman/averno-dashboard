@@ -180,10 +180,10 @@ export default function PackagesPage() {
     },
   })
 
-  const canConfirm = hasRole(user, ['PATRON', 'DON', 'CAPO'])
-  const canManage = hasRole(user, ['PATRON', 'DON', 'CAPO'])
-  const canManagePrice = hasRole(user, ['PATRON', 'DON', 'CAPO', 'RUTAS'])
-  const canRemove = hasRole(user, ['PATRON', 'DON', 'CAPO', 'RUTAS'])
+  const canConfirm = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
+  const canManage = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
+  const canManagePrice = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN', 'RUTAS'])
+  const canRemove = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN', 'RUTAS'])
 
   const handleCreateDeposit = () => {
     const packages = parseInt(depositPackages)

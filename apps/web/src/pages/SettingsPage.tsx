@@ -69,12 +69,12 @@ export default function SettingsPage() {
 
   // Permission checks
   const isPatron = user?.role === 'PATRON'
-  const canManageUsers = hasRole(user, ['PATRON', 'DON', 'CAPO'])
-  const canManageSettings = hasRole(user, ['PATRON', 'DON', 'CAPO'])
-  const canManagePackagePrice = hasRole(user, ['PATRON', 'DON', 'CAPO', 'RUTAS'])
+  const canManageUsers = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
+  const canManageSettings = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
+  const canManagePackagePrice = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN', 'RUTAS'])
   const canChangeIcName = hasRole(user, [
     // Leadership
-    'PATRON', 'DON', 'CAPO',
+    'PATRON', 'DON', 'CAPO', 'ADMIN',
     // Funktionsrollen
     'RUTAS', 'LOGISTICA', 'SICARIO', 'CONSEJERO', 'INTELIGENCIA', 'FORMACION', 'CONTACTO',
     // Ränge 7-9

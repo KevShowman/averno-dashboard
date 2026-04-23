@@ -91,7 +91,7 @@ export default function FamiliensammelnPage() {
   const [showProcessorPicker, setShowProcessorPicker] = useState(false);
   const [processorCapacity, setProcessorCapacity] = useState(3000);
 
-  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO']);
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN']);
 
   // Query: Aktuelle Woche
   const { data: currentWeek, isLoading } = useQuery<Week>({

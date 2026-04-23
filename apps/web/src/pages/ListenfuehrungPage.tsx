@@ -140,7 +140,7 @@ export default function ListenfuehrungPage() {
     isKeyFamily: false,
   })
 
-  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO'])
+  const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
   const hasContactRole = hasRole(user, ['CONTACTO'])
   const isPartner = user?.isPartner === true
   const partnerCanViewContacts = (user as any)?.partnerCanViewContacts === true
@@ -653,7 +653,7 @@ export default function ListenfuehrungPage() {
                       {allUsers
                         .filter((u: any) => 
                           !listPermissions.some(p => p.userId === u.id) &&
-                          !hasRole(u, ['PATRON', 'DON', 'CAPO', 'CONTACTO'])
+                          !hasRole(u, ['PATRON', 'DON', 'CAPO', 'ADMIN', 'CONTACTO'])
                         )
                         .map((u: any) => (
                           <SelectItem key={u.id} value={u.id}>

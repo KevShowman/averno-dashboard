@@ -48,7 +48,7 @@ export default function LagerPage() {
 
   const criticalCount = itemsData?.items?.filter((item: any) => item.isCritical).length || 0
   const availableCount = itemsData?.items?.filter((item: any) => item.availableStock > 0).length || 0
-  const canEdit = hasRole(user, ['PATRON', 'DON', 'CAPO', 'LOGISTICA'])
+  const canEdit = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN', 'LOGISTICA'])
 
   return (
     <div className="space-y-6">
