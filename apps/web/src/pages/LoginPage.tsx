@@ -77,7 +77,7 @@ export default function LoginPage() {
                   <img 
                     src="/logo.png" 
                     alt="El Averno Cartel" 
-                    className="h-[960px] w-[960px] object-contain drop-shadow-[0_0_30px_rgba(251,191,36,0.6)] transition-transform duration-500 hover:scale-110"
+                    className="h-32 w-32 object-contain drop-shadow-[0_0_30px_rgba(251,191,36,0.6)] transition-transform duration-500 hover:scale-110"
                   />
                 </div>
               </div>

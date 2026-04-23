@@ -91,7 +91,7 @@ export default function CasaPage() {
             La Casa
           </h1>
           <p className="text-muted-foreground mt-1">
-            La Fuente Blanca – Der weiße Brunnen in den Vinewood Hills
+            El Averno Cartel - Unsere Casa
           </p>
         </div>
       </div>
@@ -107,28 +107,27 @@ export default function CasaPage() {
         <CardContent className="space-y-4">
           <div className="prose prose-invert max-w-none">
             <p className="text-zinc-300 leading-relaxed">
-              An der Senora Road in den Vinewood Hills liegt unser Anwesen – La Fuente Blanca, der weiße Brunnen. 
-              Ein legendärer Ort, der einst Organizazia als Hauptquartier diente. Heute gehört er uns – 
+              Am Marlowe Drive in den Vinewood Hills liegt unser Anwesen.
+              Ein legendärer Ort, der einst Vostoka als Hauptquartier diente. Heute gehört er uns –
               El Averno Cartel.
             </p>
             <p className="text-zinc-300 leading-relaxed flex items-start gap-2">
               <Shield className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
               <span>
-                Das weitläufige Gelände bietet alles, was ein Kartell braucht: Der ikonische weiße Brunnen am Eingang 
+                Das weitläufige Gelände bietet alles, was ein Kartell braucht: Der ikonische Baum gemeinsam mit dem Bloodpool am Eingang
                 markiert den Weg zu unserem Reich. Der Blood Pool – rot wie das Blut unserer Feinde – ist das Herzstück 
-                des Anwesens. Umgeben von Palmen und bewacht von unserem Adler.
+                des Anwesens.
               </span>
             </p>
             <p className="text-zinc-300 leading-relaxed flex items-start gap-2">
               <Key className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
               <span>
-                Der Besprechungs-Circulo mit dem eingebrannten Calavera-Logo ist der Ort, an dem Entscheidungen 
-                getroffen werden. Die überdachte Outdoor-Bar lädt zu Verhandlungen bei einem kühlen Drink ein. 
-                Im eleganten Wohnzimmer werden Geschäfte besiegelt und Allianzen geschmiedet.
+                Die überdachte Besprechungs-Ecke ist der Ort, an dem Entscheidungen
+                getroffen werden.
               </span>
             </p>
             <p className="text-zinc-300 leading-relaxed italic text-sm border-l-2 border-primary/50 pl-4 mt-4">
-              "La Fuente Blanca – wo der weiße Brunnen das Blut unserer Feinde wäscht."
+              "El Averno Cartel por vida!"
             </p>
           </div>
         </CardContent>
