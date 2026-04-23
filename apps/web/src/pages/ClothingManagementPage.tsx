@@ -9,7 +9,7 @@ import { Badge } from '../components/ui/badge'
 import { useAuthStore } from '../stores/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { toast } from 'sonner'
-import { Loader2, Shirt, Save, Settings, User, Crosshair } from 'lucide-react'
+import { Loader2, Shirt, Save, Settings, Crosshair } from 'lucide-react'
 import { api } from '../lib/api'
 
 interface MaleOutfit {
@@ -186,7 +186,7 @@ export default function ClothingManagementPage() {
           <div>
             <h1 className="text-3xl font-bold text-white">Kleidungsverwaltung</h1>
             <p className="text-zinc-400 mt-1">
-              Verwalte die 5 Männer-Outfits und Sicario-Kleidung
+              Verwalte die 10 Outfits und Sicario-Kleidung
             </p>
           </div>
         </div>
@@ -204,8 +204,8 @@ export default function ClothingManagementPage() {
                   : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
               }`}
             >
-              <User className="mr-2 h-4 w-4" />
-              Männer Outfits (5)
+              <Shirt className="mr-2 h-4 w-4" />
+              Outfits
             </button>
           </div>
         </CardContent>
@@ -224,7 +224,7 @@ export default function ClothingManagementPage() {
             </CardHeader>
             <CardContent className="p-4">
               <div className="grid grid-cols-5 gap-3">
-                {[1, 2, 3, 4, 5].map((num) => {
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
                   const outfit = outfits.find(o => o.outfitNumber === num)
                   return (
                     <button
@@ -514,8 +514,7 @@ export default function ClothingManagementPage() {
           <div className="text-sm text-orange-300">
             <p className="font-medium mb-1">Hinweis zum neuen Kleidungssystem:</p>
             <ul className="list-disc list-inside space-y-1 text-orange-200/80">
-              <li><strong>Männer</strong> wählen eines der 5 vordefinierten Outfits</li>
-              <li><strong>Frauen</strong> haben automatisch freie Klamottenwahl</li>
+              <li>Alle Mitglieder wählen eines der 10 vordefinierten Outfits</li>
               <li><strong>Sicarios</strong> haben zusätzlich Zugriff auf die spezielle Sicario-Kleidung</li>
             </ul>
           </div>

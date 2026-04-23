@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import {
@@ -11,9 +11,8 @@ import {
 } from '../components/ui/select'
 import { useAuthStore } from '../stores/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { Loader2, Shirt, Info, User, Users, Check, Sparkles, Image as ImageIcon } from 'lucide-react'
+import { Loader2, Shirt, Info, Check, Image as ImageIcon } from 'lucide-react'
 import { api } from '../lib/api'
-import { toast } from 'sonner'
 
 interface MaleOutfit {
   id: string
@@ -51,64 +50,15 @@ const API_BASE = '/api'
 export default function ClothingPage() {
   const { user } = useAuthStore()
   usePageTitle('Meine Kleidung')
-  const queryClient = useQueryClient()
-  
-  // Initialize gender from user only once on mount, track if we've initialized
-  const initializedRef = useRef(false)
-  const [selectedGender, setSelectedGender] = useState<'MALE' | 'FEMALE'>(() => {
-    // Initial state from user if available
-    return (user?.gender as 'MALE' | 'FEMALE') || 'MALE'
-  })
   const [selectedOutfit, setSelectedOutfit] = useState<number>(1)
-
-  // Only sync from user once on initial load if not yet initialized
-  if (!initializedRef.current && user?.gender) {
-    initializedRef.current = true
-    // Only update if different from current state (prevents re-render)
-    if (selectedGender !== user.gender) {
-      setSelectedGender(user.gender as 'MALE' | 'FEMALE')
-    }
-  }
 
   // Fetch clothing data
   const { data: clothingData, isLoading } = useQuery({
-    queryKey: ['clothing-my-template', selectedGender],
+    queryKey: ['clothing-my-template'],
     queryFn: () => api.get('/clothing/my-clothing').then(res => res.data),
   })
 
-  const updateGenderMutation = useMutation({
-    mutationFn: async (gender: 'MALE' | 'FEMALE') => {
-      return api.patch('/users/gender', { gender })
-    },
-    onSuccess: () => {
-      toast.success('Geschlecht erfolgreich aktualisiert!')
-      // Don't invalidate auth immediately - the local state is already correct
-      // This prevents the flickering from user state changing
-      queryClient.invalidateQueries({ queryKey: ['clothing-my-template'] })
-      // Silently update auth in background without triggering re-render race
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['auth'] })
-      }, 500)
-    },
-    onError: (error: any) => {
-      // Revert to previous gender on error
-      const previousGender = user?.gender as 'MALE' | 'FEMALE' || 'MALE'
-      setSelectedGender(previousGender)
-      toast.error(error.response?.data?.message || 'Fehler beim Aktualisieren des Geschlechts')
-    },
-  })
-
-  const handleGenderChange = (gender: 'MALE' | 'FEMALE') => {
-    // Don't do anything if already selected or mutation is pending
-    if (gender === selectedGender || updateGenderMutation.isPending) return
-    
-    // Optimistically update the UI immediately
-    setSelectedGender(gender)
-    updateGenderMutation.mutate(gender)
-  }
-
   // Check type of clothing data
-  const isFreeChoice = clothingData?.type === 'free_choice'
   const hasOutfits = clothingData?.type === 'outfits'
   const outfits: MaleOutfit[] = hasOutfits ? (clothingData?.outfits || []) : []
   const hasSicario = !!clothingData?.sicario
@@ -166,155 +116,13 @@ export default function ClothingPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Familienkleidung</h1>
-            <p className="text-zinc-400 mt-1">
-              {isFreeChoice 
-                ? 'Du hast freie Klamottenwahl!' 
-                : 'Wähle eines der 5 vordefinierten Outfits'}
-            </p>
+            <p className="text-zinc-400 mt-1">Wähle eines der vordefinierten Outfits</p>
           </div>
         </div>
       </div>
 
-      {/* Gender Selector */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-orange-500/30">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-        <CardHeader className="relative">
-          <CardTitle className="text-white">Geschlecht auswählen</CardTitle>
-          <CardDescription className="text-zinc-400">
-            Wähle dein Geschlecht aus, um die passende Kleidung anzuzeigen.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="relative">
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => handleGenderChange('MALE')}
-              disabled={updateGenderMutation.isPending}
-              className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
-                selectedGender === 'MALE' 
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
-                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
-              }`}
-            >
-              {updateGenderMutation.isPending && selectedGender === 'MALE' ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              ) : (
-                <User className="mr-2 h-5 w-5" />
-              )}
-              Männlich
-            </button>
-            <button
-              onClick={() => handleGenderChange('FEMALE')}
-              disabled={updateGenderMutation.isPending}
-              className={`flex-1 max-w-xs h-14 text-lg font-medium rounded-lg flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
-                selectedGender === 'FEMALE' 
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-zinc-900 shadow-lg shadow-orange-500/25' 
-                  : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white'
-              }`}
-            >
-              {updateGenderMutation.isPending && selectedGender === 'FEMALE' ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              ) : (
-                <Users className="mr-2 h-5 w-5" />
-              )}
-              Weiblich
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Main Content */}
-      {isFreeChoice ? (
-        // Free Choice Display (Women) - mit Farbvorgaben und Pflichtkleidung
-        <Card className="bg-zinc-900/50 border-green-500/30 overflow-hidden">
-          <CardHeader className="border-b border-green-500/20">
-            <CardTitle className="text-white flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-green-400" />
-              Damenkleidung
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            {/* Farbvorgabe */}
-            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700">
-              <h3 className="text-lg font-semibold text-white mb-2">Farbvorgabe</h3>
-              <p className="text-zinc-300">
-                <span className="text-white font-medium">Schwarz</span> und <span className="text-white font-medium">elegant</span>.
-                In Ausnahmefällen sind <span className="text-zinc-400">graue Elemente</span> erlaubt.
-              </p>
-            </div>
-
-            {/* Vorgeschriebene Kleidung */}
-            <div className="bg-orange-500/10 rounded-xl p-4 border border-orange-500/30">
-              <h3 className="text-lg font-semibold text-orange-300 mb-3">Vorgeschriebene Kleidung</h3>
-              <div className="grid gap-3">
-                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">Unterhemd</span>
-                  <div className="flex gap-4">
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">277</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">2</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">Arme</span>
-                  <div className="flex gap-4">
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">264</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">0</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">Hose</span>
-                  <div className="flex gap-4">
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">243</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">0</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">Maske</span>
-                  <div className="flex gap-4">
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Item</p>
-                      <p className="text-lg font-mono text-orange-400">54</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-zinc-500 uppercase">Variation</p>
-                      <p className="text-lg font-mono text-orange-400">0</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Freie Wahl Info */}
-            <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Check className="h-5 w-5 text-green-400" />
-                <h3 className="text-lg font-semibold text-green-300">Freie Wahl</h3>
-              </div>
-              <p className="text-green-200/80">
-                Alle anderen Kleidungsstücke (Schuhe, Rucksack, etc.) sowie <span className="text-green-300 font-medium">Accessoires</span> sind frei wählbar.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : hasOutfits && outfits.length > 0 ? (
-        // Outfit Selection (Men)
+      {hasOutfits && outfits.length > 0 ? (
         <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
           <CardHeader className="border-b border-zinc-800">
             <CardTitle className="text-white flex items-center gap-2">
@@ -322,7 +130,7 @@ export default function ClothingPage() {
               Outfit auswählen
             </CardTitle>
             <CardDescription className="text-zinc-400">
-              Wähle eines der 5 vordefinierten Outfits aus.
+              Wähle eines der vordefinierten Outfits aus.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 space-y-6">
@@ -416,7 +224,7 @@ export default function ClothingPage() {
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-start gap-3">
               <Info className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-orange-300">
-                Die Outfits wurden von der Leaderschaft festgelegt. Wähle eines der 5 vordefinierten Outfits.
+                Die Outfits wurden von der Leaderschaft festgelegt. Wähle eines der vordefinierten Outfits.
               </p>
             </div>
           </CardContent>

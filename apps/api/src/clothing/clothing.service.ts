@@ -520,23 +520,7 @@ export class ClothingService {
     // Prüfe ob User ein Sicario ist
     const isSicario = allRoles.includes(Role.SICARIO);
 
-    // Frauen: Freie Klamottenwahl
-    if (user.gender === Gender.FEMALE) {
-      const result: any = {
-        type: 'free_choice',
-        message: 'Freie Klamottenwahl',
-      };
-
-      // Wenn Sicario, füge Sicario-Kleidung hinzu
-      if (isSicario) {
-        const sicarioTemplate = await this.getTemplateByRankGroup('SICARIO');
-        result.sicario = this.flattenTemplateForGender(sicarioTemplate, Gender.FEMALE);
-      }
-
-      return result;
-    }
-
-    // Männer: 5 vordefinierte Outfits
+    // Alle Mitglieder: 10 vordefinierte Outfits
     const outfits = await this.getAllMaleOutfits();
     const result: any = {
       type: 'outfits',
@@ -546,7 +530,7 @@ export class ClothingService {
     // Wenn Sicario, füge Sicario-Kleidung hinzu
     if (isSicario) {
       const sicarioTemplate = await this.getTemplateByRankGroup('SICARIO');
-      result.sicario = this.flattenTemplateForGender(sicarioTemplate, Gender.MALE);
+      result.sicario = this.flattenTemplateForGender(sicarioTemplate, user.gender ?? Gender.MALE);
     }
 
     return result;
@@ -647,26 +631,20 @@ export class ClothingService {
    * Holt alle 5 Männer-Outfits
    */
   async getAllMaleOutfits() {
-    const outfits = await this.prisma.maleOutfit.findMany({
+    // Ensure all 10 outfits exist (upsert: create missing, leave existing intact)
+    await Promise.all(
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) =>
+        this.prisma.maleOutfit.upsert({
+          where: { outfitNumber: num },
+          update: {},
+          create: { outfitNumber: num, name: `Outfit ${num}` },
+        })
+      )
+    );
+
+    return this.prisma.maleOutfit.findMany({
       orderBy: { outfitNumber: 'asc' },
     });
-
-    // Wenn noch keine Outfits existieren, erstelle sie
-    if (outfits.length === 0) {
-      const created = await Promise.all(
-        [1, 2, 3, 4, 5].map((num) =>
-          this.prisma.maleOutfit.create({
-            data: {
-              outfitNumber: num,
-              name: `Outfit ${num}`,
-            },
-          })
-        )
-      );
-      return created;
-    }
-
-    return outfits;
   }
 
   /**
