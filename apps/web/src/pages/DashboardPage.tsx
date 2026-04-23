@@ -92,23 +92,23 @@ export default function DashboardPage() {
     { key: 'lager-movements', name: 'Lagerbewegungen', icon: Clock, desc: 'Genehmigungen' },
     // Familie
     { key: 'weekly-delivery', name: 'Wochenabgabe', icon: PackageOpen, desc: 'Einer für alle!' },
-    { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, desc: 'Touren-Tracking' },
+    // { key: 'familiensammeln', name: 'Familiensammeln', icon: Users, desc: 'Touren-Tracking' }, // hidden
     { key: 'aufstellungen', name: 'Aufstellungen', icon: CalendarCheck, desc: 'Termine & Teilnahme' },
     { key: 'abmeldungen', name: 'Abmeldungen', icon: CalendarDays, desc: 'Abwesenheiten' },
     { key: 'anwesenheit', name: 'Anwesenheitsliste', icon: Calendar, desc: 'Tägliche Aktivität' },
     // Mitglieder
     { key: 'bloodlist', name: 'Blood List', icon: Droplet, desc: 'Blood In / Blood Out' },
     { key: 'sanctions', name: 'Sanktionen', icon: Scale, desc: 'Verstöße & Strafen' },
-    { key: 'organigramm', name: 'Organisation', icon: Network, desc: 'Familienstruktur' },
+    // { key: 'organigramm', name: 'Organisation', icon: Network, desc: 'Familienstruktur' }, // hidden
     ...(isLeadership ? [{ key: 'member-files', name: 'Aktensystem', icon: FileText, desc: 'Mitglieder-Akten' }] : []),
     ...(hasRole(user, 'PATRON') ? [{ key: 'user-management', name: 'Benutzer', icon: Shield, desc: 'Rollen & Rechte' }] : []),
     // Ausstattung
     { key: 'clothing', name: 'Meine Kleidung', icon: Shirt, desc: 'Deine Outfits' },
     ...(isLeadership ? [{ key: 'clothing-management', name: 'Kleidungsverwaltung', icon: Shirt, desc: 'Vorlagen verwalten' }] : []),
-    { key: 'vehicle-tuning', name: 'Fahrzeugtuning', icon: Car, desc: 'Tuning-Specs' },
+    // { key: 'vehicle-tuning', name: 'Fahrzeugtuning', icon: Car, desc: 'Tuning-Specs' }, // hidden
     // Kommunikation
     { key: 'communication', name: 'Funk/DarkChat', icon: Radio, desc: 'Funkfrequenzen' },
-    { key: 'botschaft', name: 'Botschaft', icon: ScrollText, desc: 'Familia-News' },
+    // { key: 'botschaft', name: 'Botschaft', icon: ScrollText, desc: 'Familia-News' }, // hidden
     { key: 'listenfuehrung', name: 'Listenführung', icon: BookOpen, desc: 'Familien-Kontakte' },
     { key: 'karte', name: 'Interaktive Karte', icon: Map, desc: 'Territorien & Standorte' },
     { key: 'slang', name: 'Akzent / Slang', icon: Languages, desc: 'Spanischer Akzent' },
