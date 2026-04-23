@@ -8,7 +8,7 @@ import { Textarea } from '../components/ui/textarea'
 import { useAuthStore } from '../stores/auth'
 import { api } from '../lib/api'
 import { toast } from 'sonner'
-import { Home, MapPin, Loader2, Mountain, Shield, Key, Info, Sparkles } from 'lucide-react'
+import { Home, MapPin, Loader2, Mountain, Shield, Key, Info } from 'lucide-react'
 import { hasRole } from '../lib/utils'
 
 interface CasaInfo {
@@ -17,11 +17,10 @@ interface CasaInfo {
 }
 
 const CASA_IMAGES = [
-  { id: '1', filename: 'einfahrt-rundfahrt.png', alt: 'Einfahrt zu La Fuente Blanca' },
-  { id: '2', filename: 'blood-pool.png', alt: 'Blood Pool' },
-  { id: '3', filename: 'bar-pool.png', alt: 'Outdoor-Bar am Pool' },
-  { id: '4', filename: 'wohnzimmer.png', alt: 'Wohnzimmer' },
-  { id: '5', filename: 'besprechungs-circulo.png', alt: 'Besprechungs-Circulo' },
+  { id: '1', filename: 'einfahrt.png', alt: 'Einfahrt' },
+  { id: '2', filename: 'besprechungs-sitzecke.png', alt: 'Besprechungs Sitzecke' },
+  { id: '3', filename: 'pool.png', alt: 'Pool' },
+  { id: '4', filename: 'boxring.png', alt: 'Boxring' },
 ]
 
 export default function CasaPage() {
@@ -245,58 +244,6 @@ export default function CasaPage() {
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Tagging Information */}
-      <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Sparkles className="h-5 w-5" />
-            Tor-Tagging
-          </CardTitle>
-          <CardDescription>
-            Informationen zum Markieren der Tore
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
-              <div className="flex items-start gap-3">
-                <Sparkles className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white mb-2">Spray-Informationen</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-zinc-400">Farbcode:</span>
-                      <code className="px-2 py-1 bg-zinc-900 border border-zinc-700 rounded text-primary font-mono">
-                        #cfb997
-                      </code>
-                      <div 
-                        className="w-8 h-8 rounded border-2 border-zinc-700" 
-                        style={{ backgroundColor: '#cfb997' }}
-                        title="Spray-Farbe"
-                      />
-                    </div>
-                    <div className="flex items-start gap-2 mt-3">
-                      <span className="text-zinc-400">Position:</span>
-                      <span className="text-white">Rechte Seite des Tores</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-zinc-400">Text:</span>
-                      <span className="text-white font-bold text-lg">LSC</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="p-3 bg-orange-900/20 border border-orange-700/50 rounded-lg flex items-start gap-2">
-              <Info className="h-5 w-5 text-orange-400 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-orange-200">
-                Falls die Graffitis oder Sprays entfernt wurden, bitte auf der rechten Seite des Tores mit dem Kürzel <strong>"LSC"</strong> in der Farbe <strong>#cfb997</strong> und der dritten Schrift neu sprayen.
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
 

@@ -167,7 +167,7 @@ export default function LoginPage() {
                 </p>
                 <div className="flex items-center gap-3 text-orange-500/60">
                   <div className="h-px w-8 bg-gradient-to-r from-transparent to-orange-500/30" />
-                  <span className="text-sm font-medium tracking-wider">VIVA LA SANTA</span>
+                  <span className="text-sm font-medium tracking-wider">VIVA EL AVERNO</span>
                   <div className="h-px w-8 bg-gradient-to-l from-transparent to-orange-500/30" />
                 </div>
               </div>
