@@ -133,7 +133,7 @@ export default function UserManagementPage() {
     return user.username
   }
 
-  if (!isElPatron) {
+  if (!canManageUsers) {
     return (
       <div className="p-6">
         <Card className="lasanta-card">
