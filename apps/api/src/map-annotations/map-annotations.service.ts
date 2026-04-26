@@ -19,7 +19,7 @@ export class MapAnnotationsService {
       'PATRON',
       'DON',
       'CAPO',
-      'CAPO',
+      'ADMIN',
       'CONTACTO',
       'INTELIGENCIA',
     ];
