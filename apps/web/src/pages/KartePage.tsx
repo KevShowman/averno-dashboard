@@ -447,15 +447,24 @@ export default function KartePage() {
   const isContacto = hasRole(user, ['CONTACTO'])
   const isInteligencia = hasRole(user, ['INTELIGENCIA'])
   const isPartner = user?.isPartner === true
-  // Partner haben jetzt vollen Zugriff auf Karte und Listenführung
-  const canManage = isLeadership || isContacto || isInteligencia || isPartner
-  
-  // Users who can view family contact details (Leadership, Contacto, ListPermission, or Partners with explicit permission)
-  const { data: listPermissions = [] } = useQuery({
-    queryKey: ['list-permissions-check'],
-    queryFn: () => api.get('/family-contacts/permissions/list').then(res => res.data),
+  const canManageByRole = isLeadership || isContacto || isInteligencia || isPartner
+
+  // Non-role users check their own MapPermission
+  const { data: myMapPermission } = useQuery<{ hasPermission: boolean }>({
+    queryKey: ['map-permission-me'],
+    queryFn: () => api.get('/map-annotations/permissions/me').then(res => res.data),
+    enabled: !canManageByRole,
   })
-  const hasListPermission = listPermissions.some((p: any) => p.userId === user?.id)
+  const hasMapPermission = !canManageByRole && myMapPermission?.hasPermission === true
+  const canManage = canManageByRole || hasMapPermission
+
+  // Users who can view family contact details (Leadership, Contacto, ListPermission, or Partners with explicit permission)
+  const { data: myListPermission } = useQuery<{ hasPermission: boolean }>({
+    queryKey: ['list-permission-me'],
+    queryFn: () => api.get('/family-contacts/permissions/me').then(res => res.data),
+    enabled: !isLeadership && !isContacto && !isPartner,
+  })
+  const hasListPermission = myListPermission?.hasPermission === true
   const partnerCanViewContacts = (user as any)?.partnerCanViewContacts === true
   const canViewContactDetails = isLeadership || isContacto || hasListPermission || (isPartner && partnerCanViewContacts)
   

@@ -78,6 +78,11 @@ export class MapAnnotationsController {
 
   // ============ PERMISSION MANAGEMENT ============
 
+  @Get('permissions/me')
+  checkMyPermission(@CurrentUser() user: any) {
+    return this.mapAnnotationsService.checkMyMapPermission(user.id);
+  }
+
   @Get('permissions/map')
   getMapPermissions() {
     return this.mapAnnotationsService.getMapPermissions();

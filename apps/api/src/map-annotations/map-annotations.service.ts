@@ -554,6 +554,14 @@ export class MapAnnotationsService {
 
   // ============ PERMISSION MANAGEMENT ============
 
+  // Eigene Map-Berechtigung prüfen
+  async checkMyMapPermission(userId: string): Promise<{ hasPermission: boolean }> {
+    const permission = await this.prisma.mapPermission.findUnique({
+      where: { userId },
+    });
+    return { hasPermission: !!permission };
+  }
+
   // Alle Map-Berechtigungen abrufen
   async getMapPermissions() {
     return this.prisma.mapPermission.findMany({
