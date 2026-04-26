@@ -18,7 +18,7 @@ export class BloodListService {
   async bloodIn(
     vorname: string,
     nachname: string,
-    telefon: number,
+    telefon: string,
     steam: string,
     bloodinDurch: string,
     performedByUserId: string,
@@ -171,14 +171,11 @@ export class BloodListService {
 
     let bloodRecord = null;
 
-    // Versuche zuerst als Telefonnummer zu parsen
-    const telefonNumber = parseInt(identifier);
-    
-    if (!isNaN(telefonNumber)) {
-      // Suche nach Telefonnummer
+    // Versuche zuerst als Telefonnummer (nur Ziffern)
+    if (/^\d+$/.test(identifier.trim())) {
       bloodRecord = await this.prisma.bloodRecord.findFirst({
         where: {
-          telefon: telefonNumber,
+          telefon: identifier.trim(),
           status: BloodStatus.ACTIVE,
         },
       });
@@ -616,7 +613,7 @@ export class BloodListService {
     discordId: string,
     vorname: string,
     nachname: string,
-    telefon: number,
+    telefon: string,
     steam: string,
     bloodinDurch: string,
     performedByUserId: string,

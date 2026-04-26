@@ -579,7 +579,7 @@ model BloodRecord {
   id                String      @id @default(cuid())
   vorname           String
   nachname          String
-  telefon           Int
+  telefon           String
   steam             String
   bloodinDurch      String // Wer hat Blood In durchgeführt
   bloodinTimestamp  DateTime    @default(now())

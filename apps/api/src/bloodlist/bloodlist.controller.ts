@@ -9,7 +9,7 @@ import { BloodListService } from './bloodlist.service';
 interface BloodInDto {
   vorname: string;
   nachname: string;
-  telefon: number;
+  telefon: string;
   steam: string;
   bloodinDurch: string;
 }
@@ -23,7 +23,7 @@ interface LinkDiscordUserDto {
   discordId: string;
   vorname: string;
   nachname: string;
-  telefon: number;
+  telefon: string;
   steam: string;
   bloodinDurch: string;
 }

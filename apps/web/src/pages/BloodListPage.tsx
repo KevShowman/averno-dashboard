@@ -32,7 +32,7 @@ interface BloodRecord {
   id: string;
   vorname: string;
   nachname: string;
-  telefon: number;
+  telefon: string;
   steam: string;
   bloodinDurch: string;
   bloodinTimestamp: string;
@@ -180,12 +180,7 @@ export default function BloodListPage() {
 
   const handleBloodInSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const telefon = parseInt(bloodInData.telefon);
-    if (isNaN(telefon)) {
-      toast.error('Telefonnummer muss eine Zahl sein');
-      return;
-    }
-    bloodInMutation.mutate({ ...bloodInData, telefon });
+    bloodInMutation.mutate(bloodInData);
   };
 
   const handleBloodOutSubmit = (e: React.FormEvent) => {
@@ -196,16 +191,11 @@ export default function BloodListPage() {
   const handleLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDiscordUser) return;
-    const telefon = parseInt(linkData.telefon);
-    if (isNaN(telefon)) {
-      toast.error('Telefonnummer muss eine Zahl sein');
-      return;
-    }
     linkDiscordUserMutation.mutate({
       discordId: selectedDiscordUser.discordId,
       vorname: linkData.vorname,
       nachname: linkData.nachname,
-      telefon,
+      telefon: linkData.telefon,
       steam: linkData.steam,
       bloodinDurch: linkData.bloodinDurch,
     });
