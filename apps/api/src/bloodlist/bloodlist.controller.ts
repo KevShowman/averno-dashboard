@@ -10,7 +10,7 @@ interface BloodInDto {
   vorname: string;
   nachname: string;
   telefon: string;
-  steam: string;
+  steam?: string;
   bloodinDurch: string;
 }
 
@@ -24,7 +24,7 @@ interface LinkDiscordUserDto {
   vorname: string;
   nachname: string;
   telefon: string;
-  steam: string;
+  steam?: string;
   bloodinDurch: string;
 }
 

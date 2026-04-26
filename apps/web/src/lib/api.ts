@@ -181,7 +181,7 @@ export const abmeldungApi = {
 
 // BloodList API
 export const bloodListApi = {
-  bloodIn: (data: { vorname: string; nachname: string; telefon: string; steam: string; bloodinDurch: string }) =>
+  bloodIn: (data: { vorname: string; nachname: string; telefon: string; steam?: string; bloodinDurch: string }) =>
     api.post('/bloodlist/blood-in', data).then(res => res.data),
   bloodOut: (data: { identifier: string; grund: string }) =>
     api.post('/bloodlist/blood-out', data).then(res => res.data),
@@ -195,7 +195,7 @@ export const bloodListApi = {
   // Neue Discord-Funktionen
   getUnassignedDiscordUsers: () => api.get('/bloodlist/discord/unassigned').then(res => res.data),
   getGhostUsers: () => api.get('/bloodlist/discord/ghost-users').then(res => res.data),
-  linkDiscordUser: (data: { discordId: string; vorname: string; nachname: string; telefon: string; steam: string; bloodinDurch: string }) =>
+  linkDiscordUser: (data: { discordId: string; vorname: string; nachname: string; telefon: string; steam?: string; bloodinDurch: string }) =>
     api.post('/bloodlist/link-discord-user', data).then(res => res.data),
 };
 

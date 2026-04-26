@@ -580,7 +580,7 @@ model BloodRecord {
   vorname           String
   nachname          String
   telefon           String
-  steam             String
+  steam             String?
   bloodinDurch      String // Wer hat Blood In durchgeführt
   bloodinTimestamp  DateTime    @default(now())
   status            BloodStatus @default(ACTIVE)

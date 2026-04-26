@@ -418,7 +418,7 @@ export default function BloodListPage() {
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <span className="text-zinc-300 text-sm truncate max-w-[150px] block">{member.steam}</span>
+                          <span className="text-zinc-300 text-sm truncate max-w-[150px] block">{member.steam || '—'}</span>
                         </td>
                         <td className="py-4 px-4">
                           <span className="text-zinc-400 text-sm">{formatDate(member.bloodinTimestamp)}</span>
@@ -732,7 +732,7 @@ export default function BloodListPage() {
                       <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                         <Gamepad2 className="h-4 w-4 text-red-400" />Steam ID
                       </label>
-                      <Input value={bloodInData.steam} onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })} className="bg-zinc-800/50 border-zinc-700 focus:border-red-500 text-white h-11" placeholder="steam:xxxx" required />
+                      <Input value={bloodInData.steam} onChange={(e) => setBloodInData({ ...bloodInData, steam: e.target.value })} className="bg-zinc-800/50 border-zinc-700 focus:border-red-500 text-white h-11" placeholder="steam:xxxx" />
                     </div>
                   </div>
                   <div className="relative py-2">
@@ -860,7 +860,7 @@ export default function BloodListPage() {
                       <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                         <Gamepad2 className="h-4 w-4 text-orange-400" />Steam ID
                       </label>
-                      <Input value={linkData.steam} onChange={(e) => setLinkData({ ...linkData, steam: e.target.value })} className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500 text-white h-11" placeholder="steam:xxxx" required />
+                      <Input value={linkData.steam} onChange={(e) => setLinkData({ ...linkData, steam: e.target.value })} className="bg-zinc-800/50 border-zinc-700 focus:border-orange-500 text-white h-11" placeholder="steam:xxxx" />
                     </div>
                   </div>
                   <div className="relative py-2">

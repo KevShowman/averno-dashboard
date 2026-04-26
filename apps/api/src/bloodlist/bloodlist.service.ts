@@ -19,7 +19,7 @@ export class BloodListService {
     vorname: string,
     nachname: string,
     telefon: string,
-    steam: string,
+    steam: string | undefined,
     bloodinDurch: string,
     performedByUserId: string,
   ) {
@@ -440,8 +440,6 @@ export class BloodListService {
 
   // Suche
   async searchRecords(query: string) {
-    const searchNumber = parseInt(query);
-
     return this.prisma.bloodRecord.findMany({
       where: {
         OR: [
@@ -460,13 +458,11 @@ export class BloodListService {
               contains: query,
             },
           },
-          ...(isNaN(searchNumber)
-            ? []
-            : [
-                {
-                  telefon: searchNumber,
-                },
-              ]),
+          {
+            telefon: {
+              contains: query,
+            },
+          },
         ],
       },
       orderBy: {
@@ -614,7 +610,7 @@ export class BloodListService {
     vorname: string,
     nachname: string,
     telefon: string,
-    steam: string,
+    steam: string | undefined,
     bloodinDurch: string,
     performedByUserId: string,
   ) {
