@@ -3,9 +3,10 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { AuditService } from '../audit/audit.service';
 import { PrismaModule } from '../common/prisma/prisma.module';
+import { DiscordModule } from '../discord/discord.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, DiscordModule],
   controllers: [UsersController],
   providers: [UsersService, AuditService],
   exports: [UsersService],

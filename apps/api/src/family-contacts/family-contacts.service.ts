@@ -220,6 +220,14 @@ export class FamilyContactsService {
 
   // ============ PERMISSION MANAGEMENT ============
 
+  // Eigene List-Berechtigung prüfen
+  async checkMyListPermission(userId: string): Promise<{ hasPermission: boolean }> {
+    const permission = await this.prisma.listPermission.findUnique({
+      where: { userId },
+    });
+    return { hasPermission: !!permission };
+  }
+
   // Alle List-Berechtigungen abrufen
   async getListPermissions() {
     return this.prisma.listPermission.findMany({

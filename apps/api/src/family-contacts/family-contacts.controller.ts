@@ -88,6 +88,11 @@ export class FamilyContactsController {
 
   // ============ PERMISSION MANAGEMENT ============
 
+  @Get('permissions/me')
+  checkMyPermission(@CurrentUser() user: any) {
+    return this.familyContactsService.checkMyListPermission(user.id);
+  }
+
   @Get('permissions/list')
   getListPermissions() {
     return this.familyContactsService.getListPermissions();

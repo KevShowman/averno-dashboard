@@ -1330,6 +1330,82 @@ export class DiscordService {
     return { success, failed };
   }
 
+  // Discord Rolle von einem User entfernen
+  async removeRoleFromUser(discordId: string, roleId: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.discordApiUrl}/guilds/${this.guildId}/members/${discordId}/roles/${roleId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bot ${this.botToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Fehler beim Entfernen der Rolle ${roleId} von User ${discordId}: ${response.status}`);
+        return false;
+      }
+
+      console.log(`Rolle ${roleId} von User ${discordId} entfernt`);
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Entfernen der Discord Rolle:', error);
+      return false;
+    }
+  }
+
+  // System-Rollen eines Users mit Discord synchronisieren (nach manuellem Rollen-Update)
+  async syncSystemRolesToDiscord(userId: string, newSystemRoles: Role[]): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { discordId: true, discordRoles: true },
+    });
+
+    if (!user?.discordId) return;
+
+    const roleMappings = await this.prisma.discordRoleMapping.findMany({
+      where: { isActive: true },
+    });
+
+    const systemRoleDiscordIds = new Set(roleMappings.map(m => m.discordRoleId));
+    const currentDiscordRoles: string[] = Array.isArray(user.discordRoles)
+      ? (user.discordRoles as string[])
+      : [];
+
+    const newDiscordRoleIds = new Set(
+      roleMappings
+        .filter(m => newSystemRoles.includes(m.systemRole as Role))
+        .map(m => m.discordRoleId)
+    );
+
+    // Entferne Discord-Rollen die alten System-Rollen entsprechen
+    for (const discordRoleId of currentDiscordRoles) {
+      if (systemRoleDiscordIds.has(discordRoleId) && !newDiscordRoleIds.has(discordRoleId)) {
+        await this.removeRoleFromUser(user.discordId, discordRoleId);
+      }
+    }
+
+    // Füge Discord-Rollen für neue System-Rollen hinzu
+    for (const discordRoleId of newDiscordRoleIds) {
+      if (!currentDiscordRoles.includes(discordRoleId)) {
+        await this.addRoleToUser(user.discordId, discordRoleId);
+      }
+    }
+
+    // Aktualisiere discordRoles in DB
+    const updatedDiscordRoles = [
+      ...currentDiscordRoles.filter(id => !systemRoleDiscordIds.has(id) || newDiscordRoleIds.has(id)),
+      ...[...newDiscordRoleIds].filter(id => !currentDiscordRoles.includes(id)),
+    ];
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { discordRoles: updatedDiscordRoles },
+    });
+  }
+
   // Alle Discord Rollen des Servers abrufen
   async getServerRoles(): Promise<Array<{ id: string; name: string; color: number; position: number }>> {
     try {

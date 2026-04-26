@@ -145,15 +145,24 @@ export default function ListenfuehrungPage() {
   const isPartner = user?.isPartner === true
   const partnerCanViewContacts = (user as any)?.partnerCanViewContacts === true
 
-  // Fetch list permissions
+  // Fetch list permissions (leadership only — needed for permission management UI)
   const { data: listPermissions = [], isLoading: permissionsLoading } = useQuery<ListPermission[]>({
     queryKey: ['list-permissions'],
     queryFn: () => api.get('/family-contacts/permissions/list').then(res => res.data),
-    enabled: isLeadership, // Only fetch for leadership
+    enabled: isLeadership,
+  })
+
+  // Non-leadership users check their own permission via a dedicated endpoint
+  const { data: myPermissionData } = useQuery<{ hasPermission: boolean }>({
+    queryKey: ['list-permission-me'],
+    queryFn: () => api.get('/family-contacts/permissions/me').then(res => res.data),
+    enabled: !isLeadership && !hasContactRole && !isPartner,
   })
 
   // Check if user has a list permission
-  const hasListPermission = listPermissions.some(p => p.userId === user?.id)
+  const hasListPermission = isLeadership
+    ? listPermissions.some(p => p.userId === user?.id)
+    : myPermissionData?.hasPermission === true
   
   // User can manage if they are Leadership, Contacto, Partner, or have a ListPermission
   const canManage = isLeadership || hasContactRole || hasListPermission || isPartner

@@ -2,12 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Role } from '@prisma/client';
 import { ExclusionService } from '../common/exclusion/exclusion.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private prisma: PrismaService,
     private exclusionService: ExclusionService,
+    private discordService: DiscordService,
   ) {}
 
   // Alle User abrufen (keine Partner/Taxi/Ausgeschlossene - nur interne Mitglieder)
@@ -127,7 +129,7 @@ export class UsersService {
     });
 
     // User aktualisieren
-    return this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: {
         role: highestRole,
@@ -147,6 +149,13 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    // Discord-Rollen synchronisieren (fire-and-forget, Fehler sollen den Request nicht blockieren)
+    this.discordService.syncSystemRolesToDiscord(userId, allRoles).catch(err =>
+      console.error('Fehler beim Discord-Rollen-Sync:', err)
+    );
+
+    return updatedUser;
   }
 
   // User nach Name/Username suchen (keine Partner/Taxi - nur interne Mitglieder)
