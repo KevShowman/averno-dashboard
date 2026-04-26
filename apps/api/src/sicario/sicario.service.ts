@@ -76,7 +76,7 @@ export class SicarioService {
 
     if (!user) return false;
     
-    const leadershipRoles: Role[] = [Role.PATRON, Role.DON, Role.CAPO];
+    const leadershipRoles: Role[] = [Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN];
     if (leadershipRoles.includes(user.role)) return true;
     
     const allRoles = Array.isArray(user.allRoles) ? user.allRoles : [];

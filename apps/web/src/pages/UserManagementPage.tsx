@@ -55,7 +55,7 @@ export default function UserManagementPage() {
 
   // Prüfen ob User Patron oder Don ist
   const isElPatron = hasRole(currentUser, 'PATRON')
-  const canManageUsers = currentUser?.role && ['PATRON', 'DON'].includes(currentUser.role)
+  const canManageUsers = currentUser && hasRole(currentUser, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
 
   // Queries
   const { data: allUsers = [], isLoading } = useQuery({

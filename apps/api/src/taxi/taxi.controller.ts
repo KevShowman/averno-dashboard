@@ -195,7 +195,7 @@ export class TaxiController {
   @Get('can-manage')
   @UseGuards(JwtAuthGuard)
   async canManage(@CurrentUser() user: User) {
-    const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO'];
+    const LEADERSHIP_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN'];
     const isLeadership = LEADERSHIP_ROLES.includes(user.role);
     
     return {

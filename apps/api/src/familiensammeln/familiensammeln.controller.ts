@@ -72,7 +72,7 @@ export class FamiliensammelnController {
    * Erstellt eine neue Woche (oder holt bestehende)
    */
   @Post('week')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async createWeek(@Body() body: { weekStart: string }) {
     const weekStart = new Date(body.weekStart);
     return this.familiensammelnService.getOrCreateWeek(weekStart);
@@ -83,7 +83,7 @@ export class FamiliensammelnController {
    * Fügt eine Teilnahme hinzu
    */
   @Post('participation')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async addParticipation(
     @Body()
     body: {
@@ -105,7 +105,7 @@ export class FamiliensammelnController {
    * Aktualisiert die Tour-Anzahl einer Teilnahme
    */
   @Patch('participation/:id/tourcount')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async updateParticipationTourCount(
     @Param('id') id: string,
     @Body() body: { tourCount: number },
@@ -118,7 +118,7 @@ export class FamiliensammelnController {
    * Entfernt eine Teilnahme
    */
   @Delete('participation/:id')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async removeParticipation(@Param('id') id: string) {
     return this.familiensammelnService.removeParticipation(id);
   }
@@ -137,7 +137,7 @@ export class FamiliensammelnController {
    * Startet einen neuen Verarbeiter
    */
   @Post('week/:weekId/processors')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async startProcessor(
     @Param('weekId') weekId: string,
     @Body() body: { userId: string; capacity?: number },
@@ -150,7 +150,7 @@ export class FamiliensammelnController {
    * Bestätigt die Entnahme eines Verarbeiters
    */
   @Post('processors/:id/complete')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async completeProcessor(
     @Param('id') id: string,
     @CurrentUser() user: User,
@@ -163,7 +163,7 @@ export class FamiliensammelnController {
    * Löscht einen Verarbeiter
    */
   @Delete('processors/:id')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async deleteProcessor(@Param('id') id: string) {
     return this.familiensammelnService.deleteProcessor(id);
   }

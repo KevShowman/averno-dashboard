@@ -17,7 +17,7 @@ export class CasaController {
 
   @Put('location')
   @UseGuards(RolesGuard)
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async updateLocation(
     @Body() body: { postalCode: string; additionalInfo: string },
   ) {

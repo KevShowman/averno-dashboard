@@ -52,7 +52,7 @@ export class CashController {
   }
 
   @Post('transactions/:id/approve')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async approveTransaction(
     @Param('id') id: string,
@@ -62,7 +62,7 @@ export class CashController {
   }
 
   @Post('transactions/:id/reject')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async rejectTransaction(
     @Param('id') id: string,

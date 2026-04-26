@@ -32,7 +32,7 @@ export class CommunicationController {
 
   // Funk-Frequenz aktualisieren (nur Leaderschaft)
   @Put('funk')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async updateFunkFrequency(@Body() updateDto: UpdateFunkDto) {
     return this.communicationService.updateFunkFrequency(updateDto.funkFrequency);
@@ -40,7 +40,7 @@ export class CommunicationController {
 
   // DarkChat-Name aktualisieren (nur Leaderschaft)
   @Put('darkchat')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async updateDarkChatName(@Body() updateDto: UpdateDarkChatDto) {
     return this.communicationService.updateDarkChatName(updateDto.darkChatName);

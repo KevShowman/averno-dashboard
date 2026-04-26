@@ -47,7 +47,7 @@ export class WeeklyDeliveryController {
 
   // Wochenabgabe erstellen (Leaderschaft)
   @Post()
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async createWeeklyDelivery(@Body() createDto: CreateWeeklyDeliveryDto, @Request() req) {
     const weekStart = new Date(createDto.weekStart);
@@ -104,7 +104,7 @@ export class WeeklyDeliveryController {
 
   // Vorauszahlung für mehrere Wochen (Leaderschaft)
   @Post('prepay')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async prepayWeeks(@Body() prepayDto: PrepayWeeksDto, @Request() req) {
     return this.weeklyDeliveryService.prepayWeeks(
@@ -118,7 +118,7 @@ export class WeeklyDeliveryController {
 
   // Alle User für Wochenabgabe indexieren (Leaderschaft)
   @Post('index-users')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async indexAllUsers() {
     return this.weeklyDeliveryService.indexAllUsers();
@@ -126,7 +126,7 @@ export class WeeklyDeliveryController {
 
   // Automatische Sanktionierung (Leaderschaft)
   @Post('auto-sanction')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async autoSanctionOverdue() {
     return this.weeklyDeliveryService.autoSanctionOverdue();
@@ -134,7 +134,7 @@ export class WeeklyDeliveryController {
 
   // Wöchentlicher Reset (Leaderschaft)
   @Post('weekly-reset')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async weeklyReset() {
     return this.weeklyDeliveryService.weeklyReset();
@@ -142,7 +142,7 @@ export class WeeklyDeliveryController {
 
   // Ausschluss erstellen (Patron)
   @Post('exclusions')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async createExclusion(@Body() exclusionDto: CreateExclusionDto, @Request() req) {
     const startDate = new Date(exclusionDto.startDate);
@@ -166,7 +166,7 @@ export class WeeklyDeliveryController {
 
   // Ausschluss deaktivieren (Leaderschaft)
   @Patch('exclusions/:id/deactivate')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async deactivateExclusion(@Param('id') id: string) {
     return this.weeklyDeliveryService.deactivateExclusion(id);
@@ -174,7 +174,7 @@ export class WeeklyDeliveryController {
 
   // Archivierung der aktuellen Woche (Leaderschaft)
   @Post('archive-current-week')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async archiveCurrentWeek(@CurrentUser() user: User) {
     return this.weeklyDeliveryService.archiveCurrentWeek(user.id);
@@ -182,21 +182,21 @@ export class WeeklyDeliveryController {
 
   // Archivierte Wochen abrufen
   @Get('archives')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.LINCE)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.LINCE)
   async getArchives() {
     return this.weeklyDeliveryService.getArchives();
   }
 
   // Archiv-Details abrufen
   @Get('archives/:id')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.LINCE)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.LINCE)
   async getArchiveDetails(@Param('id') archiveId: string) {
     return this.weeklyDeliveryService.getArchiveDetails(archiveId);
   }
 
   // Development: Alle Wochenabgaben löschen
   @Post('clear-all')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async clearAllWeeklyDeliveries() {
     return this.weeklyDeliveryService.clearAllWeeklyDeliveries();

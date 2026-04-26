@@ -11,7 +11,7 @@ export class AuditController {
   constructor(private auditService: AuditService) {}
 
   @Get()
-  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.LINCE)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN, Role.ROUTENVERWALTUNG, Role.RUTAS, Role.SICARIO, Role.LINCE)
   async getLogs(
     @Query('entity') entity?: string,
     @Query('userId') userId?: string,

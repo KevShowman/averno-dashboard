@@ -42,7 +42,7 @@ export class FamilyContactsService {
       'PATRON',
       'DON',
       'CAPO',
-      'CAPO',
+      'ADMIN',
     ];
     
     if (leadershipRoles.includes(user.role)) {

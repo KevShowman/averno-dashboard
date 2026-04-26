@@ -48,7 +48,7 @@ export class MapAnnotationsService {
       'PATRON',
       'DON',
       'CAPO',
-      'CAPO',
+      'ADMIN',
     ];
     
     if (leadershipRoles.includes(user.role)) {

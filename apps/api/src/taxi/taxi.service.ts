@@ -14,7 +14,7 @@ import { TaxiKeyStatus, TaxiKeyType, TaxiAssignmentStatus, TafelrundeAttendance 
 import { randomBytes } from 'crypto';
 
 // Rollen die Taxi-Keys erstellen dürfen
-const KEY_CREATOR_ROLES = ['PATRON', 'DON', 'CAPO'];
+const KEY_CREATOR_ROLES = ['PATRON', 'DON', 'CAPO', 'ADMIN'];
 
 // Spezielle User die Keys erstellen dürfen (z.B. "Olaf")
 const SPECIAL_KEY_CREATORS: string[] = []; // Hier Discord-IDs eintragen wenn nötig

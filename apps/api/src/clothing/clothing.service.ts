@@ -72,7 +72,6 @@ export class ClothingService {
     Role.PATRON,
     Role.DON,
     Role.CAPO,
-    Role.CAPO,
     Role.ADMIN,
   ];
 

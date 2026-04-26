@@ -55,7 +55,7 @@ export class SettingsController {
 
   // Setting erstellen oder aktualisieren (Leaderschaft)
   @Put()
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async setSetting(@Body() setSettingDto: SetSettingDto) {
     return this.settingsService.setSetting(
@@ -67,7 +67,7 @@ export class SettingsController {
 
   // Setting löschen (Leaderschaft)
   @Delete(':key')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async deleteSetting(@Param('key') key: string) {
     return this.settingsService.deleteSetting(key);
@@ -81,7 +81,7 @@ export class SettingsController {
 
   // Weekly Delivery Settings setzen (Leaderschaft)
   @Put('weekly-delivery')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async setWeeklyDeliverySettings(@Body() settingsDto: WeeklyDeliverySettingsDto) {
     if (settingsDto.packages <= 0) {
@@ -105,7 +105,7 @@ export class SettingsController {
 
   // Xiao Motors Settings setzen (Leaderschaft)
   @Put('xiao-motors')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async setXiaoMotorsSettings(@Body() settingsDto: XiaoMotorsSettingsDto) {
     return this.settingsService.setXiaoMotorsSettings(
@@ -122,7 +122,7 @@ export class SettingsController {
 
   // Blood List Channel Settings setzen (Leaderschaft)
   @Put('bloodlist')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   @UseGuards(RolesGuard)
   async setBloodListSettings(@Body() settingsDto: BloodListSettingsDto) {
     return this.settingsService.setBloodListSettings(
@@ -139,7 +139,7 @@ export class SettingsController {
 
   // Blood In Discord Rollen setzen (NUR Patron)
   @Put('bloodlist/roles')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async setBloodInDiscordRoles(@Body() body: { roleIds: string[] }) {
     return this.settingsService.setBloodInDiscordRoles(body.roleIds);

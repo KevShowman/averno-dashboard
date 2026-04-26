@@ -16,14 +16,14 @@ export class ModulesController {
   }
 
   @Get('all')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async getAllModules() {
     return this.modulesService.getAllModules();
   }
 
   @Patch(':key/toggle')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   @UseGuards(RolesGuard)
   async toggleModule(
     @Param('key') key: string,

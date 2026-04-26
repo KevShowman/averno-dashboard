@@ -16,7 +16,7 @@ export class AttendanceService {
     'PATRON',
     'DON',
     'CAPO',
-    'CAPO',
+    'ADMIN',
   ];
 
   // Prüft ob User Leadership ist

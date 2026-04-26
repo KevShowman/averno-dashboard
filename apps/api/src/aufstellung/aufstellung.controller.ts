@@ -34,7 +34,7 @@ export class AufstellungController {
 
   // Erstelle neue Aufstellung (nur Patron, Don, Capo)
   @Post()
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async createAufstellung(
     @Body() createDto: CreateAufstellungDto,
     @CurrentUser() user: User,
@@ -96,21 +96,21 @@ export class AufstellungController {
 
   // Aktive Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions/active')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async getActiveExclusions() {
     return this.aufstellungService.getActiveExclusions();
   }
 
   // Alle Exclusions abrufen (nur Leaderschaft)
   @Get('exclusions')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async getAllExclusions() {
     return this.aufstellungService.getAllExclusions();
   }
 
   // Exclusion erstellen (nur Patron, Don, Capo)
   @Post('exclusions')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async createExclusion(
     @Body() createDto: CreateExclusionDto,
     @CurrentUser() user: User,
@@ -126,14 +126,14 @@ export class AufstellungController {
 
   // Exclusion deaktivieren (Leaderschaft)
   @Patch('exclusions/:id/deactivate')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async deactivateExclusion(@Param('id') id: string) {
     return this.aufstellungService.deactivateExclusion(id);
   }
 
   // Exclusion löschen (nur Patron)
   @Delete('exclusions/:id')
-  @Roles(Role.PATRON)
+  @Roles(Role.PATRON, Role.ADMIN)
   async deleteExclusion(@Param('id') id: string) {
     return this.aufstellungService.deleteExclusion(id);
   }
@@ -162,21 +162,21 @@ export class AufstellungController {
 
   // Nicht-Reagierer sanktionieren (nur Patron, Don, Capo)
   @Post(':id/sanction-non-responders')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async sanctionNonResponders(@Param('id') id: string) {
     return this.aufstellungService.sanctionNonResponders(id);
   }
 
   // Reminder an nicht-reagierende User senden (Leaderschaft)
   @Post(':id/send-reminder')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async sendReminder(@Param('id') id: string) {
     return this.aufstellungService.sendReminder(id);
   }
 
   // Aufstellung löschen (Leaderschaft)
   @Delete(':id')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
   }

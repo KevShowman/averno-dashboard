@@ -27,7 +27,7 @@ interface UpdateUprankDto {
 
 @Controller('member-files')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.PATRON, Role.DON, Role.CAPO)
+@Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
 export class MemberFilesController {
   constructor(private memberFilesService: MemberFilesService) {}
 
