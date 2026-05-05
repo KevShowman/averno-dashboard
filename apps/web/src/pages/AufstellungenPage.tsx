@@ -86,6 +86,7 @@ export default function AufstellungenPage() {
 
   // Rechte prüfen
   const canManageAufstellungen = user?.role && ['PATRON', 'DON', 'CAPO', 'ADMIN'].includes(user.role)
+  const canCreateDeleteAufstellungen = user?.role && ['PATRON', 'DON', 'CAPO', 'CONSULTORA', 'PADRINO', 'ADMIN'].includes(user.role)
 
   // Query: Alle Aufstellungen
   const { data: aufstellungen, isLoading } = useQuery({
@@ -421,7 +422,7 @@ export default function AufstellungenPage() {
       )}
 
       {/* Create Aufstellung Button */}
-      {canManageAufstellungen && (
+      {canCreateDeleteAufstellungen && (
         <div className="flex justify-end">
           <Button
             onClick={() => setShowCreateModal(true)}
@@ -1078,15 +1079,15 @@ export default function AufstellungenPage() {
                   )}
 
                   {/* Admin Aktionen */}
-                  {canManageAufstellungen && (
+                  {canCreateDeleteAufstellungen && (
                     <div className="bg-zinc-800/50 p-4 rounded-xl border border-orange-500/20 space-y-3">
                       <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                         <Shield className="h-5 w-5 text-orange-400" />
                         Admin-Aktionen
                       </h3>
-                      
-                      {/* Reminder Button - nur wenn User ohne Antwort existieren */}
-                      {aufstellungDetails.stats &&
+
+                      {/* Reminder Button - nur Leaderschaft */}
+                      {canManageAufstellungen && aufstellungDetails.stats &&
                         aufstellungDetails.stats.noResponse > 0 && (
                           <Button
                             className="w-full h-12 bg-gradient-to-r from-orange-600 to-orange-600 hover:from-orange-500 hover:to-orange-500 shadow-lg shadow-orange-500/25 text-white"
@@ -1094,13 +1095,13 @@ export default function AufstellungenPage() {
                             disabled={reminderMutation.isPending}
                           >
                             <Bell className="mr-2 h-5 w-5" />
-                            {reminderMutation.isPending 
-                              ? 'Sende Reminder...' 
+                            {reminderMutation.isPending
+                              ? 'Sende Reminder...'
                               : `${aufstellungDetails.stats.noResponse} User erinnern`}
                           </Button>
                         )}
 
-                      {isDeadlinePassed(aufstellungDetails.deadline) &&
+                      {canManageAufstellungen && isDeadlinePassed(aufstellungDetails.deadline) &&
                         aufstellungDetails.stats &&
                         aufstellungDetails.stats.noResponse > 0 && (
                           <Button
