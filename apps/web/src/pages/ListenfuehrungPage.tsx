@@ -167,8 +167,9 @@ export default function ListenfuehrungPage() {
   // User can manage if they are Leadership, Contacto, Partner, or have a ListPermission
   const canManage = isLeadership || hasContactRole || hasListPermission || isPartner
   
-  // Only Leadership, Contacto, ListPermission holders, or Partners with explicit permission can see full contact details
-  const canViewDetails = isLeadership || hasContactRole || hasListPermission || (isPartner && partnerCanViewContacts)
+  // Only Leadership, Contacto, ListPermission holders, Partners with explicit permission, or rank 1-12 members can see full contact details
+  const canViewDetails = isLeadership || hasContactRole || hasListPermission || (isPartner && partnerCanViewContacts) ||
+    hasRole(user, ['PATRON', 'DON', 'CAPO', 'CONSULTORA', 'PADRINO', 'GESTION_DE_RUTAS', 'EL_MUDO', 'LINCE', 'CAPATAZ', 'MERCADER', 'COYOTE', 'RECLUTA'])
 
   // Fetch all users for permission dropdown
   const { data: allUsers = [] } = useQuery({

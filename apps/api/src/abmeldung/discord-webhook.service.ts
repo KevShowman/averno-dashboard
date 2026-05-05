@@ -65,7 +65,6 @@ export class AbmeldungWebhookService {
     // Erstelle Discord Embed
     const embed = {
       title: '📅 ABMELDUNG',
-      description: '¡HOLA COMPADRES!\n\nEin Familienmitglied hat sich abgemeldet.\n\n¡Un compañero estará ausente! 🚫',
       color: 0xFF6B6B, // Rot
       fields: [
         {
@@ -84,9 +83,7 @@ export class AbmeldungWebhookService {
           inline: true,
         },
       ],
-      footer: {
-        text: '¡Buen viaje, compadre! Wir sehen uns bald wieder.',
-      },
+      footer: {},
       timestamp: new Date().toISOString(),
     };
 
@@ -115,7 +112,7 @@ export class AbmeldungWebhookService {
         },
         body: JSON.stringify({
           username: 'Abmeldungen Bot',
-          avatar_url: 'https://cdn.discordapp.com/emojis/1234567890.png', // Optional: Custom Avatar
+          avatar_url: 'https://media.discordapp.net/attachments/1501170219652219071/1501170529795575889/image.png?ex=69fb1980&is=69f9c800&hm=d246ad0e39007846a832370e03f072853bbe1a78e5d04951f38af5c2c1a94255&=&format=webp&quality=lossless&width=1229&height=820', // Optional: Custom Avatar
           embeds: [embed],
         }),
       });

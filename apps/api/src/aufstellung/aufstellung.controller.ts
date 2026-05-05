@@ -32,9 +32,9 @@ export class AufstellungController {
     private discordWebhookService: DiscordWebhookService,
   ) {}
 
-  // Erstelle neue Aufstellung (nur Patron, Don, Capo)
+  // Erstelle neue Aufstellung (nur Patron, Don, Capo, Consultora, Padrino, Admin)
   @Post()
-  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.CONSULTORA, Role.PADRINO, Role.ADMIN)
   async createAufstellung(
     @Body() createDto: CreateAufstellungDto,
     @CurrentUser() user: User,
@@ -174,9 +174,9 @@ export class AufstellungController {
     return this.aufstellungService.sendReminder(id);
   }
 
-  // Aufstellung löschen (Leaderschaft)
+  // Aufstellung löschen (Leaderschaft + Rang 8 und 9)
   @Delete(':id')
-  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.ADMIN)
+  @Roles(Role.PATRON, Role.DON, Role.CAPO, Role.CONSULTORA, Role.PADRINO, Role.ADMIN)
   async deleteAufstellung(@Param('id') id: string) {
     return this.aufstellungService.deleteAufstellung(id);
   }

@@ -760,7 +760,7 @@ export class AufstellungService {
         },
       ],
       footer: {
-        text: '🌵 La Santa Cartel - Sistema de Aufstellungen',
+        text: '🌵 El Averno - Sistema de Aufstellungen',
       },
       timestamp: new Date().toISOString(),
     };
