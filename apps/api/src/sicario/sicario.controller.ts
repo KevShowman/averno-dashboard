@@ -5,6 +5,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Role, User, AufstellungResponseStatus } from '@prisma/client';
 import { SicarioService } from './sicario.service';
+import { fromZonedTime } from 'date-fns-tz';
 
 interface CreateSicarioAufstellungDto {
   date: string; // ISO string
@@ -50,15 +51,11 @@ export class SicarioController {
   ) {
     await this.checkAccess(user.id);
 
-    // Kombiniere Datum und Uhrzeit
-    const dateTimeStr = `${createDto.date}T${createDto.time}:00`;
-    const localDate = new Date(dateTimeStr);
-    
-    // Berlin Timezone Anpassung
-    const berlinOffset = -60;
-    const serverOffset = localDate.getTimezoneOffset();
-    const adjustmentMinutes = berlinOffset - serverOffset;
-    const berlinDate = new Date(localDate.getTime() + (adjustmentMinutes * 60 * 1000));
+    // Kombiniere Datum und Uhrzeit als Berliner Zeit und konvertiere nach UTC
+    const berlinDate = fromZonedTime(
+      `${createDto.date}T${createDto.time}:00`,
+      'Europe/Berlin',
+    );
 
     return this.sicarioService.createAufstellung(
       user.id,
