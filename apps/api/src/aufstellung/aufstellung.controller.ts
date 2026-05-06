@@ -6,6 +6,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Role, User, AufstellungResponseStatus } from '@prisma/client';
 import { AufstellungService } from './aufstellung.service';
 import { DiscordWebhookService } from './discord-webhook.service';
+import { fromZonedTime } from 'date-fns-tz';
 
 interface CreateAufstellungDto {
   date: string; // ISO string
@@ -39,23 +40,11 @@ export class AufstellungController {
     @Body() createDto: CreateAufstellungDto,
     @CurrentUser() user: User,
   ) {
-    // Kombiniere Datum und Uhrzeit als Berliner Zeit (UTC+1/UTC+2)
-    // Format: "2025-11-04T11:00:00" soll als 11:00 Berliner Zeit behandelt werden
-    const dateTimeStr = `${createDto.date}T${createDto.time}:00`;
-    
-    // Parse als ISO String und interpretiere in Europe/Berlin Zeitzone
-    // Wir erstellen ein Date-Objekt und passen dann die Timezone an
-    const localDate = new Date(dateTimeStr);
-    
-    // Berechne Offset zwischen Server-Timezone und Berlin
-    // Wenn Server in UTC läuft: getTimezoneOffset() = 0
-    // Berlin ist UTC+1 (Winter) oder UTC+2 (Sommer)
-    // Wir müssen 1-2 Stunden ADDIEREN, weil Berlin "später" ist als UTC
-    const berlinOffset = -60; // -60 Minuten = UTC+1 (CET im Winter)
-    const serverOffset = localDate.getTimezoneOffset();
-    const adjustmentMinutes = berlinOffset - serverOffset;
-    
-    const berlinDate = new Date(localDate.getTime() + (adjustmentMinutes * 60 * 1000));
+    // Kombiniere Datum und Uhrzeit als Berliner Zeit und konvertiere nach UTC
+    const berlinDate = fromZonedTime(
+      `${createDto.date}T${createDto.time}:00`,
+      'Europe/Berlin',
+    );
     
     const aufstellung = await this.aufstellungService.createAufstellung(
       user.id,
