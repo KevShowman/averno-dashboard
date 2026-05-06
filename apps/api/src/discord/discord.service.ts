@@ -665,7 +665,7 @@ export class DiscordService {
 
         return {
           discordId: member.user.id,
-          username: member.user.username,
+          username: member.nick || member.user?.display_name || member.user?.username, // Server-Nickname bevorzugen (wie beim Import)
           discriminator: member.user.discriminator,
           avatar: member.user.avatar,
           discordRoles: member.roles,
