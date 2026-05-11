@@ -111,7 +111,7 @@ export default function NotizenPage() {
   const canDeleteNote = (note: Note) => {
     if (!user) return false
     if (user.id === note.createdById) return true
-    if (hasListPermission) return true
+    if (isLeadership) return true
     return false
   }
 

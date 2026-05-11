@@ -128,8 +128,9 @@ export class NotesService {
     const note = await this.prisma.note.findUnique({ where: { id } });
     if (!note) throw new NotFoundException('Notiz nicht gefunden');
 
-    if (!(await this.canEditNote(user, note.createdById))) {
-      throw new ForbiddenException('Keine Berechtigung zum Löschen dieser Notiz');
+    const canDelete = user.id === note.createdById || this.isLeadership(user);
+    if (!canDelete) {
+      throw new ForbiddenException('Nur der Ersteller oder die Führung kann Notizen löschen');
     }
 
     return this.prisma.note.delete({ where: { id } });
