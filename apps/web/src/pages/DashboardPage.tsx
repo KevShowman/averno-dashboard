@@ -35,7 +35,8 @@ import {
   Network,
   BookOpen,
   Map,
-  Languages
+  Languages,
+  StickyNote
 } from 'lucide-react'
 import { formatCurrency, hasRole } from '../lib/utils'
 
@@ -110,6 +111,7 @@ export default function DashboardPage() {
     { key: 'communication', name: 'Funk/DarkChat', icon: Radio, desc: 'Funkfrequenzen' },
     // { key: 'botschaft', name: 'Botschaft', icon: ScrollText, desc: 'Familia-News' }, // hidden
     { key: 'listenfuehrung', name: 'Listenführung', icon: BookOpen, desc: 'Familien-Kontakte' },
+    { key: 'notizen', name: 'Notizen', icon: StickyNote, desc: 'Notizen & Verlauf' },
     { key: 'karte', name: 'Interaktive Karte', icon: Map, desc: 'Territorien & Standorte' },
     { key: 'slang', name: 'Akzent / Slang', icon: Languages, desc: 'Spanischer Akzent' },
     { key: 'la-casa', name: 'La Casa', icon: Home, desc: 'Unser Zuhause' },
