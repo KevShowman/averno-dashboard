@@ -94,6 +94,9 @@ model User {
   equipmentVestsCreated            EquipmentVest[]                @relation("equipment_vest_created_by")
   equipmentAmmo                    EquipmentAmmo[]                @relation("equipment_ammo")
   equipmentAmmoCreated             EquipmentAmmo[]                @relation("equipment_ammo_created_by")
+  // Notizen System
+  notesCreated                     Note[]                         @relation("note_created_by")
+  notesArchived                    Note[]                         @relation("note_archived_by")
 
   @@map("users")
 }
@@ -1325,6 +1328,23 @@ model EquipmentAmmo {
   updatedAt       DateTime @updatedAt
 
   @@map("equipment_ammo")
+}
+
+// ============ NOTIZEN SYSTEM ============
+
+model Note {
+  id           String    @id @default(cuid())
+  content      String    @db.Text
+  isArchived   Boolean   @default(false)
+  archivedAt   DateTime?
+  archivedById String?
+  archivedBy   User?     @relation("note_archived_by", fields: [archivedById], references: [id], onDelete: SetNull)
+  createdById  String
+  createdBy    User      @relation("note_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("notes")
 }
 
 // Discord Role Mappings

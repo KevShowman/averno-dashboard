@@ -46,6 +46,7 @@ import TafelrundePage from './pages/TafelrundePage'
 import TaxiKeyPage from './pages/TaxiKeyPage'
 import TaxiDashboardPage from './pages/TaxiDashboardPage'
 import EquipmentPage from './pages/EquipmentPage'
+import NotizenPage from './pages/NotizenPage'
 
 // Wrapper to show Listenführung - Partner haben jetzt vollen Zugang
 function ListenfuehrungWrapper() {
@@ -311,6 +312,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <ListenfuehrungWrapper />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/notizen" element={
+          <ProtectedRoute>
+            <Layout>
+              <NotizenPage />
             </Layout>
           </ProtectedRoute>
         } />

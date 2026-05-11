@@ -33,6 +33,7 @@ import { PartnerModule } from './partner/partner.module';
 import { TafelrundeModule } from './tafelrunde/tafelrunde.module';
 import { TaxiModule } from './taxi/taxi.module';
 import { EquipmentModule } from './equipment/equipment.module';
+import { NotesModule } from './notes/notes.module';
 import { ExclusionModule } from './common/exclusion/exclusion.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -81,6 +82,7 @@ import { AppService } from './app.service';
     TafelrundeModule,
     TaxiModule,
     EquipmentModule,
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

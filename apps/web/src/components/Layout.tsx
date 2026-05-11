@@ -34,7 +34,8 @@ import {
   Cog,
   BookOpen,
   Map,
-  Languages
+  Languages,
+  StickyNote
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { cn, getDisplayName, hasRole } from '../lib/utils'
@@ -156,6 +157,7 @@ const navGroups: NavGroup[] = [
       { name: 'Funk/DarkChat', href: '/communication', icon: Radio },
       // { name: 'Botschaft', href: '/botschaft', icon: ScrollText }, // hidden
       { name: 'Listenführung', href: '/listenfuehrung', icon: BookOpen },
+      { name: 'Notizen', href: '/notizen', icon: StickyNote },
       { name: 'Interaktive Karte', href: '/karte', icon: Map },
       { name: 'Tafelrunde', href: '/tafelrunde', icon: Users },
       { name: 'Akzent / Slang', href: '/slang', icon: Languages },
