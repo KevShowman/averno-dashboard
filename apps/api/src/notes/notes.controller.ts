@@ -32,6 +32,11 @@ export class NotesController {
     return this.notesService.toggleArchive(user, id);
   }
 
+  @Get(':id/history')
+  getHistory(@Param('id') id: string) {
+    return this.notesService.getHistory(id);
+  }
+
   @Delete(':id')
   delete(@CurrentUser() user: any, @Param('id') id: string) {
     return this.notesService.delete(user, id);

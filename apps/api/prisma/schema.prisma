@@ -97,6 +97,8 @@ model User {
   // Notizen System
   notesCreated                     Note[]                         @relation("note_created_by")
   notesArchived                    Note[]                         @relation("note_archived_by")
+  notesUpdated                     Note[]                         @relation("note_updated_by")
+  noteHistories                    NoteHistory[]                  @relation("note_history_edited_by")
 
   @@map("users")
 }
@@ -1333,18 +1335,34 @@ model EquipmentAmmo {
 // ============ NOTIZEN SYSTEM ============
 
 model Note {
-  id           String    @id @default(cuid())
-  content      String    @db.Text
-  isArchived   Boolean   @default(false)
+  id           String        @id @default(cuid())
+  content      String        @db.Text
+  isArchived   Boolean       @default(false)
   archivedAt   DateTime?
   archivedById String?
-  archivedBy   User?     @relation("note_archived_by", fields: [archivedById], references: [id], onDelete: SetNull)
+  archivedBy   User?         @relation("note_archived_by", fields: [archivedById], references: [id], onDelete: SetNull)
+  updatedById  String?
+  updatedBy    User?         @relation("note_updated_by", fields: [updatedById], references: [id], onDelete: SetNull)
   createdById  String
-  createdBy    User      @relation("note_created_by", fields: [createdById], references: [id], onDelete: Cascade)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdBy    User          @relation("note_created_by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  history      NoteHistory[]
 
   @@map("notes")
+}
+
+model NoteHistory {
+  id         String   @id @default(cuid())
+  noteId     String
+  note       Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  content    String   @db.Text
+  editedById String
+  editedBy   User     @relation("note_history_edited_by", fields: [editedById], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@map("note_history")
 }
 
 // Discord Role Mappings

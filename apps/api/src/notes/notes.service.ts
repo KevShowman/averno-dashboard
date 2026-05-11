@@ -1,6 +1,19 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 
+const USER_SELECT = {
+  id: true,
+  username: true,
+  icFirstName: true,
+  icLastName: true,
+};
+
+const NOTE_INCLUDE = {
+  createdBy: { select: USER_SELECT },
+  updatedBy: { select: USER_SELECT },
+  archivedBy: { select: USER_SELECT },
+};
+
 @Injectable()
 export class NotesService {
   constructor(private prisma: PrismaService) {}
@@ -31,24 +44,7 @@ export class NotesService {
         { isArchived: 'asc' },
         { createdAt: 'desc' },
       ],
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-        archivedBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-      },
+      include: NOTE_INCLUDE,
     });
   }
 
@@ -58,24 +54,7 @@ export class NotesService {
         content: data.content,
         createdById: user.id,
       },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-        archivedBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-      },
+      include: NOTE_INCLUDE,
     });
   }
 
@@ -83,32 +62,33 @@ export class NotesService {
     const note = await this.prisma.note.findUnique({ where: { id } });
     if (!note) throw new NotFoundException('Notiz nicht gefunden');
 
+    if (note.isArchived) {
+      throw new ForbiddenException('Archivierte Notizen können nicht bearbeitet werden');
+    }
+
     if (!(await this.canEditNote(user, note.createdById))) {
       throw new ForbiddenException('Keine Berechtigung zum Bearbeiten dieser Notiz');
     }
 
-    return this.prisma.note.update({
-      where: { id },
-      data: { content: data.content },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
+    const [updated] = await this.prisma.$transaction([
+      this.prisma.note.update({
+        where: { id },
+        data: {
+          content: data.content,
+          updatedById: user.id,
         },
-        archivedBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
+        include: NOTE_INCLUDE,
+      }),
+      this.prisma.noteHistory.create({
+        data: {
+          noteId: id,
+          content: data.content,
+          editedById: user.id,
         },
-      },
-    });
+      }),
+    ]);
+
+    return updated;
   }
 
   async toggleArchive(user: any, id: string) {
@@ -127,23 +107,19 @@ export class NotesService {
         archivedAt: nowArchived ? new Date() : null,
         archivedById: nowArchived ? user.id : null,
       },
+      include: NOTE_INCLUDE,
+    });
+  }
+
+  async getHistory(id: string) {
+    const note = await this.prisma.note.findUnique({ where: { id } });
+    if (!note) throw new NotFoundException('Notiz nicht gefunden');
+
+    return this.prisma.noteHistory.findMany({
+      where: { noteId: id },
+      orderBy: { createdAt: 'desc' },
       include: {
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
-        archivedBy: {
-          select: {
-            id: true,
-            username: true,
-            icFirstName: true,
-            icLastName: true,
-          },
-        },
+        editedBy: { select: USER_SELECT },
       },
     });
   }

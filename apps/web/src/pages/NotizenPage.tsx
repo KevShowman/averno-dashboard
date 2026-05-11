@@ -25,29 +25,35 @@ import {
   StickyNote,
   User,
   Clock,
+  History,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
+
+interface NoteUser {
+  id: string
+  username: string
+  icFirstName?: string
+  icLastName?: string
+}
 
 interface Note {
   id: string
   content: string
   isArchived: boolean
   archivedAt?: string
-  archivedBy?: {
-    id: string
-    username: string
-    icFirstName?: string
-    icLastName?: string
-  }
-  createdById: string
-  createdBy: {
-    id: string
-    username: string
-    icFirstName?: string
-    icLastName?: string
-  }
-  createdAt: string
+  archivedBy?: NoteUser
   updatedAt: string
+  updatedBy?: NoteUser
+  createdById: string
+  createdBy: NoteUser
+  createdAt: string
+}
+
+interface NoteHistoryEntry {
+  id: string
+  content: string
+  editedBy: NoteUser
+  createdAt: string
 }
 
 export default function NotizenPage() {
@@ -60,6 +66,8 @@ export default function NotizenPage() {
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [contentInput, setContentInput] = useState('')
 
+  const [historyNote, setHistoryNote] = useState<Note | null>(null)
+
   const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
 
   const { data: notes = [], isLoading } = useQuery<Note[]>({
@@ -70,7 +78,6 @@ export default function NotizenPage() {
     },
   })
 
-  // Check if current user has ListPermission (same as Listenführung)
   const { data: permissionData } = useQuery<{ hasPermission: boolean }>({
     queryKey: ['list-permission-me'],
     queryFn: async () => {
@@ -82,7 +89,24 @@ export default function NotizenPage() {
 
   const hasListPermission = isLeadership || permissionData?.hasPermission === true
 
+  const { data: historyEntries = [], isLoading: historyLoading } = useQuery<NoteHistoryEntry[]>({
+    queryKey: ['note-history', historyNote?.id],
+    queryFn: async () => {
+      const res = await api.get(`/notes/${historyNote!.id}/history`)
+      return res.data
+    },
+    enabled: !!historyNote,
+  })
+
   const canEditNote = (note: Note) => {
+    if (!user) return false
+    if (note.isArchived) return false
+    if (user.id === note.createdById) return true
+    if (hasListPermission) return true
+    return false
+  }
+
+  const canArchiveNote = (note: Note) => {
     if (!user) return false
     if (user.id === note.createdById) return true
     if (hasListPermission) return true
@@ -162,6 +186,9 @@ export default function NotizenPage() {
       minute: '2-digit',
     })
 
+  const wasEdited = (note: Note) =>
+    note.updatedBy && new Date(note.updatedAt) > new Date(note.createdAt)
+
   const renderNote = (note: Note) => (
     <Card
       key={note.id}
@@ -184,6 +211,12 @@ export default function NotizenPage() {
               <Clock className="h-3 w-3" />
               {formatDate(note.createdAt)}
             </span>
+            {wasEdited(note) && note.updatedBy && (
+              <span className="flex items-center gap-1 text-zinc-500">
+                <Pencil className="h-3 w-3" />
+                bearbeitet von {getDisplayName(note.updatedBy)} · {formatDate(note.updatedAt)}
+              </span>
+            )}
             {note.isArchived && note.archivedBy && (
               <span className="flex items-center gap-1 text-zinc-500">
                 <Archive className="h-3 w-3" />
@@ -192,16 +225,28 @@ export default function NotizenPage() {
               </span>
             )}
           </div>
-          {canEditNote(note) && (
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-zinc-400 hover:text-zinc-100"
+              onClick={() => setHistoryNote(note)}
+              title="Verlauf anzeigen"
+            >
+              <History className="h-3.5 w-3.5" />
+            </Button>
+            {canEditNote(note) && (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-zinc-400 hover:text-zinc-100"
                 onClick={() => openEditDialog(note)}
+                title="Bearbeiten"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
+            )}
+            {canArchiveNote(note) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -216,8 +261,8 @@ export default function NotizenPage() {
                   <Archive className="h-3.5 w-3.5" />
                 )}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -267,6 +312,7 @@ export default function NotizenPage() {
         </CardContent>
       </Card>
 
+      {/* Create / Edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -294,6 +340,54 @@ export default function NotizenPage() {
             <Button onClick={handleSubmit} disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {editingNote ? 'Speichern' : 'Hinzufügen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* History dialog */}
+      <Dialog open={!!historyNote} onOpenChange={(open) => !open && setHistoryNote(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Bearbeitungsverlauf
+            </DialogTitle>
+          </DialogHeader>
+
+          {historyLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : historyEntries.length === 0 ? (
+            <p className="py-6 text-center text-sm text-zinc-500">
+              Keine Bearbeitungen vorhanden
+            </p>
+          ) : (
+            <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
+              {historyEntries.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 p-3"
+                >
+                  <div className="mb-2 flex items-center gap-2 text-xs text-zinc-400">
+                    <User className="h-3 w-3" />
+                    <span>{getDisplayName(entry.editedBy)}</span>
+                    <span className="text-zinc-600">·</span>
+                    <Clock className="h-3 w-3" />
+                    <span>{formatDate(entry.createdAt)}</span>
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm text-zinc-300 leading-relaxed">
+                    {entry.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setHistoryNote(null)}>
+              Schließen
             </Button>
           </DialogFooter>
         </DialogContent>
