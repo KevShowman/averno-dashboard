@@ -26,6 +26,7 @@ import {
   User,
   Clock,
   History,
+  Trash2,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 
@@ -67,6 +68,7 @@ export default function NotizenPage() {
   const [contentInput, setContentInput] = useState('')
 
   const [historyNote, setHistoryNote] = useState<Note | null>(null)
+  const [deleteConfirmNote, setDeleteConfirmNote] = useState<Note | null>(null)
 
   const isLeadership = hasRole(user, ['PATRON', 'DON', 'CAPO', 'ADMIN'])
 
@@ -106,6 +108,13 @@ export default function NotizenPage() {
     return false
   }
 
+  const canDeleteNote = (note: Note) => {
+    if (!user) return false
+    if (user.id === note.createdById) return true
+    if (hasListPermission) return true
+    return false
+  }
+
   const canArchiveNote = (note: Note) => {
     if (!user) return false
     if (user.id === note.createdById) return true
@@ -132,6 +141,16 @@ export default function NotizenPage() {
       closeDialog()
     },
     onError: () => toast.error('Fehler beim Speichern der Notiz'),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/notes/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] })
+      toast.success('Notiz gelöscht')
+      setDeleteConfirmNote(null)
+    },
+    onError: () => toast.error('Fehler beim Löschen der Notiz'),
   })
 
   const archiveMutation = useMutation({
@@ -262,6 +281,17 @@ export default function NotizenPage() {
                 )}
               </Button>
             )}
+            {canDeleteNote(note) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-zinc-400 hover:text-red-400"
+                onClick={() => setDeleteConfirmNote(note)}
+                title="Löschen"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
@@ -345,6 +375,31 @@ export default function NotizenPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!deleteConfirmNote} onOpenChange={(open) => !open && setDeleteConfirmNote(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Notiz löschen?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-zinc-400">
+            Diese Aktion kann nicht rückgängig gemacht werden. Der gesamte Verlauf wird ebenfalls gelöscht.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmNote(null)} disabled={deleteMutation.isPending}>
+              Abbrechen
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteConfirmNote && deleteMutation.mutate(deleteConfirmNote.id)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Löschen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* History dialog */}
       <Dialog open={!!historyNote} onOpenChange={(open) => !open && setHistoryNote(null)}>
         <DialogContent className="sm:max-w-lg">
@@ -365,12 +420,19 @@ export default function NotizenPage() {
             </p>
           ) : (
             <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
-              {historyEntries.map((entry) => (
+              {historyEntries.map((entry, idx) => {
+                const isOriginal = idx === historyEntries.length - 1
+                return (
                 <div
                   key={entry.id}
                   className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 p-3"
                 >
                   <div className="mb-2 flex items-center gap-2 text-xs text-zinc-400">
+                    {isOriginal && (
+                      <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                        Original
+                      </span>
+                    )}
                     <User className="h-3 w-3" />
                     <span>{getDisplayName(entry.editedBy)}</span>
                     <span className="text-zinc-600">·</span>
@@ -381,7 +443,8 @@ export default function NotizenPage() {
                     {entry.content}
                   </p>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
 

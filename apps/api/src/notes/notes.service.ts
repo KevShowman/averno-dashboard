@@ -82,7 +82,7 @@ export class NotesService {
       this.prisma.noteHistory.create({
         data: {
           noteId: id,
-          content: data.content,
+          content: note.content, // save the old content before overwriting
           editedById: user.id,
         },
       }),
