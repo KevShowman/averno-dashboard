@@ -35,11 +35,17 @@ export class MapAnnotationsService {
       return true;
     }
 
-    // Prüfe MapPermission
-    const permission = await this.prisma.mapPermission.findUnique({
+    // Prüfe ListPermission (Listenführung-Berechtigte dürfen direkt Annotationen erstellen)
+    const listPermission = await this.prisma.listPermission.findUnique({
       where: { userId: user.id },
     });
-    return !!permission;
+    if (listPermission) return true;
+
+    // Prüfe MapPermission
+    const mapPermission = await this.prisma.mapPermission.findUnique({
+      where: { userId: user.id },
+    });
+    return !!mapPermission;
   }
 
   // Prüft ob User Leadership ist (für Berechtigungsverwaltung)
