@@ -456,7 +456,6 @@ export default function KartePage() {
     enabled: !canManageByRole,
   })
   const hasMapPermission = !canManageByRole && myMapPermission?.hasPermission === true
-  const canManage = canManageByRole || hasMapPermission || hasListPermission
 
   // Users who can view family contact details (Leadership, Contacto, ListPermission, or Partners with explicit permission)
   const { data: myListPermission } = useQuery<{ hasPermission: boolean }>({
@@ -467,6 +466,8 @@ export default function KartePage() {
   const hasListPermission = myListPermission?.hasPermission === true
   const partnerCanViewContacts = (user as any)?.partnerCanViewContacts === true
   const canViewContactDetails = isLeadership || isContacto || hasListPermission || (isPartner && partnerCanViewContacts)
+
+  const canManage = canManageByRole || hasMapPermission || hasListPermission
   
   // Fetch annotations for current map
   const { data: annotations = [], isLoading } = useQuery({
